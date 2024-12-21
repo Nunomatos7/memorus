@@ -133,7 +133,7 @@ const renderPosts = () => {
         >
           {post.date}
         </p>
-        <img src={post.imgSrc} alt="1" style={{ height: "60%" }} />
+        <img src={post.imgSrc} alt='1' style={{ height: "60%" }} />
         <h1
           style={{
             color: "black",
