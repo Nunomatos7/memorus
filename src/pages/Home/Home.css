@@ -1,0 +1,84 @@
+section {
+  max-height: 400px;
+}
+.latest-wrapper {
+  height: clamp(225px, 10vw, 300px);
+  overflow: visible !important;
+}
+
+.home-title {
+  font-size: 2rem !important;
+}
+
+.latest-memors {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  width: 100px;
+  height: 100%;
+  border: 2px dashed #cfd0d0;
+  border-radius: 10px;
+  padding: 5px;
+  overflow: hidden;
+}
+
+.latest-memors-pic {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  width: 100px;
+  height: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+}
+
+.image-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+}
+
+.image-wrapper::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to top, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
+  pointer-events: none;
+}
+
+.image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+}
+
+.latest-memors-content {
+  position: absolute;
+  bottom: 0.625rem;
+  left: 0.625rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.team-name {
+  color: #d0bcfe;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+#myMemors h2 {
+  color: #fff;
+  font-size: 1.5rem;
+  font-style: normal;
+  font-weight: 700;
+}
