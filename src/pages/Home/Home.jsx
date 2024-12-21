@@ -1,10 +1,21 @@
 import { useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Mousewheel, FreeMode } from "swiper/modules";
+import { Grid, Card, CardContent, Typography, Box } from "@mui/material";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import PersonIcon from "@mui/icons-material/Person";
 import MemorPicture from "./../../Components/MemorPicture/MemorPicture";
 import "swiper/css";
 import "swiper/css/free-mode";
 import "./Home.css";
+import WelcomeModal from "../../Components/WelcomeModal/WelcomeModal";
+
+const cardStyle = {
+  backgroundColor: "#1E1E1E",
+  color: "white",
+  borderRadius: "10px",
+  minHeight: "150px",
+};
 
 const slidesData = [
   {
@@ -23,7 +34,6 @@ const slidesData = [
     title: "Show us your city",
     description: "We bet it must look nice :)",
     submitDate: "8 days ago",
-    // fazer função para calcular o tempo restante
     image:
       "https://media.istockphoto.com/id/1368628035/photo/brooklyn-bridge-at-sunset.jpg?s=612x612&w=0&k=20&c=hPbMbTYRAVNYWAUMkl6r62fPIjGVJTXzRURCyCfoG08=",
   },
@@ -47,6 +57,7 @@ const Home = () => {
 
   return (
     <>
+      <WelcomeModal />
       <section className='mb-10'>
         <div className='container mb-3'>
           <h1 className='home-title'>
@@ -121,7 +132,85 @@ const Home = () => {
       </section>
 
       <section id='myMemors' className='mb-10 container'>
-        <h2>My memors</h2>
+        <Typography variant='h6' gutterBottom style={{ color: "white" }}>
+          My Memors
+        </Typography>
+        <Grid container spacing={3}>
+          {/* Pending Memors */}
+          <Grid item xs={12} sm={4}>
+            <Card style={cardStyle}>
+              <CardContent>
+                <Box
+                  display='flex'
+                  alignItems='center'
+                  justifyContent='space-between'
+                >
+                  <Typography variant='h4' fontWeight='bold'>
+                    3
+                  </Typography>
+                  <AccessTimeIcon
+                    style={{ color: "#9F80FF", fontSize: "30px" }}
+                  />
+                </Box>
+                <Typography variant='body2' color='#B0B0B0'>
+                  Pending Memors
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          {/* Completed Memors */}
+          <Grid item xs={12} sm={4}>
+            <Card style={cardStyle}>
+              <CardContent>
+                <Box
+                  display='flex'
+                  alignItems='center'
+                  justifyContent='space-between'
+                >
+                  <Typography variant='h4' fontWeight='bold'>
+                    --
+                  </Typography>
+                  <PersonIcon style={{ color: "#9F80FF", fontSize: "30px" }} />
+                </Box>
+                <Typography variant='body2' color='#B0B0B0'>
+                  Completed Memors
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          {/* Remaining Time */}
+          <Grid item xs={12} sm={4}>
+            <Card style={cardStyle}>
+              <CardContent>
+                <div className='flex justify-between items-center'>
+                  <Typography
+                    variant='h4'
+                    fontWeight='bold'
+                    fontSize={"1.5rem"}
+                  >
+                    Remaining time
+                  </Typography>
+                  <Typography
+                    variant='h3'
+                    fontWeight='bold'
+                    color='white'
+                    style={{ margin: "10px 0", fontSize: "2.5rem" }}
+                  >
+                    20 days
+                  </Typography>
+                </div>
+                <Typography variant='body2' color='#B0B0B0'>
+                  The theme of this competition is:{" "}
+                  <span style={{ color: "white", fontWeight: "bold" }}>
+                    Christmas
+                  </span>
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
       </section>
     </>
   );

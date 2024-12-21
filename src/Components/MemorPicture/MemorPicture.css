@@ -14,7 +14,7 @@
 .modal-content {
   position: relative;
   max-width: clamp(300px, 90%, 800px);
-  max-height: 90vh; /* Adjusted to be 90% of the viewport height */
+  max-height: 90vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -64,10 +64,10 @@
 
 @media (max-width: 768px) {
   .modal-sub-content h2 {
-    font-size: 1.5rem; /* Slightly smaller for smaller screens */
+    font-size: 1.5rem;
   }
 
   .modal-sub-content p {
-    font-size: 1rem; /* Reduce size for better fit */
+    font-size: 1rem;
   }
 }

@@ -1,11 +1,26 @@
+import { useState, useEffect } from "react";
 import "./WelcomeModal.css";
 import { styled } from "@mui/material/styles";
 import Button from "@mui/material/Button";
 
 const WelcomeModal = () => {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const hasClickedBegin = localStorage.getItem("hasClickedBegin");
+    if (!hasClickedBegin) {
+      setIsVisible(true);
+    }
+  }, []);
+
+  const handleBeginClick = () => {
+    localStorage.setItem("hasClickedBegin", "true");
+    setIsVisible(false);
+  };
+
   const BeginButton = styled(Button)({
     color: "#381E72",
-    backgroundColor: "#D0BCFF", //Enquanto não houver cores mesmo estabelecidas fica assim ¯\_(ツ)_/¯
+    backgroundColor: "#D0BCFF",
     textAlign: "center",
     fontFamily: "Poppins, sans-serif",
     fontSize: "0.8rem",
@@ -22,6 +37,8 @@ const WelcomeModal = () => {
       outline: "none",
     },
   });
+
+  if (!isVisible) return null;
 
   return (
     <div className='modal-back'>
@@ -52,7 +69,9 @@ const WelcomeModal = () => {
           <span>The Debuggers</span>
         </div>
         <div className='text-right'>
-          <BeginButton variant='contained'>Let&apos;s Begin</BeginButton>
+          <BeginButton variant='contained' onClick={handleBeginClick}>
+            Let&apos;s Begin
+          </BeginButton>
         </div>
       </div>
     </div>
