@@ -14,7 +14,10 @@
 .modal-content {
   position: relative;
   max-width: clamp(300px, 90%, 800px);
-  max-height: clamp(300px, 90%, 900px);
+  max-height: 90vh; /* Adjusted to be 90% of the viewport height */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .modal-sub-content {
@@ -24,7 +27,6 @@
 
 .modal-sub-content h2 {
   color: #fff;
-
   text-align: center;
   font-size: 1.85rem;
   font-style: normal;
@@ -43,9 +45,11 @@
 
 .modal-content img {
   width: auto;
-  height: 100%;
+  max-width: 100%;
+  max-height: 70vh;
   border-radius: 10px;
   user-select: none;
+  object-fit: contain;
 }
 
 .modal-close {
@@ -56,4 +60,14 @@
   cursor: pointer;
   font-size: 30px;
   border-radius: 5px;
+}
+
+@media (max-width: 768px) {
+  .modal-sub-content h2 {
+    font-size: 1.5rem; /* Slightly smaller for smaller screens */
+  }
+
+  .modal-sub-content p {
+    font-size: 1rem; /* Reduce size for better fit */
+  }
 }
