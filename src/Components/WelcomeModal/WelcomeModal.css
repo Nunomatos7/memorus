@@ -1,0 +1,47 @@
+.welcome-modal {
+  background-color: #232627;
+  color: white;
+  border-radius: 1.5rem;
+  width: clamp(18.75rem, 50%, 31.25rem);
+  padding: 2.5rem;
+  padding-bottom: 2rem;
+}
+
+.welcome-modal p:first-of-type {
+  font-size: 1.125rem;
+}
+
+.welcome-modal p {
+  font-size: 0.875rem;
+  margin-bottom: 0.625rem;
+}
+
+.modal-title {
+  font-size: 2rem;
+}
+
+.welcome-modal .user {
+  color: #82d5c7;
+}
+
+.team {
+  border-radius: 0.75rem;
+  color: #82d5c7;
+  padding: 1rem;
+  font-size: 1.75rem;
+  border: 0.125rem solid #49454f;
+  background-color: #18141c;
+  margin-top: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9375rem;
+  margin-bottom: 1.5rem;
+}
+
+.team .team-image {
+  width: 4.375rem;
+  height: 4.375rem;
+  border-radius: 50%;
+  object-fit: cover;
+}
