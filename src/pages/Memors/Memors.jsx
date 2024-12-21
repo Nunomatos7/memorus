@@ -149,6 +149,12 @@ const Memors = () => {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [selectedMemor, setSelectedMemor] = useState(null);
 	const [ongoingMemors, setOngoingMemors] = useState(initialOngoingMemors);
+	const [isDragging, setIsDragging] = useState(false);
+	const [startX, setStartX] = useState(0);
+	const [scrollLeft, setScrollLeft] = useState(0);
+
+	const scrollRef = React.useRef();
+
 
 	const handleTabChange = (_, newValue) => {
 		setTab(newValue);
@@ -184,6 +190,25 @@ const Memors = () => {
 		);
 		handleCloseModal();
 	};
+
+	const handleMouseDown = (e) => {
+		setIsDragging(true);
+		setStartX(e.pageX - scrollRef.current.offsetLeft);
+		setScrollLeft(scrollRef.current.scrollLeft);
+	};
+	
+	const handleMouseMove = (e) => {
+		if (!isDragging) return;
+		e.preventDefault();
+		const x = e.pageX - scrollRef.current.offsetLeft;
+		const walk = (x - startX) * 2; // The `2` here controls scroll speed
+		scrollRef.current.scrollLeft = scrollLeft - walk;
+	};
+	
+	const handleMouseUpOrLeave = () => {
+		setIsDragging(false);
+	};
+	
 
 	const filteredMemors = allMemors.filter((memor) => {
 		const matchesSearch = memor.title
@@ -222,7 +247,13 @@ const Memors = () => {
 						"&::-webkit-scrollbar": {
 							display: "none",
 						},
+						cursor: isDragging ? "grabbing" : "grab",
 					}}
+					ref={scrollRef}
+					onMouseDown={handleMouseDown}
+					onMouseMove={handleMouseMove}
+					onMouseUp={handleMouseUpOrLeave}
+					onMouseLeave={handleMouseUpOrLeave}
 				>
 					{ongoingMemors.map((memor, index) => (
 						<Card
@@ -326,6 +357,7 @@ const Memors = () => {
 									gap: "8px",
 									padding: "8px 16px",
 									cursor: "pointer",
+									width: "fit-content",
 								}}
 								onClick={() => handleOpenModal(memor)}
 							>
