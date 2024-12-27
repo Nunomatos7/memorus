@@ -28,10 +28,8 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
 
   const handleSubmit = () => {
     if (uploadedImage) {
-      // Call onSubmit immediately to notify the parent
       onSubmit();
   
-      // Set feedback state for positive feedback
       setFeedback({
         type: "success",
         title: "You submitted a Memor",
@@ -46,7 +44,7 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
           "Please upload an image before submitting! Try again or check the details.",
       });
   
-      setIsSubmitMemorOpen(false); // Close SubmitMemorModal for the feedback modal
+      setIsSubmitMemorOpen(false);
     }
   };
   

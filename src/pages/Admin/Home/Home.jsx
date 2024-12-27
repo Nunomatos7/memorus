@@ -48,7 +48,7 @@ const Home = () => {
   const [selectedSlide, setSelectedSlide] = useState(null);
 
   const handleImageClick = (slide) => {
-    setSelectedSlide(slide); // Pass the entire slide object
+    setSelectedSlide(slide);
   };
 
   const closeModal = () => {

@@ -151,12 +151,6 @@ const Memors = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedMemor, setSelectedMemor] = useState(null);
   const [ongoingMemors, setOngoingMemors] = useState(initialOngoingMemors);
-  const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [scrollLeft, setScrollLeft] = useState(0);
-
-  const scrollRef = React.useRef();
-
   const handleTabChange = (_, newValue) => {
     setTab(newValue);
   };
@@ -189,24 +183,6 @@ const Memors = () => {
           : memor
       )
     );
-  };
-
-  const handleMouseDown = (e) => {
-    setIsDragging(true);
-    setStartX(e.pageX - scrollRef.current.offsetLeft);
-    setScrollLeft(scrollRef.current.scrollLeft);
-  };
-
-  const handleMouseMove = (e) => {
-    if (!isDragging) return;
-    e.preventDefault();
-    const x = e.pageX - scrollRef.current.offsetLeft;
-    const walk = (x - startX) * 2; // The `2` here controls scroll speed
-    scrollRef.current.scrollLeft = scrollLeft - walk;
-  };
-
-  const handleMouseUpOrLeave = () => {
-    setIsDragging(false);
   };
 
   const filteredMemors = allMemors.filter((memor) => {
@@ -392,7 +368,7 @@ const Memors = () => {
         <SubmitMemorModal
           memor={selectedMemor}
           onClose={handleCloseModal}
-          onSubmit={() => handleSubmitMemor(selectedMemor.id)} // Pass the memor's unique ID
+          onSubmit={() => handleSubmitMemor(selectedMemor.id)}
         />
       )}
 
