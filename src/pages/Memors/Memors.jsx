@@ -189,7 +189,6 @@ const Memors = () => {
           : memor
       )
     );
-    handleCloseModal();
   };
 
   const handleMouseDown = (e) => {
