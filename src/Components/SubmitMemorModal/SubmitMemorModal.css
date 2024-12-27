@@ -3,7 +3,6 @@
   height: 100vh;
 }
 
-/* Overlay */
 .modal-overlay-submit-memor {
   position: fixed;
   top: 0;
@@ -17,7 +16,6 @@
   z-index: 1000;
 }
 
-/* Modal Container */
 .modal-container {
   width: 35vw;
   max-width: 550px;
@@ -163,7 +161,6 @@
   font-size: 14px;
 }
 
-/* Actions */
 .modal-actions {
   margin-top: 20px;
   display: flex;
@@ -186,7 +183,6 @@
   color: white;
 }
 
-/* Back Button */
 .back-button {
   background: none;
   border: none;
@@ -226,7 +222,6 @@
   align-items: center;
 }
 
-/* Hidden file input */
 .file-input {
   position: absolute;
   opacity: 0;
@@ -235,7 +230,6 @@
   cursor: pointer;
 }
 
-/* Wrapper for the file input */
 .upload-input-wrapper {
   position: relative;
   display: flex;

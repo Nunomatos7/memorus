@@ -4,11 +4,11 @@ import { Mousewheel, FreeMode } from "swiper/modules";
 import { Grid, Card, CardContent, Typography, Box } from "@mui/material";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import PersonIcon from "@mui/icons-material/Person";
-import MemorPicture from "./../../Components/MemorPicture/MemorPicture";
+import MemorPicture from "../../../Components/MemorPicture/MemorPicture";
 import "swiper/css";
 import "swiper/css/free-mode";
 import "./Home.css";
-import WelcomeModal from "../../Components/WelcomeModal/WelcomeModal";
+import WelcomeModal from "../../../Components/WelcomeModal/WelcomeModal";
 
 const cardStyle = {
   backgroundColor: "#1E1E1E",
@@ -48,7 +48,7 @@ const Home = () => {
   const [selectedSlide, setSelectedSlide] = useState(null);
 
   const handleImageClick = (slide) => {
-    setSelectedSlide(slide); // Pass the entire slide object
+    setSelectedSlide(slide);
   };
 
   const closeModal = () => {
@@ -61,7 +61,7 @@ const Home = () => {
       <section className='mb-10'>
         <div className='container mb-3'>
           <h1 className='home-title'>
-            Latest Memors • <span className='team-name'>The Debuggers</span>
+            Latest Memors
           </h1>
         </div>
 
