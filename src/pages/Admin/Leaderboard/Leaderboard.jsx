@@ -4,9 +4,9 @@ import Grid from "@mui/material/Grid2";
 import rank1 from "../../../assets/images/adminRank1.svg";
 import rank2 from "../../../assets/images/adminRank2.svg";
 import rank3 from "../../../assets/images/adminRank3.svg";
-import background1 from "../../../assets/images/background1.svg";
-import background2 from "../../../assets/images/background2.svg";
-import background3 from "../../../assets/images/background3.svg";
+import background1 from "../../../assets/images/adminBackground1.svg";
+import background3 from "../../../assets/images/adminBackground2.svg";
+import background2 from "../../../assets/images/adminBackground3.svg";
 
 const leaderboardData = [
 	{
