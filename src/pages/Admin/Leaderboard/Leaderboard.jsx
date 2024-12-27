@@ -1,12 +1,12 @@
 import React from "react";
 import { Box, Typography, Card, Avatar } from "@mui/material";
 import Grid from "@mui/material/Grid2";
-import rank1 from "../../assets/images/rank1.svg";
-import rank2 from "../../assets/images/rank2.svg";
-import rank3 from "../../assets/images/rank3.svg";
-import background1 from "../../assets/images/background1.svg";
-import background2 from "../../assets/images/background2.svg";
-import background3 from "../../assets/images/background3.svg";
+import rank1 from "../../../assets/images/adminRank1.svg";
+import rank2 from "../../../assets/images/adminRank2.svg";
+import rank3 from "../../../assets/images/adminRank3.svg";
+import background1 from "../../../assets/images/background1.svg";
+import background2 from "../../../assets/images/background2.svg";
+import background3 from "../../../assets/images/background3.svg";
 
 const leaderboardData = [
 	{
@@ -145,12 +145,14 @@ const Leaderboard = () => {
 						justifyContent: "center",
 						marginBottom: "40px",
 						alignItems: "end",
+						display: "flex",
+						flexWrap: "wrap",
 					}}
 				>
 					<Grid sx={{ width: "calc(30% - 20px)", maxWidth: "400px", minWidth: "300px" }} xs={12} sm={4}>
 						<Card
 							sx={{
-								backgroundColor: "#381e72",
+								backgroundColor: "#003731",
 								borderRadius: "20px",
 								textAlign: "center",
 								color: "white",
@@ -182,7 +184,7 @@ const Leaderboard = () => {
 								<Typography
 									variant="h6"
 									sx={{
-										color: "#D0BCFE",
+										color: "#82D5C7",
 									}}
 								>
 									{leaderboardData[1].teamName}
@@ -229,7 +231,8 @@ const Leaderboard = () => {
 					<Grid sx={{ width: "calc(38% - 20px)", maxWidth: "500px", minWidth: "300px" }} xs={12} sm={4}>
 						<Card
 							sx={{
-								backgroundColor: "#d0bcfe",
+								border: "1.358px solid var(--Schemes-Primary, #82D5C7)",
+								background: "var(--Schemes-Primary, #82D5C7)",
 								borderRadius: "20px",
 								textAlign: "center",
 								color: "white",
@@ -261,7 +264,8 @@ const Leaderboard = () => {
 								<Typography
 									variant="h6"
 									sx={{
-										color: "#381e72",
+										color: "#003731",
+										fontWeight: "bold",
 									}}
 								>
 									{leaderboardData[0].teamName}
@@ -279,7 +283,7 @@ const Leaderboard = () => {
 								<Typography
 									variant="h4"
 									sx={{
-										color: "#381e72",
+										color: "#003731",
 										fontWeight: "bold",
 										fontSize: "3rem",
 									}}
@@ -290,7 +294,7 @@ const Leaderboard = () => {
 									variant="body1"
 									sx={{
 										marginTop: "5px",
-										color: "#381e72",
+										color: "#003731",
 										fontSize: "1.4rem",
 									}}
 								>
@@ -313,8 +317,9 @@ const Leaderboard = () => {
 					<Grid sx={{ width: "calc(30% - 20px)", maxWidth: "350px", minWidth: "300px" }} xs={12} sm={4}>
 						<Card
 							sx={{
+								borderRadius: "22.626px",
+								border: "2.715px solid #333738",
 								backgroundColor: "#232627",
-								borderRadius: "20px",
 								textAlign: "center",
 								color: "white",
 								padding: "20px",
@@ -345,7 +350,7 @@ const Leaderboard = () => {
 								<Typography
 									variant="h6"
 									sx={{
-										color: "#D0BCFE",
+										color: "#82D5C7",
 									}}
 								>
 									{leaderboardData[2].teamName}
