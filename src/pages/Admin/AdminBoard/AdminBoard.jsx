@@ -6,6 +6,7 @@ import {
   Tab,
   Tabs,
   TextField,
+  Checkbox,
 } from "@mui/material";
 import background1 from "../../../assets/images/adminBackground1.svg";
 import background3 from "../../../assets/images/adminBackground2.svg";
@@ -19,6 +20,7 @@ import {
   KeyboardArrowDown,
   KeyboardArrowUp,
 } from "@mui/icons-material";
+import ConfirmationModal from "../../../Components/ConfirmationModal/ConfirmationModal";
 
 const AdminBoard = () => {
   const [tab, setTab] = useState("memors");
@@ -30,6 +32,19 @@ const AdminBoard = () => {
     setTab2(newValue);
   };
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery2, setSearchQuery2] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingTeam, setEditingTeam] = useState(null);
+  const [editedMembers, setEditedMembers] = useState({});
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalData, setModalData] = useState({
+    action: "",
+    memberName: "",
+    memberEmail: "",
+    teamName: "",
+  });
+  const [deleteTeamModalOpen, setDeleteTeamModalOpen] = useState(false);
+  const [teamToDelete, setTeamToDelete] = useState(null);
 
   const memors = [
     {
@@ -87,6 +102,32 @@ const AdminBoard = () => {
       teamsLeft: 1,
     },
   ];
+
+  const [teams, setTeams] = useState({
+    "Visual Voyagers": [
+      "johndoe@abc.com",
+      "janedoe@abc.com",
+      "johnsmith@abc.com",
+      "janesmith@abc.com",
+    ],
+    "Code Crushers": [
+      "charliebrown@abc.com",
+      "lucybrown@abc.com",
+      "snoopybrown@abc.com",
+      "woodstockbrown@abc.com",
+    ],
+    "Design Divas": ["alice@abc.com", "bob@abc.com", "eve@abc.com"],
+    "Marketing Mavericks": [
+      "tonystark@abc.com",
+      "pepperpotts@abc.com",
+      "peterparker@abc.com",
+    ],
+    "Sales Superstars": [
+      "steverogers@abc.com",
+      "natasharomanoff@abc.com",
+      "brucebanner@abc.com",
+    ],
+  });
 
   const members = [
     {
@@ -150,6 +191,11 @@ const AdminBoard = () => {
       team: "Marketing Mavericks",
     },
     {
+      name: "Thor Odinson",
+      email: "thorOdinson@abc.com",
+      team: "",
+    },
+    {
       name: "Pepper Potts",
       email: "pepperpotts@abc.com",
       team: "Marketing Mavericks",
@@ -174,17 +220,17 @@ const AdminBoard = () => {
       email: "brucebanner@abc.com",
       team: "Sales Superstars",
     },
+    {
+      name: "Loki Laufeyson",
+      email: "lokilaufaeyson@abc.com",
+      team: "",
+    },
   ];
 
   const [expandedIndex, setExpandedIndex] = useState(null);
-  const [expandedTeam, setExpandedTeam] = useState(null);
 
   const toggleExpand = (index) => {
     setExpandedIndex(expandedIndex === index ? null : index);
-  };
-
-  const toggleTeamExpand = (teamName) => {
-    setExpandedTeam(expandedTeam === teamName ? null : teamName);
   };
 
   const filteredMemors = memors
@@ -198,12 +244,86 @@ const AdminBoard = () => {
       return true;
     });
 
-  const teams = members.reduce((acc, member) => {
-    const team = member.team || "No Team Assigned";
-    if (!acc[team]) acc[team] = [];
-    acc[team].push(member);
-    return acc;
-  }, {});
+  const filteredMembers = Object.values(members).filter((member) =>
+    member.name.toLowerCase().includes(searchQuery2.toLowerCase())
+  );
+
+  const startEditing = (teamName) => {
+    setEditingTeam(teamName);
+    const currentMembers = teams[teamName] || [];
+    setEditedMembers(
+      members.reduce((acc, member) => {
+        acc[member.email] = currentMembers.includes(member.email);
+        return acc;
+      }, {})
+    );
+    setIsEditing(true);
+  };
+
+  const handleCheckboxToggle = (email, name, action) => {
+    setModalData({
+      action,
+      memberName: name,
+      memberEmail: email,
+      teamName: editingTeam,
+    });
+    setModalOpen(true);
+  };
+
+  const handleModalConfirm = () => {
+    const { memberEmail, action } = modalData;
+    setEditedMembers((prev) => ({
+      ...prev,
+      [memberEmail]: action === "add",
+    }));
+    setModalOpen(false);
+  };
+
+  const handleModalClose = () => {
+    setModalOpen(false);
+  };
+
+  const saveChanges = () => {
+    const selectedEmails = Object.entries(editedMembers)
+      .filter(([_, isSelected]) => isSelected)
+      .map(([email]) => email);
+
+    setTeams((prev) => ({
+      ...prev,
+      [editingTeam]: selectedEmails,
+    }));
+
+    setIsEditing(false);
+    setEditingTeam(null);
+    setEditedMembers({});
+  };
+
+  const cancelEditing = () => {
+    setIsEditing(false);
+    setEditingTeam(null);
+    setEditedMembers({});
+  };
+
+  const getMemberTeam = (email) => {
+    return Object.entries(teams).find(([_, members]) =>
+      members.includes(email)
+    )?.[0];
+  };
+
+  const confirmDeleteTeam = () => {
+    setTeams((prevTeams) => {
+      const updatedTeams = { ...prevTeams };
+      delete updatedTeams[teamToDelete];
+      return updatedTeams;
+    });
+    setDeleteTeamModalOpen(false);
+    setTeamToDelete(null);
+  };
+
+  const cancelDeleteTeam = () => {
+    setDeleteTeamModalOpen(false);
+    setTeamToDelete(null);
+  };
 
   const filteredTeams = Object.entries(teams).filter(([teamName]) =>
     teamName.toLowerCase().includes(searchQuery.toLowerCase())
@@ -297,6 +417,7 @@ const AdminBoard = () => {
           >
             <Tab value="memors" label="Manage Memors" />
             <Tab value="teams" label="Manage Teams" />
+            <Tab value="competition" label="Manage Competition" />
           </Tabs>
           <TextField
             placeholder="Search"
@@ -432,9 +553,10 @@ const AdminBoard = () => {
               <Typography variant="body2" sx={{ flex: 1 }}>
                 Teams Left
               </Typography>
-              <Typography variant="body2" sx={{ flex: 1, textAlign: "center" }}>
-                Actions
-              </Typography>
+              <Typography
+                variant="body2"
+                sx={{ flex: 1, textAlign: "center" }}
+              ></Typography>
             </Box>
 
             {/* Table Rows */}
@@ -491,17 +613,17 @@ const AdminBoard = () => {
                     gap: "5px",
                   }}
                 >
-                  <IconButton>
+                  <IconButton onClick={(e) => e.stopPropagation()}>
                     <img src={editIcon} alt="edit" style={{ width: "20px" }} />
                   </IconButton>
-                  <IconButton>
+                  <IconButton onClick={(e) => e.stopPropagation()}>
                     <img
                       src={deleteIcon}
                       alt="delete"
                       style={{ width: "20px" }}
                     />
                   </IconButton>
-                  <IconButton onClick={(e) => e.stopPropagation()}>
+                  <IconButton>
                     {expandedIndex === index ? (
                       <KeyboardArrowUp sx={{ color: "white" }} />
                     ) : (
@@ -547,9 +669,9 @@ const AdminBoard = () => {
                   borderRadius: "20px",
                   border: "none",
                   boxShadow: "none",
-                  marginBottom: "20px",
+                  marginBottom: "40px",
                   "&:hover": {
-                    backgroundColor: "#A3DFD8",
+                    backgroundColor: "#80ccbc",
                   },
                 }}
                 icon={
@@ -579,52 +701,256 @@ const AdminBoard = () => {
                   padding: "15px",
                 }}
               >
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => toggleTeamExpand(teamName)}
-                >
-                  <Typography
-                    variant="body2"
-                    sx={{ fontWeight: "bold", color: "white" }}
+                {!isEditing || editingTeam !== teamName ? (
+                  // Default view
+                  <Box
+                    sx={{
+                      display: "grid",
+                      gridTemplateColumns: "1fr 4fr 1fr",
+                    }}
                   >
-                    {teamName}
-                  </Typography>
-                  <IconButton>
-                    {expandedTeam === teamName ? (
-                      <KeyboardArrowUp sx={{ color: "white" }} />
-                    ) : (
-                      <KeyboardArrowDown sx={{ color: "white" }} />
-                    )}
-                  </IconButton>
-                </Box>
-
-                {expandedTeam === teamName && (
-                  <Box sx={{ marginTop: "10px", paddingLeft: "20px" }}>
-                    {teamMembers.map((member) => (
-                      <Box
-                        key={member.email}
-                        sx={{
-                          marginBottom: "10px",
-                          padding: "10px",
-                          borderRadius: "8px",
-                          backgroundColor: "#333738",
+                    <Typography
+                      variant="body2"
+                      sx={{ fontWeight: "bold", color: "white" }}
+                    >
+                      {teamName}
+                    </Typography>
+                    <Typography>
+                      Members:{" "}
+                      {teamMembers
+                        .slice(0, 3)
+                        .map(
+                          (email) =>
+                            members.find((member) => member.email === email)
+                              ?.name
+                        )
+                        .join(", ")}
+                      {teamMembers.length > 3 && "..."}
+                    </Typography>
+                    <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+                      <IconButton onClick={() => startEditing(teamName)}>
+                        <img
+                          src={editIcon}
+                          alt="Edit"
+                          style={{ width: "20px" }}
+                        />
+                      </IconButton>
+                      <IconButton
+                        onClick={() => {
+                          setTeamToDelete(teamName);
+                          setDeleteTeamModalOpen(true);
                         }}
                       >
-                        <Typography sx={{ color: "white" }}>
-                          {member.name} - {member.email}
+                        <img
+                          src={deleteIcon}
+                          alt="Delete"
+                          style={{ width: "20px" }}
+                        />
+                      </IconButton>
+                    </Box>
+                  </Box>
+                ) : (
+                  // Edit mode
+                  <Box sx={{ display: "flex", flexDirection: "column" }}>
+                    <Box
+                      sx={{
+                        display: "grid",
+                        gridTemplateColumns: "1fr 6fr",
+                        gap: 5,
+                      }}
+                    >
+                      <Typography variant="body1" sx={{ color: "white" }}>
+                        Editing Team: {teamName}
+                      </Typography>
+                      <Box>
+                        <Typography
+                          variant="body2"
+                          sx={{ color: "white", marginBottom: "10px" }}
+                        >
+                          Members
                         </Typography>
+                        <TextField
+                          placeholder="Search"
+                          value={searchQuery2}
+                          onChange={(e) => setSearchQuery2(e.target.value)}
+                          variant="outlined"
+                          size="small"
+                          slotProps={{
+                            input: {
+                              startAdornment: (
+                                <InputAdornment position="start">
+                                  <Search
+                                    fontSize="small"
+                                    sx={{ color: "gray" }}
+                                  />
+                                </InputAdornment>
+                              ),
+                            },
+                          }}
+                          sx={{
+                            borderRadius: "40px",
+                            input: { color: "white" },
+                            width: "250px",
+                            height: "40px",
+                            border: "0.905px solid #88938F",
+                            marginBottom: "10px",
+                          }}
+                        />
+                        <Box
+                          sx={{
+                            backgroundColor: "#181818",
+                            padding: "10px",
+                            borderRadius: "10.706px",
+                            border: "0.892px solid #88938F",
+                            background: "#181818",
+                            maxHeight: "300px",
+                            minHeight: "90px",
+                            overflowY: "auto",
+                            marginBottom: "10px",
+                          }}
+                        >
+                          {filteredMembers
+                            .sort((a, b) => {
+                              const isInTeamA = teams[editingTeam]?.includes(
+                                a.email
+                              );
+                              const isInTeamB = teams[editingTeam]?.includes(
+                                b.email
+                              );
+
+                              const isUnassignedA = a.team === "";
+                              const isUnassignedB = b.team === "";
+
+                              if (isInTeamA && !isInTeamB) return -1; // Team members first
+                              if (!isInTeamA && isInTeamB) return 1;
+
+                              if (isUnassignedA && !isUnassignedB) return -1; // Unassigned next
+                              if (!isUnassignedA && isUnassignedB) return 1;
+
+                              return 0; // Keep the rest in their original order
+                            })
+                            .map((member) => {
+                              const memberTeam = getMemberTeam(member.email);
+                              const isInAnotherTeam =
+                                memberTeam && memberTeam !== teamName;
+                              const isInTeam = editedMembers[member.email];
+                              const action = isInTeam ? "remove" : "add";
+
+                              return (
+                                <Box
+                                  key={member.email}
+                                  sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "space-between",
+                                    padding: "10px",
+                                    marginBottom: "10px",
+                                    opacity: isInAnotherTeam ? 0.6 : 1,
+                                    borderBottom: "1px solid #333738",
+                                  }}
+                                >
+                                  <Checkbox
+                                    disabled={isInAnotherTeam}
+                                    checked={isInTeam}
+                                    onChange={() =>
+                                      handleCheckboxToggle(
+                                        member.email,
+                                        member.name,
+                                        action
+                                      )
+                                    }
+                                    sx={{
+                                      color: isInAnotherTeam
+                                        ? "#888888"
+                                        : "#82D5C7",
+                                      "&.Mui-checked": {
+                                        color: "#82D5C7",
+                                      },
+                                    }}
+                                  />
+                                  <Typography
+                                    sx={{
+                                      color: "#DDE4E1",
+                                      flex: 1,
+                                      marginLeft: "10px",
+                                      textDecoration: isInAnotherTeam
+                                        ? "line-through"
+                                        : "none",
+                                    }}
+                                  >
+                                    {member.name}
+                                    {isInAnotherTeam &&
+                                      ` (Team: ${member.team})`}
+                                  </Typography>
+                                  <Typography
+                                    sx={{ color: "#BEC9C5" }}
+                                    variant="body2"
+                                  >
+                                    {member.email}
+                                  </Typography>
+                                </Box>
+                              );
+                            })}
+                        </Box>
                       </Box>
-                    ))}
+                    </Box>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "flex-end",
+                        gap: 2,
+                      }}
+                    >
+                      <CustomButton
+                        text="Cancel"
+                        onClick={cancelEditing}
+                        sx={{
+                          backgroundColor: "transparent",
+                          border: "1px solid #B5EDE4",
+                          color: "#B5EDE4",
+                          borderRadius: "50px",
+                          "&:hover": {
+                            backgroundColor: "rgba(181, 237, 228, 0.08)",
+                          },
+                        }}
+                      />
+                      <CustomButton
+                        text="Confirm"
+                        onClick={saveChanges}
+                        sx={{
+                          borderRadius: "50px",
+                          "&:hover": {
+                            backgroundColor: "#80ccbc",
+                          },
+                        }}
+                      />
+                    </Box>
                   </Box>
                 )}
               </Box>
             ))}
           </Box>
+        )}
+        {/* Confirmation Modal */}
+        <ConfirmationModal
+          open={modalOpen}
+          onClose={handleModalClose}
+          onConfirm={handleModalConfirm}
+          action={modalData.action}
+          memberName={modalData.memberName}
+          teamName={modalData.teamName}
+        />
+
+        {/* Confirmation Modal for Deleting Team */}
+        {deleteTeamModalOpen && (
+          <ConfirmationModal
+            open={deleteTeamModalOpen}
+            onClose={cancelDeleteTeam}
+            onConfirm={confirmDeleteTeam}
+            action="delete"
+            memberName=""
+            teamName={teamToDelete}
+          />
         )}
       </Box>
     </div>
