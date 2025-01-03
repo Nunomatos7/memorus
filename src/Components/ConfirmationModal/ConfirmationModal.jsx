@@ -73,7 +73,7 @@ const ConfirmationModal = ({
                 <Typography variant="body2" sx={{ mb: 3 }}>
                     Are you sure you want to {action}{" "}
                     <span style={{ color: "#1E928A" }}>{memberName}</span>{" "}
-                    {action === "remove" ? "from" : "to"} the team{" "}
+                    {action === "remove" ? "from" : ""} the team{" "}
                     <span style={{ color: "#1E928A" }}>{teamName}</span>?
                 </Typography>
                 <Box sx={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>

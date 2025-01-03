@@ -7,6 +7,7 @@ import {
   Tabs,
   TextField,
   Checkbox,
+  Button,
 } from "@mui/material";
 import background1 from "../../../assets/images/adminBackground1.svg";
 import background3 from "../../../assets/images/adminBackground2.svg";
@@ -15,6 +16,7 @@ import { useState } from "react";
 import CustomButton from "../../../Components/CustomButton/CustomButton";
 import editIcon from "../../../assets/images/editIcon.svg";
 import deleteIcon from "../../../assets/images/deleteIcon.svg";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import {
   Search,
   KeyboardArrowDown,
@@ -33,6 +35,7 @@ const AdminBoard = () => {
   };
   const [searchQuery, setSearchQuery] = useState("");
   const [searchQuery2, setSearchQuery2] = useState("");
+  const [searchQuery3, setSearchQuery3] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [editingTeam, setEditingTeam] = useState(null);
   const [editedMembers, setEditedMembers] = useState({});
@@ -45,6 +48,10 @@ const AdminBoard = () => {
   });
   const [deleteTeamModalOpen, setDeleteTeamModalOpen] = useState(false);
   const [teamToDelete, setTeamToDelete] = useState(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [newTeamName, setNewTeamName] = useState("");
+  const [newTeamThumbnail, setNewTeamThumbnail] = useState(null);
+  const [newTeamMembers, setNewTeamMembers] = useState({});
 
   const memors = [
     {
@@ -196,6 +203,21 @@ const AdminBoard = () => {
       team: "",
     },
     {
+      name: "Per Pos",
+      email: "perpos@abc.com",
+      team: "",
+    },
+    {
+      name: "ABC DEF",
+      email: "abcdef@abc.com",
+      team: "",
+    },
+    {
+      name: "JKL MNO",
+      email: "jklmno@abc.com",
+      team: "",
+    },
+    {
       name: "Pepper Potts",
       email: "pepperpotts@abc.com",
       team: "Marketing Mavericks",
@@ -284,24 +306,39 @@ const AdminBoard = () => {
   };
 
   const saveChanges = () => {
-    const selectedEmails = Object.entries(editedMembers)
+    if (!newTeamName.trim()) {
+      alert("Please enter a team name.");
+      return;
+    }
+
+    const selectedEmails = Object.entries(newTeamMembers)
       .filter(([_, isSelected]) => isSelected)
       .map(([email]) => email);
 
-    setTeams((prev) => ({
-      ...prev,
-      [editingTeam]: selectedEmails,
-    }));
+    if (editingTeam) {
+      // Editing an existing team
+      setTeams((prev) => ({
+        ...prev,
+        [editingTeam]: selectedEmails,
+      }));
+    } else {
+      // Creating a new team
+      setTeams((prev) => ({
+        ...prev,
+        [newTeamName]: selectedEmails,
+      }));
+    }
 
-    setIsEditing(false);
-    setEditingTeam(null);
-    setEditedMembers({});
+    // Reset the form and close the modal
+    handleTeamModalClose();
   };
 
   const cancelEditing = () => {
     setIsEditing(false);
     setEditingTeam(null);
     setEditedMembers({});
+    setNewTeamThumbnail(null);
+    setSearchQuery2("");
   };
 
   const getMemberTeam = (email) => {
@@ -328,6 +365,54 @@ const AdminBoard = () => {
   const filteredTeams = Object.entries(teams).filter(([teamName]) =>
     teamName.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  // const handleCreateTeam = () => {
+  //   if (newTeamName.trim()) {
+  //     setTeams((prevTeams) => ({
+  //       ...prevTeams,
+  //       [newTeamName]: Object.entries(newTeamMembers)
+  //         .filter(([_, isSelected]) => isSelected)
+  //         .map(([email]) => email),
+  //     }));
+  //     handleTeamModalClose();
+  //     setNewTeamName("");
+  //     setNewTeamThumbnail(null);
+  //     setNewTeamMembers({});
+  //   } else {
+  //     alert("Please enter a team name.");
+  //   }
+  // };
+
+  const handleTeamModalClose = () => {
+    setIsCreateModalOpen(false);
+    setNewTeamThumbnail(null);
+    setNewTeamMembers({});
+    setNewTeamName("");
+    setSearchQuery3("");
+    document.body.style.overflow = "auto";
+  };
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setNewTeamThumbnail(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const unassignedMembers = members.filter((member) => member.team === "");
+
+  const filteredUnassignedMembers = unassignedMembers.filter((member) =>
+    member.name.toLowerCase().includes(searchQuery3.toLowerCase())
+  );
+
+  const handleTeamModalOpen = () => {
+    setIsCreateModalOpen(true);
+    document.body.style.overflow = "hidden";
+  };
 
   return (
     <div className="container">
@@ -553,10 +638,7 @@ const AdminBoard = () => {
               <Typography variant="body2" sx={{ flex: 1 }}>
                 Teams Left
               </Typography>
-              <Typography
-                variant="body2"
-                sx={{ flex: 1, textAlign: "center" }}
-              ></Typography>
+              <Typography variant="body2" sx={{ flex: 1 }}></Typography>
             </Box>
 
             {/* Table Rows */}
@@ -610,20 +692,29 @@ const AdminBoard = () => {
                     flex: 1,
                     textAlign: "center",
                     display: "flex",
+                    justifyContent: "right",
                     gap: "5px",
                   }}
                 >
                   <IconButton onClick={(e) => e.stopPropagation()}>
-                    <img src={editIcon} alt="edit" style={{ width: "20px" }} />
+                    {memor.timeLeft !== "0:00H" && (
+                      <img
+                        src={editIcon}
+                        alt="edit"
+                        style={{ width: "20px" }}
+                      />
+                    )}
                   </IconButton>
                   <IconButton onClick={(e) => e.stopPropagation()}>
-                    <img
-                      src={deleteIcon}
-                      alt="delete"
-                      style={{ width: "20px" }}
-                    />
+                    {memor.timeLeft !== "0:00H" && (
+                      <img
+                        src={deleteIcon}
+                        alt="delete"
+                        style={{ width: "20px" }}
+                      />
+                    )}
                   </IconButton>
-                  <IconButton>
+                  <IconButton >
                     {expandedIndex === index ? (
                       <KeyboardArrowUp sx={{ color: "white" }} />
                     ) : (
@@ -658,6 +749,7 @@ const AdminBoard = () => {
             >
               <CustomButton
                 text="Create a Team"
+                onClick={() => handleTeamModalOpen()}
                 sx={{
                   backgroundColor: "#B5EDE4",
                   color: "#000",
@@ -821,13 +913,13 @@ const AdminBoard = () => {
                               const isUnassignedA = a.team === "";
                               const isUnassignedB = b.team === "";
 
-                              if (isInTeamA && !isInTeamB) return -1; // Team members first
+                              if (isInTeamA && !isInTeamB) return -1;
                               if (!isInTeamA && isInTeamB) return 1;
 
-                              if (isUnassignedA && !isUnassignedB) return -1; // Unassigned next
+                              if (isUnassignedA && !isUnassignedB) return -1;
                               if (!isUnassignedA && isUnassignedB) return 1;
 
-                              return 0; // Keep the rest in their original order
+                              return 0;
                             })
                             .map((member) => {
                               const memberTeam = getMemberTeam(member.email);
@@ -951,6 +1043,221 @@ const AdminBoard = () => {
             memberName=""
             teamName={teamToDelete}
           />
+        )}
+
+        {/* Create Team Modal */}
+        {isCreateModalOpen && (
+          <div className="modal-overlay-submit-memor">
+            <div
+              className="modal-container"
+              style={{ padding: "20px", maxWidth: "600px" }}
+            >
+              <div className="modal-top" style={{ marginBottom: "20px" }}>
+                <Button
+                  onClick={() => handleTeamModalClose()}
+                  sx={{ minWidth: 0, p: 0, color: "#BEC9C5" }}
+                >
+                  <ArrowBackIcon />
+                </Button>
+                <Typography
+                  variant="h6"
+                  sx={{ marginLeft: "10px", color: "#BEC9C5" }}
+                >
+                  Admin Board
+                </Typography>
+              </div>
+              <Typography
+                variant="h5"
+                sx={{
+                  fontWeight: "bold",
+                  color: "#FFFFFF",
+                  marginBottom: "20px",
+                }}
+              >
+                Team Configuration
+              </Typography>
+              <TextField
+                label="Team's Name"
+                variant="outlined"
+                value={newTeamName}
+                onChange={(e) => setNewTeamName(e.target.value)}
+                fullWidth
+                sx={{
+                  marginBottom: "20px",
+                  "& .MuiInputBase-input": { color: "#FFFFFF" },
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": { borderColor: "#888" },
+                    "&:hover fieldset": { borderColor: "#AAA" },
+                    "&.Mui-focused fieldset": { borderColor: "#CCC" },
+                  },
+                  "& .MuiInputLabel-root": { color: "#888" },
+                }}
+              />
+              <Typography
+                variant="body1"
+                sx={{ color: "#CAC4D0", marginBottom: "10px" }}
+              >
+                Thumbnail
+              </Typography>
+              <div
+                style={{
+                  border: "1px dashed #888",
+                  borderRadius: "10px",
+                  padding: "20px",
+                  textAlign: "center",
+                  marginBottom: "20px",
+                  position: "relative",
+                  background: "#1E1E1E",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                {newTeamThumbnail ? (
+                  <img
+                    src={newTeamThumbnail}
+                    alt="Uploaded Thumbnail"
+                    style={{ borderRadius: "10px", height: "120px" }}
+                  />
+                ) : (
+                  <>
+                    <label htmlFor="file-input" style={{ cursor: "pointer" }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                        }}
+                      >
+                        <img
+                          src={background3}
+                          alt="Upload Thumbnail"
+                          style={{
+                            width: "50px",
+                            height: "50px",
+                            marginBottom: "10px",
+                          }}
+                        />
+                        <Typography variant="body2" sx={{ color: "#888" }}>
+                          Upload file from computer
+                        </Typography>
+                      </div>
+                    </label>
+                    <input
+                      id="file-input"
+                      type="file"
+                      accept="image/*"
+                      className="file-input"
+                      onChange={handleFileChange}
+                      style={{ display: "none" }}
+                    />
+                  </>
+                )}
+              </div>
+              <Typography
+                variant="body1"
+                sx={{ color: "#CAC4D0", marginBottom: "10px" }}
+              >
+                Members
+              </Typography>
+              <TextField
+                placeholder="Search Name"
+                value={searchQuery3}
+                onChange={(e) => setSearchQuery3(e.target.value)}
+                variant="outlined"
+                size="small"
+                sx={{
+                  marginBottom: "20px",
+                  "& .MuiInputBase-input": { color: "#FFFFFF" },
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": { borderColor: "#888" },
+                    "&:hover fieldset": { borderColor: "#AAA" },
+                    "&.Mui-focused fieldset": { borderColor: "#CCC" },
+                  },
+                  "& .MuiInputLabel-root": { color: "#888" },
+                }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Search sx={{ color: "#888" }} />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+              <div
+                style={{
+                  maxHeight: "200px",
+                  overflowY: "auto",
+                  background: "#1E1E1E",
+                  borderRadius: "10px",
+                  padding: "10px",
+                  border: "1px solid #333",
+                }}
+              >
+                {filteredUnassignedMembers.map((member) => (
+                  <Box
+                    key={member.email}
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      padding: "10px",
+                      borderBottom: "1px solid #333",
+                    }}
+                  >
+                    <Checkbox
+                      checked={!!newTeamMembers[member.email]}
+                      onChange={() =>
+                        setNewTeamMembers((prev) => ({
+                          ...prev,
+                          [member.email]: !prev[member.email],
+                        }))
+                      }
+                      sx={{ color: "#82D5C7" }}
+                    />
+                    <Typography sx={{ color: "#FFFFFF" }}>
+                      {member.name}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: "#888" }}>
+                      {member.email}
+                    </Typography>
+                  </Box>
+                ))}
+              </div>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  gap: 2,
+                  marginTop: "20px",
+                }}
+              >
+                <CustomButton
+                  text="Cancel"
+                  onClick={handleTeamModalClose}
+                  sx={{
+                    backgroundColor: "transparent",
+                    border: "1px solid #B5EDE4",
+                    color: "#B5EDE4",
+                    borderRadius: "50px",
+                    "&:hover": {
+                      backgroundColor: "rgba(181, 237, 228, 0.08)",
+                    },
+                  }}
+                />
+                <CustomButton
+                  text="Confirm"
+                  onClick={saveChanges}
+                  sx={{
+                    borderRadius: "50px",
+                    "&:hover": {
+                      backgroundColor: "#80ccbc",
+                    },
+                  }}
+                />
+              </Box>
+            </div>
+          </div>
         )}
       </Box>
     </div>
