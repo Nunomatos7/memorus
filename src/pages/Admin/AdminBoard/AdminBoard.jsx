@@ -23,6 +23,7 @@ import {
   KeyboardArrowUp,
 } from "@mui/icons-material";
 import ConfirmationModal from "../../../Components/ConfirmationModal/ConfirmationModal";
+import FeedbackModal from "../../../Components/FeedbackModal/FeedbackModal";
 
 const AdminBoard = () => {
   const [tab, setTab] = useState("memors");
@@ -52,6 +53,12 @@ const AdminBoard = () => {
   const [newTeamName, setNewTeamName] = useState("");
   const [newTeamThumbnail, setNewTeamThumbnail] = useState(null);
   const [newTeamMembers, setNewTeamMembers] = useState({});
+  const [feedbackModal, setFeedbackModal] = useState({
+    open: false,
+    type: "",
+    title: "",
+    description: "",
+  });
 
   const memors = [
     {
@@ -305,32 +312,47 @@ const AdminBoard = () => {
     setModalOpen(false);
   };
 
-  const saveChanges = () => {
-    if (!newTeamName.trim()) {
-      alert("Please enter a team name.");
-      return;
-    }
+  const saveChangesEditTeam = () => {
+    setTeams((prevTeams) => {
+      const updatedTeams = { ...prevTeams };
+      updatedTeams[editingTeam] = Object.entries(editedMembers)
+        .filter(([_, isSelected]) => isSelected)
+        .map(([email]) => email);
+      return updatedTeams;
+    });
+    setFeedbackModal({
+      open: true,
+      type: "success",
+      title: "Team Updated",
+      description: `The team "${editingTeam}" has been successfully updated.`,
+    });
+    setIsEditing(false);
+    setEditingTeam(null);
+    setEditedMembers({});
+    setSearchQuery2("");
+  };
 
-    const selectedEmails = Object.entries(newTeamMembers)
-      .filter(([_, isSelected]) => isSelected)
-      .map(([email]) => email);
-
-    if (editingTeam) {
-      // Editing an existing team
-      setTeams((prev) => ({
-        ...prev,
-        [editingTeam]: selectedEmails,
+  const saveChangesCreateTeam = () => {
+    if (newTeamName.trim()) {
+      setTeams((prevTeams) => ({
+        ...prevTeams,
+        [newTeamName]: Object.entries(newTeamMembers)
+          .filter(([_, isSelected]) => isSelected)
+          .map(([email]) => email),
       }));
+      setFeedbackModal({
+        open: true,
+        type: "success",
+        title: "Team Created",
+        description: `The team "${newTeamName}" has been successfully created.`,
+      });
+      handleTeamModalClose();
+      setNewTeamName("");
+      setNewTeamThumbnail(null);
+      setNewTeamMembers({});
     } else {
-      // Creating a new team
-      setTeams((prev) => ({
-        ...prev,
-        [newTeamName]: selectedEmails,
-      }));
+      alert("Please enter a team name.");
     }
-
-    // Reset the form and close the modal
-    handleTeamModalClose();
   };
 
   const cancelEditing = () => {
@@ -353,6 +375,13 @@ const AdminBoard = () => {
       delete updatedTeams[teamToDelete];
       return updatedTeams;
     });
+    setFeedbackModal({
+      open: true,
+      type: "success",
+      title: "Team Deleted",
+      description: `The team "${teamToDelete}" has been successfully deleted.`,
+    });
+
     setDeleteTeamModalOpen(false);
     setTeamToDelete(null);
   };
@@ -714,7 +743,7 @@ const AdminBoard = () => {
                       />
                     )}
                   </IconButton>
-                  <IconButton >
+                  <IconButton>
                     {expandedIndex === index ? (
                       <KeyboardArrowUp sx={{ color: "white" }} />
                     ) : (
@@ -1008,7 +1037,7 @@ const AdminBoard = () => {
                       />
                       <CustomButton
                         text="Confirm"
-                        onClick={saveChanges}
+                        onClick={saveChangesEditTeam}
                         sx={{
                           borderRadius: "50px",
                           "&:hover": {
@@ -1247,7 +1276,7 @@ const AdminBoard = () => {
                 />
                 <CustomButton
                   text="Confirm"
-                  onClick={saveChanges}
+                  onClick={saveChangesCreateTeam}
                   sx={{
                     borderRadius: "50px",
                     "&:hover": {
@@ -1258,6 +1287,27 @@ const AdminBoard = () => {
               </Box>
             </div>
           </div>
+        )}
+
+        {feedbackModal.open && (
+          <FeedbackModal
+            type={feedbackModal.type}
+            title={feedbackModal.title}
+            description={feedbackModal.description}
+            actions={[
+              {
+                label: "Close",
+                onClick: () =>
+                  setFeedbackModal({
+                    open: false,
+                    type: "",
+                    title: "",
+                    description: "",
+                  }),
+                style: { backgroundColor: "#4caf50", color: "#fff" }, // Styling for the button
+              },
+            ]}
+          />
         )}
       </Box>
     </div>
