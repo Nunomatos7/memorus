@@ -493,6 +493,28 @@ const AdminBoard = () => {
     return today.toISOString().split("T")[0];
   };
 
+  const [deleteMemorModalOpen, setDeleteMemorModalOpen] = useState(false);
+  const [memorToDelete, setMemorToDelete] = useState(null);
+
+  const confirmDeleteMemor = () => {
+    setMemors((prevMemors) =>
+      prevMemors.filter((memor) => memor !== memorToDelete)
+    );
+    setFeedbackModal({
+      open: true,
+      type: "success",
+      title: "Memor Deleted",
+      description: `The memor "${memorToDelete.title}" has been successfully deleted.`,
+    });
+    setDeleteMemorModalOpen(false);
+    setMemorToDelete(null);
+  };
+
+  const cancelDeleteMemor = () => {
+    setDeleteMemorModalOpen(false);
+    setMemorToDelete(null);
+  };
+
   return (
     <div className="container">
       <img
@@ -785,7 +807,13 @@ const AdminBoard = () => {
                       />
                     )}
                   </IconButton>
-                  <IconButton onClick={(e) => e.stopPropagation()}>
+                  <IconButton
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setMemorToDelete(memor);
+                      setDeleteMemorModalOpen(true);
+                    }}
+                  >
                     {memor.timeLeft !== "0:00H" && (
                       <img
                         src={deleteIcon}
@@ -794,6 +822,7 @@ const AdminBoard = () => {
                       />
                     )}
                   </IconButton>
+
                   <IconButton>
                     {expandedIndex === index ? (
                       <KeyboardArrowUp sx={{ color: "white" }} />
@@ -1108,7 +1137,8 @@ const AdminBoard = () => {
           onClose={handleModalClose}
           onConfirm={handleModalConfirm}
           action={modalData.action}
-          memberName={modalData.memberName}
+          context="team"
+          itemName={modalData.memberName}
           teamName={modalData.teamName}
         />
 
@@ -1119,8 +1149,8 @@ const AdminBoard = () => {
             onClose={cancelDeleteTeam}
             onConfirm={confirmDeleteTeam}
             action="delete"
-            memberName=""
-            teamName={teamToDelete}
+            context="team"
+            itemName={teamToDelete}
           />
         )}
 
@@ -1507,6 +1537,18 @@ const AdminBoard = () => {
               </Box>
             </div>
           </div>
+        )}
+
+        {/* Confirmation Modal for Deleting Memor */}
+        {deleteMemorModalOpen && (
+          <ConfirmationModal
+            open={deleteMemorModalOpen}
+            onClose={cancelDeleteMemor}
+            onConfirm={confirmDeleteMemor}
+            action="delete"
+            context="memor"
+            itemName={memorToDelete?.title}
+          />
         )}
       </Box>
     </div>
