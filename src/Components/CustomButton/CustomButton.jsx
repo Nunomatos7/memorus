@@ -1,31 +1,28 @@
-import React from "react";
-import Button from "@mui/material/Button";
+import { Box, Button } from "@mui/material";
 
-const CustomButton = ({ text, onClose, onClick, sx }) => {
+const CustomButton = ({ text, onClick, sx, icon }) => {
   return (
     <Button
-      variant="outlined"
-      className="cancel-button"
-      onClick={onClick || onClose}
+      onClick={onClick}
       sx={{
         textTransform: "none",
-        fontSize: "14px",
-        color: "#d0bcfe",
-        padding: "6px 16px",
-        borderRadius: "40px",
-        border: "1px solid #938f99",
-        marginRight: "10px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: "5px",
+        padding: "10px 20px",
+        borderRadius: "20px",
+        border: "none",
+        backgroundColor: "#B5EDE4",
+        color: "#000",
+        boxShadow: "none",
         "&:hover": {
-          backgroundColor: "rgba(163, 133, 242, 0.2)",
-        },
-        "&.Mui-selected": {
-          backgroundColor: "#d0bcfe",
-          color: "#381e72",
-          fontWeight: 600,
+          backgroundColor: "#A3DFD8",
         },
         ...sx,
       }}
     >
+      {icon && <Box component="span">{icon}</Box>}
       {text}
     </Button>
   );
