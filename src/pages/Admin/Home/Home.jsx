@@ -12,6 +12,13 @@ import rank3 from "../../../assets/images/rank3admin.svg";
 import ongoing from "../../../assets/images/ongoingAdmin.svg";
 import closed from "../../../assets/images/closedAdmin.svg";
 import WelcomeModal from "../../../Components/WelcomeModal/WelcomeModal";
+import { leaderboardData } from "../../Leaderboard/Leaderboard";
+
+const rankImages = {
+  1: rank1,
+  2: rank2,
+  3: rank3,
+};
 
 const slidesData = [
   {
@@ -210,191 +217,90 @@ const Home = () => {
           Current Leaders
         </Typography>
         <Grid container spacing={3}>
-          {/* First Place */}
-          <Grid item xs={12} sm={5}>
-            <Card className='card'>
-              <Box
-                display='flex'
-                alignItems='center'
-                style={{ width: "100%", height: "100%" }}
+          {leaderboardData
+            .filter((team) => team.rank <= 3)
+            .map((team) => (
+              <Grid
+                item
+                xs={12}
+                sm={team.rank === 1 ? 5 : team.rank === 2 ? 4 : 3}
+                key={team.rank}
               >
-                {/* Left Column - Number */}
-                <Box style={{ flex: 1, textAlign: "center" }}>
-                  <img
-                    src={rank1}
-                    alt='rank'
-                    style={{
-                      position: "absolute",
-                      bottom: "0px",
-                      left: "10px",
-                      height: "75%",
-                    }}
-                  />
-                </Box>
-                {/* Right Column - Team Details */}
-                <Box style={{ flex: 1, paddingRight: "20px" }}>
+                <Card className='card'>
                   <Box
-                    className='team-header'
                     display='flex'
-                    justifyContent='space-between'
+                    alignItems='center'
+                    style={{ width: "100%" }}
                   >
-                    <Typography variant='h6' className='team-name'>
-                      Visual Voyagers
-                    </Typography>
-                    <img
-                      src='https://via.placeholder.com/50'
-                      alt='Visual Voyagers'
-                      className='team-avatar-admin'
-                    />
-                  </Box>
-                  <Box
-                    className='stats'
-                    display='flex'
-                    justifyContent='space-between'
-                    marginTop='10px'
-                  >
-                    <div>
-                      <Typography variant='body2' className='label'>
-                        Total Points
-                      </Typography>
-                      <Typography variant='h5' className='value'>
-                        510
-                      </Typography>
-                    </div>
-                    <div>
-                      <Typography variant='body2' className='label'>
-                        Total Memors
-                      </Typography>
-                      <Typography variant='h5' className='value'>
-                        51
-                      </Typography>
-                    </div>
-                  </Box>
-                </Box>
-              </Box>
-            </Card>
-          </Grid>
+                    {/* Left Column - Rank Image */}
+                    <Box style={{ flex: 1, textAlign: "center" }}>
+                      <img
+                        src={rankImages[team.rank]}
+                        alt={`Rank ${team.rank}`}
+                        style={{
+                          position: "absolute",
+                          bottom: "0px",
+                          left: "10px",
+                          height: `${75 - team.rank * 10}%`,
+                        }}
+                      />
+                    </Box>
 
-          <Grid item xs={12} sm={4}>
-            <Card className='card'>
-              <Box display='flex' alignItems='center' style={{ width: "100%" }}>
-                {/* Left Column - Number */}
-                <Box style={{ flex: 1, textAlign: "center" }}>
-                  <img
-                    src={rank2}
-                    alt='rank'
-                    style={{
-                      position: "absolute",
-                      bottom: "0px",
-                      left: "10px",
-                      height: "65%",
-                    }}
-                  />
-                </Box>
-
-                {/* Right Column - Team Details */}
-                <Box style={{ flex: 1.2, paddingRight: "20px" }}>
-                  <Box
-                    className='team-header'
-                    display='flex'
-                    justifyContent='space-between'
-                  >
-                    <Typography variant='h6' className='team-name'>
-                      Visual Voyagers
-                    </Typography>
-                    <img
-                      src='https://via.placeholder.com/50'
-                      alt='Visual Voyagers'
-                      className='team-avatar-admin'
-                    />
+                    {/* Right Column - Team Details */}
+                    <Box
+                      style={{
+                        flex: team.rank === 1 ? 1 : 1.5,
+                        paddingRight: "20px",
+                      }}
+                    >
+                      <Box
+                        className='team-header'
+                        display='flex'
+                        justifyContent='space-between'
+                      >
+                        <Typography variant='h6' className='team-name'>
+                          {team.teamName}
+                        </Typography>
+                        <img
+                          src={team.avatar}
+                          alt={team.teamName}
+                          className='team-avatar-admin'
+                          style={{
+                            width: "50px",
+                            height: "50px",
+                            borderRadius: "50%",
+                            objectFit: "cover",
+                          }}
+                        />
+                      </Box>
+                      <Box
+                        className='stats'
+                        display='flex'
+                        justifyContent='space-between'
+                        marginTop='10px'
+                      >
+                        <div>
+                          <Typography variant='body2' className='label'>
+                            Total Points
+                          </Typography>
+                          <Typography variant='h5' className='value'>
+                            {team.points}
+                          </Typography>
+                        </div>
+                        <div>
+                          <Typography variant='body2' className='label'>
+                            Total Memors
+                          </Typography>
+                          <Typography variant='h5' className='value'>
+                            {team.memors}
+                          </Typography>
+                        </div>
+                      </Box>
+                    </Box>
                   </Box>
-                  <Box
-                    className='stats'
-                    display='flex'
-                    justifyContent='space-between'
-                    marginTop='10px'
-                  >
-                    <div>
-                      <Typography variant='body2' className='label'>
-                        Total Points
-                      </Typography>
-                      <Typography variant='h5' className='value'>
-                        510
-                      </Typography>
-                    </div>
-                    <div>
-                      <Typography variant='body2' className='label'>
-                        Total Memors
-                      </Typography>
-                      <Typography variant='h5' className='value'>
-                        51
-                      </Typography>
-                    </div>
-                  </Box>
-                </Box>
-              </Box>
-            </Card>
-          </Grid>
-          <Grid item xs={12} sm={3}>
-            <Card className='card'>
-              <Box display='flex' alignItems='center' style={{ width: "100%" }}>
-                {/* Left Column - Number */}
-                <Box style={{ flex: 1, textAlign: "center" }}>
-                  <img
-                    src={rank3}
-                    alt='rank'
-                    style={{
-                      position: "absolute",
-                      bottom: "0px",
-                      left: "10px",
-                      height: "55%",
-                    }}
-                  />
-                </Box>
-
-                {/* Right Column - Team Details */}
-                <Box style={{ flex: 1.5, paddingRight: "20px" }}>
-                  <Box
-                    className='team-header'
-                    display='flex'
-                    justifyContent='space-between'
-                  >
-                    <Typography variant='h6' className='team-name'>
-                      Visual Voyagers
-                    </Typography>
-                    <img
-                      src='https://via.placeholder.com/50'
-                      alt='Visual Voyagers'
-                      className='team-avatar-admin'
-                    />
-                  </Box>
-                  <Box
-                    className='stats'
-                    display='flex'
-                    justifyContent='space-between'
-                    marginTop='10px'
-                  >
-                    <div>
-                      <Typography variant='body2' className='label'>
-                        Total Points
-                      </Typography>
-                      <Typography variant='h5' className='value'>
-                        510
-                      </Typography>
-                    </div>
-                    <div>
-                      <Typography variant='body2' className='label'>
-                        Total Memors
-                      </Typography>
-                      <Typography variant='h5' className='value'>
-                        51
-                      </Typography>
-                    </div>
-                  </Box>
-                </Box>
-              </Box>
-            </Card>
-          </Grid>
+                </Card>
+              </Grid>
+            ))}
         </Grid>
       </section>
     </>
