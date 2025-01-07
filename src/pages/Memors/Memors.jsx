@@ -279,33 +279,34 @@ const Memors = () => {
                       Due on {memor.dueDate}
                     </Typography>
                   </Box>
-
-                  {memor.timeLeft && (
-                    <Chip
-                      label={memor.timeLeft}
-                      size="small"
-                      sx={{
-                        backgroundColor: "rgba(255, 0, 136, 0.2)",
-                        color: "#D582B0",
-                        borderRadius: "40px",
-                        marginTop: "10px",
-                        boxShadow: "0px 4px 10px rgba(0,0,0,0.4)",
-                      }}
-                    />
-                  )}
-                  {memor.status === "submitted" && (
-                    <Chip
-                      label="Submitted"
-                      size="small"
-                      sx={{
-                        backgroundColor: "rgba(0, 255, 163, 0.2)",
-                        color: "#82D5C7",
-                        borderRadius: "40px",
-                        marginTop: "10px",
-                        boxShadow: "0px 4px 10px rgba(0,0,0,0.4)",
-                      }}
-                    />
-                  )}
+                  <Box sx={{ display: "flex", gap: "10px" }}>
+                    {memor.timeLeft && (
+                      <Chip
+                        label={memor.timeLeft}
+                        size="small"
+                        sx={{
+                          backgroundColor: "rgba(255, 0, 136, 0.2)",
+                          color: "#D582B0",
+                          borderRadius: "40px",
+                          marginTop: "10px",
+                          boxShadow: "0px 4px 10px rgba(0,0,0,0.4)",
+                        }}
+                      />
+                    )}
+                    {memor.status === "submitted" && (
+                      <Chip
+                        label="Submitted"
+                        size="small"
+                        sx={{
+                          backgroundColor: "rgba(0, 255, 163, 0.2)",
+                          color: "#82D5C7",
+                          borderRadius: "40px",
+                          marginTop: "10px",
+                          boxShadow: "0px 4px 10px rgba(0,0,0,0.4)",
+                        }}
+                      />
+                    )}
+                  </Box>
                 </CardContent>
 
                 <Box
