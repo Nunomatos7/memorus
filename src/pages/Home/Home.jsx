@@ -207,7 +207,7 @@ const Home = () => {
         </Grid>
       </section>
 
-      <section id='currentLeaders' className='mb-10 container'>
+      <section id='currentLeaders' className='pb-10 container'>
         <Typography variant='h6' gutterBottom style={{ color: "white" }}>
           Current Leaders
         </Typography>
@@ -277,6 +277,7 @@ const Home = () => {
             </Card>
           </Grid>
 
+          {/* Second place */}
           <Grid item xs={12} sm={4}>
             <Card className='card'>
               <Box display='flex' alignItems='center' style={{ width: "100%" }}>
@@ -337,6 +338,7 @@ const Home = () => {
               </Box>
             </Card>
           </Grid>
+          {/* Third place */}
           <Grid item xs={12} sm={3}>
             <Card className='card'>
               <Box display='flex' alignItems='center' style={{ width: "100%" }}>

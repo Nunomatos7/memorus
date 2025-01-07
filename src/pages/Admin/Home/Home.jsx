@@ -205,7 +205,7 @@ const Home = () => {
         </Grid>
       </section>
 
-      <section id='currentLeaders' className='mb-10 container'>
+      <section id='currentLeaders' className='pb-10 container'>
         <Typography variant='h6' gutterBottom style={{ color: "white" }}>
           Current Leaders
         </Typography>
