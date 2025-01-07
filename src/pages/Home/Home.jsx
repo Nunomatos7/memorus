@@ -222,12 +222,12 @@ const Home = () => {
         </Typography>
         <Grid container spacing={3}>
           {leaderboardData
-            .filter((team) => team.rank <= 3) // Ensure only top 3 teams are displayed
+            .filter((team) => team.rank <= 3)
             .map((team) => (
               <Grid
                 item
                 xs={12}
-                sm={team.rank === 1 ? 5 : team.rank === 2 ? 4 : 3} // Adjust sizes for top 3
+                sm={team.rank === 1 ? 5 : team.rank === 2 ? 4 : 3}
                 key={team.rank}
               >
                 <Card className='card'>
@@ -254,7 +254,7 @@ const Home = () => {
                     <Box
                       style={{
                         flex: team.rank === 1 ? 1 : 1.5,
-                        paddingRight: "20px",
+                        paddingRight: "1rem",
                       }}
                     >
                       <Box
