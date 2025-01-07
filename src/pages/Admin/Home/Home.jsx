@@ -20,6 +20,15 @@ const rankImages = {
   3: rank3,
 };
 
+export const mockUser = {
+  id: 1,
+  name: "John Doe",
+  email: "john.doe@example.com",
+  pending_memors: 5,
+  complete_memors: 10,
+  admin: false,
+};
+
 const slidesData = [
   {
     id: 1,
@@ -147,7 +156,7 @@ const Home = () => {
                   justifyContent='space-between'
                 >
                   <Typography variant='h4' fontWeight='bold'>
-                    3
+                    {mockUser.pending_memors}
                   </Typography>
                   <img src={ongoing} alt='ongoing' />
                 </Box>
@@ -168,7 +177,7 @@ const Home = () => {
                   justifyContent='space-between'
                 >
                   <Typography variant='h4' fontWeight='bold'>
-                    --
+                    {mockUser.complete_memors}
                   </Typography>
                   <img src={closed} alt='ongoing' />
                 </Box>
