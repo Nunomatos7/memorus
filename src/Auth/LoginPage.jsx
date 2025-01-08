@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./LoginPage.css"; // Reuse the same CSS for consistent styling
+import "./LoginPage.css";
 import logo from "../assets/images/logo.svg";
+import PropTypes from "prop-types";
 import {
   TextField,
   Button,
@@ -12,41 +13,29 @@ import {
 import leftBackground from "../assets/images/left-auth.svg";
 import rightBackground from "../assets/images/right-auth.svg";
 
-const LoginPage = () => {
+const LoginPage = ({ login }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false); // State for Remember Me checkbox
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  // Demo user database
-  const demoUsers = [
-    { email: "admin@example.com", password: "admin123", role: "Admin" },
-    { email: "user@example.com", password: "user123", role: "Regular" },
-  ];
-
   const handleLogin = (e) => {
     e.preventDefault();
     setError("");
 
-    // Simulate user authentication
-    const user = demoUsers.find(
-      (user) => user.email === email && user.password === password
-    );
+    try {
+      // Call the login function from props
+      const user = login(email, password);
 
-    if (!user) {
-      setError("Invalid email or password.");
-      return;
-    }
-
-    // Save user to localStorage
-    localStorage.setItem("user", JSON.stringify(user));
-
-    // Redirect based on user role
-    if (user.role === "Admin") {
-      navigate("/admin/home");
-    } else {
-      navigate("/home");
+      // Redirect based on user role
+      if (user.role === "Admin") {
+        navigate("/admin/home");
+      } else {
+        navigate("/home");
+      }
+    } catch (err) {
+      setError(err.message); // Display error message from login function
     }
   };
 
@@ -70,7 +59,7 @@ const LoginPage = () => {
         <form onSubmit={handleLogin} className='login-form'>
           {error && <Typography className='error-message'>{error}</Typography>}
 
-          {/* Material-UI Username Field */}
+          {/* Material-UI Email Field */}
           <TextField
             label='Email'
             variant='outlined'
@@ -174,6 +163,10 @@ const LoginPage = () => {
       <img className='right-background' src={rightBackground} alt='' />
     </div>
   );
+};
+
+LoginPage.propTypes = {
+  login: PropTypes.func.isRequired,
 };
 
 export default LoginPage;

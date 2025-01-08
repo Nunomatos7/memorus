@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import {
   AppBar,
   Toolbar,
@@ -34,6 +34,7 @@ const StyledNavLink = styled(NavLink)(() => ({
 
 const Navbar = () => {
   const [anchorEl, setAnchorEl] = useState(null);
+  const navigate = useNavigate();
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -41,6 +42,17 @@ const Navbar = () => {
 
   const handleMenuClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleLogOut = () => {
+    // Clear user data from localStorage
+    localStorage.removeItem("user");
+
+    // Close the dropdown menu
+    setAnchorEl(null);
+
+    // Redirect to login page
+    navigate("/login");
   };
 
   return (
@@ -142,7 +154,10 @@ const Navbar = () => {
               </MenuItem>
               <Divider sx={{ backgroundColor: "gray" }} />
               <MenuItem
-                onClick={handleMenuClose}
+                onClick={() => {
+                  navigate("/change-password");
+                  handleMenuClose();
+                }}
                 sx={{
                   "&:hover": {
                     backgroundColor: "#ccff33",
@@ -154,7 +169,7 @@ const Navbar = () => {
               </MenuItem>
 
               <MenuItem
-                onClick={handleMenuClose}
+                onClick={handleLogOut}
                 sx={{
                   color: "#FF5C5C",
                   "&:hover": {
@@ -162,9 +177,7 @@ const Navbar = () => {
                   },
                 }}
               >
-                <Typography variant='body1' sx={{}}>
-                  Log Out
-                </Typography>
+                <Typography variant='body1'>Log Out</Typography>
               </MenuItem>
             </Menu>
           </Box>

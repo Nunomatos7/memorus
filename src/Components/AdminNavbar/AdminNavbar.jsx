@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import {
   AppBar,
   Toolbar,
@@ -24,7 +24,8 @@ const StyledNavLink = styled(NavLink)(() => ({
   transition: "background-color 0.3s ease, color 0.3s ease",
   "&:hover": {
     color: "#82D5C7",
-    backgroundColor: "var(--State-Layers-Primary-Opacity-12, rgba(130, 213, 199, 0.12));",
+    backgroundColor:
+      "var(--State-Layers-Primary-Opacity-12, rgba(130, 213, 199, 0.12));",
   },
   "&.active": {
     backgroundColor: "#82d5c7",
@@ -34,6 +35,7 @@ const StyledNavLink = styled(NavLink)(() => ({
 
 const AdminNavbar = () => {
   const [anchorEl, setAnchorEl] = useState(null);
+  const navigate = useNavigate();
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -41,6 +43,16 @@ const AdminNavbar = () => {
 
   const handleMenuClose = () => {
     setAnchorEl(null);
+  };
+  const handleLogOut = () => {
+    // Clear user data from localStorage
+    localStorage.removeItem("user");
+
+    // Close the dropdown menu
+    setAnchorEl(null);
+
+    // Redirect to login page
+    navigate("/login");
   };
 
   return (
@@ -138,7 +150,10 @@ const AdminNavbar = () => {
               </MenuItem>
               <Divider sx={{ backgroundColor: "gray" }} />
               <MenuItem
-                onClick={handleMenuClose}
+                onClick={() => {
+                  navigate("/change-password");
+                  handleMenuClose();
+                }}
                 sx={{
                   "&:hover": {
                     backgroundColor: "#ccff33",
@@ -150,7 +165,7 @@ const AdminNavbar = () => {
               </MenuItem>
 
               <MenuItem
-                onClick={handleMenuClose}
+                onClick={handleLogOut}
                 sx={{
                   color: "#FF5C5C",
                   "&:hover": {
@@ -158,9 +173,7 @@ const AdminNavbar = () => {
                   },
                 }}
               >
-                <Typography variant='body1' sx={{}}>
-                  Log Out
-                </Typography>
+                <Typography variant='body1'>Log Out</Typography>
               </MenuItem>
             </Menu>
           </Box>
