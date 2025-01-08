@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import PropTypes from "prop-types"; // Import PropTypes
 import "./App.css";
 import Home from "./pages/Home/Home";
 import Memors from "./pages/Memors/Memors";
@@ -11,37 +12,42 @@ import AdminMemoryBoard from "./pages/Admin/MemoryBoard/MemoryBoard";
 import AdminBoard from "./pages/Admin/AdminBoard/AdminBoard";
 import AdminLayout from "./Components/AdminLayout/AdminLayout";
 import CollaboratorLayout from "./Components/CollaboratorLayout/CollaboratorLayout";
-import "./index.css";
 import LoginPage from "./auth/LoginPage";
 import RegisterPage from "./auth/RegisterPage";
 import ChangePassword from "./auth/ChangePassword";
 
 function App() {
-  const [user, setUser] = useState(null); // User object (e.g., { email, role })
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    // Simulate fetching user info from localStorage
     const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (storedUser) {
-      setUser(storedUser);
-    }
-    setLoading(false); // Stop loading
+    setUser(storedUser);
   }, []);
 
-  if (loading) {
-    return <div>Loading...</div>; // Display loading screen while checking localStorage
-  }
+  const ProtectedRoute = ({ children, role }) => {
+    if (!user) {
+      return <Navigate to='/login' replace />;
+    }
+    if (role && user.role !== role) {
+      return <Navigate to='/login' replace />;
+    }
+    return children;
+  };
+
+  // PropTypes for ProtectedRoute
+  ProtectedRoute.propTypes = {
+    children: PropTypes.node.isRequired,
+    role: PropTypes.string,
+  };
 
   return (
     <Routes>
-      {/* Public Routes */}
       <Route
         path='/login'
         element={
           user ? (
             <Navigate
-              to={user.role === "Admin" ? "/admin/home" : "/home"}
+              to={`/${user.role === "Admin" ? "admin/home" : "home"}`}
               replace
             />
           ) : (
@@ -54,7 +60,7 @@ function App() {
         element={
           user ? (
             <Navigate
-              to={user.role === "Admin" ? "/admin/home" : "/home"}
+              to={`/${user.role === "Admin" ? "admin/home" : "home"}`}
               replace
             />
           ) : (
@@ -64,15 +70,12 @@ function App() {
       />
       <Route path='/change-password' element={<ChangePassword />} />
 
-      {/* Collaborator (Regular User) Routes */}
       <Route
         path='/home/*'
         element={
-          user && user.role === "Regular" ? (
+          <ProtectedRoute role='Regular'>
             <CollaboratorLayout />
-          ) : (
-            <Navigate to='/login' replace />
-          )
+          </ProtectedRoute>
         }
       >
         <Route index element={<Home />} />
@@ -81,15 +84,12 @@ function App() {
         <Route path='memoryboard' element={<MemoryBoard />} />
       </Route>
 
-      {/* Admin Routes */}
       <Route
         path='/admin/*'
         element={
-          user && user.role === "Admin" ? (
+          <ProtectedRoute role='Admin'>
             <AdminLayout />
-          ) : (
-            <Navigate to='/login' replace />
-          )
+          </ProtectedRoute>
         }
       >
         <Route path='home' element={<AdminHome />} />
@@ -98,7 +98,6 @@ function App() {
         <Route path='adminboard' element={<AdminBoard />} />
       </Route>
 
-      {/* Redirect unknown routes */}
       <Route path='*' element={<Navigate to='/login' replace />} />
     </Routes>
   );

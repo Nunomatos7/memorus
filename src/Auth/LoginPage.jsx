@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./LoginPage.css"; // Reuse the same CSS for consistent styling
 import logo from "../assets/images/logo.svg";
 import {
@@ -16,6 +17,7 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false); // State for Remember Me checkbox
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   // Demo user database
   const demoUsers = [
@@ -37,14 +39,15 @@ const LoginPage = () => {
       return;
     }
 
-    alert(`Login successful! Welcome, ${user.role}!`);
-    if (rememberMe) {
-      console.log("Remember Me is enabled");
-    }
+    // Save user to localStorage
+    localStorage.setItem("user", JSON.stringify(user));
 
-    // Clear inputs
-    setEmail("");
-    setPassword("");
+    // Redirect based on user role
+    if (user.role === "Admin") {
+      navigate("/admin/home");
+    } else {
+      navigate("/home");
+    }
   };
 
   const handleRememberMeChange = (event) => {
