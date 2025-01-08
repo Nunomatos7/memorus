@@ -2,35 +2,46 @@ import { useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Mousewheel, FreeMode } from "swiper/modules";
 import { Grid, Card, CardContent, Typography, Box } from "@mui/material";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import PersonIcon from "@mui/icons-material/Person";
-import MemorPicture from "../../../Components/MemorPicture/MemorPicture";
+import MemorPicture from "./../../../Components/MemorPicture/MemorPicture";
 import "swiper/css";
 import "swiper/css/free-mode";
 import "./Home.css";
+import rank1 from "../../../assets/images/rank1admin.svg";
+import rank2 from "../../../assets/images/rank2admin.svg";
+import rank3 from "../../../assets/images/rank3admin.svg";
+import ongoing from "../../../assets/images/ongoingAdmin.svg";
+import closed from "../../../assets/images/closedAdmin.svg";
 import WelcomeModal from "../../../Components/WelcomeModal/WelcomeModal";
+import { leaderboardData } from "../../Leaderboard/Leaderboard";
 
-const cardStyle = {
-  backgroundColor: "#1E1E1E",
-  color: "white",
-  borderRadius: "10px",
-  minHeight: "150px",
+const rankImages = {
+  1: rank1,
+  2: rank2,
+  3: rank3,
+};
+
+export const mockUser = {
+  id: 1,
+  name: "John Doe",
+  email: "john.doe@example.com",
+  pending_memors: 5,
+  complete_memors: 10,
+  admin: false,
 };
 
 const slidesData = [
   {
     id: 1,
     teamName: "The Debuggers",
-    title: "Coffe break",
-    description: "A nice coffe break with friends",
+    title: "Coffee break",
+    description: "A nice coffee break with friends",
     submitDate: "2 days ago",
-    // fazer função para calcular o tempo restante
     image:
       "https://cdn.pixabay.com/photo/2023/10/23/16/24/bird-8336436_1280.jpg",
   },
   {
     id: 2,
-    teamName: "Capital crew",
+    teamName: "Capital Crew",
     title: "Show us your city",
     description: "We bet it must look nice :)",
     submitDate: "8 days ago",
@@ -42,6 +53,7 @@ const slidesData = [
   { id: 5, image: "" },
   { id: 6, image: "" },
   { id: 7, image: "" },
+  { id: 8, image: "" },
 ];
 
 const Home = () => {
@@ -60,9 +72,7 @@ const Home = () => {
       <WelcomeModal />
       <section className='mb-10'>
         <div className='container mb-3'>
-          <h1 className='home-title'>
-            Latest Memors
-          </h1>
+          <h1 className='home-title'>Latest Memors</h1>
         </div>
 
         {/* Swiper */}
@@ -137,8 +147,8 @@ const Home = () => {
         </Typography>
         <Grid container spacing={3}>
           {/* Pending Memors */}
-          <Grid item xs={12} sm={4}>
-            <Card style={cardStyle}>
+          <Grid item xs={12} sm={3}>
+            <Card className='card'>
               <CardContent>
                 <Box
                   display='flex'
@@ -146,11 +156,9 @@ const Home = () => {
                   justifyContent='space-between'
                 >
                   <Typography variant='h4' fontWeight='bold'>
-                    3
+                    {mockUser.pending_memors}
                   </Typography>
-                  <AccessTimeIcon
-                    style={{ color: "#9F80FF", fontSize: "30px" }}
-                  />
+                  <img src={ongoing} alt='ongoing' />
                 </Box>
                 <Typography variant='body2' color='#B0B0B0'>
                   Pending Memors
@@ -159,9 +167,9 @@ const Home = () => {
             </Card>
           </Grid>
 
-          {/* Completed Memors */}
-          <Grid item xs={12} sm={4}>
-            <Card style={cardStyle}>
+          {/* Closed Memors */}
+          <Grid item xs={12} sm={3}>
+            <Card className='card'>
               <CardContent>
                 <Box
                   display='flex'
@@ -169,20 +177,20 @@ const Home = () => {
                   justifyContent='space-between'
                 >
                   <Typography variant='h4' fontWeight='bold'>
-                    --
+                    {mockUser.complete_memors}
                   </Typography>
-                  <PersonIcon style={{ color: "#9F80FF", fontSize: "30px" }} />
+                  <img src={closed} alt='ongoing' />
                 </Box>
                 <Typography variant='body2' color='#B0B0B0'>
-                  Completed Memors
+                  Closed Memors
                 </Typography>
               </CardContent>
             </Card>
           </Grid>
 
           {/* Remaining Time */}
-          <Grid item xs={12} sm={4}>
-            <Card style={cardStyle}>
+          <Grid item xs={12} sm={6}>
+            <Card className='card'>
               <CardContent>
                 <div className='flex justify-between items-center'>
                   <Typography
@@ -196,7 +204,7 @@ const Home = () => {
                     variant='h3'
                     fontWeight='bold'
                     color='white'
-                    style={{ margin: "10px 0", fontSize: "2.5rem" }}
+                    style={{ margin: "10px 0", fontSize: "2rem" }}
                   >
                     20 days
                   </Typography>
@@ -210,6 +218,98 @@ const Home = () => {
               </CardContent>
             </Card>
           </Grid>
+        </Grid>
+      </section>
+
+      <section id='currentLeaders' className='pb-10 container'>
+        <Typography variant='h6' gutterBottom style={{ color: "white" }}>
+          Current Leaders
+        </Typography>
+        <Grid container spacing={3}>
+          {leaderboardData
+            .filter((team) => team.rank <= 3)
+            .map((team) => (
+              <Grid
+                item
+                xs={12}
+                sm={team.rank === 1 ? 5 : team.rank === 2 ? 4 : 3}
+                key={team.rank}
+              >
+                <Card className='card'>
+                  <Box
+                    display='flex'
+                    alignItems='center'
+                    style={{ width: "100%" }}
+                  >
+                    {/* Left Column - Rank Image */}
+                    <Box style={{ flex: 1, textAlign: "center" }}>
+                      <img
+                        src={rankImages[team.rank]}
+                        alt={`Rank ${team.rank}`}
+                        style={{
+                          position: "absolute",
+                          bottom: "0px",
+                          left: "10px",
+                          height: `${75 - team.rank * 10}%`,
+                        }}
+                      />
+                    </Box>
+
+                    {/* Right Column - Team Details */}
+                    <Box
+                      style={{
+                        flex: team.rank === 1 ? 1 : 1.5,
+                        paddingRight: "20px",
+                      }}
+                    >
+                      <Box
+                        className='team-header'
+                        display='flex'
+                        justifyContent='space-between'
+                      >
+                        <Typography variant='h6' className='team-name'>
+                          {team.teamName}
+                        </Typography>
+                        <img
+                          src={team.avatar}
+                          alt={team.teamName}
+                          className='team-avatar-admin'
+                          style={{
+                            width: "50px",
+                            height: "50px",
+                            borderRadius: "50%",
+                            objectFit: "cover",
+                          }}
+                        />
+                      </Box>
+                      <Box
+                        className='stats'
+                        display='flex'
+                        justifyContent='space-between'
+                        marginTop='10px'
+                      >
+                        <div>
+                          <Typography variant='body2' className='label'>
+                            Total Points
+                          </Typography>
+                          <Typography variant='h5' className='value'>
+                            {team.points}
+                          </Typography>
+                        </div>
+                        <div>
+                          <Typography variant='body2' className='label'>
+                            Total Memors
+                          </Typography>
+                          <Typography variant='h5' className='value'>
+                            {team.memors}
+                          </Typography>
+                        </div>
+                      </Box>
+                    </Box>
+                  </Box>
+                </Card>
+              </Grid>
+            ))}
         </Grid>
       </section>
     </>

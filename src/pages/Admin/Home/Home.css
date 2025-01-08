@@ -1,85 +1,146 @@
 section {
-    max-height: 400px;
-  }
-  .latest-wrapper {
-    height: clamp(225px, 10vw, 300px);
-    overflow: visible !important;
-  }
-  
-  .home-title {
-    font-size: 2rem !important;
-  }
-  
-  .latest-memors {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    width: 100px;
-    height: 100%;
-    border: 2px dashed #cfd0d0;
-    border-radius: 10px;
-    padding: 5px;
-    overflow: hidden;
-  }
-  
-  .latest-memors-pic {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    width: 100px;
-    height: 100%;
-    border-radius: 10px;
-    overflow: hidden;
-    position: relative;
-    cursor: pointer;
-  }
-  
-  .image-wrapper {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
-  }
-  
-  .image-wrapper::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(to top, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
-    pointer-events: none;
-  }
-  
-  .image-wrapper img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    user-select: none;
-  }
-  
-  .latest-memors-content {
-    position: absolute;
-    bottom: 0.625rem;
-    left: 0.625rem;
-    cursor: pointer;
-    user-select: none;
-  }
-  
-  .team-name {
-    color: #d0bcfe;
-    font-size: 1rem;
-    font-weight: 700;
-  }
-  
-  #myMemors h2 {
-    color: #fff;
-    font-size: 1.5rem;
-    font-style: normal;
-    font-weight: 700;
-  }
-  
+  max-height: 400px;
+}
+.latest-wrapper {
+  height: clamp(225px, 10vw, 300px);
+  overflow: visible !important;
+}
+
+.home-title {
+  font-size: 2rem !important;
+}
+
+.latest-memors {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  width: 100px;
+  height: 100%;
+  border: 2px dashed #cfd0d0;
+  border-radius: 10px;
+  padding: 5px;
+  overflow: hidden;
+}
+
+.latest-memors-pic {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  width: 100px;
+  height: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+}
+
+.image-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+}
+
+.image-wrapper::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to top, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
+  pointer-events: none;
+}
+
+.image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+}
+
+.latest-memors-content {
+  position: absolute;
+  bottom: 0.625rem;
+  left: 0.625rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.team-name {
+  color: #d0bcfe;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+#myMemors h2 {
+  color: #fff;
+  font-size: 1.5rem;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.card {
+  background-color: #1e1e1e !important;
+  color: white !important;
+  border-radius: 16px !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+  min-height: 150px;
+  position: relative;
+}
+
+.number {
+  font-size: 4rem;
+  font-weight: bold;
+  color: #9f80ff;
+}
+
+.team-details {
+  flex: 1;
+}
+
+.team-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.team-name {
+  font-weight: bold;
+  color: white;
+}
+
+.team-avatar-admin {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #1e928a;
+}
+
+.stats {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.stats div {
+  text-align: center;
+}
+
+.label {
+  color: #b0b0b0;
+  font-size: 0.9rem;
+}
+
+.value {
+  font-size: 1.5rem;
+  font-weight: bold;
+}

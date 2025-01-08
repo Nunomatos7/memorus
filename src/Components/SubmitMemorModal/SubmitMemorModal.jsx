@@ -29,7 +29,7 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
   const handleSubmit = () => {
     if (uploadedImage) {
       onSubmit();
-  
+
       setFeedback({
         type: "success",
         title: "You submitted a Memor",
@@ -43,11 +43,10 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
         description:
           "Please upload an image before submitting! Try again or check the details.",
       });
-  
+
       setIsSubmitMemorOpen(false);
     }
   };
-  
 
   const closeFeedbackModal = () => {
     setFeedback(null);
@@ -71,17 +70,39 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
                   {
                     label: "Close",
                     onClick: onClose,
+                    style: {
+                      backgroundColor: "transparent",
+                      border: "1px solid #988c9c",
+                      color: "#D0BCFE",
+                      "&:hover": {
+                        backgroundColor: "rgba(181, 237, 228, 0.08)",
+                      },
+                    },
                   },
                   {
                     label: "Try Again",
                     onClick: closeFeedbackModal,
-                    style: { backgroundColor: "#d0bcfe", color: "#381e72" },
+                    style: {
+                      backgroundColor: "#d0bcfe",
+                      color: "#381e72",
+                      "&:hover": {
+                        backgroundColor: "#c8acf4",
+                      },
+                    },
                   },
                 ]
               : [
                   {
                     label: "Close",
                     onClick: closeFeedbackModal,
+                    style: {
+                      backgroundColor: "transparent",
+                      border: "1px solid #988c9c",
+                      color: "#D0BCFE",
+                      "&:hover": {
+                        backgroundColor: "rgba(181, 237, 228, 0.08)",
+                      },
+                    },
                   },
                   {
                     label: "Go to Memory Board",
@@ -89,8 +110,14 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
                       onSubmit();
                       window.location.href = "/memoryBoard";
                     },
-                    style: { backgroundColor: "#d0bcfe", color: "#381e72" },
-                  }
+                    style: {
+                      backgroundColor: "#d0bcfe",
+                      color: "#381e72",
+                      "&:hover": {
+                        backgroundColor: "#c8acf4",
+                      },
+                    },
+                  },
                 ]
           }
         />
@@ -186,13 +213,27 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
             </Typography>
 
             <div className="modal-actions">
-              <CustomButton text="Cancel" onClose={onClose} />
+              <CustomButton
+                text="Cancel"
+                onClick={onClose}
+                sx={{
+                  backgroundColor: "transparent",
+                  border: "1px solid #988c9c",
+                  color: "#D0BCFE",
+                  "&:hover": {
+                    backgroundColor: "rgba(181, 237, 228, 0.08)",
+                  },
+                }}
+              />
               <CustomButton
                 text="Submit"
                 onClick={handleSubmit}
                 sx={{
                   backgroundColor: "#d0bcfe",
                   color: "#381e72",
+                  "&:hover": {
+                    backgroundColor: "#c8acf4",
+                  },
                 }}
               />
             </div>

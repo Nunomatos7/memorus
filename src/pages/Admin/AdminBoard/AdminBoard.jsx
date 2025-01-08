@@ -24,7 +24,6 @@ import {
 } from "@mui/icons-material";
 import ConfirmationModal from "../../../Components/ConfirmationModal/ConfirmationModal";
 import FeedbackModal from "../../../Components/FeedbackModal/FeedbackModal";
-import dayjs from "dayjs";
 
 const AdminBoard = () => {
   const [tab, setTab] = useState("memors");
@@ -449,29 +448,42 @@ const AdminBoard = () => {
   };
 
   const handleCreateMemor = () => {
-    if (!newMemorTitle || !newMemorDate || !newMemorPoints) {
-      alert("Please fill in all the fields.");
-      return;
+    try {
+      if (!newMemorTitle || !newMemorDate || !newMemorPoints) {
+        alert("Please fill in all the fields.");
+        return;
+      }
+
+      // Format the date using JavaScript's Date object
+      const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+      };
+
+      const newMemor = {
+        title: newMemorTitle,
+        description: newMemorDescription,
+        date: formatDate(newMemorDate),
+        points: `+ ${newMemorPoints} pts`,
+        timeLeft: "9:00H",
+        teamsLeft: Object.keys(teams).length,
+      };
+
+      setMemors((prevMemors) => [...prevMemors, newMemor]);
+      setFeedbackModal({
+        open: true,
+        type: "success",
+        title: "Memor Created",
+        description: `The memor "${newMemorTitle}" has been successfully created.`,
+      });
+
+      handleCreateMemorModalClose();
+    } catch (error) {
+      console.error("Error while creating a memor:", error);
     }
-
-    const newMemor = {
-      title: newMemorTitle,
-      description: newMemorDescription,
-      date: dayjs(newMemorDate).format("DD/MM/YYYY"),
-      points: `+ ${newMemorPoints} pts`,
-      timeLeft: "9:00H",
-      teamsLeft: Object.keys(teams).length,
-    };
-
-    setMemors((prevMemors) => [...prevMemors, newMemor]);
-    setFeedbackModal({
-      open: true,
-      type: "success",
-      title: "Memor Created",
-      description: `The memor "${newMemorTitle}" has been successfully created.`,
-    });
-
-    handleCreateMemorModalClose();
   };
 
   const handleCreateMemorModalOpen = () => {
@@ -513,6 +525,72 @@ const AdminBoard = () => {
   const cancelDeleteMemor = () => {
     setDeleteMemorModalOpen(false);
     setMemorToDelete(null);
+  };
+
+  const [isEditMemorModalOpen, setIsEditMemorModalOpen] = useState(false);
+  const [memorToEdit, setMemorToEdit] = useState(null);
+
+  const handleEditMemorModalOpen = (memor) => {
+    setMemorToEdit(memor);
+    setNewMemorTitle(memor.title);
+    setNewMemorDescription(memor.description);
+    setNewMemorDate(memor.date.split("/").reverse().join("-")); // Convert DD/MM/YYYY to YYYY-MM-DD
+    setNewMemorPoints(
+      parseInt(memor.points.replace("+ ", "").replace(" pts", ""), 10)
+    );
+    setIsEditMemorModalOpen(true);
+  };
+
+  const handleEditMemorModalClose = () => {
+    setIsEditMemorModalOpen(false);
+    setMemorToEdit(null);
+    setNewMemorTitle("");
+    setNewMemorDescription("");
+    setNewMemorDate(null);
+    setNewMemorPoints(null);
+  };
+
+  const handleEditMemor = () => {
+    try {
+      if (!newMemorTitle || !newMemorDate || !newMemorPoints) {
+        alert("Please fill in all the fields.");
+        return;
+      }
+
+      // Format the date using JavaScript's Date object
+      const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+      };
+
+      const updatedMemor = {
+        ...memorToEdit,
+        title: newMemorTitle,
+        description: newMemorDescription,
+        date: formatDate(newMemorDate),
+        points: `+ ${newMemorPoints} pts`,
+      };
+
+      setMemors((prevMemors) =>
+        prevMemors.map((memor) =>
+          memor === memorToEdit ? updatedMemor : memor
+        )
+      );
+
+      setFeedbackModal({
+        open: true,
+        type: "success",
+        title: "Memor Updated",
+        description: `The memor "${newMemorTitle}" has been successfully updated.`,
+      });
+
+      handleEditMemorModalClose();
+    } catch (error) {
+      console.error("Error while editing a memor:", error);
+    }
   };
 
   return (
@@ -798,7 +876,12 @@ const AdminBoard = () => {
                     gap: "5px",
                   }}
                 >
-                  <IconButton onClick={(e) => e.stopPropagation()}>
+                  <IconButton
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleEditMemorModalOpen(memor);
+                    }}
+                  >
                     {memor.timeLeft !== "0:00H" && (
                       <img
                         src={editIcon}
@@ -807,6 +890,7 @@ const AdminBoard = () => {
                       />
                     )}
                   </IconButton>
+
                   <IconButton
                     onClick={(e) => {
                       e.stopPropagation();
@@ -1549,6 +1633,153 @@ const AdminBoard = () => {
             context="memor"
             itemName={memorToDelete?.title}
           />
+        )}
+
+        {/* Edit Memor Modal */}
+        {isEditMemorModalOpen && (
+          <div className="modal-overlay-submit-memor">
+            <div
+              className="modal-container"
+              style={{ padding: "20px", maxWidth: "600px" }}
+            >
+              <div className="modal-top" style={{ marginBottom: "20px" }}>
+                <Button
+                  onClick={() => handleEditMemorModalClose()}
+                  sx={{ minWidth: 0, p: 0, color: "#BEC9C5" }}
+                >
+                  <ArrowBackIcon />
+                </Button>
+                <Typography
+                  variant="h6"
+                  sx={{ marginLeft: "10px", color: "#BEC9C5" }}
+                >
+                  Admin Board
+                </Typography>
+              </div>
+              <Typography
+                variant="h5"
+                sx={{
+                  fontWeight: "bold",
+                  color: "#FFFFFF",
+                  marginBottom: "20px",
+                }}
+              >
+                Edit Memor
+              </Typography>
+              <TextField
+                label="Title"
+                variant="outlined"
+                value={newMemorTitle}
+                onChange={(e) => setNewMemorTitle(e.target.value)}
+                fullWidth
+                sx={{
+                  marginBottom: "20px",
+                  "& .MuiInputBase-input": { color: "#FFFFFF" },
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": { borderColor: "#90948c" },
+                    "&:hover fieldset": { borderColor: "#AAA" },
+                    "&.Mui-focused fieldset": { borderColor: "#CCC" },
+                  },
+                  "& .MuiInputLabel-root": { color: "#888" },
+                }}
+              />
+              <Typography variant="body1" sx={{ color: "#CAC4D0" }}>
+                Due Date
+              </Typography>
+              <TextField
+                type="date"
+                value={newMemorDate || ""}
+                onChange={(e) => setNewMemorDate(e.target.value)}
+                fullWidth
+                inputProps={{
+                  min: getTodayDate(),
+                }}
+                sx={{
+                  marginBottom: "20px",
+                  "& .MuiInputBase-input": { color: "#FFFFFF" },
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": { borderColor: "#90948c" },
+                    "&:hover fieldset": { borderColor: "#AAA" },
+                    "&.Mui-focused fieldset": { borderColor: "#CCC" },
+                  },
+                  "&hover": { backgroundColor: "#80ccbc" },
+                }}
+              />
+              <TextField
+                label="Description"
+                variant="outlined"
+                multiline
+                rows={4}
+                value={newMemorDescription}
+                onChange={(e) => setNewMemorDescription(e.target.value)}
+                fullWidth
+                sx={{
+                  marginBottom: "20px",
+                  "& .MuiInputBase-input": { color: "#FFFFFF" },
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": { borderColor: "#90948c" },
+                    "&:hover fieldset": { borderColor: "#AAA" },
+                    "&.Mui-focused fieldset": { borderColor: "#CCC" },
+                  },
+                  "& .MuiInputLabel-root": { color: "#888" },
+                }}
+              />
+              <Typography variant="body1" sx={{ color: "#CAC4D0" }}>
+                Points
+              </Typography>
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: 2,
+                  marginBottom: "20px",
+                  justifyContent: "space-between",
+                }}
+              >
+                {[5, 10, 20, 30, 50, 100].map((point) => (
+                  <Button
+                    key={point}
+                    onClick={() => setNewMemorPoints(point)}
+                    sx={{
+                      backgroundColor:
+                        newMemorPoints === point ? "#283434" : "#181c1c",
+                      color: "#82D5C7",
+                      borderRadius: "50%",
+                      width: "50px",
+                      height: "50px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      minWidth: 0,
+                      "&:hover": { backgroundColor: "#1f2c29" },
+                    }}
+                  >
+                    {point}
+                  </Button>
+                ))}
+              </Box>
+              <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
+                <CustomButton
+                  text="Cancel"
+                  onClick={() => handleEditMemorModalClose()}
+                  sx={{
+                    backgroundColor: "transparent",
+                    border: "1px solid #B5EDE4",
+                    color: "#B5EDE4",
+                    borderRadius: "50px",
+                    "&:hover": { backgroundColor: "rgba(181, 237, 228, 0.08)" },
+                  }}
+                />
+                <CustomButton
+                  text="Submit"
+                  onClick={() => handleEditMemor()}
+                  sx={{
+                    borderRadius: "50px",
+                    "&:hover": { backgroundColor: "#80ccbc" },
+                  }}
+                />
+              </Box>
+            </div>
+          </div>
         )}
       </Box>
     </div>
