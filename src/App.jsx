@@ -20,20 +20,18 @@ import Navbar from "./Components/Navbar/Navbar";
 function App() {
   const [user, setUser] = useState(null);
 
-  // Test User Database
   const demoUsers = [
     { email: "admin@example.com", password: "admin123", role: "Admin" },
     { email: "user@example.com", password: "user123", role: "Regular" },
+    { email: "nengue@nengue.com", password: "nengue", role: "Regular" },
   ];
 
   useEffect(() => {
-    // Load user from localStorage on initial render
     const storedUser = JSON.parse(localStorage.getItem("user"));
     if (storedUser) {
       setUser(storedUser);
     }
 
-    // Listen for `storage` events (e.g., logout)
     const handleStorageChange = () => {
       const updatedUser = JSON.parse(localStorage.getItem("user"));
       setUser(updatedUser);
@@ -55,16 +53,16 @@ function App() {
       throw new Error("Invalid email or password");
     }
 
-    // Save user to state and localStorage
     setUser(authenticatedUser);
     localStorage.setItem("user", JSON.stringify(authenticatedUser));
     return authenticatedUser;
   };
 
   const logout = () => {
-    // Clear user data
     localStorage.removeItem("user");
     setUser(null);
+
+    window.location.href = "/login";
   };
 
   const ProtectedRoute = ({ children, role }) => {
@@ -85,7 +83,7 @@ function App() {
   return (
     <>
       {/* Render Navbar only if user is logged in */}
-      {user && <Navbar logout={logout} />}
+      {user == "Regular" && <Navbar logout={logout} />}
       <Routes>
         {/* Login Route */}
         <Route

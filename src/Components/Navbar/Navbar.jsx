@@ -45,14 +45,9 @@ const Navbar = () => {
   };
 
   const handleLogOut = () => {
-    // Clear user data from localStorage
     localStorage.removeItem("user");
-
-    // Close the dropdown menu
     setAnchorEl(null);
-
-    // Redirect to login page
-    navigate("/login");
+    window.location.href = "/login";
   };
 
   return (

@@ -52,7 +52,7 @@ const AdminNavbar = () => {
     setAnchorEl(null);
 
     // Redirect to login page
-    navigate("/login");
+    window.location.href = "/login";
   };
 
   return (
