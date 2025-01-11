@@ -77,7 +77,7 @@ const AdminNavbar = () => {
       >
         {/* Logo */}
         <Box>
-          <NavLink to='/admin'>
+          <NavLink to='/admin/home'>
             <img
               src={logo}
               alt='logo'
@@ -88,7 +88,7 @@ const AdminNavbar = () => {
 
         {/* Navigation Menu */}
         <Box sx={{ display: "flex", gap: "24px", alignItems: "center" }}>
-          <StyledNavLink to='/admin' end>
+          <StyledNavLink to='/admin/home' end>
             <Typography variant='body2' sx={{ fontWeight: 600 }}>
               Home
             </Typography>
