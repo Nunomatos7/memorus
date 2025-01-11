@@ -68,36 +68,7 @@ const posts = [
     imgSrc: imgTest,
     title: "Share Di Maria",
   },
-  {
-    date: "16/12/2024",
-    imgSrc: imgTest,
-    title: "Share Di Maria",
-  },
-  {
-    date: "16/12/2024",
-    imgSrc: imgTest,
-    title: "Share Di Maria",
-  },
-  {
-    date: "01/12/2024",
-    imgSrc: imgTest,
-    title: "Share Di Maria",
-  },
-  {
-    date: "16/12/2024",
-    imgSrc: imgTest,
-    title: "Share Di Maria",
-  },
-  {
-    date: "16/12/2024",
-    imgSrc: imgTest,
-    title: "Share Di Maria",
-  },
-  {
-    date: "01/12/2024",
-    imgSrc: imgTest,
-    title: "Share Di Maria",
-  },
+  
 ];
 
 const renderPosts = () => {
