@@ -15,7 +15,6 @@ import CollaboratorLayout from "./Components/CollaboratorLayout/CollaboratorLayo
 import LoginPage from "./auth/LoginPage";
 import RegisterPage from "./auth/RegisterPage";
 import ChangePassword from "./auth/ChangePassword";
-import Navbar from "./Components/Navbar/Navbar";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -58,13 +57,6 @@ function App() {
     return authenticatedUser;
   };
 
-  const logout = () => {
-    localStorage.removeItem("user");
-    setUser(null);
-
-    window.location.href = "/login";
-  };
-
   const ProtectedRoute = ({ children, role }) => {
     if (!user) {
       return <Navigate to='/login' replace />;
@@ -82,8 +74,6 @@ function App() {
 
   return (
     <>
-      {/* Render Navbar only if user is logged in */}
-      {user == "Regular" && <Navbar logout={logout} />}
       <Routes>
         {/* Login Route */}
         <Route
@@ -118,14 +108,14 @@ function App() {
 
         {/* Regular User Routes */}
         <Route
-          path='/home/*'
+          path='/*'
           element={
             <ProtectedRoute role='Regular'>
               <CollaboratorLayout />
             </ProtectedRoute>
           }
         >
-          <Route index element={<Home />} />
+          <Route path='home' index element={<Home />} />
           <Route path='memors' element={<Memors />} />
           <Route path='leaderboard' element={<Leaderboard />} />
           <Route path='memoryboard' element={<MemoryBoard />} />

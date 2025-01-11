@@ -72,7 +72,7 @@ const Navbar = () => {
       >
         {/* Logo */}
         <Box>
-          <NavLink to='/'>
+          <NavLink to='/home'>
             <img
               src={logo}
               alt='logo'
@@ -83,7 +83,7 @@ const Navbar = () => {
 
         {/* Navigation Menu */}
         <Box sx={{ display: "flex", gap: "24px", alignItems: "center" }}>
-          <StyledNavLink to='/' end>
+          <StyledNavLink to='/home' end>
             <Typography variant='body2' sx={{ fontWeight: 600 }}>
               Home
             </Typography>
