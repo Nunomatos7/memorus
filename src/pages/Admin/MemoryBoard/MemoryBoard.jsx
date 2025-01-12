@@ -68,7 +68,6 @@ const posts = [
     imgSrc: imgTest,
     title: "Share Di Maria",
   },
-  
 ];
 
 const renderPosts = () => {
@@ -105,7 +104,7 @@ const renderPosts = () => {
           {post.date}
         </p>
         <img src={post.imgSrc} alt='1' style={{ height: "60%" }} />
-        <h1
+        <p
           style={{
             color: "black",
             textAlign: "center",
@@ -114,7 +113,7 @@ const renderPosts = () => {
           }}
         >
           {post.title}
-        </h1>
+        </p>
       </div>
     );
   });
