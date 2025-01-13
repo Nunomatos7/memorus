@@ -76,11 +76,20 @@ section {
   font-weight: 700;
 }
 
+#myMemors {
+  margin-top: 40px !important;
+}
+
 #myMemors h2 {
   color: #fff;
   font-size: 1.5rem;
   font-style: normal;
   font-weight: 700;
+}
+
+#currentLeaders {
+  margin-top: 40px !important;
+  margin-bottom: 40px !important;
 }
 
 .card {

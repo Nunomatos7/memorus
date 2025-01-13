@@ -62,7 +62,7 @@ const Home = () => {
     <>
       <WelcomeModal />
       <section className='mb-10'>
-        <div className='container mb-3'>
+        <div className='container' style={{ marginBottom: "1rem", marginTop: "2rem" }}>
           <h1 className='home-title'>
             Latest Memors • <span className='team-name'>The Debuggers</span>
           </h1>
@@ -134,14 +134,19 @@ const Home = () => {
         )}
       </section>
 
-      <section id='myMemors' className='mb-10 container'>
+      <section id='myMemors' className='container'>
         <Typography variant='h6' gutterBottom style={{ color: "white" }}>
           My Memors
         </Typography>
         <Grid container spacing={3}>
           {/* Pending Memors */}
           <Grid item xs={12} sm={3}>
-            <Card className='card'>
+            <Card className='card'
+            onClick={() =>
+              (window.location.href = "/memors?tab=incomplete")
+            }
+            style={{ cursor: "pointer" }}
+            >
               <CardContent>
                 <Box
                   display='flex'
@@ -162,7 +167,12 @@ const Home = () => {
 
           {/* Completed Memors */}
           <Grid item xs={12} sm={3}>
-            <Card className='card'>
+            <Card className='card'
+            onClick={() =>
+              (window.location.href = "/memors?tab=completed")
+            }
+            style={{ cursor: "pointer" }}
+            >
               <CardContent>
                 <Box
                   display='flex'
@@ -202,12 +212,6 @@ const Home = () => {
                     20 days
                   </Typography>
                 </div>
-                <Typography variant='body2' color='#B0B0B0'>
-                  The theme of this competition is:{" "}
-                  <span style={{ color: "white", fontWeight: "bold" }}>
-                    Christmas
-                  </span>
-                </Typography>
               </CardContent>
             </Card>
           </Grid>
@@ -215,7 +219,6 @@ const Home = () => {
       </section>
 
       {/* Current Leaders */}
-
       <section id='currentLeaders' className='pb-10 container'>
         <Typography variant='h6' gutterBottom style={{ color: "white" }}>
           Current Leaders
@@ -230,7 +233,10 @@ const Home = () => {
                 sm={team.rank === 1 ? 5 : team.rank === 2 ? 4 : 3}
                 key={team.rank}
               >
-                <Card className='card'>
+                <Card className='card'
+                  onClick={() => { window.location.href = "/leaderboard" }}
+                  style={{ cursor: "pointer" }}
+                >
                   <Box
                     display='flex'
                     alignItems='center'
