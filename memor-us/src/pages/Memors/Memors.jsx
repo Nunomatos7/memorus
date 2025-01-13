@@ -25,6 +25,8 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Mousewheel, FreeMode } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/free-mode";
+import {useLocation} from "react-router-dom";
+import AddRoundedIcon from '@mui/icons-material/AddRounded';
 
 const initialOngoingMemors = [
   {
@@ -145,7 +147,11 @@ const allMemors = [
 ];
 
 const Memors = () => {
-  const [tab, setTab] = useState("all");
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const tabParam = searchParams.get("tab") || "all";
+
+  const [tab, setTab] = useState(tabParam);
   const [expandedIndex, setExpandedIndex] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -209,171 +215,163 @@ const Memors = () => {
         </div>
 
         {/* Swiper Section */}
-        <Swiper
-          spaceBetween={80}
-          breakpoints={{
-            640: {
-              slidesPerView: 2.3,
-            },
-            768: {
-              slidesPerView: 3.3,
-            },
-            1024: {
-              slidesPerView: 4.3,
-            },
-          }}
-          freeMode={true}
-          mousewheel={{
-            releaseOnEdges: true,
-          }}
-          modules={[Mousewheel, FreeMode]}
-        >
-          {ongoingMemors.map((memor, index) => (
-            <SwiperSlide key={index}>
-              <Card
-                key={index}
+          <Swiper
+            spaceBetween={80}
+            breakpoints={{
+              640: {
+                slidesPerView: 2.3,
+              },
+              768: {
+                slidesPerView: 3.3,
+              },
+              1024: {
+                slidesPerView: 4.3,
+              },
+            }}
+            freeMode={true}
+            mousewheel={{
+              releaseOnEdges: true,
+            }}
+            modules={[Mousewheel, FreeMode]}
+          >
+            {ongoingMemors.map((memor, index) => (
+              <SwiperSlide key={index}>
+                <Card
+            key={index}
+            sx={{
+              width: "300px",
+              height: "220px",
+              backgroundColor: "#1E1F20",
+              color: "white",
+              borderRadius: "12px",
+              boxShadow: "0px 4px 10px rgba(0,0,0,0.2)",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              paddingBottom: "8px",
+              flexShrink: 0,
+            }}
+                >
+            <CardContent>
+              <Typography variant="h6" sx={{ mb: 1, fontWeight: "bold" }}>
+                {memor.title}
+              </Typography>
+
+              <Box
                 sx={{
-                  width: "300px",
-                  height: "220px",
-                  backgroundColor: "#1E1F20",
-                  color: "white",
-                  borderRadius: "12px",
-                  boxShadow: "0px 4px 10px rgba(0,0,0,0.2)",
                   display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-between",
-                  paddingBottom: "8px",
-                  flexShrink: 0,
+                  alignItems: "center",
+                  mb: 1,
                 }}
               >
-                <CardContent>
-                  <Typography variant="h6" sx={{ mb: 1, fontWeight: "bold" }}>
-                    {memor.title}
-                  </Typography>
+                <Groups fontSize="small" sx={{ mr: 1, color: "gray" }} />
+                <Typography color="gray" sx={{ fontSize: "0.8rem" }}>
+                  {memor.submission}
+                </Typography>
+              </Box>
 
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      mb: 1,
-                    }}
-                  >
-                    <Groups fontSize="small" sx={{ mr: 1, color: "gray" }} />
-                    <Typography color="gray" sx={{ fontSize: "0.8rem" }}>
-                      {memor.submission}
-                    </Typography>
-                  </Box>
-
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                    }}
-                  >
-                    <TodayIcon fontSize="small" sx={{ mr: 1, color: "gray" }} />
-                    <Typography
-                      variant="body2"
-                      color="gray"
-                      sx={{ fontSize: "0.8rem" }}
-                    >
-                      Due on {memor.dueDate}
-                    </Typography>
-                  </Box>
-                  <Box sx={{ display: "flex", gap: "10px" }}>
-                    {memor.timeLeft && (
-                      <Chip
-                        label={memor.timeLeft}
-                        size="small"
-                        sx={{
-                          backgroundColor: "rgba(255, 0, 136, 0.2)",
-                          color: "#D582B0",
-                          borderRadius: "40px",
-                          marginTop: "10px",
-                          boxShadow: "0px 4px 10px rgba(0,0,0,0.4)",
-                        }}
-                      />
-                    )}
-                    {memor.status === "submitted" && (
-                      <Chip
-                        label="Submitted"
-                        size="small"
-                        sx={{
-                          backgroundColor: "rgba(0, 255, 163, 0.2)",
-                          color: "#82D5C7",
-                          borderRadius: "40px",
-                          marginTop: "10px",
-                          boxShadow: "0px 4px 10px rgba(0,0,0,0.4)",
-                        }}
-                      />
-                    )}
-                  </Box>
-                </CardContent>
-
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
-                    padding: "8px 16px",
-                    cursor: "pointer",
-                    width: "fit-content",
-                  }}
-                  onClick={() => handleOpenModal(memor)}
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <TodayIcon fontSize="small" sx={{ mr: 1, color: "gray" }} />
+                <Typography
+                  variant="body2"
+                  color="gray"
+                  sx={{ fontSize: "0.8rem" }}
                 >
-                  <Button
-                    variant="contained"
-                    sx={{
-                      backgroundColor: "#7E57C2",
-                      color: "white",
-                      borderRadius: "8px",
-                      width: "30px",
-                      height: "30px",
-                      minWidth: "0px",
-                      padding: "0px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      boxShadow: "0px 4px 10px rgba(0,0,0,0.4)",
-                      "&:hover": {
-                        backgroundColor: "#6A48B3",
-                      },
-                    }}
-                  >
-                    <Typography
-                      component="span"
-                      sx={{
-                        fontSize: "16px",
-                        lineHeight: "1",
-                      }}
-                    >
-                      {">"}
-                    </Typography>
-                  </Button>
+                  Due on {memor.dueDate}
+                </Typography>
+              </Box>
+              <Box sx={{ display: "flex", gap: "10px" }}>
+                {memor.timeLeft && (
+                  <Chip
+              label={memor.timeLeft}
+              size="small"
+              sx={{
+                backgroundColor: "rgba(255, 0, 136, 0.2)",
+                color: "#D582B0",
+                borderRadius: "40px",
+                marginTop: "10px",
+                boxShadow: "0px 4px 10px rgba(0,0,0,0.4)",
+              }}
+                  />
+                )}
+                {memor.status === "submitted" && (
+                  <Chip
+              label="Submitted"
+              size="small"
+              sx={{
+                backgroundColor: "rgba(0, 255, 163, 0.2)",
+                color: "#82D5C7",
+                borderRadius: "40px",
+                marginTop: "10px",
+                boxShadow: "0px 4px 10px rgba(0,0,0,0.4)",
+              }}
+                  />
+                )}
+              </Box>
+            </CardContent>
 
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontSize: "0.8rem",
-                      color: "white",
-                    }}
-                  >
-                    View details
-                  </Typography>
-                </Box>
-              </Card>
-            </SwiperSlide>
-          ))}
-        </Swiper>
-      </Box>
-      {isModalOpen && (
-        <SubmitMemorModal
-          memor={selectedMemor}
-          onClose={handleCloseModal}
-          onSubmit={() => handleSubmitMemor(selectedMemor.id)}
-        />
-      )}
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                padding: "8px 16px",
+                cursor: "pointer",
+                width: "fit-content",
+              }}
+              onClick={() => handleOpenModal(memor)}
+            >
+              <Button
+                variant="contained"
+                sx={{
+                  backgroundColor: "#7E57C2",
+                  color: "white",
+                  borderRadius: "8px",
+                  width: "30px",
+                  height: "30px",
+                  minWidth: "0px",
+                  padding: "0px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  boxShadow: "0px 4px 10px rgba(0,0,0,0.4)",
+                  "&:hover": {
+              backgroundColor: "#6A48B3",
+                  },
+                }}
+              >
+                <AddRoundedIcon fontSize="small" />
+              </Button>
 
-      {/* Divider */}
+              <Typography
+                variant="body2"
+                sx={{
+                  fontSize: "0.8rem",
+                  color: "white",
+                }}
+              >
+                View details
+              </Typography>
+            </Box>
+                </Card>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+              </Box>
+              {isModalOpen && (
+          <SubmitMemorModal
+            memor={selectedMemor}
+            onClose={handleCloseModal}
+            onSubmit={() => handleSubmitMemor(selectedMemor.id)}
+          />
+              )}
+
+              {/* Divider */}
       <Divider
         sx={{
           backgroundColor: "gray",

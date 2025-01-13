@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "./Login/LoginPage.css";
+import "./LoginPage.css"; // Reuse the same CSS for consistent styling
 import logo from "../assets/images/logo.svg";
 import { TextField, Button, Typography } from "@mui/material";
 import leftBackground from "../assets/images/left-auth.svg";

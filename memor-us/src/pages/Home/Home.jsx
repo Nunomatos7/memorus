@@ -13,6 +13,7 @@ import pending from "../../assets/images/pendingHome.svg";
 import completed from "../../assets/images/completedHome.svg";
 import WelcomeModal from "../../Components/WelcomeModal/WelcomeModal";
 import { leaderboardData } from "../Leaderboard/Leaderboard";
+import Countdown from "../../Components/Countdown/Countdown";
 
 const rankImages = {
   1: rank1,
@@ -32,7 +33,7 @@ const slidesData = [
   },
   {
     id: 2,
-    teamName: "Capital Crew",
+    teamName: "The Debuggers",
     title: "Show us your city",
     description: "We bet it must look nice :)",
     submitDate: "8 days ago",
@@ -52,17 +53,19 @@ const Home = () => {
 
   const handleImageClick = (slide) => {
     setSelectedSlide(slide);
+    document.body.style.overflow = "hidden";
   };
 
   const closeModal = () => {
     setSelectedSlide(null);
+    document.body.style.overflow = "auto";
   };
 
   return (
     <>
       <WelcomeModal />
       <section className='mb-10'>
-        <div className='container mb-3'>
+        <div className='container' style={{ marginBottom: "1rem", marginTop: "2rem" }}>
           <h1 className='home-title'>
             Latest Memors • <span className='team-name'>The Debuggers</span>
           </h1>
@@ -112,7 +115,7 @@ const Home = () => {
                       </div>
                       <div className='latest-memors-content'>
                         <h3>{slide.submitDate}</h3>
-                        <p>{slide.description}</p>
+                        <p style={{ fontSize: "0.9rem" }}>"{slide.title}"</p>
                       </div>
                     </div>
                   )}
@@ -134,14 +137,19 @@ const Home = () => {
         )}
       </section>
 
-      <section id='myMemors' className='mb-10 container'>
+      <section id='myMemors' className='container'>
         <Typography variant='h6' gutterBottom style={{ color: "white" }}>
           My Memors
         </Typography>
         <Grid container spacing={3}>
           {/* Pending Memors */}
           <Grid item xs={12} sm={3}>
-            <Card className='card'>
+            <Card className='card'
+            onClick={() =>
+              (window.location.href = "/memors?tab=incomplete")
+            }
+            style={{ cursor: "pointer" }}
+            >
               <CardContent>
                 <Box
                   display='flex'
@@ -162,7 +170,12 @@ const Home = () => {
 
           {/* Completed Memors */}
           <Grid item xs={12} sm={3}>
-            <Card className='card'>
+            <Card className='card'
+            onClick={() =>
+              (window.location.href = "/memors?tab=completed")
+            }
+            style={{ cursor: "pointer" }}
+            >
               <CardContent>
                 <Box
                   display='flex'
@@ -185,29 +198,8 @@ const Home = () => {
           <Grid item xs={12} sm={6}>
             <Card className='card'>
               <CardContent>
-                <div className='flex justify-between items-center'>
-                  <Typography
-                    variant='h4'
-                    fontWeight='bold'
-                    fontSize={"1.5rem"}
-                  >
-                    Remaining time
-                  </Typography>
-                  <Typography
-                    variant='h3'
-                    fontWeight='bold'
-                    color='white'
-                    style={{ margin: "10px 0", fontSize: "2rem" }}
-                  >
-                    20 days
-                  </Typography>
-                </div>
-                <Typography variant='body2' color='#B0B0B0'>
-                  The theme of this competition is:{" "}
-                  <span style={{ color: "white", fontWeight: "bold" }}>
-                    Christmas
-                  </span>
-                </Typography>
+              <Countdown endDate="2025-12-25T00:00:00" />
+
               </CardContent>
             </Card>
           </Grid>
@@ -215,7 +207,6 @@ const Home = () => {
       </section>
 
       {/* Current Leaders */}
-
       <section id='currentLeaders' className='pb-10 container'>
         <Typography variant='h6' gutterBottom style={{ color: "white" }}>
           Current Leaders
@@ -230,7 +221,10 @@ const Home = () => {
                 sm={team.rank === 1 ? 5 : team.rank === 2 ? 4 : 3}
                 key={team.rank}
               >
-                <Card className='card'>
+                <Card className='card'
+                  onClick={() => { window.location.href = "/leaderboard" }}
+                  style={{ cursor: "pointer" }}
+                >
                   <Box
                     display='flex'
                     alignItems='center'

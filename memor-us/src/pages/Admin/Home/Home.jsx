@@ -62,10 +62,12 @@ const Home = () => {
 
   const handleImageClick = (slide) => {
     setSelectedSlide(slide);
+    document.body.style.overflow = "hidden";
   };
 
   const closeModal = () => {
     setSelectedSlide(null);
+    document.body.style.overflow = "auto";
   };
 
   return (

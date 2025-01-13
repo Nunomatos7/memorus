@@ -14,7 +14,6 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/system";
 import MenuIcon from "@mui/icons-material/Menu";
-import CloseIcon from "@mui/icons-material/Close";
 import logo from "../../assets/images/logoAdmin.svg";
 import profileIcon from "../../assets/images/profileAdmin.svg";
 
@@ -123,13 +122,10 @@ const AdminNavbar = () => {
               <MenuItem>
                 <Box sx={{ cursor: "default" }}>
                   <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                    John Doe
+                    Blip Admin
                   </Typography>
                   <Typography variant="body2" color="gray">
-                    john.doe@example.com
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: "#00C896" }}>
-                    Team Alpha
+                    admin.blip@example.com
                   </Typography>
                 </Box>
               </MenuItem>
@@ -200,13 +196,10 @@ const AdminNavbar = () => {
                 }}
               />
               <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                John Doe
+                Blip Admin
               </Typography>
               <Typography variant="body2" color="gray">
-                john.doe@example.com
-              </Typography>
-              <Typography variant="body2" sx={{ color: "#00C896" }}>
-                Team Alpha
+                admin.blip@example.com
               </Typography>
             </Box>
             <Divider sx={{ backgroundColor: "#444" }} />

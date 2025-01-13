@@ -129,7 +129,7 @@ const Navbar = () => {
                     jane.doe@example.com
                   </Typography>
                   <Typography variant="body2" sx={{ color: "#00C896" }}>
-                    Team Beta
+                    The Debuggers
                   </Typography>
                 </Box>
               </MenuItem>
@@ -206,7 +206,7 @@ const Navbar = () => {
                 jane.doe@example.com
               </Typography>
               <Typography variant="body2" sx={{ color: "#00C896" }}>
-                Team Beta
+                The Debuggers
               </Typography>
             </Box>
             <Divider sx={{ backgroundColor: "#444" }} />
