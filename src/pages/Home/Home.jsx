@@ -13,7 +13,7 @@ import pending from "../../assets/images/pendingHome.svg";
 import completed from "../../assets/images/completedHome.svg";
 import WelcomeModal from "../../Components/WelcomeModal/WelcomeModal";
 import { leaderboardData } from "../Leaderboard/Leaderboard";
-
+import Countdown from "../../Components/Countdown/Countdown";
 
 const rankImages = {
   1: rank1,
@@ -198,23 +198,8 @@ const Home = () => {
           <Grid item xs={12} sm={6}>
             <Card className='card'>
               <CardContent>
-                <div className='flex justify-between items-center'>
-                  <Typography
-                    variant='h4'
-                    fontWeight='bold'
-                    fontSize={"1.5rem"}
-                  >
-                    Remaining time
-                  </Typography>
-                  <Typography
-                    variant='h3'
-                    fontWeight='bold'
-                    color='white'
-                    style={{ margin: "10px 0", fontSize: "2rem" }}
-                  >
-                    20 days
-                  </Typography>
-                </div>
+              <Countdown endDate="2025-12-25T00:00:00" />
+
               </CardContent>
             </Card>
           </Grid>
