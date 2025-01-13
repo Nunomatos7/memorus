@@ -14,6 +14,7 @@ import completed from "../../assets/images/completedHome.svg";
 import WelcomeModal from "../../Components/WelcomeModal/WelcomeModal";
 import { leaderboardData } from "../Leaderboard/Leaderboard";
 
+
 const rankImages = {
   1: rank1,
   2: rank2,
@@ -32,7 +33,7 @@ const slidesData = [
   },
   {
     id: 2,
-    teamName: "Capital Crew",
+    teamName: "The Debuggers",
     title: "Show us your city",
     description: "We bet it must look nice :)",
     submitDate: "8 days ago",
@@ -52,10 +53,12 @@ const Home = () => {
 
   const handleImageClick = (slide) => {
     setSelectedSlide(slide);
+    document.body.style.overflow = "hidden";
   };
 
   const closeModal = () => {
     setSelectedSlide(null);
+    document.body.style.overflow = "auto";
   };
 
   return (
@@ -112,7 +115,7 @@ const Home = () => {
                       </div>
                       <div className='latest-memors-content'>
                         <h3>{slide.submitDate}</h3>
-                        <p>{slide.description}</p>
+                        <p style={{ fontSize: "0.9rem" }}>"{slide.title}"</p>
                       </div>
                     </div>
                   )}
