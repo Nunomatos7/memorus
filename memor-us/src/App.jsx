@@ -12,7 +12,7 @@ import AdminMemoryBoard from "./pages/Admin/MemoryBoard/MemoryBoard";
 import AdminBoard from "./pages/Admin/AdminBoard/AdminBoard";
 import AdminLayout from "./Components/AdminLayout/AdminLayout";
 import CollaboratorLayout from "./Components/CollaboratorLayout/CollaboratorLayout";
-import LoginPage from "./auth/LoginPage";
+import LoginPage from "./auth/LoginPage.jsx";
 import RegisterPage from "./auth/RegisterPage";
 import ChangePassword from "./auth/ChangePassword";
 
