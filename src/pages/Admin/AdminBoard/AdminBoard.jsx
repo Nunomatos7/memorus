@@ -544,6 +544,7 @@ const AdminBoard = () => {
       parseInt(memor.points.replace("+ ", "").replace(" pts", ""), 10)
     );
     setIsEditMemorModalOpen(true);
+    document.body.style.overflow = "hidden";
   };
 
   const handleEditMemorModalClose = () => {
@@ -553,6 +554,7 @@ const AdminBoard = () => {
     setNewMemorDescription("");
     setNewMemorDate(null);
     setNewMemorPoints(null);
+    document.body.style.overflow = "auto";
   };
 
   const handleEditMemor = () => {
