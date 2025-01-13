@@ -126,7 +126,7 @@ const Leaderboard = () => {
       >
         {/* Header */}
         <Typography
-          variant='h1'
+          variant='h2'
           sx={{
             fontWeight: "bold",
             color: "white",

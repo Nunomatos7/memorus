@@ -68,6 +68,9 @@ section {
   left: 0.625rem;
   cursor: pointer;
   user-select: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
 }
 
 .team-name {
@@ -76,11 +79,20 @@ section {
   font-weight: 700;
 }
 
+#myMemors {
+  margin-top: 40px;
+}
+
 #myMemors h2 {
   color: #fff;
   font-size: 1.5rem;
   font-style: normal;
   font-weight: 700;
+}
+
+#currentLeaders {
+  margin-top: 40px;
+  margin-bottom: 40px;
 }
 
 .card {

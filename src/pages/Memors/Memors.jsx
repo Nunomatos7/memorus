@@ -200,9 +200,9 @@ const Memors = () => {
 
   return (
     <div className="container">
-      <Box sx={{ marginTop: "7vh" }}>
+      <Box>
         <div className="memors-header">
-          <Typography variant="h1" sx={{ fontWeight: "bold", color: "white" }}>
+          <Typography variant="h2" sx={{ fontWeight: "bold", color: "white" }}>
             Ongoing Memors
           </Typography>
           <p className="memors-ongoing"> ({ongoingMemors.length}) </p>
@@ -440,6 +440,7 @@ const Memors = () => {
             borderRadius: "40px",
             input: { color: "white" },
             width: "250px",
+            "& fieldset": { border: 'none' },
           }}
         />
       </Box>
