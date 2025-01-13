@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import "./App.css";
@@ -18,6 +18,7 @@ import ChangePassword from "./auth/ChangePassword";
 
 function App() {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true); // Add a loading state
 
   const demoUsers = [
     { email: "admin@example.com", password: "admin123", role: "Admin" },
@@ -30,6 +31,7 @@ function App() {
     if (storedUser) {
       setUser(storedUser);
     }
+    setLoading(false); // Loading complete after checking localStorage
 
     const handleStorageChange = () => {
       const updatedUser = JSON.parse(localStorage.getItem("user"));
@@ -58,12 +60,20 @@ function App() {
   };
 
   const ProtectedRoute = ({ children, role }) => {
-    if (!user) {
-      return <Navigate to='/login' replace />;
+    const location = useLocation();
+
+    if (loading) {
+      return <div>Loading...</div>; // Display a loading spinner while checking auth
     }
+
+    if (!user) {
+      return <Navigate to='/login' state={{ from: location }} replace />;
+    }
+
     if (role && user.role !== role) {
       return <Navigate to='/login' replace />;
     }
+
     return children;
   };
 

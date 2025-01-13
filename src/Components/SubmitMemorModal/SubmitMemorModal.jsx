@@ -124,9 +124,9 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
       )}
 
       {isSubmitMemorOpen && !feedback && (
-        <div className="modal-overlay-submit-memor">
-          <div className="modal-container">
-            <div className="modal-top">
+        <div className='modal-overlay-submit-memor'>
+          <div className='modal-container'>
+            <div className='modal-top'>
               <Button
                 onClick={onClose}
                 sx={{ minWidth: 0, p: 0, color: "#CAC4D0" }}
@@ -135,62 +135,62 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
               </Button>
               <h4>Details</h4>
             </div>
-            <div className="modal-header">
-              <Typography variant="h5" className="modal-title">
+            <div className='modal-header'>
+              <Typography variant='h5' className='modal-title'>
                 {memor.title}
               </Typography>
-              <Typography variant="body2" className="modal-description">
+              <Typography variant='body2' className='modal-description'>
                 {memor.description}
               </Typography>
             </div>
-            <div className="modal-details">
-              <div className="modal-details-header">
+            <div className='modal-details'>
+              <div className='modal-details-header'>
                 <Groups />
-                <p className="submission-status">{memor.submission}</p>
+                <p className='submission-status'>{memor.submission}</p>
               </div>
-              <div className="modal-details-header">
+              <div className='modal-details-header'>
                 <TodayIcon />
-                <p className="due-date">Due on {memor.dueDate}</p>
+                <p className='due-date'>Due on {memor.dueDate}</p>
               </div>
-              <div className="modal-details-header">
+              <div className='modal-details-header'>
                 <Stars />
-                <p className="points">+{memor.points} points</p>
+                <p className='points'>+{memor.points} points</p>
               </div>
             </div>
-            <div className="modal-upload">
-              <div className="upload-box">
+            <div className='modal-upload'>
+              <div className='upload-box'>
                 {uploadedImage ? (
-                  <div className="uploaded-image">
-                    <img src={uploadedImage} alt="Uploaded" />
+                  <div className='uploaded-image'>
+                    <img src={uploadedImage} alt='Uploaded' />
                   </div>
                 ) : (
                   <>
-                    <div className="qr-code-placeholder">
-                      <img src={QrCode} alt="QR code" />
-                      <Typography variant="body2" style={{ color: "#DDDAF2" }}>
+                    <div className='qr-code-placeholder'>
+                      <img src={QrCode} alt='QR code' />
+                      <Typography variant='body2' style={{ color: "#DDDAF2" }}>
                         Scan it with your phone
                       </Typography>
                     </div>
-                    <Typography variant="body2" className="or-text">
+                    <Typography variant='body2' className='or-text'>
                       or
                     </Typography>
-                    <div className="qr-code-placeholder">
-                      <label htmlFor="file-input">
+                    <div className='qr-code-placeholder'>
+                      <label htmlFor='file-input'>
                         <img
                           src={UploadButton}
-                          alt="Upload Button"
-                          className="upload-button"
+                          alt='Upload Button'
+                          className='upload-button'
                         />
                       </label>
                       <input
-                        id="file-input"
-                        type="file"
-                        accept="image/*"
-                        className="file-input"
+                        id='file-input'
+                        type='file'
+                        accept='image/*'
+                        className='file-input'
                         onChange={handleFileChange}
                         style={{ display: "none" }}
                       />
-                      <Typography variant="body2" sx={{ color: "#DDDAF2" }}>
+                      <Typography variant='body2' sx={{ color: "#DDDAF2" }}>
                         Upload Computer File
                       </Typography>
                     </div>
@@ -198,23 +198,23 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
                 )}
               </div>
             </div>
-            <Typography variant="body2" className="uploaded-photos-title">
+            <Typography variant='body2' className='uploaded-photos-title'>
               Your team's photos for this Memor
             </Typography>
-            <div className="uploaded-photos-slider">
+            <div className='uploaded-photos-slider'>
               {Array(10)
                 .fill(null)
                 .map((_, index) => (
-                  <div key={index} className="photo-placeholder"></div>
+                  <div key={index} className='photo-placeholder'></div>
                 ))}
             </div>
-            <Typography variant="body2" className="no-photos-text">
+            <Typography variant='body2' className='no-photos-text'>
               No team memors uploaded yet.
             </Typography>
 
-            <div className="modal-actions">
+            <div className='modal-actions'>
               <CustomButton
-                text="Cancel"
+                text='Cancel'
                 onClick={onClose}
                 sx={{
                   backgroundColor: "transparent",
@@ -226,7 +226,7 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
                 }}
               />
               <CustomButton
-                text="Submit"
+                text='Submit'
                 onClick={handleSubmit}
                 sx={{
                   backgroundColor: "#d0bcfe",

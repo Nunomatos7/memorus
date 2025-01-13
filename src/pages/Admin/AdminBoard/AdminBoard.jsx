@@ -24,10 +24,15 @@ import {
 } from "@mui/icons-material";
 import ConfirmationModal from "../../../Components/ConfirmationModal/ConfirmationModal";
 import FeedbackModal from "../../../Components/FeedbackModal/FeedbackModal";
+import {useLocation} from "react-router-dom";
 
 const AdminBoard = () => {
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const tabParam = searchParams.get('tab') || 'all';
+  
   const [tab, setTab] = useState("memors");
-  const [tab2, setTab2] = useState("all");
+  const [tab2, setTab2] = useState(tabParam);
   const handleTabChange = (_, newValue) => {
     setTab(newValue);
   };
@@ -629,7 +634,7 @@ const AdminBoard = () => {
         }}
       />
       <Typography
-        variant="h1"
+        variant="h2"
         sx={{
           fontWeight: "bold",
           color: "white",
@@ -703,6 +708,7 @@ const AdminBoard = () => {
               input: { color: "white" },
               width: "250px",
               border: "0.905px solid #88938F",
+              "& fieldset": { border: 'none' },
             }}
           />
         </Box>
@@ -1078,6 +1084,7 @@ const AdminBoard = () => {
                             height: "40px",
                             border: "0.905px solid #88938F",
                             marginBottom: "10px",
+                            "& fieldset": { border: 'none' },
                           }}
                         />
                         <Box
@@ -1368,6 +1375,7 @@ const AdminBoard = () => {
                     "&.Mui-focused fieldset": { borderColor: "#CCC" },
                   },
                   "& .MuiInputLabel-root": { color: "#888" },
+                  "& fieldset": { border: 'none' },
                 }}
                 InputProps={{
                   startAdornment: (
@@ -1490,7 +1498,7 @@ const AdminBoard = () => {
                   <ArrowBackIcon />
                 </Button>
                 <Typography
-                  variant="h6"
+                  variant="h5"
                   sx={{ marginLeft: "10px", color: "#BEC9C5" }}
                 >
                   Admin Board
