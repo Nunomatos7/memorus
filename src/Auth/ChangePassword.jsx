@@ -4,9 +4,10 @@ import logo from "../assets/images/logo.svg";
 import { TextField, Button, Typography } from "@mui/material";
 import leftBackground from "../assets/images/left-auth.svg";
 import rightBackground from "../assets/images/right-auth.svg";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'; // Import ArrowBackIcon for the back button
 
 const ChangePasswordPage = () => {
-  const [username, setUsername] = useState(""); // Username (email)
+  const [username, setUsername] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [error, setError] = useState("");
@@ -45,6 +46,23 @@ const ChangePasswordPage = () => {
   return (
     <div className='login-container'>
       <div className='login-card'>
+        {/* Back Button */}
+        <Button
+          startIcon={<ArrowBackIcon />}
+          onClick={() => window.history.back()} // Use history.back() to navigate to the previous page
+          sx={{
+            color: "#ffffff", // Adjust the color to match your theme
+            position: 'absolute', // Position it at the top-left corner of the card
+            top: 16, // Top margin
+            left: 16, // Left margin
+            '&:hover': {
+              backgroundColor: "rgba(255, 255, 255, 0.1)", // Slightly darker hover effect
+            }
+          }}
+        >
+          Back
+        </Button>
+
         <div className='logo-container'>
           <img src={logo} alt='Logo' className='logo' />
         </div>
@@ -52,8 +70,7 @@ const ChangePasswordPage = () => {
           Change Password
         </Typography>
         <Typography variant='body2' className='login-subtitle' sx={{ mb: 2 }}>
-          Enter your username (email) and a new password to update your
-          credentials.
+          Enter your username (email) and a new password to update your credentials.
         </Typography>
         <form onSubmit={handleChangePassword} className='login-form'>
           {error && <Typography className='error-message'>{error}</Typography>}
