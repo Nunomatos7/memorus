@@ -46,11 +46,6 @@ const posts = [
   {
     date: "16/12/2024",
     imgSrc: imgTest,
-    pos: { x: 100, y: 100 },
-    zIndex: 1,
-    imgSrc2: imgTest,
-    pos2: { x: 100 + 10, y: 100 + 10 },
-    zIndex: 2,
     title: "Share Di Maria",
   },
   {
