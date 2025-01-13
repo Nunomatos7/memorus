@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./LoginPage.css";
-import logo from "../assets/images/logo.svg";
+import logo from "../../assets/images/logo.svg";
 import PropTypes from "prop-types";
 import {
   TextField,
@@ -10,8 +10,8 @@ import {
   Checkbox,
   Typography,
 } from "@mui/material";
-import leftBackground from "../assets/images/left-auth.svg";
-import rightBackground from "../assets/images/right-auth.svg";
+import leftBackground from "../../assets/images/left-auth.svg";
+import rightBackground from "../../assets/images/right-auth.svg";
 
 const LoginPage = ({ login }) => {
   const [email, setEmail] = useState("");
