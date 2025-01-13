@@ -12,11 +12,12 @@ import {
 } from "@mui/material";
 import leftBackground from "../assets/images/left-auth.svg";
 import rightBackground from "../assets/images/right-auth.svg";
+import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 
 const LoginPage = ({ login }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false); // State for Remember Me checkbox
+  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
@@ -25,17 +26,15 @@ const LoginPage = ({ login }) => {
     setError("");
 
     try {
-      // Call the login function from props
       const user = login(email, password);
 
-      // Redirect based on user role
       if (user.role === "Admin") {
         navigate("/admin/home");
       } else {
         navigate("/home");
       }
     } catch (err) {
-      setError(err.message); // Display error message from login function
+      setError(err.message);
     }
   };
 
@@ -45,6 +44,23 @@ const LoginPage = ({ login }) => {
 
   return (
     <div className='login-container'>
+      <div style={{ position: "absolute", top: "20px", left: "20px" }}>
+        <Button
+          variant='text'
+          startIcon={<ArrowBackIosIcon />}
+          href='https://landing.memor-us.com/'
+          sx={{
+            color: "#ffffff",
+            textTransform: "none",
+            fontSize: "14px",
+            "&:hover": {
+              backgroundColor: "rgba(255, 255, 255, 0.1)",
+            },
+          }}
+        >
+          Back to Landing
+        </Button>
+      </div>
       <div className='login-card'>
         <div className='logo-container'>
           <img src={logo} alt='Logo' className='logo' />
@@ -58,8 +74,6 @@ const LoginPage = ({ login }) => {
         </Typography>
         <form onSubmit={handleLogin} className='login-form'>
           {error && <Typography className='error-message'>{error}</Typography>}
-
-          {/* Material-UI Email Field */}
           <TextField
             label='Email'
             variant='outlined'
@@ -129,7 +143,7 @@ const LoginPage = ({ login }) => {
                 <Checkbox
                   checked={rememberMe}
                   onChange={handleRememberMeChange}
-                  color='primary'
+                  color='white'
                 />
               }
               label={
