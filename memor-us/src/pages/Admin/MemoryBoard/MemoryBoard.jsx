@@ -46,36 +46,11 @@ const posts = [
   {
     date: "16/12/2024",
     imgSrc: imgTest,
-    title: "Share Di Maria",
-  },
-  {
-    date: "01/12/2024",
-    imgSrc: imgTest,
-    title: "Share Di Maria",
-  },
-  {
-    date: "16/12/2024",
-    imgSrc: imgTest,
-    title: "Share Di Maria",
-  },
-  {
-    date: "16/12/2024",
-    imgSrc: imgTest,
-    title: "Share Di Maria",
-  },
-  {
-    date: "01/12/2024",
-    imgSrc: imgTest,
-    title: "Share Di Maria",
-  },
-  {
-    date: "16/12/2024",
-    imgSrc: imgTest,
-    title: "Share Di Maria",
-  },
-  {
-    date: "16/12/2024",
-    imgSrc: imgTest,
+    pos: { x: 100, y: 100 },
+    zIndex: 1,
+    imgSrc2: imgTest,
+    pos2: { x: 100 + 10, y: 100 + 10 },
+    zIndex: 2,
     title: "Share Di Maria",
   },
   {
@@ -134,7 +109,7 @@ const renderPosts = () => {
           {post.date}
         </p>
         <img src={post.imgSrc} alt='1' style={{ height: "60%" }} />
-        <h1
+        <p
           style={{
             color: "black",
             textAlign: "center",
@@ -143,7 +118,7 @@ const renderPosts = () => {
           }}
         >
           {post.title}
-        </h1>
+        </p>
       </div>
     );
   });

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import {
   AppBar,
   Toolbar,
@@ -9,12 +9,15 @@ import {
   Menu,
   MenuItem,
   Divider,
+  Drawer,
+  List,
 } from "@mui/material";
 import { styled } from "@mui/system";
+import MenuIcon from "@mui/icons-material/Menu";
+import CloseIcon from "@mui/icons-material/Close";
 import logo from "../../assets/images/logoText.svg";
 import profileIcon from "../../assets/images/profile.svg";
 
-// Custom styled NavLink for active and hover states
 const StyledNavLink = styled(NavLink)(() => ({
   textDecoration: "none",
   color: "#D0BCFE",
@@ -34,6 +37,8 @@ const StyledNavLink = styled(NavLink)(() => ({
 
 const Navbar = () => {
   const [anchorEl, setAnchorEl] = useState(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const navigate = useNavigate();
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -43,9 +48,19 @@ const Navbar = () => {
     setAnchorEl(null);
   };
 
+  const toggleDrawer = (open) => () => {
+    setDrawerOpen(open);
+  };
+
+  const handleLogOut = () => {
+    localStorage.removeItem("user");
+    setAnchorEl(null);
+    window.location.href = "/login";
+  };
+
   return (
     <AppBar
-      position='sticky'
+      position="sticky"
       sx={{
         backgroundColor: "#111315",
         height: "60px",
@@ -65,43 +80,28 @@ const Navbar = () => {
       >
         {/* Logo */}
         <Box>
-          <NavLink to='/'>
+          <NavLink to="/home">
             <img
               src={logo}
-              alt='logo'
+              alt="Memorus Logo"
               style={{ height: "40px", width: "auto" }}
             />
           </NavLink>
         </Box>
 
-        {/* Navigation Menu */}
-        <Box sx={{ display: "flex", gap: "24px", alignItems: "center" }}>
-          <StyledNavLink to='/' end>
-            <Typography variant='body2' sx={{ fontWeight: 600 }}>
-              Home
-            </Typography>
+        {/* Desktop Navigation */}
+        <Box sx={{ display: { xs: "none", md: "flex" }, gap: "24px", alignItems: "center" }}>
+          <StyledNavLink to="/home" end>
+            Home
           </StyledNavLink>
-          <StyledNavLink to='/memors'>
-            <Typography variant='body2' sx={{ fontWeight: 600 }}>
-              Memors
-            </Typography>
-          </StyledNavLink>
-          <StyledNavLink to='/leaderboard'>
-            <Typography variant='body2' sx={{ fontWeight: 600 }}>
-              Leaderboard
-            </Typography>
-          </StyledNavLink>
-          <StyledNavLink to='/memoryBoard'>
-            <Typography variant='body2' sx={{ fontWeight: 600 }}>
-              Memory Board
-            </Typography>
-          </StyledNavLink>
-          {/* Profile Icon and Dropdown Menu */}
+          <StyledNavLink to="/memors">Memors</StyledNavLink>
+          <StyledNavLink to="/leaderboard">Leaderboard</StyledNavLink>
+          <StyledNavLink to="/memoryBoard">Memory Board</StyledNavLink>
           <Box>
             <IconButton onClick={handleMenuOpen}>
               <img
                 src={profileIcon}
-                alt='profile'
+                alt="User Profile"
                 style={{
                   height: "40px",
                   width: "40px",
@@ -121,28 +121,24 @@ const Navbar = () => {
               }}
             >
               <MenuItem>
-                <Box
-                  sx={{
-                    cursor: "default",
-                    "&:hover": {
-                      backgroundColor: "#39ff14 ",
-                    },
-                  }}
-                >
-                  <Typography variant='body1' sx={{ fontWeight: 600 }}>
-                    User
+                <Box sx={{ cursor: "default" }}>
+                  <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                    Jane Doe
                   </Typography>
-                  <Typography variant='body2' color='gray'>
-                    memorus.user@ua.blip.pt
+                  <Typography variant="body2" color="gray">
+                    jane.doe@example.com
                   </Typography>
-                  <Typography variant='body2' sx={{ color: "#00C896" }}>
-                    The Debuggers
+                  <Typography variant="body2" sx={{ color: "#00C896" }}>
+                    Team Beta
                   </Typography>
                 </Box>
               </MenuItem>
               <Divider sx={{ backgroundColor: "gray" }} />
               <MenuItem
-                onClick={handleMenuClose}
+                onClick={() => {
+                  navigate("/change-password");
+                  handleMenuClose();
+                }}
                 sx={{
                   "&:hover": {
                     backgroundColor: "#ccff33",
@@ -150,11 +146,10 @@ const Navbar = () => {
                   },
                 }}
               >
-                <Typography variant='body1'>Change Password</Typography>
+                Change Password
               </MenuItem>
-
               <MenuItem
-                onClick={handleMenuClose}
+                onClick={handleLogOut}
                 sx={{
                   color: "#FF5C5C",
                   "&:hover": {
@@ -162,12 +157,120 @@ const Navbar = () => {
                   },
                 }}
               >
-                <Typography variant='body1' sx={{}}>
-                  Log Out
-                </Typography>
+                Log Out
               </MenuItem>
             </Menu>
           </Box>
+        </Box>
+
+        {/* Mobile Burger Menu */}
+        <Box sx={{ display: { xs: "block", md: "none" } }}>
+          <IconButton onClick={toggleDrawer(true)}>
+            <MenuIcon sx={{ color: "#D0BCFE" }} />
+          </IconButton>
+          <Drawer
+            anchor="right"
+            open={drawerOpen}
+            onClose={toggleDrawer(false)}
+            sx={{
+              "& .MuiDrawer-paper": {
+                backgroundColor: "#111315",
+                color: "#fff",
+                width: "250px",
+              },
+            }}
+          >
+            {/* User Info */}
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "8px",
+                padding: "16px",
+              }}
+            >
+              <img
+                src={profileIcon}
+                alt="User Profile"
+                style={{
+                  height: "60px",
+                  width: "60px",
+                  borderRadius: "50%",
+                }}
+              />
+              <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                Jane Doe
+              </Typography>
+              <Typography variant="body2" color="gray">
+                jane.doe@example.com
+              </Typography>
+              <Typography variant="body2" sx={{ color: "#00C896" }}>
+                Team Beta
+              </Typography>
+            </Box>
+            <Divider sx={{ backgroundColor: "#444" }} />
+            {/* Navigation Links */}
+            <List
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "10px",
+                marginTop: "20px",
+              }}
+            >
+              <StyledNavLink to="/home" onClick={toggleDrawer(false)}>
+                Home
+              </StyledNavLink>
+              <StyledNavLink to="/memors" onClick={toggleDrawer(false)}>
+                Memors
+              </StyledNavLink>
+              <StyledNavLink to="/leaderboard" onClick={toggleDrawer(false)}>
+                Leaderboard
+              </StyledNavLink>
+              <StyledNavLink to="/memoryBoard" onClick={toggleDrawer(false)}>
+                Memory Board
+              </StyledNavLink>
+            </List>
+            <Divider sx={{ backgroundColor: "#444", marginTop: "20px" }} />
+            {/* Change Password and Log Out */}
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "10px",
+                marginTop: "20px",
+              }}
+            >
+              <Typography
+                variant="body2"
+                sx={{
+                  cursor: "pointer",
+                  color: "#FFF",
+                  "&:hover": { color: "#ccff33" },
+                }}
+                onClick={() => {
+                  navigate("/change-password");
+                  toggleDrawer(false)();
+                }}
+              >
+                Change Password
+              </Typography>
+              <Typography
+                variant="body2"
+                sx={{
+                  cursor: "pointer",
+                  color: "#FF5C5C",
+                  "&:hover": { color: "#FF3333" },
+                }}
+                onClick={handleLogOut}
+              >
+                Log Out
+              </Typography>
+            </Box>
+          </Drawer>
         </Box>
       </Toolbar>
     </AppBar>
