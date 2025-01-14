@@ -15,15 +15,15 @@ import CollaboratorLayout from "./Components/CollaboratorLayout/CollaboratorLayo
 import LoginPage from "./auth/LoginPage";
 import RegisterPage from "./auth/RegisterPage";
 import ChangePassword from "./auth/ChangePassword";
+import Loader from "./Components/Loader/Loader";
 
 function App() {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // Add a loading state
+  const [loading, setLoading] = useState(true);
 
   const demoUsers = [
     { email: "admin@example.com", password: "admin123", role: "Admin" },
     { email: "user@example.com", password: "user123", role: "Regular" },
-    { email: "nengue@nengue.com", password: "nengue", role: "Regular" },
   ];
 
   useEffect(() => {
@@ -31,7 +31,7 @@ function App() {
     if (storedUser) {
       setUser(storedUser);
     }
-    setLoading(false); // Loading complete after checking localStorage
+    setLoading(false);
 
     const handleStorageChange = () => {
       const updatedUser = JSON.parse(localStorage.getItem("user"));
@@ -63,7 +63,7 @@ function App() {
     const location = useLocation();
 
     if (loading) {
-      return <div>Loading...</div>; // Display a loading spinner while checking auth
+      return <Loader />;
     }
 
     if (!user) {
