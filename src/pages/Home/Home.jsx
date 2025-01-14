@@ -14,6 +14,7 @@ import completed from "../../assets/images/completedHome.svg";
 import WelcomeModal from "../../Components/WelcomeModal/WelcomeModal";
 import { leaderboardData } from "../Leaderboard/Leaderboard";
 import Countdown from "../../Components/Countdown/Countdown";
+import Loader from "../../Components/Loader/Loader";
 
 const rankImages = {
   1: rank1,
@@ -63,11 +64,21 @@ const Home = () => {
 
   return (
     <>
+      <Loader />
       <WelcomeModal />
       <section className='mb-10'>
-        <div className='container' style={{ marginBottom: "1rem", marginTop: "2rem" }}>
-          <h1 className='home-title' style={{  display: "flex", alignItems: "center", gap: "1rem" }}>
-            Latest Memors <span>•</span> <span className='team-name' style={{ color: "#5547bf" }}>The Debuggers</span>
+        <div
+          className='container'
+          style={{ marginBottom: "1rem", marginTop: "2rem" }}
+        >
+          <h1
+            className='home-title'
+            style={{ display: "flex", alignItems: "center", gap: "1rem" }}
+          >
+            Latest Memors <span>•</span>{" "}
+            <span className='team-name' style={{ color: "#5547bf" }}>
+              The Debuggers
+            </span>
           </h1>
         </div>
 
@@ -115,7 +126,9 @@ const Home = () => {
                       </div>
                       <div className='latest-memors-content'>
                         <h3>{slide.submitDate}</h3>
-                        <p style={{ fontSize: "0.9rem" }}>"{slide.title}"</p>
+                        <p style={{ fontSize: "0.9rem" }}>
+                          &quot;{slide.title}&quot;
+                        </p>
                       </div>
                     </div>
                   )}
@@ -144,11 +157,10 @@ const Home = () => {
         <Grid container spacing={3}>
           {/* Pending Memors */}
           <Grid item xs={12} sm={3}>
-            <Card className='card'
-            onClick={() =>
-              (window.location.href = "/memors?tab=incomplete")
-            }
-            style={{ cursor: "pointer" }}
+            <Card
+              className='card'
+              onClick={() => (window.location.href = "/memors?tab=incomplete")}
+              style={{ cursor: "pointer" }}
             >
               <CardContent>
                 <Box
@@ -170,11 +182,10 @@ const Home = () => {
 
           {/* Completed Memors */}
           <Grid item xs={12} sm={3}>
-            <Card className='card'
-            onClick={() =>
-              (window.location.href = "/memors?tab=completed")
-            }
-            style={{ cursor: "pointer" }}
+            <Card
+              className='card'
+              onClick={() => (window.location.href = "/memors?tab=completed")}
+              style={{ cursor: "pointer" }}
             >
               <CardContent>
                 <Box
@@ -198,8 +209,7 @@ const Home = () => {
           <Grid item xs={12} sm={6}>
             <Card className='card'>
               <CardContent>
-              <Countdown endDate="2025-12-25T00:00:00" />
-
+                <Countdown endDate='2025-12-25T00:00:00' />
               </CardContent>
             </Card>
           </Grid>
@@ -221,8 +231,11 @@ const Home = () => {
                 sm={team.rank === 1 ? 5 : team.rank === 2 ? 4 : 3}
                 key={team.rank}
               >
-                <Card className='card'
-                  onClick={() => { window.location.href = "/leaderboard" }}
+                <Card
+                  className='card'
+                  onClick={() => {
+                    window.location.href = "/leaderboard";
+                  }}
                   style={{ cursor: "pointer" }}
                 >
                   <Box

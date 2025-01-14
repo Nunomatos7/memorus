@@ -14,6 +14,7 @@ import closed from "../../../assets/images/closedAdmin.svg";
 import WelcomeModal from "../../../Components/WelcomeModal/WelcomeModal";
 import { leaderboardData } from "../Leaderboard/Leaderboard";
 import CustomButton from "../../../Components/CustomButton/CustomButton";
+import Loader from "../../../Components/Loader/Loader";
 
 const rankImages = {
   1: rank1,
@@ -72,15 +73,19 @@ const Home = () => {
 
   return (
     <>
+      <Loader />
       <WelcomeModal />
-      <section className="mb-10">
-        <div className="container" style={{ marginBottom: "1rem", marginTop: "2rem" }}>
-          <h1 className="home-title">Latest Memors</h1>
+      <section className='mb-10'>
+        <div
+          className='container'
+          style={{ marginBottom: "1rem", marginTop: "2rem" }}
+        >
+          <h1 className='home-title'>Latest Memors</h1>
         </div>
 
         {/* Swiper */}
-        <div className="overflow-hidden w-full">
-          <div className="container">
+        <div className='overflow-hidden w-full'>
+          <div className='container'>
             <Swiper
               spaceBetween={20}
               breakpoints={{
@@ -94,7 +99,7 @@ const Home = () => {
                   slidesPerView: 5.3,
                 },
               }}
-              className="latest-wrapper"
+              className='latest-wrapper'
               freeMode={true}
               mousewheel={{
                 releaseOnEdges: true,
@@ -111,16 +116,16 @@ const Home = () => {
                 >
                   {slide.image && (
                     <div onClick={() => handleImageClick(slide)}>
-                      <div className="image-wrapper">
+                      <div className='image-wrapper'>
                         <img
                           width={"100%"}
                           height={"100%"}
                           style={{ objectFit: "cover" }}
                           src={slide.image}
-                          alt=""
+                          alt=''
                         />
                       </div>
-                      <div className="latest-memors-content">
+                      <div className='latest-memors-content'>
                         <CustomButton
                           text={slide.teamName}
                           onClick={() => handleImageClick(slide)}
@@ -159,15 +164,15 @@ const Home = () => {
         )}
       </section>
 
-      <section id="myMemors" className="container">
-        <Typography variant="h6" gutterBottom style={{ color: "white" }}>
+      <section id='myMemors' className='container'>
+        <Typography variant='h6' gutterBottom style={{ color: "white" }}>
           My Memors
         </Typography>
         <Grid container spacing={3}>
           {/* Pending Memors */}
           <Grid item xs={12} sm={3}>
             <Card
-              className="card"
+              className='card'
               onClick={() =>
                 (window.location.href = "/admin/adminBoard?tab=ongoing")
               }
@@ -175,16 +180,16 @@ const Home = () => {
             >
               <CardContent>
                 <Box
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="space-between"
+                  display='flex'
+                  alignItems='center'
+                  justifyContent='space-between'
                 >
-                  <Typography variant="h4" fontWeight="bold">
+                  <Typography variant='h4' fontWeight='bold'>
                     {mockUser.pending_memors}
                   </Typography>
-                  <img src={ongoing} alt="ongoing" />
+                  <img src={ongoing} alt='ongoing' />
                 </Box>
-                <Typography variant="body2" color="#B0B0B0">
+                <Typography variant='body2' color='#B0B0B0'>
                   Pending Memors
                 </Typography>
               </CardContent>
@@ -194,7 +199,7 @@ const Home = () => {
           {/* Closed Memors */}
           <Grid item xs={12} sm={3}>
             <Card
-              className="card"
+              className='card'
               onClick={() =>
                 (window.location.href = "/admin/adminBoard?tab=closed")
               }
@@ -202,16 +207,16 @@ const Home = () => {
             >
               <CardContent>
                 <Box
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="space-between"
+                  display='flex'
+                  alignItems='center'
+                  justifyContent='space-between'
                 >
-                  <Typography variant="h4" fontWeight="bold">
+                  <Typography variant='h4' fontWeight='bold'>
                     {mockUser.complete_memors}
                   </Typography>
-                  <img src={closed} alt="ongoing" />
+                  <img src={closed} alt='ongoing' />
                 </Box>
-                <Typography variant="body2" color="#B0B0B0">
+                <Typography variant='body2' color='#B0B0B0'>
                   Closed Memors
                 </Typography>
               </CardContent>
@@ -220,20 +225,20 @@ const Home = () => {
 
           {/* Remaining Time */}
           <Grid item xs={12} sm={6}>
-            <Card className="card">
+            <Card className='card'>
               <CardContent>
-                <div className="flex justify-between items-center">
+                <div className='flex justify-between items-center'>
                   <Typography
-                    variant="h4"
-                    fontWeight="bold"
+                    variant='h4'
+                    fontWeight='bold'
                     fontSize={"1.5rem"}
                   >
                     Remaining time
                   </Typography>
                   <Typography
-                    variant="h3"
-                    fontWeight="bold"
-                    color="white"
+                    variant='h3'
+                    fontWeight='bold'
+                    color='white'
                     style={{ margin: "10px 0", fontSize: "2rem" }}
                   >
                     20 days
@@ -245,8 +250,8 @@ const Home = () => {
         </Grid>
       </section>
 
-      <section id="currentLeaders" className="pb-10 container">
-        <Typography variant="h6" gutterBottom style={{ color: "white" }}>
+      <section id='currentLeaders' className='pb-10 container'>
+        <Typography variant='h6' gutterBottom style={{ color: "white" }}>
           Current Leaders
         </Typography>
         <Grid container spacing={3}>
@@ -260,13 +265,13 @@ const Home = () => {
                 key={team.rank}
               >
                 <Card
-                  className="card"
+                  className='card'
                   onClick={() => (window.location.href = "/admin/leaderboard")}
                   style={{ cursor: "pointer" }}
                 >
                   <Box
-                    display="flex"
-                    alignItems="center"
+                    display='flex'
+                    alignItems='center'
                     style={{ width: "100%" }}
                   >
                     {/* Left Column - Rank Image */}
@@ -291,17 +296,17 @@ const Home = () => {
                       }}
                     >
                       <Box
-                        className="team-header"
-                        display="flex"
-                        justifyContent="space-between"
+                        className='team-header'
+                        display='flex'
+                        justifyContent='space-between'
                       >
-                        <Typography variant="h6" className="team-name">
+                        <Typography variant='h6' className='team-name'>
                           {team.teamName}
                         </Typography>
                         <img
                           src={team.avatar}
                           alt={team.teamName}
-                          className="team-avatar-admin"
+                          className='team-avatar-admin'
                           style={{
                             width: "50px",
                             height: "50px",
@@ -311,24 +316,24 @@ const Home = () => {
                         />
                       </Box>
                       <Box
-                        className="stats"
-                        display="flex"
-                        justifyContent="space-between"
-                        marginTop="10px"
+                        className='stats'
+                        display='flex'
+                        justifyContent='space-between'
+                        marginTop='10px'
                       >
                         <div>
-                          <Typography variant="body2" className="label">
+                          <Typography variant='body2' className='label'>
                             Total Points
                           </Typography>
-                          <Typography variant="h5" className="value">
+                          <Typography variant='h5' className='value'>
                             {team.points}
                           </Typography>
                         </div>
                         <div>
-                          <Typography variant="body2" className="label">
+                          <Typography variant='body2' className='label'>
                             Total Memors
                           </Typography>
-                          <Typography variant="h5" className="value">
+                          <Typography variant='h5' className='value'>
                             {team.memors}
                           </Typography>
                         </div>
