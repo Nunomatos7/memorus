@@ -66,8 +66,8 @@ const Home = () => {
       <WelcomeModal />
       <section className='mb-10'>
         <div className='container' style={{ marginBottom: "1rem", marginTop: "2rem" }}>
-          <h1 className='home-title'>
-            Latest Memors • <span className='team-name'>The Debuggers</span>
+          <h1 className='home-title' style={{  display: "flex", alignItems: "center", gap: "1rem" }}>
+            Latest Memors <span>•</span> <span className='team-name' style={{ color: "#5547bf" }}>The Debuggers</span>
           </h1>
         </div>
 
