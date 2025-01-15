@@ -14,7 +14,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 100;
   opacity: 1;
   transition: opacity 0.3s ease-out;
   overflow-y: hidden;
@@ -28,7 +28,7 @@
 .loader {
   position: inherit;
   display: inline-block;
-  margin: 0 12.5% 100px;
+  margin: 6% 12.5% 100px;
   width: 40px;
   height: 40px;
   border: 2px solid #0cf;

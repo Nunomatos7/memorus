@@ -22,15 +22,14 @@ import notifGreen from "../../assets/images/notifGreen.svg";
 import notifDelete from "../../assets/images/notifDelete.svg";
 import NotificationsNoneRoundedIcon from "@mui/icons-material/NotificationsNoneRounded";
 import { Badge } from "@mui/material";
-import { makeStyles } from '@mui/styles';
+import { makeStyles } from "@mui/styles";
 
 const useStyles = makeStyles({
   customBadge: {
     backgroundColor: "#42102B",
-    color: "#fff"
-  }
+    color: "#fff",
+  },
 });
-
 
 const NotificationItem = ({ notification, onDelete }) => {
   return (
@@ -49,17 +48,17 @@ const NotificationItem = ({ notification, onDelete }) => {
     >
       <img
         src={notification.image}
-        alt="Notification Icon"
+        alt='Notification Icon'
         style={{ width: 28, height: 28 }}
       />
       <Box sx={{ flexGrow: 1, paddingLeft: 2 }}>
         <Typography
-          variant="subtitle1"
+          variant='subtitle1'
           sx={{ color: "#fff", lineHeight: 1.2, marginBottom: 1 }}
         >
           {notification.title}
         </Typography>
-        <Typography variant="body2" sx={{ color: "#aaa" }}>
+        <Typography variant='body2' sx={{ color: "#aaa" }}>
           {notification.description}
         </Typography>
       </Box>
@@ -69,7 +68,7 @@ const NotificationItem = ({ notification, onDelete }) => {
       >
         <img
           src={notifDelete}
-          alt="Delete Icon"
+          alt='Delete Icon'
           style={{ width: 24, height: 24 }}
         />
       </IconButton>
@@ -177,12 +176,11 @@ const Navbar = () => {
 
   return (
     <AppBar
-      position="sticky"
+      position='sticky'
       sx={{
         backgroundColor: "#111315",
         height: "60px",
         boxShadow: "none",
-        zIndex: 10,
         marginBottom: "10px",
         borderBottom: "1px solid #444444",
       }}
@@ -197,10 +195,10 @@ const Navbar = () => {
       >
         {/* Logo */}
         <Box>
-          <NavLink to="/home">
+          <NavLink to='/home'>
             <img
               src={logo}
-              alt="Memorus Logo"
+              alt='Memorus Logo'
               style={{ height: "40px", width: "auto" }}
             />
           </NavLink>
@@ -214,17 +212,17 @@ const Navbar = () => {
             alignItems: "center",
           }}
         >
-          <StyledNavLink to="/home" end>
+          <StyledNavLink to='/home' end>
             Home
           </StyledNavLink>
-          <StyledNavLink to="/memors">Memors</StyledNavLink>
-          <StyledNavLink to="/leaderboard">Leaderboard</StyledNavLink>
-          <StyledNavLink to="/memoryBoard">Memory Board</StyledNavLink>
+          <StyledNavLink to='/memors'>Memors</StyledNavLink>
+          <StyledNavLink to='/leaderboard'>Leaderboard</StyledNavLink>
+          <StyledNavLink to='/memoryBoard'>Memory Board</StyledNavLink>
           <Box>
             <IconButton onClick={handleMenuOpen}>
               <img
                 src={profileIcon}
-                alt="User Profile"
+                alt='User Profile'
                 style={{
                   height: "40px",
                   width: "40px",
@@ -245,13 +243,13 @@ const Navbar = () => {
             >
               <MenuItem>
                 <Box sx={{ cursor: "default" }}>
-                  <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                  <Typography variant='body1' sx={{ fontWeight: 600 }}>
                     Jane Doe
                   </Typography>
-                  <Typography variant="body2" color="gray">
+                  <Typography variant='body2' color='gray'>
                     jane.doe@example.com
                   </Typography>
-                  <Typography variant="body2" sx={{ color: "#00C896" }}>
+                  <Typography variant='body2' sx={{ color: "#00C896" }}>
                     The Debuggers
                   </Typography>
                 </Box>
@@ -286,7 +284,9 @@ const Navbar = () => {
           </Box>
           <Box>
             <IconButton onClick={handleNotifClick}>
-              <Badge badgeContent={notifications.length} classes={{ badge: classes.customBadge }}
+              <Badge
+                badgeContent={notifications.length}
+                classes={{ badge: classes.customBadge }}
               >
                 <NotificationsNoneRoundedIcon
                   sx={{ color: "#D0BCFE", fontSize: "30px" }}
@@ -314,11 +314,11 @@ const Navbar = () => {
                   padding: "10px",
                 }}
               >
-                <Typography variant="body1" sx={{ color: "#fff" }}>
+                <Typography variant='body1' sx={{ color: "#fff" }}>
                   Notifications ({notifications.length})
                 </Typography>
                 <Button
-                  variant="text"
+                  variant='text'
                   sx={{ color: "#fff" }}
                   onClick={handleMarkAllRead}
                 >
@@ -344,7 +344,7 @@ const Navbar = () => {
             <MenuIcon sx={{ color: "#D0BCFE" }} />
           </IconButton>
           <Drawer
-            anchor="right"
+            anchor='right'
             open={drawerOpen}
             onClose={toggleDrawer(false)}
             sx={{
@@ -367,20 +367,20 @@ const Navbar = () => {
             >
               <img
                 src={profileIcon}
-                alt="User Profile"
+                alt='User Profile'
                 style={{
                   height: "60px",
                   width: "60px",
                   borderRadius: "50%",
                 }}
               />
-              <Typography variant="body1" sx={{ fontWeight: 600 }}>
+              <Typography variant='body1' sx={{ fontWeight: 600 }}>
                 Jane Doe
               </Typography>
-              <Typography variant="body2" color="gray">
+              <Typography variant='body2' color='gray'>
                 jane.doe@example.com
               </Typography>
-              <Typography variant="body2" sx={{ color: "#00C896" }}>
+              <Typography variant='body2' sx={{ color: "#00C896" }}>
                 The Debuggers
               </Typography>
             </Box>
@@ -395,16 +395,16 @@ const Navbar = () => {
                 marginTop: "20px",
               }}
             >
-              <StyledNavLink to="/home" onClick={toggleDrawer(false)}>
+              <StyledNavLink to='/home' onClick={toggleDrawer(false)}>
                 Home
               </StyledNavLink>
-              <StyledNavLink to="/memors" onClick={toggleDrawer(false)}>
+              <StyledNavLink to='/memors' onClick={toggleDrawer(false)}>
                 Memors
               </StyledNavLink>
-              <StyledNavLink to="/leaderboard" onClick={toggleDrawer(false)}>
+              <StyledNavLink to='/leaderboard' onClick={toggleDrawer(false)}>
                 Leaderboard
               </StyledNavLink>
-              <StyledNavLink to="/memoryBoard" onClick={toggleDrawer(false)}>
+              <StyledNavLink to='/memoryBoard' onClick={toggleDrawer(false)}>
                 Memory Board
               </StyledNavLink>
             </List>
@@ -420,7 +420,7 @@ const Navbar = () => {
               }}
             >
               <Typography
-                variant="body2"
+                variant='body2'
                 sx={{
                   cursor: "pointer",
                   color: "#FFF",
@@ -434,7 +434,7 @@ const Navbar = () => {
                 Change Password
               </Typography>
               <Typography
-                variant="body2"
+                variant='body2'
                 sx={{
                   cursor: "pointer",
                   color: "#FF5C5C",

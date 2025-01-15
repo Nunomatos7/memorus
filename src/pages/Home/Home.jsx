@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Mousewheel, FreeMode } from "swiper/modules";
-import { Grid, Card, CardContent, Typography, Box } from "@mui/material";
-import MemorPicture from "./../../Components/MemorPicture/MemorPicture";
 import "swiper/css";
 import "swiper/css/free-mode";
+import { Grid, Card, CardContent, Typography, Box } from "@mui/material";
+import MemorPicture from "./../../Components/MemorPicture/MemorPicture";
 import "./Home.css";
 import rank1 from "../../assets/images/rank1home.svg";
 import rank2 from "../../assets/images/rank2home.svg";
@@ -209,10 +209,20 @@ const Home = () => {
           <Grid item xs={12} sm={6}>
             <Card className='card'>
               <CardContent>
-                <Box style={{ display: "flex", alignItems: "center",  flexDirection: "column" }}>
+                <Box
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    flexDirection: "column",
+                  }}
+                >
                   <Box>
                     <Typography variant='h6' style={{ color: "white" }}>
-                      The competition <span style={ { color: "#5547bf", fontWeight: "bold" } }>Christmas</span> ends in
+                      The competition{" "}
+                      <span style={{ color: "#5547bf", fontWeight: "bold" }}>
+                        Christmas
+                      </span>{" "}
+                      ends in
                     </Typography>
                   </Box>
                   <Countdown endDate='2025-12-25T00:00:00' />

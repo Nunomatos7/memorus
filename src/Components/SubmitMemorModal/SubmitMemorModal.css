@@ -211,6 +211,19 @@
   background: transparent;
 }
 
+.photo-slide {
+  flex-shrink: 0;
+  max-width: 80px !important;
+}
+
+.photo {
+  width: 80px;
+  height: 80px;
+  border-radius: 10px;
+  overflow: hidden;
+  object-fit: contain;
+}
+
 .photo-placeholder {
   flex: 0 0 auto;
   width: 80px;
