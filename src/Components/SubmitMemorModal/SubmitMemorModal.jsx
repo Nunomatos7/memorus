@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import "./SubmitMemorModal.css";
 import "../FeedbackModal/FeedbackModal.css";
 import { Typography, Button } from "@mui/material";
@@ -9,11 +9,23 @@ import QrCode from "../../assets/images/QRcode.svg";
 import UploadButton from "../../assets/images/UploadButton.svg";
 import CustomButton from "../CustomButton/CustomButton";
 import FeedbackModal from "../FeedbackModal/FeedbackModal";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Mousewheel, FreeMode } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/free-mode";
+import PropTypes from "prop-types";
 
 const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
   const [uploadedImage, setUploadedImage] = useState(null);
   const [feedback, setFeedback] = useState(null);
   const [isSubmitMemorOpen, setIsSubmitMemorOpen] = useState(true);
+
+  // Normalize images array to always have at least 6 items
+  const normalizedImages = (() => {
+    const images = memor.image || []; // Use memor.image or an empty array
+    const placeholderCount = Math.max(6 - images.length, 0); // Calculate the number of placeholders needed
+    return [...images, ...Array(placeholderCount).fill(null)]; // Fill placeholders with null
+  })();
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -199,18 +211,40 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
               </div>
             </div>
             <Typography variant='body2' className='uploaded-photos-title'>
-              Your team's photos for this Memor
+              Your team&apos;s photos for this Memor
             </Typography>
-            <div className='uploaded-photos-slider'>
-              {Array(10)
-                .fill(null)
-                .map((_, index) => (
-                  <div key={index} className='photo-placeholder'></div>
-                ))}
-            </div>
-            <Typography variant='body2' className='no-photos-text'>
-              No team memors uploaded yet.
-            </Typography>
+
+            <Swiper
+              spaceBetween={15}
+              slidesPerView={5.3}
+              freeMode={true}
+              modules={[FreeMode, Mousewheel]}
+              mousewheel={true}
+              className='uploaded-photos-slider'
+            >
+              {normalizedImages.map((image, index) => (
+                <SwiperSlide key={index} className='photo-slide'>
+                  {image ? (
+                    (console.log(image),
+                    (
+                      <img
+                        src={image}
+                        alt={`Team photo ${index + 1}`}
+                        className='photo'
+                      />
+                    ))
+                  ) : (
+                    <div className='photo-placeholder'></div>
+                  )}
+                </SwiperSlide>
+              ))}
+            </Swiper>
+
+            {(memor.image?.length ?? 0) === 0 && (
+              <Typography variant='body2' className='no-photos-text'>
+                No team memors uploaded yet.
+              </Typography>
+            )}
 
             <div className='modal-actions'>
               <CustomButton
@@ -242,6 +276,21 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
       )}
     </>
   );
+};
+
+SubmitMemorModal.propTypes = {
+  memor: PropTypes.shape({
+    image: PropTypes.arrayOf(PropTypes.string),
+    title: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+    submission: PropTypes.string,
+    dueDate: PropTypes.string.isRequired,
+    points: PropTypes.number.isRequired,
+  }).isRequired,
+
+  onClose: PropTypes.func.isRequired,
+
+  onSubmit: PropTypes.func.isRequired,
 };
 
 export default SubmitMemorModal;
