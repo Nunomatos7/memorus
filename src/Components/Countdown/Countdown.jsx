@@ -25,7 +25,7 @@ const appearAnimation = keyframes`
 `;
 
 const PaperSheet = styled(Box)(({ theme, animateDrop, animateAppear }) => ({
-  width: 140,
+  width: 120,
   height: 100,
   backgroundColor: '#5547bf',
   borderRadius: '8px',

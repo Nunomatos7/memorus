@@ -28,6 +28,7 @@ import "swiper/css/free-mode";
 import { useLocation } from "react-router-dom";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import Loader from "../../Components/Loader/Loader";
+import BackupRoundedIcon from "@mui/icons-material/BackupRounded";
 
 const initialOngoingMemors = [
   {
@@ -209,16 +210,16 @@ const Memors = () => {
     <>
       {" "}
       <Loader />
-      <div className='container'>
+      <div className="container">
         <Box>
-          <div className='memors-header'>
+          <div className="memors-header">
             <Typography
-              variant='h2'
+              variant="h4"
               sx={{ fontWeight: "bold", color: "white" }}
             >
               Ongoing Memors
             </Typography>
-            <p className='memors-ongoing'> ({ongoingMemors.length}) </p>
+            <p className="memors-ongoing"> ({ongoingMemors.length}) </p>
           </div>
 
           {/* Swiper Section */}
@@ -260,7 +261,7 @@ const Memors = () => {
                   }}
                 >
                   <CardContent>
-                    <Typography variant='h6' sx={{ mb: 1, fontWeight: "bold" }}>
+                    <Typography variant="h6" sx={{ mb: 1, fontWeight: "bold" }}>
                       {memor.title}
                     </Typography>
 
@@ -271,8 +272,8 @@ const Memors = () => {
                         mb: 1,
                       }}
                     >
-                      <Groups fontSize='small' sx={{ mr: 1, color: "gray" }} />
-                      <Typography color='gray' sx={{ fontSize: "0.8rem" }}>
+                      <Groups fontSize="small" sx={{ mr: 1, color: "gray" }} />
+                      <Typography color="gray" sx={{ fontSize: "0.8rem" }}>
                         {memor.submission}
                       </Typography>
                     </Box>
@@ -284,12 +285,12 @@ const Memors = () => {
                       }}
                     >
                       <TodayIcon
-                        fontSize='small'
+                        fontSize="small"
                         sx={{ mr: 1, color: "gray" }}
                       />
                       <Typography
-                        variant='body2'
-                        color='gray'
+                        variant="body2"
+                        color="gray"
                         sx={{ fontSize: "0.8rem" }}
                       >
                         Due on {memor.dueDate}
@@ -299,7 +300,7 @@ const Memors = () => {
                       {memor.timeLeft && (
                         <Chip
                           label={memor.timeLeft}
-                          size='small'
+                          size="small"
                           sx={{
                             backgroundColor: "rgba(255, 0, 136, 0.2)",
                             color: "#D582B0",
@@ -311,8 +312,8 @@ const Memors = () => {
                       )}
                       {memor.status === "submitted" && (
                         <Chip
-                          label='Submitted'
-                          size='small'
+                          label="Submitted"
+                          size="small"
                           sx={{
                             backgroundColor: "rgba(0, 255, 163, 0.2)",
                             color: "#82D5C7",
@@ -337,7 +338,7 @@ const Memors = () => {
                     onClick={() => handleOpenModal(memor)}
                   >
                     <Button
-                      variant='contained'
+                      variant="contained"
                       sx={{
                         backgroundColor: "#7E57C2",
                         color: "white",
@@ -355,11 +356,11 @@ const Memors = () => {
                         },
                       }}
                     >
-                      <AddRoundedIcon fontSize='small' />
+                      <AddRoundedIcon fontSize="small" />
                     </Button>
 
                     <Typography
-                      variant='body2'
+                      variant="body2"
                       sx={{
                         fontSize: "0.8rem",
                         color: "white",
@@ -423,22 +424,22 @@ const Memors = () => {
               },
             }}
           >
-            <Tab value='all' label='All Memors' />
-            <Tab value='completed' label='Completed' />
-            <Tab value='incomplete' label='Incomplete' />
+            <Tab value="all" label="All Memors" />
+            <Tab value="completed" label="Completed" />
+            <Tab value="incomplete" label="Incomplete" />
           </Tabs>
 
           <TextField
-            placeholder='Search Memors'
+            placeholder="Search Memors"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            variant='outlined'
-            size='small'
+            variant="outlined"
+            size="small"
             slotProps={{
               input: {
                 startAdornment: (
-                  <InputAdornment position='start'>
-                    <Search fontSize='small' sx={{ color: "gray" }} />
+                  <InputAdornment position="start">
+                    <Search fontSize="small" sx={{ color: "gray" }} />
                   </InputAdornment>
                 ),
               },
@@ -474,10 +475,10 @@ const Memors = () => {
                   }}
                   onClick={() => toggleExpand(index)}
                 >
-                  <div className='memor'>
-                    <div className='title_date'>
+                  <div className="memor">
+                    <div className="title_date">
                       <Typography
-                        variant='h6'
+                        variant="h6"
                         sx={{
                           mb: 1,
                           fontWeight: "bold",
@@ -487,7 +488,7 @@ const Memors = () => {
                         {memor.title}
                       </Typography>{" "}
                       <Typography
-                        variant='body2'
+                        variant="body2"
                         sx={{
                           color: "gray",
                           fontSize: "0.8rem",
@@ -496,13 +497,13 @@ const Memors = () => {
                         {memor.dueDate}
                       </Typography>
                     </div>
-                    <div className='description'>
+                    <div className="description">
                       {expandedIndex === index
                         ? memor.description
                         : `${memor.description.substring(0, 50)}...`}
                     </div>
-                    <div className='submission'>{memor.submittedOn}</div>
-                    <div className='status'>
+                    <div className="submission">{memor.submittedOn}</div>
+                    <div className="status">
                       <Chip
                         label={
                           memor.status === "submitted"
@@ -523,7 +524,14 @@ const Memors = () => {
                         }}
                       />
                     </div>
-                    <div className='arrowIcon'>
+
+                    <div className="submissions">
+                      <BackupRoundedIcon
+                        sx={{ color: "gray", fontSize: "35px", cursor: "pointer", "&:hover": { color: "white" } }}
+                        onClick={() => handleOpenModal(memor)}
+                      />
+                    </div>
+                    <div className="arrowIcon">
                       <Button
                         sx={{
                           width: "30px",
@@ -538,7 +546,7 @@ const Memors = () => {
                         }}
                       >
                         <Typography
-                          variant='body'
+                          variant="body"
                           sx={{
                             fontSize: "14px",
                             color: "white",

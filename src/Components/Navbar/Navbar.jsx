@@ -11,12 +11,71 @@ import {
   Divider,
   Drawer,
   List,
+  Button,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import MenuIcon from "@mui/icons-material/Menu";
-import CloseIcon from "@mui/icons-material/Close";
 import logo from "../../assets/images/logoText.svg";
 import profileIcon from "../../assets/images/profile.svg";
+import notifPurple from "../../assets/images/notifPurple.svg";
+import notifGreen from "../../assets/images/notifGreen.svg";
+import notifDelete from "../../assets/images/notifDelete.svg";
+import NotificationsNoneRoundedIcon from "@mui/icons-material/NotificationsNoneRounded";
+import { Badge } from "@mui/material";
+import { makeStyles } from '@mui/styles';
+
+const useStyles = makeStyles({
+  customBadge: {
+    backgroundColor: "#42102B",
+    color: "#fff"
+  }
+});
+
+
+const NotificationItem = ({ notification, onDelete }) => {
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        backgroundColor: "#272A2C",
+        padding: "10px",
+        marginBottom: "8px",
+        "&:hover": {
+          backgroundColor: "#323537",
+          cursor: "pointer",
+        },
+      }}
+    >
+      <img
+        src={notification.image}
+        alt="Notification Icon"
+        style={{ width: 28, height: 28 }}
+      />
+      <Box sx={{ flexGrow: 1, paddingLeft: 2 }}>
+        <Typography
+          variant="subtitle1"
+          sx={{ color: "#fff", lineHeight: 1.2, marginBottom: 1 }}
+        >
+          {notification.title}
+        </Typography>
+        <Typography variant="body2" sx={{ color: "#aaa" }}>
+          {notification.description}
+        </Typography>
+      </Box>
+      <IconButton
+        onClick={() => onDelete(notification.id)}
+        sx={{ color: "#ff1744" }}
+      >
+        <img
+          src={notifDelete}
+          alt="Delete Icon"
+          style={{ width: 24, height: 24 }}
+        />
+      </IconButton>
+    </Box>
+  );
+};
 
 const StyledNavLink = styled(NavLink)(() => ({
   textDecoration: "none",
@@ -58,6 +117,64 @@ const Navbar = () => {
     window.location.href = "/login";
   };
 
+  const [notifAnchorEl, setNotifAnchorEl] = useState(null);
+  const handleNotifClick = (event) => {
+    setNotifAnchorEl(event.currentTarget);
+  };
+  const handleNotifClose = () => {
+    setNotifAnchorEl(null);
+  };
+  const handleDeleteNotification = (id) => {
+    setNotifications(
+      notifications.filter((notification) => notification.id !== id)
+    );
+  };
+
+  const handleMarkAllRead = () => {
+    setNotifications([]);
+  };
+
+  const [notifications, setNotifications] = useState([
+    {
+      id: 1,
+      image: notifPurple,
+      title: "1 hour left to submit your memor!",
+      description: "Don't forget to submit your memor 'Virtual Coffee Break'!",
+    },
+    {
+      id: 2,
+      image: notifGreen,
+      title: "You've received a new memor",
+      description: "A new memor was added to your team's memors.",
+    },
+    {
+      id: 3,
+      image: notifPurple,
+      title: "1 hour left to submit your memor!",
+      description: "Don't forget to submit your memor 'Virtual Coffee Break'!",
+    },
+    {
+      id: 4,
+      image: notifGreen,
+      title: "You've received a new memor",
+      description: "A new memor was added to your team's memors.",
+    },
+    {
+      id: 5,
+      image: notifPurple,
+      title: "1 hour left to submit your memor!",
+      description: "Don't forget to submit your memor 'Virtual Coffee Break'!",
+    },
+    {
+      id: 6,
+      image: notifGreen,
+      title: "You've received a new memor",
+      description: "A new memor was added to your team's memors.",
+    },
+  ]);
+
+  const classes = useStyles();
+
   return (
     <AppBar
       position="sticky"
@@ -90,7 +207,13 @@ const Navbar = () => {
         </Box>
 
         {/* Desktop Navigation */}
-        <Box sx={{ display: { xs: "none", md: "flex" }, gap: "24px", alignItems: "center" }}>
+        <Box
+          sx={{
+            display: { xs: "none", md: "flex" },
+            gap: "24px",
+            alignItems: "center",
+          }}
+        >
           <StyledNavLink to="/home" end>
             Home
           </StyledNavLink>
@@ -159,6 +282,58 @@ const Navbar = () => {
               >
                 Log Out
               </MenuItem>
+            </Menu>
+          </Box>
+          <Box>
+            <IconButton onClick={handleNotifClick}>
+              <Badge badgeContent={notifications.length} classes={{ badge: classes.customBadge }}
+              >
+                <NotificationsNoneRoundedIcon
+                  sx={{ color: "#D0BCFE", fontSize: "30px" }}
+                />
+              </Badge>
+            </IconButton>
+
+            <Menu
+              anchorEl={notifAnchorEl}
+              open={Boolean(notifAnchorEl)}
+              onClose={handleNotifClose}
+              PaperProps={{
+                style: {
+                  backgroundColor: "#232627",
+                  color: "white",
+                  width: "400px",
+                },
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  padding: "10px",
+                }}
+              >
+                <Typography variant="body1" sx={{ color: "#fff" }}>
+                  Notifications ({notifications.length})
+                </Typography>
+                <Button
+                  variant="text"
+                  sx={{ color: "#fff" }}
+                  onClick={handleMarkAllRead}
+                >
+                  Remove All
+                </Button>
+              </Box>
+              <Box sx={{ maxHeight: "300px", overflowY: "auto" }}>
+                {notifications.map((notification) => (
+                  <NotificationItem
+                    key={notification.id}
+                    notification={notification}
+                    onDelete={handleDeleteNotification}
+                  />
+                ))}
+              </Box>
             </Menu>
           </Box>
         </Box>

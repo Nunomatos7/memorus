@@ -209,7 +209,14 @@ const Home = () => {
           <Grid item xs={12} sm={6}>
             <Card className='card'>
               <CardContent>
-                <Countdown endDate='2025-12-25T00:00:00' />
+                <Box style={{ display: "flex", alignItems: "center",  flexDirection: "column" }}>
+                  <Box>
+                    <Typography variant='h6' style={{ color: "white" }}>
+                      The competition <span style={ { color: "#5547bf", fontWeight: "bold" } }>Christmas</span> ends in
+                    </Typography>
+                  </Box>
+                  <Countdown endDate='2025-12-25T00:00:00' />
+                </Box>
               </CardContent>
             </Card>
           </Grid>

@@ -47,7 +47,7 @@ const MemoryBoard = () => {
     const positions = [];
     const newPosts = mockPosts.map((post) => {
       const position = generateNonOverlappingPosition(positions);
-      positions.push(position); // Store the position to avoid overlaps
+      positions.push(position);
       return { ...post, ...position };
     });
     setPosts(newPosts);
