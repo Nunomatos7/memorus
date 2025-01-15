@@ -1,71 +1,72 @@
 .memor {
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-    justify-content: space-between;
-    align-items: center;
-    margin: 10px;
-    padding: 10px;
-    border-radius: 10px;
-    transition: height 0.3s ease;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  margin: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  transition: height 0.3s ease;
 }
 
 .modal-open {
-    overflow: hidden !important;
+  overflow: hidden !important;
 }
 
-.memors-header{
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    border-radius: 10px;
-    margin-bottom: 3vh;
+.memors-header {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 3vh;
+  gap: 5px;
 }
 
-.memors-ongoing{
-    font-size: 1rem;
-    padding: 0;
-    height: 100%;
+.memors-ongoing {
+  font-size: 1rem;
+  padding: 0;
+  height: 100%;
+  margin-top: 3px;
 }
 
 .memor .title_date {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    width: 10vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 10vw;
 }
 
 .memor .title_date .date {
-    color: rgba(230, 224, 233, 0.4);
-    font-size: 0.8rem;
+  color: rgba(230, 224, 233, 0.4);
+  font-size: 0.8rem;
 }
 
-.container{
-    margin: auto;
+.container {
+  margin: auto;
 }
 
 .memor .description {
-    color: white;
-    width: 400px;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    transition: all 0.3s ease;
-    
+  color: white;
+  width: 400px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  transition: all 0.3s ease;
 }
 
 .memor.expanded .description {
-    white-space: normal;
-    overflow: visible;
-    text-overflow: unset;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
 }
 
 .memor .submission {
-    color: rgba(255, 255, 255, 0.6);
-    width: 10vw;
-    font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+  width: 10vw;
+  font-size: 0.8rem;
 }
 
 .memor .actions {
-    color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.6);
 }
