@@ -30,12 +30,13 @@ import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import Loader from "../../Components/Loader/Loader";
 import BackupRoundedIcon from "@mui/icons-material/BackupRounded";
 
-const allMemors = [
+export const allMemors = [
   {
     id: 1,
     title: "Virtual Coffee Break",
     dueDate: "10/12/2024",
     submission: "No submission yet",
+    submittedDate: "01/01/2025",
     status: "incomplete",
     timeLeft: "1 hour left",
     description:
@@ -48,6 +49,7 @@ const allMemors = [
     title: "Fist bump a colleague",
     dueDate: "12/12/2024",
     submission: "No submission yet",
+    submittedDate: "01/01/2025",
     status: "incomplete",
     description:
       "For this team-building activity, capture a fun selfie! Show off your personality and creativity. Once you're ready, snap the photo and upload it to complete the task. Let's see your team spirit!",
@@ -59,6 +61,7 @@ const allMemors = [
     title: "Take a photo of your pet",
     dueDate: "17/12/2024",
     submission: "Submitted by a team member",
+    submittedDate: "01/01/2025",
     status: "submitted",
     description:
       "For this team-building activity, capture a fun selfie! Show off your personality and creativity. Once you're ready, snap the photo and upload it to complete the task. Let's see your team spirit!",
@@ -70,6 +73,7 @@ const allMemors = [
     title: "Fist bump a colleague",
     dueDate: "12/12/2024",
     submission: "No submission yet",
+    submittedDate: "01/01/2025",
     status: "incomplete",
     description:
       "For this team-building activity, capture a fun selfie! Show off your personality and creativity. Once you're ready, snap the photo and upload it to complete the task. Let's see your team spirit!",
@@ -81,6 +85,7 @@ const allMemors = [
     title: "Take a photo of your pet",
     dueDate: "17/12/2024",
     submission: "Submitted by a team member",
+    submittedDate: "01/01/2025",
     status: "submitted",
     description:
       "For this team-building activity, capture a fun selfie! Show off your personality and creativity. Once you're ready, snap the photo and upload it to complete the task. Let's see your team spirit!",

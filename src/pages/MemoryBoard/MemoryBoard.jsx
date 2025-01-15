@@ -1,23 +1,17 @@
 import { useRef, useState, useEffect } from "react";
 import { ReactInfiniteCanvas } from "react-infinite-canvas";
-import imgTest from "../../assets/images/goat.png";
 import seedrandom from "seedrandom";
+import { allMemors } from "../Memors/Memors";
+import MemorPicture from "../../Components/MemorPicture/MemorPicture";
+import "./MemoryBoard.css";
 
-const canvasWidth = 10000; // Logical canvas width
-const canvasHeight = 10000; // Logical canvas height
-const cardWidth = 200; // Width of each card
-const cardHeight = 200; // Height of each card
-const spacing = 200; // Minimum spacing between cards
+const canvasWidth = 10000;
+const canvasHeight = 10000;
+const cardWidth = 250;
+const cardHeight = 300;
+const spacing = 200;
 
-// Seeded random number generator, fixed seed ensures the same random sequence
 const rng = seedrandom("fixed-seed");
-
-// Mock data for the posts
-const mockPosts = Array.from({ length: 160 }, (_, index) => ({
-  date: index % 2 === 0 ? "16/12/2024" : "01/12/2024",
-  imgSrc: imgTest,
-  title: `Share Di Maria ${index + 1}`,
-}));
 
 const generateNonOverlappingPosition = (positions) => {
   let position;
@@ -42,16 +36,51 @@ const generateNonOverlappingPosition = (positions) => {
 const MemoryBoard = () => {
   const canvasRef = useRef();
   const [posts, setPosts] = useState([]);
+  const [selectedMemor, setSelectedMemor] = useState(null); // Track the selected memor
+  const [zoomLevel, setZoomLevel] = useState(1); // Track zoom level
+
+  const getCanvasState = () => {
+    return canvasRef.current?.getCanvasState?.();
+  };
 
   useEffect(() => {
     const positions = [];
-    const newPosts = mockPosts.map((post) => {
+    const memorsWithImages = allMemors.filter(
+      (memor) => memor.image && memor.image.length > 0
+    );
+
+    const newPosts = memorsWithImages.map((post) => {
       const position = generateNonOverlappingPosition(positions);
       positions.push(position);
       return { ...post, ...position };
     });
+
     setPosts(newPosts);
   }, []);
+
+  const openModal = (image, title, submittedDate) => {
+    setSelectedMemor({ image, title, submittedDate });
+  };
+
+  const closeModal = () => {
+    setSelectedMemor(null);
+  };
+
+  // Zoom controls using d3Zoom
+  const handleZoom = (action = "out") => {
+    const canvasState = getCanvasState();
+    if (!canvasState) return;
+
+    const { canvasNode, currentPosition, d3Zoom } = canvasState;
+    const { k: currentScale } = currentPosition || {};
+    const diff = action === "out" ? -0.25 : 0.25;
+
+    const newScale = currentScale + diff;
+    if (newScale >= 0.1) {
+      d3Zoom.scaleTo(canvasNode.transition().duration(500), newScale);
+      setZoomLevel(newScale); // Update the zoom level state
+    }
+  };
 
   return (
     <div style={{ width: "100%", height: "90vh", position: "relative" }}>
@@ -68,39 +97,82 @@ const MemoryBoard = () => {
               position: "absolute",
               top: post.y + canvasHeight / 2,
               left: post.x + canvasWidth / 2,
-              height: `${cardHeight}px`,
               width: `${cardWidth}px`,
-              border: "5px solid white",
-              backgroundColor: "white",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "start",
+              height: `${cardHeight}px`,
             }}
           >
-            <p
+            <div
               style={{
-                color: "black",
-                textAlign: "left",
-                fontFamily: "cursive",
-                fontSize: "10px",
+                position: "relative",
+                width: "100%",
+                height: "100%",
               }}
             >
-              {post.date}
-            </p>
-            <img src={post.imgSrc} alt="Post image" style={{ height: "60%" }} />
-            <p
-              style={{
-                color: "black",
-                textAlign: "center",
-                fontFamily: "cursive",
-                marginTop: "10px",
-              }}
-            >
-              {post.title}
-            </p>
+              {post.image.map((imgSrc, cardIndex) => (
+                <div
+                  key={cardIndex}
+                  onClick={() =>
+                    openModal(imgSrc, post.title, post.submittedDate)
+                  }
+                  style={{
+                    position: "absolute",
+                    top: `${cardIndex * 10}px`,
+                    left: `${cardIndex * 10}px`,
+                    width: "100%",
+                    height: "100%",
+                    backgroundColor: "white",
+                    border: "2px solid white",
+                    boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)",
+                    borderRadius: "8px",
+                    transform: `rotate(${cardIndex % 2 === 0 ? -5 : 5}deg)`,
+                    zIndex: cardIndex,
+                    cursor: "pointer",
+                  }}
+                >
+                  <p style={{ fontSize: "10px", margin: "10px" }}>
+                    {post.submittedDate}
+                  </p>
+                  <img
+                    src={imgSrc}
+                    alt={`Post image ${cardIndex}`}
+                    style={{
+                      width: "90%",
+                      height: "60%",
+                      objectFit: "cover",
+                      borderRadius: "8px",
+                      margin: "10px auto",
+                      display: "block",
+                    }}
+                  />
+                  <p style={{ textAlign: "center", fontSize: "14px" }}>
+                    {post.title}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
         ))}
       </ReactInfiniteCanvas>
+
+      {selectedMemor && (
+        <MemorPicture
+          image={selectedMemor.image}
+          title={selectedMemor.title}
+          submitDate={selectedMemor.submittedDate}
+          onClose={closeModal}
+        />
+      )}
+
+      {/* Zoom Controls */}
+      <div className='zoom-controls'>
+        <button className='zoom-btn' onClick={() => handleZoom("out")}>
+          -
+        </button>
+        <span className='zoom-display'>{Math.round(zoomLevel * 100)}%</span>
+        <button className='zoom-btn' onClick={() => handleZoom("in")}>
+          +
+        </button>
+      </div>
     </div>
   );
 };
