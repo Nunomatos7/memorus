@@ -130,7 +130,7 @@ const Leaderboard = () => {
         >
           {/* Header */}
           <Typography
-            variant='h2'
+            variant='h4'
             sx={{
               fontWeight: "bold",
               color: "white",

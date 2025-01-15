@@ -1,160 +1,107 @@
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import { ReactInfiniteCanvas } from "react-infinite-canvas";
-import { COMPONENT_POSITIONS } from "../../assets/Helpers/constants";
 import imgTest from "../../assets/images/goat.png";
-import Loader from "../../Components/Loader/Loader";
+import seedrandom from "seedrandom";
 
-// Minimum spacing between posts to avoid overlap
-const MIN_SPACING = 220;
+const canvasWidth = 10000; // Logical canvas width
+const canvasHeight = 10000; // Logical canvas height
+const cardWidth = 200; // Width of each card
+const cardHeight = 200; // Height of each card
+const spacing = 200; // Minimum spacing between cards
 
-const generateNonOverlappingPosition = (existingPositions) => {
+// Seeded random number generator, fixed seed ensures the same random sequence
+const rng = seedrandom("fixed-seed");
+
+// Mock data for the posts
+const mockPosts = Array.from({ length: 160 }, (_, index) => ({
+  date: index % 2 === 0 ? "16/12/2024" : "01/12/2024",
+  imgSrc: imgTest,
+  title: `Share Di Maria ${index + 1}`,
+}));
+
+const generateNonOverlappingPosition = (positions) => {
   let position;
-  let isOverlapping;
+  let overlaps;
 
   do {
     position = {
-      x: Math.floor(Math.random() * window.innerWidth),
-      y: Math.floor(Math.random() * window.innerHeight),
+      x: rng() * canvasWidth - canvasWidth / 2,
+      y: rng() * canvasHeight - canvasHeight / 2,
     };
 
-    // Check for overlap with existing positions
-    isOverlapping = existingPositions.some(
-      (existing) =>
-        Math.abs(existing.x - position.x) < MIN_SPACING &&
-        Math.abs(existing.y - position.y) < MIN_SPACING
+    overlaps = positions.some(
+      (pos) =>
+        Math.abs(pos.x - position.x) < cardWidth + spacing &&
+        Math.abs(pos.y - position.y) < cardHeight + spacing
     );
-  } while (isOverlapping);
+  } while (overlaps);
 
   return position;
 };
 
-const posts = [
-  {
-    date: "16/12/2024",
-    imgSrc: imgTest,
-    title: "Share Di Maria",
-  },
-  {
-    date: "01/12/2024",
-    imgSrc: imgTest,
-    title: "Share Di Maria",
-  },
-  {
-    date: "16/12/2024",
-    imgSrc: imgTest,
-    title: "Share Di Maria",
-  },
-  {
-    date: "16/12/2024",
-    imgSrc: imgTest,
-    title: "Share Di Maria",
-  },
-  {
-    date: "01/12/2024",
-    imgSrc: imgTest,
-    title: "Share Di Maria",
-  },
-  {
-    date: "16/12/2024",
-    imgSrc: imgTest,
-    title: "Share Di Maria",
-  },
-  {
-    date: "16/12/2024",
-    imgSrc: imgTest,
-    title: "Share Di Maria",
-  },
-  {
-    date: "01/12/2024",
-    imgSrc: imgTest,
-    title: "Share Di Maria",
-  },
-];
-
-const renderPosts = () => {
-  const positions = [];
-
-  return posts.map((post, index) => {
-    const position = generateNonOverlappingPosition(positions);
-    positions.push(position); // Store the position for overlap checks
-
-    return (
-      <>
-        <div
-          key={index}
-          style={{
-            position: "absolute",
-            top: position.y,
-            left: position.x,
-            height: "200px",
-            width: "200px",
-            border: "5px solid white",
-            backgroundColor: "white",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "start",
-          }}
-        >
-          <p
-            style={{
-              color: "black",
-              textAlign: "left",
-              fontFamily: "cursive",
-              fontSize: "10px",
-            }}
-          >
-            {post.date}
-          </p>
-          <img src={post.imgSrc} alt='1' style={{ height: "60%" }} />
-          <p
-            style={{
-              color: "black",
-              textAlign: "center",
-              fontFamily: "cursive",
-              marginTop: "10px",
-            }}
-          >
-            {post.title}
-          </p>
-        </div>
-      </>
-    );
-  });
-};
-
 const MemoryBoard = () => {
-  <Loader />;
   const canvasRef = useRef();
+  const [posts, setPosts] = useState([]);
+
+  useEffect(() => {
+    const positions = [];
+    const newPosts = mockPosts.map((post) => {
+      const position = generateNonOverlappingPosition(positions);
+      positions.push(position);
+      return { ...post, ...position };
+    });
+    setPosts(newPosts);
+  }, []);
 
   return (
-    <>
-      <Loader />
-      <div style={{ width: "100%", height: "90vh", position: "relative" }}>
-        <ReactInfiniteCanvas
-          ref={canvasRef}
-          onCanvasMount={(mountFunc) => {
-            mountFunc.fitContentToView({ scale: 1 });
-          }}
-          customComponents={[
-            {
-              component: (
-                <button
-                  onClick={() => {
-                    canvasRef.current?.fitContentToView({ scale: 1 });
-                  }}
-                >
-                  Start
-                </button>
-              ),
-              position: COMPONENT_POSITIONS.TOP_LEFT,
-              offset: { x: 120, y: 10 },
-            },
-          ]}
-        >
-          {renderPosts()}
-        </ReactInfiniteCanvas>
-      </div>
-    </>
+    <div style={{ width: "100%", height: "90vh", position: "relative" }}>
+      <ReactInfiniteCanvas
+        ref={canvasRef}
+        onCanvasMount={(mountFunc) => {
+          mountFunc.fitContentToView({ scale: 1 });
+        }}
+      >
+        {posts.map((post, index) => (
+          <div
+            key={index}
+            style={{
+              position: "absolute",
+              top: post.y + canvasHeight / 2,
+              left: post.x + canvasWidth / 2,
+              height: `${cardHeight}px`,
+              width: `${cardWidth}px`,
+              border: "5px solid white",
+              backgroundColor: "white",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "start",
+            }}
+          >
+            <p
+              style={{
+                color: "black",
+                textAlign: "left",
+                fontFamily: "cursive",
+                fontSize: "10px",
+              }}
+            >
+              {post.date}
+            </p>
+            <img src={post.imgSrc} alt="Post image" style={{ height: "60%" }} />
+            <p
+              style={{
+                color: "black",
+                textAlign: "center",
+                fontFamily: "cursive",
+                marginTop: "10px",
+              }}
+            >
+              {post.title}
+            </p>
+          </div>
+        ))}
+      </ReactInfiniteCanvas>
+    </div>
   );
 };
 
