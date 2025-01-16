@@ -11,9 +11,9 @@ import AdminLeaderboard from "./pages/Admin/Leaderboard/Leaderboard";
 import AdminBoard from "./pages/Admin/AdminBoard/AdminBoard";
 import AdminLayout from "./Components/AdminLayout/AdminLayout";
 import CollaboratorLayout from "./Components/CollaboratorLayout/CollaboratorLayout";
-import LoginPage from "./auth/LoginPage";
-import RegisterPage from "./auth/RegisterPage";
-import ChangePassword from "./auth/ChangePassword";
+import LoginPage from "./Auth/LoginPage";
+import RegisterPage from "./Auth/RegisterPage";
+import ChangePassword from "./Auth/ChangePassword";
 import Loader from "./Components/Loader/Loader";
 
 function App() {
