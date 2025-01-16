@@ -29,82 +29,7 @@ import { useLocation } from "react-router-dom";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import Loader from "../../Components/Loader/Loader";
 import BackupRoundedIcon from "@mui/icons-material/BackupRounded";
-
-export const allMemors = [
-  {
-    id: 1,
-    title: "Virtual Coffee Break",
-    dueDate: "10/12/2024",
-    submission: "No submission yet",
-    submittedDate: "01/01/2025",
-    status: "incomplete",
-    timeLeft: "1 hour left",
-    description:
-      "For this team-building activity, capture a fun selfie! Show off your personality and creativity. Once you're ready, snap the photo and upload it to complete the task. Let's see your team spirit!",
-    points: 10,
-    image: null,
-  },
-  {
-    id: 2,
-    title: "Fist bump a colleague",
-    dueDate: "12/12/2024",
-    submission: "No submission yet",
-    submittedDate: "01/01/2025",
-    status: "incomplete",
-    description:
-      "For this team-building activity, capture a fun selfie! Show off your personality and creativity. Once you're ready, snap the photo and upload it to complete the task. Let's see your team spirit!",
-    points: 20,
-    image: null,
-  },
-  {
-    id: 3,
-    title: "Take a photo of your pet",
-    dueDate: "17/12/2024",
-    submission: "Submitted by a team member",
-    submittedDate: "01/01/2025",
-    status: "submitted",
-    description:
-      "For this team-building activity, capture a fun selfie! Show off your personality and creativity. Once you're ready, snap the photo and upload it to complete the task. Let's see your team spirit!",
-    points: 30,
-    image: ["https://placehold.jp/80x80.png", "https://placehold.jp/80x80.png"],
-  },
-  {
-    id: 4,
-    title: "Fist bump a colleague",
-    dueDate: "12/12/2024",
-    submission: "No submission yet",
-    submittedDate: "01/01/2025",
-    status: "incomplete",
-    description:
-      "For this team-building activity, capture a fun selfie! Show off your personality and creativity. Once you're ready, snap the photo and upload it to complete the task. Let's see your team spirit!",
-    points: 40,
-    image: null,
-  },
-  {
-    id: 5,
-    title: "Take a photo of your pet",
-    dueDate: "17/12/2024",
-    submission: "Submitted by a team member",
-    submittedDate: "01/01/2025",
-    status: "submitted",
-    description:
-      "For this team-building activity, capture a fun selfie! Show off your personality and creativity. Once you're ready, snap the photo and upload it to complete the task. Let's see your team spirit!",
-    points: 50,
-    image: ["https://placehold.jp/80x80.png", "https://placehold.jp/80x80.png"],
-  },
-  {
-    id: 6,
-    title: "Virtual Coffee Break",
-    dueDate: "10/12/2024",
-    submission: "No submission yet",
-    status: "incomplete",
-    timeLeft: "1 hour left",
-    description:
-      "For this team-building activity, capture a fun selfie! Show off your personality and creativity. Once you're ready, snap the photo and upload it to complete the task. Let's see your team spirit!",
-    points: 60,
-    image: null,
-  },
-];
+import { memorsData } from "../../Data/Memors.json";
 
 const Memors = () => {
   const location = useLocation();
@@ -116,7 +41,7 @@ const Memors = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedMemor, setSelectedMemor] = useState(null);
-  const [ongoingMemors, setOngoingMemors] = useState(allMemors);
+  const [ongoingMemors, setOngoingMemors] = useState(memorsData);
   const handleTabChange = (_, newValue) => {
     setTab(newValue);
   };
@@ -151,17 +76,18 @@ const Memors = () => {
     );
   };
 
-  const filteredMemors = allMemors.filter((memor) => {
+  const filteredMemors = memorsData.filter((memor) => {
     const matchesSearch = memor.title
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
+    const matchesTeam = memor.team === "The Debuggers"; // Filter by team name
     if (tab === "completed") {
-      return memor.status === "submitted" && matchesSearch;
+      return memor.status === "submitted" && matchesSearch && matchesTeam;
     }
     if (tab === "incomplete") {
-      return memor.status === "incomplete" && matchesSearch;
+      return memor.status === "incomplete" && matchesSearch && matchesTeam;
     }
-    return matchesSearch;
+    return matchesSearch && matchesTeam;
   });
 
   return (

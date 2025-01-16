@@ -8,7 +8,6 @@ import Leaderboard from "./pages/Leaderboard/Leaderboard";
 import MemoryBoard from "./pages/MemoryBoard/MemoryBoard";
 import AdminHome from "./pages/Admin/Home/Home";
 import AdminLeaderboard from "./pages/Admin/Leaderboard/Leaderboard";
-import AdminMemoryBoard from "./pages/Admin/MemoryBoard/MemoryBoard";
 import AdminBoard from "./pages/Admin/AdminBoard/AdminBoard";
 import AdminLayout from "./Components/AdminLayout/AdminLayout";
 import CollaboratorLayout from "./Components/CollaboratorLayout/CollaboratorLayout";
@@ -125,6 +124,7 @@ function App() {
             </ProtectedRoute>
           }
         >
+          <Route path='' element={<Navigate to='home' replace />} />
           <Route path='home' index element={<Home />} />
           <Route path='memors' element={<Memors />} />
           <Route path='leaderboard' element={<Leaderboard />} />
@@ -142,7 +142,7 @@ function App() {
         >
           <Route path='home' element={<AdminHome />} />
           <Route path='leaderboard' element={<AdminLeaderboard />} />
-          <Route path='memoryboard' element={<AdminMemoryBoard />} />
+          <Route path='memoryboard' element={<MemoryBoard />} />
           <Route path='adminboard' element={<AdminBoard />} />
         </Route>
 

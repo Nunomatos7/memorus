@@ -1,14 +1,16 @@
 import { useRef, useState, useEffect } from "react";
 import { ReactInfiniteCanvas } from "react-infinite-canvas";
 import seedrandom from "seedrandom";
-import { allMemors } from "../Memors/Memors";
+import { COMPONENT_POSITIONS } from "../../assets/Helpers/constants";
+import { memorsData } from "../../Data/Memors.json";
 import MemorPicture from "../../Components/MemorPicture/MemorPicture";
 import "./MemoryBoard.css";
+import Loader from "../../Components/Loader/Loader";
 
-const canvasWidth = 10000;
-const canvasHeight = 10000;
-const cardWidth = 250;
-const cardHeight = 300;
+const canvasWidth = 2000;
+const canvasHeight = 2000;
+const cardWidth = 350;
+const cardHeight = 400;
 const spacing = 200;
 
 const rng = seedrandom("fixed-seed");
@@ -36,17 +38,20 @@ const generateNonOverlappingPosition = (positions) => {
 const MemoryBoard = () => {
   const canvasRef = useRef();
   const [posts, setPosts] = useState([]);
-  const [selectedMemor, setSelectedMemor] = useState(null); // Track the selected memor
-  const [zoomLevel, setZoomLevel] = useState(1); // Track zoom level
+  const [selectedMemor, setSelectedMemor] = useState(null);
+  const [zoomLevel, setZoomLevel] = useState(1);
+  const [loadedImages, setLoadedImages] = useState(new Set());
+  const [filteredTeam, setFilteredTeam] = useState("The Debuggers");
 
-  const getCanvasState = () => {
-    return canvasRef.current?.getCanvasState?.();
-  };
+  const teams = ["All", ...new Set(memorsData.map((memor) => memor.team))];
 
   useEffect(() => {
     const positions = [];
-    const memorsWithImages = allMemors.filter(
-      (memor) => memor.image && memor.image.length > 0
+    const memorsWithImages = memorsData.filter(
+      (memor) =>
+        memor.image &&
+        memor.image.length > 0 &&
+        (filteredTeam === "All" || memor.team === filteredTeam)
     );
 
     const newPosts = memorsWithImages.map((post) => {
@@ -56,19 +61,76 @@ const MemoryBoard = () => {
     });
 
     setPosts(newPosts);
+  }, [filteredTeam]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setLoadedImages(
+              (prev) => new Set([...prev, entry.target.dataset.src])
+            );
+          }
+        });
+      },
+      { root: null, rootMargin: "150px" }
+    );
+
+    const imageElements = document.querySelectorAll("[data-src]");
+    imageElements.forEach((img) => observer.observe(img));
+
+    return () => observer.disconnect();
+  }, [posts]);
+
+  useEffect(() => {
+    const handleWheel = (e) => {
+      if (e.ctrlKey) {
+        e.preventDefault();
+        const canvasState = canvasRef.current?.getCanvasState?.();
+        if (canvasState) {
+          const { currentPosition } = canvasState;
+          const { k: currentScale } = currentPosition || {};
+          const newScale = currentScale + (e.deltaY > 0 ? -0.1 : 0.1);
+          if (newScale >= 0.1 && newScale <= 3) {
+            canvasState.d3Zoom.scaleTo(
+              canvasState.canvasNode.transition().duration(0),
+              newScale
+            );
+            setZoomLevel(newScale);
+          }
+        }
+      }
+    };
+
+    const syncZoomLevel = () => {
+      const canvasState = canvasRef.current?.getCanvasState?.();
+      if (canvasState) {
+        const { currentPosition } = canvasState;
+        const { k: currentScale } = currentPosition || {};
+        setZoomLevel(currentScale);
+      }
+    };
+
+    window.addEventListener("wheel", handleWheel, { passive: false });
+    const interval = setInterval(syncZoomLevel, 200); // Sync every 200ms
+
+    return () => {
+      window.removeEventListener("wheel", handleWheel);
+      clearInterval(interval);
+    };
   }, []);
 
-  const openModal = (image, title, submittedDate) => {
-    setSelectedMemor({ image, title, submittedDate });
+  const openModal = (image, title, submittedDate, team) => {
+    setSelectedMemor({ image, title, submittedDate, team });
   };
 
   const closeModal = () => {
     setSelectedMemor(null);
   };
 
-  // Zoom controls using d3Zoom
   const handleZoom = (action = "out") => {
-    const canvasState = getCanvasState();
+    const canvasState = canvasRef.current?.getCanvasState?.();
     if (!canvasState) return;
 
     const { canvasNode, currentPosition, d3Zoom } = canvasState;
@@ -76,104 +138,156 @@ const MemoryBoard = () => {
     const diff = action === "out" ? -0.25 : 0.25;
 
     const newScale = currentScale + diff;
-    if (newScale >= 0.1) {
+    if (newScale >= 0.1 && newScale <= 3) {
       d3Zoom.scaleTo(canvasNode.transition().duration(500), newScale);
-      setZoomLevel(newScale); // Update the zoom level state
+      setZoomLevel(newScale);
     }
   };
 
   return (
-    <div style={{ width: "100%", height: "90vh", position: "relative" }}>
-      <ReactInfiniteCanvas
-        ref={canvasRef}
-        onCanvasMount={(mountFunc) => {
-          mountFunc.fitContentToView({ scale: 1 });
+    <>
+      <Loader />
+      <div
+        style={{
+          width: "100%",
+          height: "93vh",
+          position: "relative",
+          backgroundColor: "#9990d8",
         }}
       >
-        {posts.map((post, index) => (
-          <div
-            key={index}
-            style={{
-              position: "absolute",
-              top: post.y + canvasHeight / 2,
-              left: post.x + canvasWidth / 2,
-              width: `${cardWidth}px`,
-              height: `${cardHeight}px`,
-            }}
+        <div className='filter-controls'>
+          <select
+            value={filteredTeam}
+            onChange={(e) => setFilteredTeam(e.target.value)}
+            className='filter-dropdown'
           >
-            <div
-              style={{
-                position: "relative",
-                width: "100%",
-                height: "100%",
-              }}
-            >
-              {post.image.map((imgSrc, cardIndex) => (
-                <div
-                  key={cardIndex}
-                  onClick={() =>
-                    openModal(imgSrc, post.title, post.submittedDate)
-                  }
-                  style={{
-                    position: "absolute",
-                    top: `${cardIndex * 10}px`,
-                    left: `${cardIndex * 10}px`,
-                    width: "100%",
-                    height: "100%",
-                    backgroundColor: "white",
-                    border: "2px solid white",
-                    boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)",
-                    borderRadius: "8px",
-                    transform: `rotate(${cardIndex % 2 === 0 ? -5 : 5}deg)`,
-                    zIndex: cardIndex,
-                    cursor: "pointer",
+            {teams.map((team, index) => (
+              <option key={index} value={team}>
+                {team}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <ReactInfiniteCanvas
+          ref={canvasRef}
+          onCanvasMount={(mountFunc) => {
+            mountFunc.fitContentToView({ scale: 0.5 });
+          }}
+          customComponents={[
+            {
+              component: (
+                <button
+                  className='start-btn'
+                  onClick={() => {
+                    canvasRef.current?.fitContentToView({ scale: 1 });
                   }}
                 >
-                  <p style={{ fontSize: "10px", margin: "10px" }}>
-                    {post.submittedDate}
-                  </p>
-                  <img
-                    src={imgSrc}
-                    alt={`Post image ${cardIndex}`}
-                    style={{
-                      width: "90%",
-                      height: "60%",
-                      objectFit: "cover",
-                      borderRadius: "8px",
-                      margin: "10px auto",
-                      display: "block",
-                    }}
-                  />
-                  <p style={{ textAlign: "center", fontSize: "14px" }}>
-                    {post.title}
-                  </p>
-                </div>
-              ))}
+                  Start
+                </button>
+              ),
+              position: COMPONENT_POSITIONS.BOTTOM_LEFT,
+              offset: { x: 20, y: 70 },
+            },
+          ]}
+        >
+          {posts.map((post, index) => (
+            <div
+              key={index}
+              className='polaroid-container'
+              style={{
+                position: "absolute",
+                top: post.y + canvasHeight / 2,
+                left: post.x + canvasWidth / 2,
+                width: `${cardWidth}px`,
+                height: `${cardHeight}px`,
+              }}
+            >
+              <div
+                style={{ position: "relative", width: "100%", height: "100%" }}
+              >
+                {post.image
+                  .slice()
+                  .reverse()
+                  .map((imgSrc, cardIndex, reversedArray) => (
+                    <div
+                      key={cardIndex}
+                      className='polaroid-card'
+                      onClick={() =>
+                        openModal(
+                          imgSrc,
+                          post.title,
+                          post.submittedDate,
+                          post.team
+                        )
+                      }
+                      style={{
+                        position: "absolute",
+                        top: `${cardIndex * 5}px`,
+                        left: `${cardIndex * 25}px`,
+                        width: "100%",
+                        height: "100%",
+                        backgroundColor: "white",
+                        border: "2px solid white",
+                        boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)",
+                        borderRadius: "8px",
+                        transform: `rotate(${cardIndex % 2 === 0 ? -1 : 1}deg)`,
+                        zIndex: cardIndex,
+                        cursor: "pointer",
+                      }}
+                    >
+                      {/* Submitted Date */}
+                      {cardIndex === reversedArray.length - 1 && (
+                        <p className='card-date'>{post.submittedDate}</p>
+                      )}
+
+                      {/* Image */}
+                      <img
+                        data-src={imgSrc}
+                        src={loadedImages.has(imgSrc) ? imgSrc : ""}
+                        alt={`Post image ${cardIndex}`}
+                        style={{
+                          width: "90%",
+                          height: "60%",
+                          objectFit: "cover",
+                          borderRadius: "8px",
+                          margin: "10px auto",
+                          display: "block",
+                        }}
+                      />
+
+                      {/* Title - Only for the first image */}
+                      {cardIndex === reversedArray.length - 1 && (
+                        <p className='card-title'>{post.title}</p>
+                      )}
+                    </div>
+                  ))}
+              </div>
             </div>
-          </div>
-        ))}
-      </ReactInfiniteCanvas>
+          ))}
+        </ReactInfiniteCanvas>
 
-      {selectedMemor && (
-        <MemorPicture
-          image={selectedMemor.image}
-          title={selectedMemor.title}
-          submitDate={selectedMemor.submittedDate}
-          onClose={closeModal}
-        />
-      )}
+        {selectedMemor && (
+          <MemorPicture
+            image={selectedMemor.image}
+            title={selectedMemor.title}
+            submitDate={selectedMemor.submittedDate}
+            teamName={selectedMemor.team}
+            onClose={closeModal}
+          />
+        )}
 
-      {/* Zoom Controls */}
-      <div className='zoom-controls'>
-        <button className='zoom-btn' onClick={() => handleZoom("out")}>
-          -
-        </button>
-        <span className='zoom-display'>{Math.round(zoomLevel * 100)}%</span>
-        <button className='zoom-btn' onClick={() => handleZoom("in")}>
-          +
-        </button>
+        <div className='zoom-controls'>
+          <button className='zoom-btn' onClick={() => handleZoom("out")}>
+            -
+          </button>
+          <span className='zoom-display'>{Math.round(zoomLevel * 100)}%</span>
+          <button className='zoom-btn' onClick={() => handleZoom("in")}>
+            +
+          </button>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
