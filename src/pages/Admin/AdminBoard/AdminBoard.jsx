@@ -73,9 +73,9 @@ const AdminBoard = () => {
   const [newMemorPoints, setNewMemorPoints] = useState(null);
   const [memors, setMemors] = useState([
     {
-      title: "Virtual Coffee Break",
+      title: "Coffee Break",
       description:
-        "Join the virtual coffee break, where you can share a cup and a story online. Make sure to have your favorite mug!",
+        "Join the coffee break, where you can share a cup and a story online. Make sure to have your favorite mug!",
       date: "01/25/2025",
       points: "+ 30 pts",
       teamsLeft: 5,
@@ -961,10 +961,10 @@ const AdminBoard = () => {
     <>
       <Loader />
 
-      <div className="container">
+      <div className='container'>
         <img
           src={background1}
-          alt="leaderboard-bg1"
+          alt='leaderboard-bg1'
           style={{
             position: "absolute",
             top: "2",
@@ -975,7 +975,7 @@ const AdminBoard = () => {
         />
         <img
           src={background2}
-          alt="leaderboard-bg2"
+          alt='leaderboard-bg2'
           style={{
             position: "absolute",
             top: "25%",
@@ -986,7 +986,7 @@ const AdminBoard = () => {
         />
         <img
           src={background3}
-          alt="leaderboard-bg3"
+          alt='leaderboard-bg3'
           style={{
             position: "absolute",
             top: "35%",
@@ -996,7 +996,7 @@ const AdminBoard = () => {
           }}
         />
         <Typography
-          variant="h4"
+          variant='h4'
           sx={{
             fontWeight: "bold",
             color: "white",
@@ -1049,21 +1049,21 @@ const AdminBoard = () => {
                 },
               }}
             >
-              <Tab value="memors" label="Manage Memors" />
-              <Tab value="teams" label="Manage Teams" />
-              <Tab value="competition" label="Manage Competition" />
+              <Tab value='memors' label='Manage Memors' />
+              <Tab value='teams' label='Manage Teams' />
+              <Tab value='competition' label='Manage Competition' />
             </Tabs>
             <TextField
-              placeholder="Search"
+              placeholder='Search'
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              variant="outlined"
-              size="small"
+              variant='outlined'
+              size='small'
               slotProps={{
                 input: {
                   startAdornment: (
-                    <InputAdornment position="start">
-                      <Search fontSize="small" sx={{ color: "gray" }} />
+                    <InputAdornment position='start'>
+                      <Search fontSize='small' sx={{ color: "gray" }} />
                     </InputAdornment>
                   ),
                 },
@@ -1103,7 +1103,7 @@ const AdminBoard = () => {
                 }}
               >
                 <CustomButton
-                  text="Create a Memor"
+                  text='Create a Memor'
                   onClick={() => handleCreateMemorModalOpen()}
                   sx={{
                     backgroundColor: "#B5EDE4",
@@ -1122,7 +1122,7 @@ const AdminBoard = () => {
                   }}
                   icon={
                     <Typography
-                      component="span"
+                      component='span'
                       sx={{
                         fontWeight: "bold",
                         fontSize: "18px",
@@ -1158,9 +1158,9 @@ const AdminBoard = () => {
                     },
                   }}
                 >
-                  <Tab value="all" label="All Memors" />
-                  <Tab value="ongoing" label="Ongoing" />
-                  <Tab value="closed" label="Closed" />
+                  <Tab value='all' label='All Memors' />
+                  <Tab value='ongoing' label='Ongoing' />
+                  <Tab value='closed' label='Closed' />
                 </Tabs>
               </Box>
 
@@ -1176,22 +1176,22 @@ const AdminBoard = () => {
                   width: "100%",
                 }}
               >
-                <Typography variant="body2" sx={{ flex: 2 }}>
+                <Typography variant='body2' sx={{ flex: 2 }}>
                   Title
                 </Typography>
-                <Typography variant="body2" sx={{ flex: 4 }}>
+                <Typography variant='body2' sx={{ flex: 4 }}>
                   Description
                 </Typography>
-                <Typography variant="body2" sx={{ flex: 1 }}>
+                <Typography variant='body2' sx={{ flex: 1 }}>
                   Points
                 </Typography>
-                <Typography variant="body2" sx={{ flex: 1 }}>
+                <Typography variant='body2' sx={{ flex: 1 }}>
                   Time Left
                 </Typography>
-                <Typography variant="body2" sx={{ flex: 1 }}>
+                <Typography variant='body2' sx={{ flex: 1 }}>
                   Teams Left
                 </Typography>
-                <Typography variant="body2" sx={{ flex: 1 }}></Typography>
+                <Typography variant='body2' sx={{ flex: 1 }}></Typography>
               </Box>
 
               {/* Table Rows */}
@@ -1217,24 +1217,24 @@ const AdminBoard = () => {
                   }}
                 >
                   <Box sx={{ flex: 2 }}>
-                    <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                    <Typography variant='body2' sx={{ fontWeight: "bold" }}>
                       {memor.title}
                     </Typography>
                     {expandedIndex === index && (
-                      <Typography variant="caption" sx={{ color: "gray" }}>
+                      <Typography variant='caption' sx={{ color: "gray" }}>
                         {memor.date}
                       </Typography>
                     )}
                   </Box>
-                  <Typography variant="body2" sx={{ flex: 4 }}>
+                  <Typography variant='body2' sx={{ flex: 4 }}>
                     {expandedIndex === index
                       ? memor.description
                       : `${memor.description.substring(0, 50)} (...)`}
                   </Typography>
-                  <Typography variant="body2" sx={{ flex: 1 }}>
+                  <Typography variant='body2' sx={{ flex: 1 }}>
                     {memor.points}
                   </Typography>
-                  <Typography variant="body2" sx={{ flex: 1 }}>
+                  <Typography variant='body2' sx={{ flex: 1 }}>
                     {(() => {
                       const daysLeft = calculateDaysLeft(memor.date);
                       if (daysLeft > 0) {
@@ -1250,7 +1250,7 @@ const AdminBoard = () => {
                       }
                     })()}
                   </Typography>
-                  <Typography variant="body2" sx={{ flex: 1 }}>
+                  <Typography variant='body2' sx={{ flex: 1 }}>
                     {memor.teamsLeft}
                   </Typography>
                   <Box
@@ -1274,7 +1274,7 @@ const AdminBoard = () => {
                     >
                       <img
                         src={editIcon}
-                        alt="edit"
+                        alt='edit'
                         style={{ width: "20px" }}
                       />
                     </IconButton>
@@ -1292,7 +1292,7 @@ const AdminBoard = () => {
                     >
                       <img
                         src={deleteIcon}
-                        alt="delete"
+                        alt='delete'
                         style={{ width: "20px" }}
                       />
                     </IconButton>
@@ -1331,7 +1331,7 @@ const AdminBoard = () => {
                 }}
               >
                 <CustomButton
-                  text="Create a Team"
+                  text='Create a Team'
                   onClick={() => handleTeamModalOpen()}
                   sx={{
                     backgroundColor: "#B5EDE4",
@@ -1351,7 +1351,7 @@ const AdminBoard = () => {
                   }}
                   icon={
                     <Typography
-                      component="span"
+                      component='span'
                       sx={{
                         fontWeight: "bold",
                         fontSize: "18px",
@@ -1390,7 +1390,7 @@ const AdminBoard = () => {
                         }}
                       >
                         <Typography
-                          variant="body2"
+                          variant='body2'
                           sx={{ fontWeight: "bold", color: "white" }}
                         >
                           {teamName}
@@ -1419,7 +1419,7 @@ const AdminBoard = () => {
                         <IconButton onClick={() => startEditing(teamName)}>
                           <img
                             src={editIcon}
-                            alt="Edit"
+                            alt='Edit'
                             style={{ width: "20px" }}
                           />
                         </IconButton>
@@ -1431,7 +1431,7 @@ const AdminBoard = () => {
                         >
                           <img
                             src={deleteIcon}
-                            alt="Delete"
+                            alt='Delete'
                             style={{ width: "20px" }}
                           />
                         </IconButton>
@@ -1447,28 +1447,28 @@ const AdminBoard = () => {
                           gap: 5,
                         }}
                       >
-                        <Typography variant="body1" sx={{ color: "white" }}>
+                        <Typography variant='body1' sx={{ color: "white" }}>
                           Editing Team: {teamName}
                         </Typography>
                         <Box>
                           <Typography
-                            variant="body2"
+                            variant='body2'
                             sx={{ color: "white", marginBottom: "10px" }}
                           >
                             Members
                           </Typography>
                           <TextField
-                            placeholder="Search"
+                            placeholder='Search'
                             value={searchQuery2}
                             onChange={(e) => setSearchQuery2(e.target.value)}
-                            variant="outlined"
-                            size="small"
+                            variant='outlined'
+                            size='small'
                             slotProps={{
                               input: {
                                 startAdornment: (
-                                  <InputAdornment position="start">
+                                  <InputAdornment position='start'>
                                     <Search
-                                      fontSize="small"
+                                      fontSize='small'
                                       sx={{ color: "gray" }}
                                     />
                                   </InputAdornment>
@@ -1573,7 +1573,7 @@ const AdminBoard = () => {
                                     </Typography>
                                     <Typography
                                       sx={{ color: "#BEC9C5" }}
-                                      variant="body2"
+                                      variant='body2'
                                     >
                                       {member.email}
                                     </Typography>
@@ -1591,7 +1591,7 @@ const AdminBoard = () => {
                         }}
                       >
                         <CustomButton
-                          text="Cancel"
+                          text='Cancel'
                           onClick={cancelEditing}
                           sx={{
                             backgroundColor: "transparent",
@@ -1604,7 +1604,7 @@ const AdminBoard = () => {
                           }}
                         />
                         <CustomButton
-                          text="Confirm"
+                          text='Confirm'
                           onClick={saveChangesEditTeam}
                           sx={{
                             borderRadius: "50px",
@@ -1645,7 +1645,7 @@ const AdminBoard = () => {
                       }}
                     >
                       <CustomButton
-                        text="Create a Competition"
+                        text='Create a Competition'
                         disabled={true}
                         sx={{
                           backgroundColor: "rgba(49, 49, 49, 1)",
@@ -1665,7 +1665,7 @@ const AdminBoard = () => {
                         }}
                         icon={
                           <Typography
-                            component="span"
+                            component='span'
                             sx={{
                               fontWeight: "bold",
                               fontSize: "18px",
@@ -1687,7 +1687,7 @@ const AdminBoard = () => {
                       }}
                     >
                       <Typography
-                        variant="body1"
+                        variant='body1'
                         sx={{
                           fontWeight: "bold",
                           color: "#FFFFFF",
@@ -1717,12 +1717,12 @@ const AdminBoard = () => {
                           }}
                         >
                           <Typography
-                            variant="body2"
+                            variant='body2'
                             sx={{ fontWeight: "bold" }}
                           >
                             {ongoingCompetition.title}
                           </Typography>
-                          <Typography variant="body2">
+                          <Typography variant='body2'>
                             {ongoingCompetition.description}
                           </Typography>
                         </Box>
@@ -1735,7 +1735,7 @@ const AdminBoard = () => {
                             gap: "20px",
                           }}
                         >
-                          <Typography variant="body2">Duration</Typography>
+                          <Typography variant='body2'>Duration</Typography>
                           <Box
                             sx={{
                               display: "flex",
@@ -1745,13 +1745,13 @@ const AdminBoard = () => {
                             }}
                           >
                             <Typography
-                              variant="body2"
+                              variant='body2'
                               sx={{ color: "#9FE9E4" }}
                             >
                               {calculateDaysLeft(ongoingCompetition.endDate)}{" "}
                               days remaining
                             </Typography>
-                            <Typography variant="body2">
+                            <Typography variant='body2'>
                               {formatDate(ongoingCompetition.startDate)} -{" "}
                               {formatDate(ongoingCompetition.endDate)}
                             </Typography>
@@ -1769,7 +1769,7 @@ const AdminBoard = () => {
                               >
                                 <img
                                   src={editIcon}
-                                  alt="edit"
+                                  alt='edit'
                                   style={{ width: "20px" }}
                                 />
                               </IconButton>
@@ -1780,7 +1780,7 @@ const AdminBoard = () => {
                   </>
                 ) : (
                   <CustomButton
-                    text="Create a Competition"
+                    text='Create a Competition'
                     sx={{
                       backgroundColor: "#B5EDE4",
                       color: "#000",
@@ -1798,7 +1798,7 @@ const AdminBoard = () => {
                     }}
                     icon={
                       <Typography
-                        component="span"
+                        component='span'
                         sx={{
                           fontWeight: "bold",
                           fontSize: "18px",
@@ -1825,7 +1825,7 @@ const AdminBoard = () => {
                   <Box>
                     {/* Competition History */}
                     <Typography
-                      variant="body1"
+                      variant='body1'
                       sx={{
                         fontWeight: "bold",
                         color: "#FFFFFF",
@@ -1847,16 +1847,16 @@ const AdminBoard = () => {
                         width: "100%",
                       }}
                     >
-                      <Typography variant="body2" sx={{ flex: 2 }}>
+                      <Typography variant='body2' sx={{ flex: 2 }}>
                         Title
                       </Typography>
-                      <Typography variant="body2" sx={{ flex: 4 }}>
+                      <Typography variant='body2' sx={{ flex: 4 }}>
                         Description
                       </Typography>
-                      <Typography variant="body2" sx={{ flex: 2 }}>
+                      <Typography variant='body2' sx={{ flex: 2 }}>
                         Duration
                       </Typography>
-                      <Typography variant="body2" sx={{ flex: 1 }}></Typography>
+                      <Typography variant='body2' sx={{ flex: 1 }}></Typography>
                     </Box>
 
                     {/* Table Rows */}
@@ -1883,18 +1883,18 @@ const AdminBoard = () => {
                       >
                         <Box sx={{ flex: 2 }}>
                           <Typography
-                            variant="body2"
+                            variant='body2'
                             sx={{ fontWeight: "bold" }}
                           >
                             {comp.title}
                           </Typography>
                         </Box>
-                        <Typography variant="body2" sx={{ flex: 4 }}>
+                        <Typography variant='body2' sx={{ flex: 4 }}>
                           {expandedIndex === index
                             ? comp.description
                             : `${comp.description.substring(0, 50)} (...)`}
                         </Typography>
-                        <Typography variant="body2" sx={{ flex: 2 }}>
+                        <Typography variant='body2' sx={{ flex: 2 }}>
                           {comp.startDate} - {comp.endDate}
                         </Typography>
                         <Box
@@ -1926,7 +1926,7 @@ const AdminBoard = () => {
             onClose={handleModalClose}
             onConfirm={handleModalConfirm}
             action={modalData.action}
-            context="team"
+            context='team'
             itemName={modalData.memberName}
             teamName={modalData.teamName}
           />
@@ -1937,20 +1937,20 @@ const AdminBoard = () => {
               open={deleteTeamModalOpen}
               onClose={cancelDeleteTeam}
               onConfirm={confirmDeleteTeam}
-              action="delete"
-              context="team"
+              action='delete'
+              context='team'
               itemName={teamToDelete}
             />
           )}
 
           {/* Create Team Modal */}
           {isCreateModalOpen && (
-            <div className="modal-overlay-submit-memor">
+            <div className='modal-overlay-submit-memor'>
               <div
-                className="modal-container"
+                className='modal-container'
                 style={{ padding: "20px", maxWidth: "600px" }}
               >
-                <div className="modal-top" style={{ marginBottom: "20px" }}>
+                <div className='modal-top' style={{ marginBottom: "20px" }}>
                   <Button
                     onClick={() => handleTeamModalClose()}
                     sx={{ minWidth: 0, p: 0, color: "#BEC9C5" }}
@@ -1958,14 +1958,14 @@ const AdminBoard = () => {
                     <ArrowBackIcon />
                   </Button>
                   <Typography
-                    variant="h6"
+                    variant='h6'
                     sx={{ marginLeft: "10px", color: "#BEC9C5" }}
                   >
                     Admin Board
                   </Typography>
                 </div>
                 <Typography
-                  variant="h5"
+                  variant='h5'
                   sx={{
                     fontWeight: "bold",
                     color: "#FFFFFF",
@@ -1976,7 +1976,7 @@ const AdminBoard = () => {
                 </Typography>
                 <TextField
                   label="Team's Name"
-                  variant="outlined"
+                  variant='outlined'
                   value={newTeamName}
                   onChange={(e) => setNewTeamName(e.target.value)}
                   fullWidth
@@ -1992,7 +1992,7 @@ const AdminBoard = () => {
                   }}
                 />
                 <Typography
-                  variant="body1"
+                  variant='body1'
                   sx={{ color: "#CAC4D0", marginBottom: "10px" }}
                 >
                   Thumbnail
@@ -2014,12 +2014,12 @@ const AdminBoard = () => {
                   {newTeamThumbnail ? (
                     <img
                       src={newTeamThumbnail}
-                      alt="Uploaded Thumbnail"
+                      alt='Uploaded Thumbnail'
                       style={{ borderRadius: "10px", height: "120px" }}
                     />
                   ) : (
                     <>
-                      <label htmlFor="file-input" style={{ cursor: "pointer" }}>
+                      <label htmlFor='file-input' style={{ cursor: "pointer" }}>
                         <div
                           style={{
                             display: "flex",
@@ -2029,23 +2029,23 @@ const AdminBoard = () => {
                         >
                           <img
                             src={background3}
-                            alt="Upload Thumbnail"
+                            alt='Upload Thumbnail'
                             style={{
                               width: "50px",
                               height: "50px",
                               marginBottom: "10px",
                             }}
                           />
-                          <Typography variant="body2" sx={{ color: "#888" }}>
+                          <Typography variant='body2' sx={{ color: "#888" }}>
                             Upload file from computer
                           </Typography>
                         </div>
                       </label>
                       <input
-                        id="file-input"
-                        type="file"
-                        accept="image/*"
-                        className="file-input"
+                        id='file-input'
+                        type='file'
+                        accept='image/*'
+                        className='file-input'
                         onChange={handleFileChange}
                         style={{ display: "none" }}
                       />
@@ -2053,17 +2053,17 @@ const AdminBoard = () => {
                   )}
                 </div>
                 <Typography
-                  variant="body1"
+                  variant='body1'
                   sx={{ color: "#CAC4D0", marginBottom: "10px" }}
                 >
                   Members
                 </Typography>
                 <TextField
-                  placeholder="Search Name"
+                  placeholder='Search Name'
                   value={searchQuery3}
                   onChange={(e) => setSearchQuery3(e.target.value)}
-                  variant="outlined"
-                  size="small"
+                  variant='outlined'
+                  size='small'
                   sx={{
                     marginBottom: "20px",
                     "& .MuiInputBase-input": { color: "#FFFFFF" },
@@ -2077,7 +2077,7 @@ const AdminBoard = () => {
                   }}
                   InputProps={{
                     startAdornment: (
-                      <InputAdornment position="start">
+                      <InputAdornment position='start'>
                         <Search sx={{ color: "#888" }} />
                       </InputAdornment>
                     ),
@@ -2117,7 +2117,7 @@ const AdminBoard = () => {
                       <Typography sx={{ color: "#FFFFFF" }}>
                         {member.name}
                       </Typography>
-                      <Typography variant="body2" sx={{ color: "#888" }}>
+                      <Typography variant='body2' sx={{ color: "#888" }}>
                         {member.email}
                       </Typography>
                     </Box>
@@ -2132,7 +2132,7 @@ const AdminBoard = () => {
                   }}
                 >
                   <CustomButton
-                    text="Cancel"
+                    text='Cancel'
                     onClick={handleTeamModalClose}
                     sx={{
                       backgroundColor: "transparent",
@@ -2145,7 +2145,7 @@ const AdminBoard = () => {
                     }}
                   />
                   <CustomButton
-                    text="Confirm"
+                    text='Confirm'
                     onClick={saveChangesCreateTeam}
                     sx={{
                       borderRadius: "50px",
@@ -2183,12 +2183,12 @@ const AdminBoard = () => {
 
           {/* Create Memor Modal */}
           {isCreateMemorModalOpen && (
-            <div className="modal-overlay-submit-memor">
+            <div className='modal-overlay-submit-memor'>
               <div
-                className="modal-container"
+                className='modal-container'
                 style={{ padding: "20px", maxWidth: "600px" }}
               >
-                <div className="modal-top" style={{ marginBottom: "20px" }}>
+                <div className='modal-top' style={{ marginBottom: "20px" }}>
                   <Button
                     onClick={() => handleCreateMemorModalClose()}
                     sx={{ minWidth: 0, p: 0, color: "#BEC9C5" }}
@@ -2196,14 +2196,14 @@ const AdminBoard = () => {
                     <ArrowBackIcon />
                   </Button>
                   <Typography
-                    variant="h5"
+                    variant='h5'
                     sx={{ marginLeft: "10px", color: "#BEC9C5" }}
                   >
                     Admin Board
                   </Typography>
                 </div>
                 <Typography
-                  variant="h5"
+                  variant='h5'
                   sx={{
                     fontWeight: "bold",
                     color: "#FFFFFF",
@@ -2213,8 +2213,8 @@ const AdminBoard = () => {
                   Memor Configuration
                 </Typography>
                 <TextField
-                  label="Title"
-                  variant="outlined"
+                  label='Title'
+                  variant='outlined'
                   value={newMemorTitle}
                   onChange={(e) => setNewMemorTitle(e.target.value)}
                   fullWidth
@@ -2229,11 +2229,11 @@ const AdminBoard = () => {
                     "& .MuiInputLabel-root": { color: "#888" },
                   }}
                 />
-                <Typography variant="body1" sx={{ color: "#CAC4D0" }}>
+                <Typography variant='body1' sx={{ color: "#CAC4D0" }}>
                   Due Date
                 </Typography>
                 <TextField
-                  type="date"
+                  type='date'
                   value={newMemorDate || ""}
                   onChange={(e) => setNewMemorDate(e.target.value)}
                   fullWidth
@@ -2252,8 +2252,8 @@ const AdminBoard = () => {
                   }}
                 />
                 <TextField
-                  label="Description"
-                  variant="outlined"
+                  label='Description'
+                  variant='outlined'
                   multiline
                   rows={4}
                   value={newMemorDescription}
@@ -2270,7 +2270,7 @@ const AdminBoard = () => {
                     "& .MuiInputLabel-root": { color: "#888" },
                   }}
                 />
-                <Typography variant="body1" sx={{ color: "#CAC4D0" }}>
+                <Typography variant='body1' sx={{ color: "#CAC4D0" }}>
                   Points
                 </Typography>
                 <Box
@@ -2308,7 +2308,7 @@ const AdminBoard = () => {
                   sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}
                 >
                   <CustomButton
-                    text="Cancel"
+                    text='Cancel'
                     onClick={() => handleCreateMemorModalClose()}
                     sx={{
                       backgroundColor: "transparent",
@@ -2321,7 +2321,7 @@ const AdminBoard = () => {
                     }}
                   />
                   <CustomButton
-                    text="Submit"
+                    text='Submit'
                     onClick={handleCreateMemor}
                     sx={{
                       borderRadius: "50px",
@@ -2339,20 +2339,20 @@ const AdminBoard = () => {
               open={deleteMemorModalOpen}
               onClose={cancelDeleteMemor}
               onConfirm={confirmDeleteMemor}
-              action="delete"
-              context="memor"
+              action='delete'
+              context='memor'
               itemName={memorToDelete?.title}
             />
           )}
 
           {/* Edit Memor Modal */}
           {isEditMemorModalOpen && (
-            <div className="modal-overlay-submit-memor">
+            <div className='modal-overlay-submit-memor'>
               <div
-                className="modal-container"
+                className='modal-container'
                 style={{ padding: "20px", maxWidth: "600px" }}
               >
-                <div className="modal-top" style={{ marginBottom: "20px" }}>
+                <div className='modal-top' style={{ marginBottom: "20px" }}>
                   <Button
                     onClick={() => handleEditMemorModalClose()}
                     sx={{ minWidth: 0, p: 0, color: "#BEC9C5" }}
@@ -2360,14 +2360,14 @@ const AdminBoard = () => {
                     <ArrowBackIcon />
                   </Button>
                   <Typography
-                    variant="h6"
+                    variant='h6'
                     sx={{ marginLeft: "10px", color: "#BEC9C5" }}
                   >
                     Admin Board
                   </Typography>
                 </div>
                 <Typography
-                  variant="h5"
+                  variant='h5'
                   sx={{
                     fontWeight: "bold",
                     color: "#FFFFFF",
@@ -2377,8 +2377,8 @@ const AdminBoard = () => {
                   Edit Memor
                 </Typography>
                 <TextField
-                  label="Title"
-                  variant="outlined"
+                  label='Title'
+                  variant='outlined'
                   value={newMemorTitle}
                   onChange={(e) => setNewMemorTitle(e.target.value)}
                   fullWidth
@@ -2393,11 +2393,11 @@ const AdminBoard = () => {
                     "& .MuiInputLabel-root": { color: "#888" },
                   }}
                 />
-                <Typography variant="body1" sx={{ color: "#CAC4D0" }}>
+                <Typography variant='body1' sx={{ color: "#CAC4D0" }}>
                   Due Date
                 </Typography>
                 <TextField
-                  type="date"
+                  type='date'
                   value={newMemorDate || ""}
                   onChange={(e) => setNewMemorDate(e.target.value)}
                   fullWidth
@@ -2416,8 +2416,8 @@ const AdminBoard = () => {
                   }}
                 />
                 <TextField
-                  label="Description"
-                  variant="outlined"
+                  label='Description'
+                  variant='outlined'
                   multiline
                   rows={4}
                   value={newMemorDescription}
@@ -2434,7 +2434,7 @@ const AdminBoard = () => {
                     "& .MuiInputLabel-root": { color: "#888" },
                   }}
                 />
-                <Typography variant="body1" sx={{ color: "#CAC4D0" }}>
+                <Typography variant='body1' sx={{ color: "#CAC4D0" }}>
                   Points
                 </Typography>
                 <Box
@@ -2471,7 +2471,7 @@ const AdminBoard = () => {
                   sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}
                 >
                   <CustomButton
-                    text="Cancel"
+                    text='Cancel'
                     onClick={() => handleEditMemorModalClose()}
                     sx={{
                       backgroundColor: "transparent",
@@ -2484,7 +2484,7 @@ const AdminBoard = () => {
                     }}
                   />
                   <CustomButton
-                    text="Submit"
+                    text='Submit'
                     onClick={() => handleEditMemor()}
                     sx={{
                       borderRadius: "50px",
@@ -2502,20 +2502,20 @@ const AdminBoard = () => {
               open={confirmEditMemorModalOpen}
               onClose={() => setConfirmEditMemorModalOpen(false)}
               onConfirm={confirmEditMemor}
-              action="edit"
-              context="memor"
+              action='edit'
+              context='memor'
               itemName={memorToEdit?.title}
             />
           )}
 
           {/* Edit Competition Modal */}
           {isEditCompetitionModalOpen && (
-            <div className="modal-overlay-submit-memor">
+            <div className='modal-overlay-submit-memor'>
               <div
-                className="modal-container"
+                className='modal-container'
                 style={{ padding: "20px", maxWidth: "600px" }}
               >
-                <div className="modal-top" style={{ marginBottom: "20px" }}>
+                <div className='modal-top' style={{ marginBottom: "20px" }}>
                   <Button
                     onClick={() => handleEditCompetitionModalClose()}
                     sx={{ minWidth: 0, p: 0, color: "#BEC9C5" }}
@@ -2523,14 +2523,14 @@ const AdminBoard = () => {
                     <ArrowBackIcon />
                   </Button>
                   <Typography
-                    variant="h6"
+                    variant='h6'
                     sx={{ marginLeft: "10px", color: "#BEC9C5" }}
                   >
                     Admin Board
                   </Typography>
                 </div>
                 <Typography
-                  variant="h5"
+                  variant='h5'
                   sx={{
                     fontWeight: "bold",
                     color: "#FFFFFF",
@@ -2539,12 +2539,12 @@ const AdminBoard = () => {
                 >
                   Edit Competition
                 </Typography>
-                <Typography variant="body1" sx={{ color: "#CAC4D0" }}>
+                <Typography variant='body1' sx={{ color: "#CAC4D0" }}>
                   Title
                 </Typography>
                 <TextField
-                  label="Title"
-                  variant="outlined"
+                  label='Title'
+                  variant='outlined'
                   value={newCompetitionTitle}
                   onChange={(e) => setNewCompetitionTitle(e.target.value)}
                   fullWidth
@@ -2560,11 +2560,11 @@ const AdminBoard = () => {
                   }}
                 />
 
-                <Typography variant="body1" sx={{ color: "#CAC4D0" }}>
+                <Typography variant='body1' sx={{ color: "#CAC4D0" }}>
                   End Date
                 </Typography>
                 <TextField
-                  type="text"
+                  type='text'
                   value={newCompetitionEndDate || ""}
                   onChange={(e) => setNewCompetitionEndDate(e.target.value)}
                   fullWidth
@@ -2583,8 +2583,8 @@ const AdminBoard = () => {
                   }}
                 />
                 <TextField
-                  label="Description"
-                  variant="outlined"
+                  label='Description'
+                  variant='outlined'
                   multiline
                   rows={4}
                   value={newCompetitionDescription}
@@ -2605,7 +2605,7 @@ const AdminBoard = () => {
                   sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}
                 >
                   <CustomButton
-                    text="Cancel"
+                    text='Cancel'
                     onClick={() => handleEditCompetitionModalClose()}
                     sx={{
                       backgroundColor: "transparent",
@@ -2618,7 +2618,7 @@ const AdminBoard = () => {
                     }}
                   />
                   <CustomButton
-                    text="Submit"
+                    text='Submit'
                     onClick={() => handleEditCompetition()}
                     sx={{
                       borderRadius: "50px",
@@ -2635,8 +2635,8 @@ const AdminBoard = () => {
               open={confirmEditCompetitionModalOpen}
               onClose={() => setConfirmEditCompetitionModalOpen(false)}
               onConfirm={confirmEditCompetition}
-              action="edit"
-              context="competition"
+              action='edit'
+              context='competition'
               itemName={newCompetitionTitle}
             />
           )}
