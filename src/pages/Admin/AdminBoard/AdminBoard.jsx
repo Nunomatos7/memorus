@@ -519,6 +519,8 @@ const AdminBoard = () => {
 
   const [isEditMemorModalOpen, setIsEditMemorModalOpen] = useState(false);
   const [memorToEdit, setMemorToEdit] = useState(null);
+  const [confirmEditMemorModalOpen, setConfirmEditMemorModalOpen] =
+    useState(false);
 
   const handleEditMemorModalOpen = (memor) => {
     setMemorToEdit(memor);
@@ -543,46 +545,43 @@ const AdminBoard = () => {
   };
 
   const handleEditMemor = () => {
-    try {
-      if (!newMemorTitle || !newMemorDate || !newMemorPoints) {
-        alert("Please fill in all the fields.");
-        return;
-      }
-
-      // Format the date using JavaScript's Date object
-      const formatDate = (dateString) => {
-        const date = new Date(dateString);
-        const day = String(date.getDate()).padStart(2, "0");
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const year = date.getFullYear();
-        return `${day}/${month}/${year}`;
-      };
-
-      const updatedMemor = {
-        ...memorToEdit,
-        title: newMemorTitle,
-        description: newMemorDescription,
-        date: formatDate(newMemorDate),
-        points: `+ ${newMemorPoints} pts`,
-      };
-
-      setMemors((prevMemors) =>
-        prevMemors.map((memor) =>
-          memor === memorToEdit ? updatedMemor : memor
-        )
-      );
-
-      setFeedbackModal({
-        open: true,
-        type: "success",
-        title: "Memor Updated",
-        description: `The memor "${newMemorTitle}" has been successfully updated.`,
-      });
-
-      handleEditMemorModalClose();
-    } catch (error) {
-      console.error("Error while editing a memor:", error);
+    if (!newMemorTitle || !newMemorDate || !newMemorPoints) {
+      alert("Please fill in all the fields.");
+      return;
     }
+    setConfirmEditMemorModalOpen(true);
+  };
+
+  const confirmEditMemor = () => {
+    const formatDate = (dateString) => {
+      const date = new Date(dateString);
+      const day = String(date.getDate()).padStart(2, "0");
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const year = date.getFullYear();
+      return `${day}/${month}/${year}`;
+    };
+
+    const updatedMemor = {
+      ...memorToEdit,
+      title: newMemorTitle,
+      description: newMemorDescription,
+      date: formatDate(newMemorDate),
+      points: `+ ${newMemorPoints} pts`,
+    };
+
+    setMemors((prevMemors) =>
+      prevMemors.map((memor) => (memor === memorToEdit ? updatedMemor : memor))
+    );
+
+    setFeedbackModal({
+      open: true,
+      type: "success",
+      title: "Memor Updated",
+      description: `The memor "${newMemorTitle}" has been successfully updated.`,
+    });
+
+    handleEditMemorModalClose();
+    setConfirmEditMemorModalOpen(false); // Close the confirmation modal
   };
 
   const cleanSearchQuery = () => {
@@ -598,7 +597,9 @@ const AdminBoard = () => {
     useState("");
   const [newCompetitionStartDate, setNewCompetitionStartDate] = useState("");
   const [newCompetitionEndDate, setNewCompetitionEndDate] = useState("");
+  const [confirmEditCompetitionModalOpen, setConfirmEditCompetitionModalOpen] = useState(false);
 
+  
   const checkCompStatus = (startDate, endDate) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -689,38 +690,41 @@ const AdminBoard = () => {
   };
 
   const handleEditCompetition = () => {
-    if (
-      !newCompetitionTitle ||
-      !newCompetitionStartDate ||
-      !newCompetitionEndDate
-    ) {
-      alert("Please fill in all the fields.");
-      return;
+    if (!newCompetitionTitle || !newCompetitionStartDate || !newCompetitionEndDate) {
+        alert("Please fill in all the fields.");
+        return;
     }
+    setConfirmEditCompetitionModalOpen(true);
+};
 
+
+  const confirmEditCompetition = () => {
     const updatedCompetition = {
-      ...competitionToEdit,
-      title: newCompetitionTitle,
-      description: newCompetitionDescription,
-      startDate: newCompetitionStartDate,
-      endDate: newCompetitionEndDate,
+        ...competitionToEdit,
+        title: newCompetitionTitle,
+        description: newCompetitionDescription,
+        startDate: newCompetitionStartDate,
+        endDate: newCompetitionEndDate,
     };
 
     setCompetitions((prevCompetitions) =>
-      prevCompetitions.map((comp) =>
-        comp === competitionToEdit ? updatedCompetition : comp
-      )
+        prevCompetitions.map((comp) =>
+            comp === competitionToEdit ? updatedCompetition : comp
+        )
     );
 
     setFeedbackModal({
-      open: true,
-      type: "success",
-      title: "Competition Updated",
-      description: `The competition "${newCompetitionTitle}" has been successfully updated.`,
+        open: true,
+        type: "success",
+        title: "Competition Updated",
+        description: `The competition "${newCompetitionTitle}" has been successfully updated.`,
     });
 
+    // Close the confirmation modal
+    setConfirmEditCompetitionModalOpen(false);
     handleEditCompetitionModalClose();
-  };
+};
+
 
   return (
     <>
@@ -2231,6 +2235,18 @@ const AdminBoard = () => {
             </div>
           )}
 
+          {/* New Confirmation Modal for Editing Memor */}
+          {confirmEditMemorModalOpen && (
+            <ConfirmationModal
+              open={confirmEditMemorModalOpen}
+              onClose={() => setConfirmEditMemorModalOpen(false)}
+              onConfirm={confirmEditMemor}
+              action="edit"
+              context="memor"
+              itemName={memorToEdit?.title}
+            />
+          )}
+
           {/* Edit Competition Modal */}
           {isEditCompetitionModalOpen && (
             <div className="modal-overlay-submit-memor">
@@ -2352,6 +2368,18 @@ const AdminBoard = () => {
               </div>
             </div>
           )}
+
+{confirmEditCompetitionModalOpen && (
+    <ConfirmationModal
+        open={confirmEditCompetitionModalOpen}
+        onClose={() => setConfirmEditCompetitionModalOpen(false)}
+        onConfirm={confirmEditCompetition}
+        action="edit"
+        context="competition"
+        itemName={newCompetitionTitle}
+    />
+)}
+
         </Box>
       </div>
     </>
