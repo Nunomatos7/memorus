@@ -33,12 +33,28 @@ const ConfirmationModal = ({
       );
     }
   } else if (context === "memor") {
-    message = (
-      <>
-        Are you sure you want to delete the memor{" "}
-        <span style={{ color: "#1E928A" }}>{itemName}</span>?
-      </>
-    );
+    if (action === "delete") {
+      message = (
+        <>
+          Are you sure you want to delete the memor{" "}
+          <span style={{ color: "#1E928A" }}>{itemName}</span>?
+        </>
+      );
+    } else {
+      message = (
+        <>
+          Are you sure you want to {action} the {context}{" "}
+          <span style={{ color: "#1E928A" }}>{itemName}</span>?
+        </>
+      );
+    }
+  } else if (context === "competition") {
+      message = (
+        <>
+          Are you sure you want to {action} the current competition{" "}
+          <span style={{ color: "#1E928A" }}>{itemName}</span>?
+        </>
+      );
   }
 
   return (
