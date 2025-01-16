@@ -3,6 +3,7 @@ import { Modal, Box, Typography } from "@mui/material";
 import CustomButton from "../CustomButton/CustomButton";
 import img1 from "../../assets/images/confirmationModalBack1.svg";
 import img2 from "../../assets/images/confirmationModalBack2.svg";
+import PropTypes from 'prop-types';
 
 const ConfirmationModal = ({
   open,
@@ -146,6 +147,16 @@ const ConfirmationModal = ({
       </Box>
     </Modal>
   );
+};
+
+ConfirmationModal.propTypes = {
+  open: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onConfirm: PropTypes.func.isRequired,
+  action: PropTypes.string.isRequired,
+  context: PropTypes.string.isRequired,
+  itemName: PropTypes.string.isRequired,
+  teamName: PropTypes.string,
 };
 
 export default ConfirmationModal;

@@ -142,7 +142,7 @@ const AdminNavbar = () => {
                 }}
                 sx={{
                   "&:hover": {
-                    backgroundColor: "#ccff33",
+                    backgroundColor: "#181818",
                     color: "#FFFFFF",
                   },
                 }}
@@ -154,7 +154,7 @@ const AdminNavbar = () => {
                 sx={{
                   color: "#FF5C5C",
                   "&:hover": {
-                    backgroundColor: "#ff0000 ",
+                    backgroundColor: "#181818 ",
                   },
                 }}
               >
