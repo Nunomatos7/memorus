@@ -137,7 +137,7 @@ const Navbar = () => {
     {
       id: 1,
       image: notifPurple,
-      title: "1 hour left to submit your memor!",
+      title: "Less than a day to submit your memor!",
       description: "Don't forget to submit your memor 'Virtual Coffee Break'!",
     },
     {
@@ -148,9 +148,9 @@ const Navbar = () => {
     },
     {
       id: 3,
-      image: notifPurple,
-      title: "1 hour left to submit your memor!",
-      description: "Don't forget to submit your memor 'Virtual Coffee Break'!",
+      image: notifGreen,
+      title: "You've received a new memor",
+      description: "A new memor was added to your team's memors.",
     },
     {
       id: 4,
@@ -158,18 +158,7 @@ const Navbar = () => {
       title: "You've received a new memor",
       description: "A new memor was added to your team's memors.",
     },
-    {
-      id: 5,
-      image: notifPurple,
-      title: "1 hour left to submit your memor!",
-      description: "Don't forget to submit your memor 'Virtual Coffee Break'!",
-    },
-    {
-      id: 6,
-      image: notifGreen,
-      title: "You've received a new memor",
-      description: "A new memor was added to your team's memors.",
-    },
+    
   ]);
 
   const classes = useStyles();

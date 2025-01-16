@@ -43,15 +43,13 @@ const MemoryBoard = () => {
   const [loadedImages, setLoadedImages] = useState(new Set());
   const [filteredTeam, setFilteredTeam] = useState("The Debuggers");
 
-  const teams = ["All", ...new Set(memorsData.map((memor) => memor.team))];
+  const teams = [...new Set(memorsData.map((memor) => memor.team))];
 
   useEffect(() => {
     const positions = [];
     const memorsWithImages = memorsData.filter(
       (memor) =>
-        memor.image &&
-        memor.image.length > 0 &&
-        (filteredTeam === "All" || memor.team === filteredTeam)
+        memor.image && memor.image.length > 0 && memor.team === filteredTeam
     );
 
     const newPosts = memorsWithImages.map((post) => {

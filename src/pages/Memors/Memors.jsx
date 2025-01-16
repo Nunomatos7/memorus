@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -41,7 +41,16 @@ const Memors = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedMemor, setSelectedMemor] = useState(null);
-  const [ongoingMemors, setOngoingMemors] = useState(memorsData);
+  const [ongoingMemors, setOngoingMemors] = useState(
+    memorsData.filter((memor) => memor.team === "The Debuggers")
+  );
+
+  useEffect(() => {
+    setOngoingMemors(
+      memorsData.filter((memor) => memor.team === "The Debuggers")
+    );
+  }, []);
+
   const handleTabChange = (_, newValue) => {
     setTab(newValue);
   };
@@ -80,7 +89,7 @@ const Memors = () => {
     const matchesSearch = memor.title
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
-    const matchesTeam = memor.team === "The Debuggers"; // Filter by team name
+    const matchesTeam = memor.team === "The Debuggers";
     if (tab === "completed") {
       return memor.status === "submitted" && matchesSearch && matchesTeam;
     }
@@ -108,7 +117,7 @@ const Memors = () => {
 
           {/* Swiper Section */}
           <Swiper
-            spaceBetween={50}
+            spaceBetween={80}
             breakpoints={{
               640: {
                 slidesPerView: 2.3,
@@ -117,7 +126,7 @@ const Memors = () => {
                 slidesPerView: 3.3,
               },
               1024: {
-                slidesPerView: 5.3,
+                slidesPerView: 4.3,
               },
             }}
             freeMode={true}
