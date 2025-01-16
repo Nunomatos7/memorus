@@ -143,7 +143,12 @@ const LoginPage = ({ login }) => {
                 <Checkbox
                   checked={rememberMe}
                   onChange={handleRememberMeChange}
-                  color='white'
+                  sx={{
+                    color: "white",
+                    "&.Mui-checked": {
+                      color: "white",
+                    },
+                  }}
                 />
               }
               label={
