@@ -117,7 +117,7 @@ const Memors = () => {
 
           {/* Swiper Section */}
           <Swiper
-            spaceBetween={50}
+            spaceBetween={80}
             breakpoints={{
               640: {
                 slidesPerView: 2.3,
@@ -126,7 +126,7 @@ const Memors = () => {
                 slidesPerView: 3.3,
               },
               1024: {
-                slidesPerView: 5.3,
+                slidesPerView: 4.3,
               },
             }}
             freeMode={true}
