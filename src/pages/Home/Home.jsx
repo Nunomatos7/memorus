@@ -15,6 +15,9 @@ import WelcomeModal from "../../Components/WelcomeModal/WelcomeModal";
 import { leaderboardData } from "../Leaderboard/Leaderboard";
 import Countdown from "../../Components/Countdown/Countdown";
 import Loader from "../../Components/Loader/Loader";
+import background1 from "../../assets/images/background1.svg";
+import background2 from "../../assets/images/background2.svg";
+import background3 from "../../assets/images/background3.svg";
 
 const rankImages = {
   1: rank1,
@@ -71,6 +74,39 @@ const Home = () => {
           className='container'
           style={{ marginBottom: "1rem", marginTop: "2rem" }}
         >
+          <img
+                    src={background1}
+                    alt='leaderboard-bg1'
+                    style={{
+                      position: "absolute",
+                      top: "2",
+                      right: "0",
+                      width: "15%",
+                      zIndex: "0",
+                    }}
+                  />
+                  <img
+                    src={background2}
+                    alt='leaderboard-bg2'
+                    style={{
+                      position: "absolute",
+                      top: "25%",
+                      left: "5%",
+                      width: "5%",
+                      zIndex: "0",
+                    }}
+                  />
+                  <img
+                    src={background3}
+                    alt='leaderboard-bg3'
+                    style={{
+                      position: "absolute",
+                      top: "35%",
+                      right: "6%",
+                      width: "5%",
+                      zIndex: "0",
+                    }}
+                  />
           <h1
             className='home-title'
             style={{ display: "flex", alignItems: "center", gap: "1rem" }}
@@ -225,7 +261,7 @@ const Home = () => {
                       ends in
                     </Typography>
                   </Box>
-                  <Countdown endDate='2025-12-25T00:00:00' />
+                  <Countdown endDate='2025-12-25T00:00:00' role="user" />
                 </Box>
               </CardContent>
             </Card>
