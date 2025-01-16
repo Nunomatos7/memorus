@@ -39,15 +39,11 @@ p {
   font-style: normal;
 }
 
-h1, h2 {
+h1, h2, h3, h4 {
   font-family: 'Exo 2', sans-serif;
 }
 
-h2 {
-  font-size: 3.75rem !important;
-}
-
-h3, h4, h5, h6 {
+h5, h6 {
   font-family: 'Poppins', sans-serif;
 }
 

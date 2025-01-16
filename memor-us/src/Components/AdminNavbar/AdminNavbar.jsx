@@ -59,12 +59,11 @@ const AdminNavbar = () => {
 
   return (
     <AppBar
-      position="sticky"
+      position='sticky'
       sx={{
         backgroundColor: "#111315",
         height: "60px",
         boxShadow: "none",
-        zIndex: 10,
         marginBottom: "10px",
         borderBottom: "1px solid #444444",
       }}
@@ -79,28 +78,34 @@ const AdminNavbar = () => {
       >
         {/* Logo */}
         <Box>
-          <NavLink to="/admin/home">
+          <NavLink to='/admin/home'>
             <img
               src={logo}
-              alt="Admin Dashboard Logo"
+              alt='Admin Dashboard Logo'
               style={{ height: "40px", width: "auto" }}
             />
           </NavLink>
         </Box>
 
         {/* Desktop Navigation */}
-        <Box sx={{ display: { xs: "none", md: "flex" }, gap: "24px", alignItems: "center" }}>
-          <StyledNavLink to="/admin/home" end>
+        <Box
+          sx={{
+            display: { xs: "none", md: "flex" },
+            gap: "24px",
+            alignItems: "center",
+          }}
+        >
+          <StyledNavLink to='/admin/home' end>
             Home
           </StyledNavLink>
-          <StyledNavLink to="/admin/leaderboard">Leaderboard</StyledNavLink>
-          <StyledNavLink to="/admin/memoryBoard">Memory Board</StyledNavLink>
-          <StyledNavLink to="/admin/adminBoard">Admin Board</StyledNavLink>
+          <StyledNavLink to='/admin/leaderboard'>Leaderboard</StyledNavLink>
+          <StyledNavLink to='/admin/memoryBoard'>Memory Board</StyledNavLink>
+          <StyledNavLink to='/admin/adminBoard'>Admin Board</StyledNavLink>
           <Box>
             <IconButton onClick={handleMenuOpen}>
               <img
                 src={profileIcon}
-                alt="User Profile"
+                alt='User Profile'
                 style={{
                   height: "40px",
                   width: "40px",
@@ -121,10 +126,10 @@ const AdminNavbar = () => {
             >
               <MenuItem>
                 <Box sx={{ cursor: "default" }}>
-                  <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                  <Typography variant='body1' sx={{ fontWeight: 600 }}>
                     Blip Admin
                   </Typography>
-                  <Typography variant="body2" color="gray">
+                  <Typography variant='body2' color='gray'>
                     admin.blip@example.com
                   </Typography>
                 </Box>
@@ -137,7 +142,7 @@ const AdminNavbar = () => {
                 }}
                 sx={{
                   "&:hover": {
-                    backgroundColor: "#ccff33",
+                    backgroundColor: "#181818",
                     color: "#FFFFFF",
                   },
                 }}
@@ -149,7 +154,7 @@ const AdminNavbar = () => {
                 sx={{
                   color: "#FF5C5C",
                   "&:hover": {
-                    backgroundColor: "#ff0000 ",
+                    backgroundColor: "#181818 ",
                   },
                 }}
               >
@@ -165,7 +170,7 @@ const AdminNavbar = () => {
             <MenuIcon sx={{ color: "#82D5C7" }} />
           </IconButton>
           <Drawer
-            anchor="right"
+            anchor='right'
             open={drawerOpen}
             onClose={toggleDrawer(false)}
             sx={{
@@ -188,17 +193,17 @@ const AdminNavbar = () => {
             >
               <img
                 src={profileIcon}
-                alt="User Profile"
+                alt='User Profile'
                 style={{
                   height: "60px",
                   width: "60px",
                   borderRadius: "50%",
                 }}
               />
-              <Typography variant="body1" sx={{ fontWeight: 600 }}>
+              <Typography variant='body1' sx={{ fontWeight: 600 }}>
                 Blip Admin
               </Typography>
-              <Typography variant="body2" color="gray">
+              <Typography variant='body2' color='gray'>
                 admin.blip@example.com
               </Typography>
             </Box>
@@ -213,16 +218,25 @@ const AdminNavbar = () => {
                 marginTop: "20px",
               }}
             >
-              <StyledNavLink to="/admin/home" onClick={toggleDrawer(false)}>
+              <StyledNavLink to='/admin/home' onClick={toggleDrawer(false)}>
                 Home
               </StyledNavLink>
-              <StyledNavLink to="/admin/leaderboard" onClick={toggleDrawer(false)}>
+              <StyledNavLink
+                to='/admin/leaderboard'
+                onClick={toggleDrawer(false)}
+              >
                 Leaderboard
               </StyledNavLink>
-              <StyledNavLink to="/admin/memoryBoard" onClick={toggleDrawer(false)}>
+              <StyledNavLink
+                to='/admin/memoryBoard'
+                onClick={toggleDrawer(false)}
+              >
                 Memory Board
               </StyledNavLink>
-              <StyledNavLink to="/admin/adminBoard" onClick={toggleDrawer(false)}>
+              <StyledNavLink
+                to='/admin/adminBoard'
+                onClick={toggleDrawer(false)}
+              >
                 Admin Board
               </StyledNavLink>
             </List>
@@ -238,7 +252,7 @@ const AdminNavbar = () => {
               }}
             >
               <Typography
-                variant="body2"
+                variant='body2'
                 sx={{
                   cursor: "pointer",
                   color: "#FFF",
@@ -252,7 +266,7 @@ const AdminNavbar = () => {
                 Change Password
               </Typography>
               <Typography
-                variant="body2"
+                variant='body2'
                 sx={{
                   cursor: "pointer",
                   color: "#FF5C5C",

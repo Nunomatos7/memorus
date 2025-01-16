@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ReactInfiniteCanvas } from "react-infinite-canvas";
 import MemorPicture from "../../../Components/MemorPicture/MemorPicture";
 import imgTest from "../../../assets/images/goat.png";
 import { COMPONENT_POSITIONS } from "../../../assets/Helpers/constants";
+import Loader from "../../../Components/Loader/Loader";
 
 const MIN_SPACING = 250;
 
@@ -140,7 +141,7 @@ const MemoryBoard = () => {
           </p>
           <img
             src={post.imgSrc}
-            alt="Post Image"
+            alt='Post Image'
             style={{
               height: "70%",
               width: "100%",
@@ -165,38 +166,44 @@ const MemoryBoard = () => {
   };
 
   return (
-    <div style={{ width: "100%", height: "90vh", position: "relative" }}>
-      {isModalOpen && (
-        <MemorPicture
-          image={currentPost.imgSrc}
-          teamName={currentPost.teamName}
-          title={currentPost.title}
-          submitDate={currentPost.date}
-          onClose={() => setIsModalOpen(false)}
-        />
-      )}
-      <ReactInfiniteCanvas
-        ref={canvasRef}
-        onCanvasMount={(mountFunc) => mountFunc.fitContentToView({ scale: 1 })}
-        customComponents={[
-          {
-            component: (
-              <button
-                onClick={() =>
-                  canvasRef.current?.fitContentToView({ scale: 1 })
-                }
-              >
-                Start
-              </button>
-            ),
-            position: COMPONENT_POSITIONS.TOP_LEFT,
-            offset: { x: 120, y: 10 },
-          },
-        ]}
-      >
-        {renderPosts()}
-      </ReactInfiniteCanvas>
-    </div>
+    <>
+      <Loader />
+
+      <div style={{ width: "100%", height: "90vh", position: "relative" }}>
+        {isModalOpen && (
+          <MemorPicture
+            image={currentPost.imgSrc}
+            teamName={currentPost.teamName}
+            title={currentPost.title}
+            submitDate={currentPost.date}
+            onClose={() => setIsModalOpen(false)}
+          />
+        )}
+        <ReactInfiniteCanvas
+          ref={canvasRef}
+          onCanvasMount={(mountFunc) =>
+            mountFunc.fitContentToView({ scale: 1 })
+          }
+          customComponents={[
+            {
+              component: (
+                <button
+                  onClick={() =>
+                    canvasRef.current?.fitContentToView({ scale: 1 })
+                  }
+                >
+                  Start
+                </button>
+              ),
+              position: COMPONENT_POSITIONS.TOP_LEFT,
+              offset: { x: 120, y: 10 },
+            },
+          ]}
+        >
+          {renderPosts()}
+        </ReactInfiniteCanvas>
+      </div>
+    </>
   );
 };
 

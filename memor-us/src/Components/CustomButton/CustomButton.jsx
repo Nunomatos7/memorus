@@ -1,4 +1,5 @@
 import { Box, Button } from "@mui/material";
+import PropTypes from 'prop-types';
 
 const CustomButton = ({ text, onClick, sx, icon }) => {
   return (
@@ -26,6 +27,13 @@ const CustomButton = ({ text, onClick, sx, icon }) => {
       {text}
     </Button>
   );
+};
+
+CustomButton.propTypes = {
+  text: PropTypes.string.isRequired,
+  onClick: PropTypes.func.isRequired,
+  sx: PropTypes.object,
+  icon: PropTypes.element,
 };
 
 export default CustomButton;

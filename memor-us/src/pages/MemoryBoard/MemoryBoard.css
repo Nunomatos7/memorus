@@ -1,0 +1,161 @@
+.zoom-controls {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  display: flex;
+  align-items: center;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 5px 10px;
+  z-index: 10;
+  user-select: none;
+}
+
+.zoom-btn {
+  background: none;
+  border: none;
+  font-size: 16px;
+  font-weight: bold;
+  color: #555;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+.zoom-btn:hover {
+  background-color: #f0f0f0;
+  user-select: none;
+}
+
+.zoom-display {
+  margin: 0 10px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #555;
+  user-select: none;
+}
+
+.polaroid-container {
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.polaroid-card {
+  transition: transform 0.2s ease, z-index 0.2s ease;
+}
+
+.polaroid-card:hover {
+  transform: translateY(-80px) rotate(0deg) !important;
+}
+
+.card-date {
+  color: black;
+  font-family: cursive;
+  font-size: 12px;
+  margin: 5px 10px;
+}
+
+/* Adjust title style */
+.card-title {
+  color: black;
+  text-align: center;
+  font-family: cursive;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.start-btn {
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #555;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.3s ease;
+}
+
+.start-btn:hover {
+  background-color: #d2beff;
+  color: #111315;
+}
+
+.filter-controls {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  display: flex;
+  justify-content: flex-end;
+  margin: 10px 20px;
+  z-index: 10;
+  cursor: pointer;
+}
+
+.filter-dropdown {
+  width: 200px;
+  padding: 10px;
+  font-size: 16px;
+  font-family: "Arial", sans-serif;
+  color: #555;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  outline: none;
+  background-color: #f9f9f9;
+  transition: all 0.3s ease;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  max-height: 150px; /* Added for scrollable dropdown */
+  overflow-y: auto; /* Allow scrolling if necessary */
+}
+
+/* Hover Effects */
+.filter-dropdown:hover {
+  background-color: #f0f0f0;
+  border-color: #888;
+  cursor: pointer;
+}
+
+/* Focus Effects */
+.filter-dropdown:focus {
+  border-color: #7e57c2;
+  box-shadow: 0 0 5px #7e57c2;
+  cursor: pointer;
+}
+
+/* Options Styling */
+.filter-dropdown option {
+  font-size: 16px;
+  font-family: "Arial", sans-serif;
+  padding: 10px;
+  color: #333;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+/* Custom Scrollbar */
+.filter-dropdown::-webkit-scrollbar {
+  width: 8px;
+}
+
+.filter-dropdown::-webkit-scrollbar-track {
+  background: #f9f9f9;
+  border-radius: 8px;
+}
+
+.filter-dropdown::-webkit-scrollbar-thumb {
+  background: #7e57c2;
+  border-radius: 8px;
+}
+
+.filter-dropdown::-webkit-scrollbar-thumb:hover {
+  background: #5c3a91;
+}
