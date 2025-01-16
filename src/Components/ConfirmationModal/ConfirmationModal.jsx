@@ -3,6 +3,7 @@ import { Modal, Box, Typography } from "@mui/material";
 import CustomButton from "../CustomButton/CustomButton";
 import img1 from "../../assets/images/confirmationModalBack1.svg";
 import img2 from "../../assets/images/confirmationModalBack2.svg";
+import PropTypes from 'prop-types';
 
 const ConfirmationModal = ({
   open,
@@ -33,12 +34,28 @@ const ConfirmationModal = ({
       );
     }
   } else if (context === "memor") {
-    message = (
-      <>
-        Are you sure you want to delete the memor{" "}
-        <span style={{ color: "#1E928A" }}>{itemName}</span>?
-      </>
-    );
+    if (action === "delete") {
+      message = (
+        <>
+          Are you sure you want to delete the memor{" "}
+          <span style={{ color: "#1E928A" }}>{itemName}</span>?
+        </>
+      );
+    } else {
+      message = (
+        <>
+          Are you sure you want to {action} the {context}{" "}
+          <span style={{ color: "#1E928A" }}>{itemName}</span>?
+        </>
+      );
+    }
+  } else if (context === "competition") {
+      message = (
+        <>
+          Are you sure you want to {action} the current competition{" "}
+          <span style={{ color: "#1E928A" }}>{itemName}</span>?
+        </>
+      );
   }
 
   return (
@@ -130,6 +147,16 @@ const ConfirmationModal = ({
       </Box>
     </Modal>
   );
+};
+
+ConfirmationModal.propTypes = {
+  open: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onConfirm: PropTypes.func.isRequired,
+  action: PropTypes.string.isRequired,
+  context: PropTypes.string.isRequired,
+  itemName: PropTypes.string.isRequired,
+  teamName: PropTypes.string,
 };
 
 export default ConfirmationModal;

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Typography, Box } from '@mui/material';
 import { styled, keyframes } from '@mui/system';
+import PropTypes from 'prop-types';
 
 const dropAnimation = keyframes`
   from {
@@ -25,7 +26,7 @@ const appearAnimation = keyframes`
 `;
 
 const PaperSheet = styled(Box)(({ theme, animateDrop, animateAppear }) => ({
-  width: 140,
+  width: 120,
   height: 100,
   backgroundColor: '#5547bf',
   borderRadius: '8px',
@@ -94,5 +95,9 @@ function calculateTimeLeft(endDate) {
   }
   return { days: 0, hours: 0, minutes: 0, seconds: 0 };
 }
+
+Countdown.propTypes = {
+  endDate: PropTypes.string.isRequired
+};
 
 export default Countdown;

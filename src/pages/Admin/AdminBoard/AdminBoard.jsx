@@ -8,11 +8,12 @@ import {
   TextField,
   Checkbox,
   Button,
+  Divider,
 } from "@mui/material";
 import background1 from "../../../assets/images/adminBackground1.svg";
 import background3 from "../../../assets/images/adminBackground2.svg";
 import background2 from "../../../assets/images/adminBackground3.svg";
-import { useState } from "react";
+import { act, useState } from "react";
 import CustomButton from "../../../Components/CustomButton/CustomButton";
 import editIcon from "../../../assets/images/editIcon.svg";
 import deleteIcon from "../../../assets/images/deleteIcon.svg";
@@ -25,6 +26,7 @@ import {
 import ConfirmationModal from "../../../Components/ConfirmationModal/ConfirmationModal";
 import FeedbackModal from "../../../Components/FeedbackModal/FeedbackModal";
 import { useLocation } from "react-router-dom";
+import Loader from "../../../Components/Loader/Loader";
 
 const AdminBoard = () => {
   const location = useLocation();
@@ -404,23 +406,6 @@ const AdminBoard = () => {
     teamName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // const handleCreateTeam = () => {
-  //   if (newTeamName.trim()) {
-  //     setTeams((prevTeams) => ({
-  //       ...prevTeams,
-  //       [newTeamName]: Object.entries(newTeamMembers)
-  //         .filter(([_, isSelected]) => isSelected)
-  //         .map(([email]) => email),
-  //     }));
-  //     handleTeamModalClose();
-  //     setNewTeamName("");
-  //     setNewTeamThumbnail(null);
-  //     setNewTeamMembers({});
-  //   } else {
-  //     alert("Please enter a team name.");
-  //   }
-  // };
-
   const handleTeamModalClose = () => {
     setIsCreateModalOpen(false);
     setNewTeamThumbnail(null);
@@ -534,6 +519,8 @@ const AdminBoard = () => {
 
   const [isEditMemorModalOpen, setIsEditMemorModalOpen] = useState(false);
   const [memorToEdit, setMemorToEdit] = useState(null);
+  const [confirmEditMemorModalOpen, setConfirmEditMemorModalOpen] =
+    useState(false);
 
   const handleEditMemorModalOpen = (memor) => {
     setMemorToEdit(memor);
@@ -558,1255 +545,1844 @@ const AdminBoard = () => {
   };
 
   const handleEditMemor = () => {
-    try {
-      if (!newMemorTitle || !newMemorDate || !newMemorPoints) {
-        alert("Please fill in all the fields.");
-        return;
-      }
+    if (!newMemorTitle || !newMemorDate || !newMemorPoints) {
+      alert("Please fill in all the fields.");
+      return;
+    }
+    setConfirmEditMemorModalOpen(true);
+  };
 
-      // Format the date using JavaScript's Date object
-      const formatDate = (dateString) => {
-        const date = new Date(dateString);
-        const day = String(date.getDate()).padStart(2, "0");
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const year = date.getFullYear();
-        return `${day}/${month}/${year}`;
-      };
+  const confirmEditMemor = () => {
+    const formatDate = (dateString) => {
+      const date = new Date(dateString);
+      const day = String(date.getDate()).padStart(2, "0");
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const year = date.getFullYear();
+      return `${day}/${month}/${year}`;
+    };
 
-      const updatedMemor = {
-        ...memorToEdit,
-        title: newMemorTitle,
-        description: newMemorDescription,
-        date: formatDate(newMemorDate),
-        points: `+ ${newMemorPoints} pts`,
-      };
+    const updatedMemor = {
+      ...memorToEdit,
+      title: newMemorTitle,
+      description: newMemorDescription,
+      date: formatDate(newMemorDate),
+      points: `+ ${newMemorPoints} pts`,
+    };
 
-      setMemors((prevMemors) =>
-        prevMemors.map((memor) =>
-          memor === memorToEdit ? updatedMemor : memor
-        )
-      );
+    setMemors((prevMemors) =>
+      prevMemors.map((memor) => (memor === memorToEdit ? updatedMemor : memor))
+    );
 
-      setFeedbackModal({
-        open: true,
-        type: "success",
-        title: "Memor Updated",
-        description: `The memor "${newMemorTitle}" has been successfully updated.`,
-      });
+    setFeedbackModal({
+      open: true,
+      type: "success",
+      title: "Memor Updated",
+      description: `The memor "${newMemorTitle}" has been successfully updated.`,
+    });
 
-      handleEditMemorModalClose();
-    } catch (error) {
-      console.error("Error while editing a memor:", error);
+    handleEditMemorModalClose();
+    setConfirmEditMemorModalOpen(false); // Close the confirmation modal
+  };
+
+  const cleanSearchQuery = () => {
+    setSearchQuery("");
+  };
+
+  const [isCurrentCompetition, setIsCurrentCompetition] = useState(true);
+  const [isEditCompetitionModalOpen, setIsEditCompetitionModalOpen] =
+    useState(false);
+  const [competitionToEdit, setCompetitionToEdit] = useState(null);
+  const [newCompetitionTitle, setNewCompetitionTitle] = useState("");
+  const [newCompetitionDescription, setNewCompetitionDescription] =
+    useState("");
+  const [newCompetitionStartDate, setNewCompetitionStartDate] = useState("");
+  const [newCompetitionEndDate, setNewCompetitionEndDate] = useState("");
+  const [confirmEditCompetitionModalOpen, setConfirmEditCompetitionModalOpen] = useState(false);
+
+  
+  const checkCompStatus = (startDate, endDate) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const start = new Date(startDate);
+    start.setHours(0, 0, 0, 0);
+
+    const end = new Date(endDate);
+    end.setHours(23, 59, 59, 999);
+
+    if (today >= start && today <= end) {
+      return "Ongoing";
+    } else {
+      return "Closed";
     }
   };
 
-  return (
-    <div className="container">
-      <img
-        src={background1}
-        alt="leaderboard-bg1"
-        style={{
-          position: "absolute",
-          top: "2",
-          right: "0",
-          width: "15%",
-          zIndex: "0",
-        }}
-      />
-      <img
-        src={background2}
-        alt="leaderboard-bg2"
-        style={{
-          position: "absolute",
-          top: "25%",
-          left: "5%",
-          width: "5%",
-          zIndex: "0",
-        }}
-      />
-      <img
-        src={background3}
-        alt="leaderboard-bg3"
-        style={{
-          position: "absolute",
-          top: "35%",
-          right: "6%",
-          width: "5%",
-          zIndex: "0",
-        }}
-      />
-      <Typography
-        variant="h2"
-        sx={{
-          fontWeight: "bold",
-          color: "white",
-          marginBottom: "30px",
-          padding: "20px",
-        }}
-      >
-        Admin Board
-      </Typography>
+  const [competitions, setCompetitions] = useState([
+    {
+      id: 1,
+      title: "Christmas",
+      description:
+        "For this competition, capture in your memors something that reflects your personal growth. Let your memors celebrate renewal, progress, and the journey to becoming your best self. 🌟",
+      startDate: "2024/12/25",
+      endDate: "2024/12/31",
+    },
+    {
+      id: 2,
+      title: "New Year",
+      description:
+        "For this competition, capture in your memors something that reflects your personal growth. Let your memors celebrate renewal, progress, and the journey to becoming your best self. 🌟",
+      startDate: "2024/12/26",
+      endDate: "2024/12/31",
+    },
+    {
+      id: 3,
+      title: "Valentine's Time",
+      description:
+        "For this competition, capture in your memors something that reflects your personal growth. Let your memors celebrate renewal, progress, and the journey to becoming your best self. 🌟",
+      startDate: "2024/02/02",
+      endDate: "2024/02/14",
+    },
+    {
+      id: 4,
+      title: "Easter",
+      description:
+        "For this competition, capture in your memors something that reflects your personal growth. Let your memors celebrate renewal, progress, and the journey to becoming your best self. 🌟",
+      startDate: "2024/04/01",
+      endDate: "2024/04/30",
+    },
+    {
+      id: 5,
+      title: "New Year New Me",
+      description:
+        "For this competition, capture in your memors something that reflects your personal growth. Let your memors celebrate renewal, progress, and the journey to becoming your best self. 🌟",
+      startDate: "2025/01/01",
+      endDate: "2025/01/31",
+    },
+  ]);
 
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          flexDirection: "column",
-        }}
-      >
+  const finishedCompetitions = competitions.filter((comp) => {
+    const status = checkCompStatus(comp.startDate, comp.endDate);
+    return status === "Closed";
+  });
+
+  const filteredCompetitions = finishedCompetitions.filter((comp) =>
+    comp.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const handleEditCompetitionModalOpen = (competition) => {
+    setCompetitionToEdit(competition);
+    setNewCompetitionTitle(competition.title);
+    setNewCompetitionDescription(competition.description);
+    setNewCompetitionStartDate(competition.startDate);
+    setNewCompetitionEndDate(competition.endDate);
+    setIsEditCompetitionModalOpen(true);
+    document.body.style.overflow = "hidden";
+  };
+
+  const handleEditCompetitionModalClose = () => {
+    setIsEditCompetitionModalOpen(false);
+    setCompetitionToEdit(null);
+    setNewCompetitionTitle("");
+    setNewCompetitionDescription("");
+    setNewCompetitionStartDate("");
+    setNewCompetitionEndDate("");
+    document.body.style.overflow = "auto";
+  };
+
+  const handleEditCompetition = () => {
+    if (!newCompetitionTitle || !newCompetitionStartDate || !newCompetitionEndDate) {
+        alert("Please fill in all the fields.");
+        return;
+    }
+    setConfirmEditCompetitionModalOpen(true);
+};
+
+
+  const confirmEditCompetition = () => {
+    const updatedCompetition = {
+        ...competitionToEdit,
+        title: newCompetitionTitle,
+        description: newCompetitionDescription,
+        startDate: newCompetitionStartDate,
+        endDate: newCompetitionEndDate,
+    };
+
+    setCompetitions((prevCompetitions) =>
+        prevCompetitions.map((comp) =>
+            comp === competitionToEdit ? updatedCompetition : comp
+        )
+    );
+
+    setFeedbackModal({
+        open: true,
+        type: "success",
+        title: "Competition Updated",
+        description: `The competition "${newCompetitionTitle}" has been successfully updated.`,
+    });
+
+    // Close the confirmation modal
+    setConfirmEditCompetitionModalOpen(false);
+    handleEditCompetitionModalClose();
+};
+
+
+  return (
+    <>
+      <Loader />
+
+      <div className="container">
+        <img
+          src={background1}
+          alt="leaderboard-bg1"
+          style={{
+            position: "absolute",
+            top: "2",
+            right: "0",
+            width: "15%",
+            zIndex: "0",
+          }}
+        />
+        <img
+          src={background2}
+          alt="leaderboard-bg2"
+          style={{
+            position: "absolute",
+            top: "25%",
+            left: "5%",
+            width: "5%",
+            zIndex: "0",
+          }}
+        />
+        <img
+          src={background3}
+          alt="leaderboard-bg3"
+          style={{
+            position: "absolute",
+            top: "35%",
+            right: "6%",
+            width: "5%",
+            zIndex: "0",
+          }}
+        />
+        <Typography
+          variant="h4"
+          sx={{
+            fontWeight: "bold",
+            color: "white",
+            marginBottom: "30px",
+            padding: "20px",
+          }}
+        >
+          Admin Board
+        </Typography>
+
         <Box
           sx={{
             display: "flex",
+            justifyContent: "center",
             alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
+            flexDirection: "column",
           }}
         >
-          <Tabs
-            value={tab}
-            onChange={handleTabChange}
-            TabIndicatorProps={{ style: { display: "none" } }}
-            sx={{
-              "& .MuiTab-root": {
-                textTransform: "none",
-                fontSize: "14px",
-                color: "#CCE8E2",
-                padding: "6px 16px",
-                borderRadius: "40px",
-                border: "1px solid #938f99",
-                marginRight: "10px",
-                "&:hover": {
-                  backgroundColor: "rgba(204, 232, 226, 0.08)",
-                },
-                "&.Mui-selected": {
-                  backgroundColor: "#384c44",
-                  color: "#CCE8E2",
-                },
-              },
-            }}
-          >
-            <Tab value="memors" label="Manage Memors" />
-            <Tab value="teams" label="Manage Teams" />
-            <Tab value="competition" label="Manage Competition" />
-          </Tabs>
-          <TextField
-            placeholder="Search"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            variant="outlined"
-            size="small"
-            slotProps={{
-              input: {
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Search fontSize="small" sx={{ color: "gray" }} />
-                  </InputAdornment>
-                ),
-              },
-            }}
-            sx={{
-              borderRadius: "40px",
-              input: { color: "white" },
-              width: "250px",
-              border: "0.905px solid #88938F",
-              "& fieldset": { border: "none" },
-            }}
-          />
-        </Box>
-
-        {tab === "memors" && (
           <Box
             sx={{
-              width: "100%",
-              marginTop: "20px",
               display: "flex",
-              justifyContent: "center",
               alignItems: "center",
-              flexDirection: "column",
-              borderRadius: "13.576px",
-              border: "2.715px solid #333738",
-              background: "#1E1F20",
-              padding: "20px",
-              backdropFilter: "blur(20px)",
-              marginBottom: "50px",
+              justifyContent: "space-between",
+              width: "100%",
             }}
           >
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                width: "100%",
+            <Tabs
+              value={tab}
+              onChange={(event, newValue) => {
+                handleTabChange(event, newValue);
+                cleanSearchQuery();
               }}
-            >
-              <CustomButton
-                text="Create a Memor"
-                onClick={() => handleCreateMemorModalOpen()}
-                sx={{
-                  backgroundColor: "#B5EDE4",
-                  color: "#000",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "8px",
-                  padding: "10px 20px",
-                  borderRadius: "20px",
-                  border: "none",
-                  boxShadow: "none",
+              TabIndicatorProps={{ style: { display: "none" } }}
+              sx={{
+                "& .MuiTab-root": {
+                  textTransform: "none",
+                  fontSize: "14px",
+                  color: "#CCE8E2",
+                  padding: "6px 16px",
+                  borderRadius: "40px",
+                  border: "1px solid #938f99",
+                  marginRight: "10px",
                   "&:hover": {
-                    backgroundColor: "#A3DFD8",
+                    backgroundColor: "rgba(204, 232, 226, 0.08)",
                   },
-                }}
-                icon={
-                  <Typography
-                    component="span"
-                    sx={{
-                      fontWeight: "bold",
-                      fontSize: "18px",
-                      display: "flex",
-                      alignItems: "center",
-                    }}
-                  >
-                    +
-                  </Typography>
-                }
-              />
-
-              <Tabs
-                value={tab2}
-                onChange={handleTabChange2}
-                TabIndicatorProps={{ style: { display: "none" } }}
-                sx={{
-                  "& .MuiTab-root": {
-                    textTransform: "none",
-                    fontSize: "14px",
-                    color: "#82D5C7",
-                    padding: "6px 16px",
-                    borderRadius: "40px",
-                    border: "1px solid #938f99",
-                    marginRight: "10px",
-                    "&:hover": { backgroundColor: "rgba(130, 213, 199, 0.08)" },
-                    "&.Mui-selected": {
-                      backgroundColor: "#88d4c4",
-                      color: "#003731",
-                    },
+                  "&.Mui-selected": {
+                    backgroundColor: "#384c44",
+                    color: "#CCE8E2",
                   },
-                }}
-              >
-                <Tab value="all" label="All Memors" />
-                <Tab value="ongoing" label="Ongoing" />
-                <Tab value="closed" label="Closed" />
-              </Tabs>
-            </Box>
-
-            {/* Table Header */}
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                padding: "10px",
-                fontWeight: "bold",
-                color: "white",
-                marginTop: "20px",
-                width: "100%",
+                },
               }}
             >
-              <Typography variant="body2" sx={{ flex: 2 }}>
-                Title
-              </Typography>
-              <Typography variant="body2" sx={{ flex: 4 }}>
-                Description
-              </Typography>
-              <Typography variant="body2" sx={{ flex: 1 }}>
-                Points
-              </Typography>
-              <Typography variant="body2" sx={{ flex: 1 }}>
-                Time Left
-              </Typography>
-              <Typography variant="body2" sx={{ flex: 1 }}>
-                Teams Left
-              </Typography>
-              <Typography variant="body2" sx={{ flex: 1 }}></Typography>
-            </Box>
+              <Tab value="memors" label="Manage Memors" />
+              <Tab value="teams" label="Manage Teams" />
+              <Tab value="competition" label="Manage Competition" />
+            </Tabs>
+            <TextField
+              placeholder="Search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              variant="outlined"
+              size="small"
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Search fontSize="small" sx={{ color: "gray" }} />
+                    </InputAdornment>
+                  ),
+                },
+              }}
+              sx={{
+                borderRadius: "40px",
+                input: { color: "white" },
+                width: "250px",
+                border: "0.905px solid #88938F",
+                "& fieldset": { border: "none" },
+              }}
+            />
+          </Box>
 
-            {/* Table Rows */}
-            {filteredMemors.map((memor, index) => (
+          {tab === "memors" && (
+            <Box
+              sx={{
+                width: "100%",
+                marginTop: "20px",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                flexDirection: "column",
+                borderRadius: "13.576px",
+                border: "2.715px solid #333738",
+                background: "#1E1F20",
+                padding: "20px",
+                backdropFilter: "blur(20px)",
+                marginBottom: "50px",
+              }}
+            >
               <Box
-                key={index}
-                onClick={() => toggleExpand(index)}
                 sx={{
                   display: "flex",
                   justifyContent: "space-between",
-                  padding: "15px",
-                  alignItems: "center",
-                  color: "white",
-                  marginBottom: "10px",
-                  borderRadius: "10.861px",
-                  border: "2.715px solid #333738",
-                  background: "#272728",
-                  cursor: "pointer",
                   width: "100%",
-                  "&:hover": {
-                    backgroundColor: "#3a3b3c",
-                  },
-                }}
-              >
-                <Box sx={{ flex: 2 }}>
-                  <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-                    {memor.title}
-                  </Typography>
-                  {expandedIndex === index && (
-                    <Typography variant="caption" sx={{ color: "gray" }}>
-                      {memor.date}
-                    </Typography>
-                  )}
-                </Box>
-                <Typography variant="body2" sx={{ flex: 4 }}>
-                  {expandedIndex === index
-                    ? memor.description
-                    : `${memor.description.substring(0, 50)} (...)`}
-                </Typography>
-                <Typography variant="body2" sx={{ flex: 1 }}>
-                  {memor.points}
-                </Typography>
-                <Typography variant="body2" sx={{ flex: 1 }}>
-                  {memor.timeLeft !== "0:00H" && memor.timeLeft}
-                </Typography>
-                <Typography variant="body2" sx={{ flex: 1 }}>
-                  {memor.teamsLeft}
-                </Typography>
-                <Box
-                  sx={{
-                    flex: 1,
-                    textAlign: "center",
-                    display: "flex",
-                    justifyContent: "right",
-                    gap: "5px",
-                  }}
-                >
-                  <IconButton
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleEditMemorModalOpen(memor);
-                    }}
-                  >
-                    {memor.timeLeft !== "0:00H" && (
-                      <img
-                        src={editIcon}
-                        alt="edit"
-                        style={{ width: "20px" }}
-                      />
-                    )}
-                  </IconButton>
-
-                  <IconButton
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setMemorToDelete(memor);
-                      setDeleteMemorModalOpen(true);
-                    }}
-                  >
-                    {memor.timeLeft !== "0:00H" && (
-                      <img
-                        src={deleteIcon}
-                        alt="delete"
-                        style={{ width: "20px" }}
-                      />
-                    )}
-                  </IconButton>
-
-                  <IconButton>
-                    {expandedIndex === index ? (
-                      <KeyboardArrowUp sx={{ color: "white" }} />
-                    ) : (
-                      <KeyboardArrowDown sx={{ color: "white" }} />
-                    )}
-                  </IconButton>
-                </Box>
-              </Box>
-            ))}
-          </Box>
-        )}
-
-        {tab === "teams" && (
-          <Box
-            sx={{
-              width: "100%",
-              marginTop: "20px",
-              borderRadius: "13.576px",
-              border: "2.715px solid #333738",
-              background: "#1E1F20",
-              padding: "20px",
-              backdropFilter: "blur(20px)",
-              marginBottom: "50px",
-            }}
-          >
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                width: "100%",
-              }}
-            >
-              <CustomButton
-                text="Create a Team"
-                onClick={() => handleTeamModalOpen()}
-                sx={{
-                  backgroundColor: "#B5EDE4",
-                  color: "#000",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "8px",
-                  padding: "10px 20px",
-                  borderRadius: "20px",
-                  border: "none",
-                  boxShadow: "none",
-                  marginBottom: "40px",
-                  "&:hover": {
-                    backgroundColor: "#80ccbc",
-                  },
-                }}
-                icon={
-                  <Typography
-                    component="span"
-                    sx={{
-                      fontWeight: "bold",
-                      fontSize: "18px",
-                      display: "flex",
-                      alignItems: "center",
-                    }}
-                  >
-                    +
-                  </Typography>
-                }
-              />
-            </Box>
-
-            {filteredTeams.map(([teamName, teamMembers]) => (
-              <Box
-                key={teamName}
-                sx={{
-                  marginBottom: "15px",
-                  borderRadius: "10.861px",
-                  border: "2.715px solid #333738",
-                  background: "#272728",
-                  padding: "15px",
-                }}
-              >
-                {!isEditing || editingTeam !== teamName ? (
-                  <Box
-                    sx={{
-                      display: "grid",
-                      gridTemplateColumns: "1fr 4fr 1fr",
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                      }}
-                    >
-                      <Typography
-                        variant="body2"
-                        sx={{ fontWeight: "bold", color: "white" }}
-                      >
-                        {teamName}
-                      </Typography>
-                    </Box>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                      }}
-                    >
-                      <Typography>
-                        Members:{" "}
-                        {teamMembers
-                          .slice(0, 3)
-                          .map(
-                            (email) =>
-                              members.find((member) => member.email === email)
-                                ?.name
-                          )
-                          .join(", ")}
-                        {teamMembers.length > 3 && "..."}
-                      </Typography>
-                    </Box>
-                    <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-                      <IconButton onClick={() => startEditing(teamName)}>
-                        <img
-                          src={editIcon}
-                          alt="Edit"
-                          style={{ width: "20px" }}
-                        />
-                      </IconButton>
-                      <IconButton
-                        onClick={() => {
-                          setTeamToDelete(teamName);
-                          setDeleteTeamModalOpen(true);
-                        }}
-                      >
-                        <img
-                          src={deleteIcon}
-                          alt="Delete"
-                          style={{ width: "20px" }}
-                        />
-                      </IconButton>
-                    </Box>
-                  </Box>
-                ) : (
-                  // Edit mode
-                  <Box sx={{ display: "flex", flexDirection: "column" }}>
-                    <Box
-                      sx={{
-                        display: "grid",
-                        gridTemplateColumns: "1fr 6fr",
-                        gap: 5,
-                      }}
-                    >
-                      <Typography variant="body1" sx={{ color: "white" }}>
-                        Editing Team: {teamName}
-                      </Typography>
-                      <Box>
-                        <Typography
-                          variant="body2"
-                          sx={{ color: "white", marginBottom: "10px" }}
-                        >
-                          Members
-                        </Typography>
-                        <TextField
-                          placeholder="Search"
-                          value={searchQuery2}
-                          onChange={(e) => setSearchQuery2(e.target.value)}
-                          variant="outlined"
-                          size="small"
-                          slotProps={{
-                            input: {
-                              startAdornment: (
-                                <InputAdornment position="start">
-                                  <Search
-                                    fontSize="small"
-                                    sx={{ color: "gray" }}
-                                  />
-                                </InputAdornment>
-                              ),
-                            },
-                          }}
-                          sx={{
-                            borderRadius: "40px",
-                            input: { color: "white" },
-                            width: "250px",
-                            height: "40px",
-                            border: "0.905px solid #88938F",
-                            marginBottom: "10px",
-                            "& fieldset": { border: "none" },
-                          }}
-                        />
-                        <Box
-                          sx={{
-                            backgroundColor: "#181818",
-                            padding: "10px",
-                            borderRadius: "10.706px",
-                            border: "0.892px solid #88938F",
-                            background: "#181818",
-                            maxHeight: "300px",
-                            minHeight: "90px",
-                            overflowY: "auto",
-                            marginBottom: "10px",
-                          }}
-                        >
-                          {filteredMembers
-                            .sort((a, b) => {
-                              const isInTeamA = teams[editingTeam]?.includes(
-                                a.email
-                              );
-                              const isInTeamB = teams[editingTeam]?.includes(
-                                b.email
-                              );
-
-                              const isUnassignedA = a.team === "";
-                              const isUnassignedB = b.team === "";
-
-                              if (isInTeamA && !isInTeamB) return -1;
-                              if (!isInTeamA && isInTeamB) return 1;
-
-                              if (isUnassignedA && !isUnassignedB) return -1;
-                              if (!isUnassignedA && isUnassignedB) return 1;
-
-                              return 0;
-                            })
-                            .map((member) => {
-                              const memberTeam = getMemberTeam(member.email);
-                              const isInAnotherTeam =
-                                memberTeam && memberTeam !== teamName;
-                              const isInTeam = editedMembers[member.email];
-                              const action = isInTeam ? "remove" : "add";
-
-                              return (
-                                <Box
-                                  key={member.email}
-                                  sx={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "space-between",
-                                    padding: "10px",
-                                    marginBottom: "10px",
-                                    opacity: isInAnotherTeam ? 0.6 : 1,
-                                    borderBottom: "1px solid #333738",
-                                  }}
-                                >
-                                  <Checkbox
-                                    disabled={isInAnotherTeam}
-                                    checked={isInTeam}
-                                    onChange={() =>
-                                      handleCheckboxToggle(
-                                        member.email,
-                                        member.name,
-                                        action
-                                      )
-                                    }
-                                    sx={{
-                                      color: isInAnotherTeam
-                                        ? "#888888"
-                                        : "#82D5C7",
-                                      "&.Mui-checked": {
-                                        color: "#82D5C7",
-                                      },
-                                    }}
-                                  />
-                                  <Typography
-                                    sx={{
-                                      color: "#DDE4E1",
-                                      flex: 1,
-                                      marginLeft: "10px",
-                                      textDecoration: isInAnotherTeam
-                                        ? "line-through"
-                                        : "none",
-                                    }}
-                                  >
-                                    {member.name}
-                                    {isInAnotherTeam &&
-                                      ` (Team: ${member.team})`}
-                                  </Typography>
-                                  <Typography
-                                    sx={{ color: "#BEC9C5" }}
-                                    variant="body2"
-                                  >
-                                    {member.email}
-                                  </Typography>
-                                </Box>
-                              );
-                            })}
-                        </Box>
-                      </Box>
-                    </Box>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "flex-end",
-                        gap: 2,
-                      }}
-                    >
-                      <CustomButton
-                        text="Cancel"
-                        onClick={cancelEditing}
-                        sx={{
-                          backgroundColor: "transparent",
-                          border: "1px solid #B5EDE4",
-                          color: "#B5EDE4",
-                          borderRadius: "50px",
-                          "&:hover": {
-                            backgroundColor: "rgba(181, 237, 228, 0.08)",
-                          },
-                        }}
-                      />
-                      <CustomButton
-                        text="Confirm"
-                        onClick={saveChangesEditTeam}
-                        sx={{
-                          borderRadius: "50px",
-                          "&:hover": {
-                            backgroundColor: "#80ccbc",
-                          },
-                        }}
-                      />
-                    </Box>
-                  </Box>
-                )}
-              </Box>
-            ))}
-          </Box>
-        )}
-        {/* Confirmation Modal */}
-        <ConfirmationModal
-          open={modalOpen}
-          onClose={handleModalClose}
-          onConfirm={handleModalConfirm}
-          action={modalData.action}
-          context="team"
-          itemName={modalData.memberName}
-          teamName={modalData.teamName}
-        />
-
-        {/* Confirmation Modal for Deleting Team */}
-        {deleteTeamModalOpen && (
-          <ConfirmationModal
-            open={deleteTeamModalOpen}
-            onClose={cancelDeleteTeam}
-            onConfirm={confirmDeleteTeam}
-            action="delete"
-            context="team"
-            itemName={teamToDelete}
-          />
-        )}
-
-        {/* Create Team Modal */}
-        {isCreateModalOpen && (
-          <div className="modal-overlay-submit-memor">
-            <div
-              className="modal-container"
-              style={{ padding: "20px", maxWidth: "600px" }}
-            >
-              <div className="modal-top" style={{ marginBottom: "20px" }}>
-                <Button
-                  onClick={() => handleTeamModalClose()}
-                  sx={{ minWidth: 0, p: 0, color: "#BEC9C5" }}
-                >
-                  <ArrowBackIcon />
-                </Button>
-                <Typography
-                  variant="h6"
-                  sx={{ marginLeft: "10px", color: "#BEC9C5" }}
-                >
-                  Admin Board
-                </Typography>
-              </div>
-              <Typography
-                variant="h5"
-                sx={{
-                  fontWeight: "bold",
-                  color: "#FFFFFF",
-                  marginBottom: "20px",
-                }}
-              >
-                Team Configuration
-              </Typography>
-              <TextField
-                label="Team's Name"
-                variant="outlined"
-                value={newTeamName}
-                onChange={(e) => setNewTeamName(e.target.value)}
-                fullWidth
-                sx={{
-                  marginBottom: "20px",
-                  "& .MuiInputBase-input": { color: "#FFFFFF" },
-                  "& .MuiOutlinedInput-root": {
-                    "& fieldset": { borderColor: "#888" },
-                    "&:hover fieldset": { borderColor: "#AAA" },
-                    "&.Mui-focused fieldset": { borderColor: "#CCC" },
-                  },
-                  "& .MuiInputLabel-root": { color: "#888" },
-                }}
-              />
-              <Typography
-                variant="body1"
-                sx={{ color: "#CAC4D0", marginBottom: "10px" }}
-              >
-                Thumbnail
-              </Typography>
-              <div
-                style={{
-                  border: "1px dashed #888",
-                  borderRadius: "10px",
-                  padding: "20px",
-                  textAlign: "center",
-                  marginBottom: "20px",
-                  position: "relative",
-                  background: "#1E1E1E",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                {newTeamThumbnail ? (
-                  <img
-                    src={newTeamThumbnail}
-                    alt="Uploaded Thumbnail"
-                    style={{ borderRadius: "10px", height: "120px" }}
-                  />
-                ) : (
-                  <>
-                    <label htmlFor="file-input" style={{ cursor: "pointer" }}>
-                      <div
-                        style={{
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                        }}
-                      >
-                        <img
-                          src={background3}
-                          alt="Upload Thumbnail"
-                          style={{
-                            width: "50px",
-                            height: "50px",
-                            marginBottom: "10px",
-                          }}
-                        />
-                        <Typography variant="body2" sx={{ color: "#888" }}>
-                          Upload file from computer
-                        </Typography>
-                      </div>
-                    </label>
-                    <input
-                      id="file-input"
-                      type="file"
-                      accept="image/*"
-                      className="file-input"
-                      onChange={handleFileChange}
-                      style={{ display: "none" }}
-                    />
-                  </>
-                )}
-              </div>
-              <Typography
-                variant="body1"
-                sx={{ color: "#CAC4D0", marginBottom: "10px" }}
-              >
-                Members
-              </Typography>
-              <TextField
-                placeholder="Search Name"
-                value={searchQuery3}
-                onChange={(e) => setSearchQuery3(e.target.value)}
-                variant="outlined"
-                size="small"
-                sx={{
-                  marginBottom: "20px",
-                  "& .MuiInputBase-input": { color: "#FFFFFF" },
-                  "& .MuiOutlinedInput-root": {
-                    "& fieldset": { borderColor: "#888" },
-                    "&:hover fieldset": { borderColor: "#AAA" },
-                    "&.Mui-focused fieldset": { borderColor: "#CCC" },
-                  },
-                  "& .MuiInputLabel-root": { color: "#888" },
-                  "& fieldset": { border: "none" },
-                }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Search sx={{ color: "#888" }} />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-              <div
-                style={{
-                  maxHeight: "200px",
-                  overflowY: "auto",
-                  background: "#1E1E1E",
-                  borderRadius: "10px",
-                  padding: "10px",
-                  border: "1px solid #333",
-                }}
-              >
-                {filteredUnassignedMembers.map((member) => (
-                  <Box
-                    key={member.email}
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      padding: "10px",
-                      borderBottom: "1px solid #333",
-                    }}
-                  >
-                    <Checkbox
-                      checked={!!newTeamMembers[member.email]}
-                      onChange={() =>
-                        setNewTeamMembers((prev) => ({
-                          ...prev,
-                          [member.email]: !prev[member.email],
-                        }))
-                      }
-                      sx={{ color: "#82D5C7" }}
-                    />
-                    <Typography sx={{ color: "#FFFFFF" }}>
-                      {member.name}
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: "#888" }}>
-                      {member.email}
-                    </Typography>
-                  </Box>
-                ))}
-              </div>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "flex-end",
-                  gap: 2,
-                  marginTop: "20px",
                 }}
               >
                 <CustomButton
-                  text="Cancel"
-                  onClick={handleTeamModalClose}
+                  text="Create a Memor"
+                  onClick={() => handleCreateMemorModalOpen()}
                   sx={{
-                    backgroundColor: "transparent",
-                    border: "1px solid #B5EDE4",
-                    color: "#B5EDE4",
-                    borderRadius: "50px",
+                    backgroundColor: "#B5EDE4",
+                    color: "#000",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "8px",
+                    padding: "10px 20px",
+                    borderRadius: "20px",
+                    border: "none",
+                    boxShadow: "none",
                     "&:hover": {
-                      backgroundColor: "rgba(181, 237, 228, 0.08)",
+                      backgroundColor: "#A3DFD8",
                     },
                   }}
+                  icon={
+                    <Typography
+                      component="span"
+                      sx={{
+                        fontWeight: "bold",
+                        fontSize: "18px",
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                    >
+                      +
+                    </Typography>
+                  }
                 />
-                <CustomButton
-                  text="Confirm"
-                  onClick={saveChangesCreateTeam}
+
+                <Tabs
+                  value={tab2}
+                  onChange={handleTabChange2}
+                  TabIndicatorProps={{ style: { display: "none" } }}
                   sx={{
-                    borderRadius: "50px",
+                    "& .MuiTab-root": {
+                      textTransform: "none",
+                      fontSize: "14px",
+                      color: "#82D5C7",
+                      padding: "6px 16px",
+                      borderRadius: "40px",
+                      border: "1px solid #938f99",
+                      marginRight: "10px",
+                      "&:hover": {
+                        backgroundColor: "rgba(130, 213, 199, 0.08)",
+                      },
+                      "&.Mui-selected": {
+                        backgroundColor: "#88d4c4",
+                        color: "#003731",
+                      },
+                    },
+                  }}
+                >
+                  <Tab value="all" label="All Memors" />
+                  <Tab value="ongoing" label="Ongoing" />
+                  <Tab value="closed" label="Closed" />
+                </Tabs>
+              </Box>
+
+              {/* Table Header */}
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  padding: "10px",
+                  fontWeight: "bold",
+                  color: "white",
+                  marginTop: "20px",
+                  width: "100%",
+                }}
+              >
+                <Typography variant="body2" sx={{ flex: 2 }}>
+                  Title
+                </Typography>
+                <Typography variant="body2" sx={{ flex: 4 }}>
+                  Description
+                </Typography>
+                <Typography variant="body2" sx={{ flex: 1 }}>
+                  Points
+                </Typography>
+                <Typography variant="body2" sx={{ flex: 1 }}>
+                  Time Left
+                </Typography>
+                <Typography variant="body2" sx={{ flex: 1 }}>
+                  Teams Left
+                </Typography>
+                <Typography variant="body2" sx={{ flex: 1 }}></Typography>
+              </Box>
+
+              {/* Table Rows */}
+              {filteredMemors.map((memor, index) => (
+                <Box
+                  key={index}
+                  onClick={() => toggleExpand(index)}
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    padding: "15px",
+                    alignItems: "center",
+                    color: "white",
+                    marginBottom: "10px",
+                    borderRadius: "10.861px",
+                    border: "2.715px solid #333738",
+                    background: "#272728",
+                    cursor: "pointer",
+                    width: "100%",
+                    "&:hover": {
+                      backgroundColor: "#3a3b3c",
+                    },
+                  }}
+                >
+                  <Box sx={{ flex: 2 }}>
+                    <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                      {memor.title}
+                    </Typography>
+                    {expandedIndex === index && (
+                      <Typography variant="caption" sx={{ color: "gray" }}>
+                        {memor.date}
+                      </Typography>
+                    )}
+                  </Box>
+                  <Typography variant="body2" sx={{ flex: 4 }}>
+                    {expandedIndex === index
+                      ? memor.description
+                      : `${memor.description.substring(0, 50)} (...)`}
+                  </Typography>
+                  <Typography variant="body2" sx={{ flex: 1 }}>
+                    {memor.points}
+                  </Typography>
+                  <Typography variant="body2" sx={{ flex: 1 }}>
+                    {memor.timeLeft !== "0:00H" && memor.timeLeft}
+                  </Typography>
+                  <Typography variant="body2" sx={{ flex: 1 }}>
+                    {memor.teamsLeft}
+                  </Typography>
+                  <Box
+                    sx={{
+                      flex: 1,
+                      textAlign: "center",
+                      display: "flex",
+                      justifyContent: "right",
+                      gap: "5px",
+                    }}
+                  >
+                    <IconButton
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEditMemorModalOpen(memor);
+                      }}
+                    >
+                      {memor.timeLeft !== "0:00H" && (
+                        <img
+                          src={editIcon}
+                          alt="edit"
+                          style={{ width: "20px" }}
+                        />
+                      )}
+                    </IconButton>
+
+                    <IconButton
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setMemorToDelete(memor);
+                        setDeleteMemorModalOpen(true);
+                      }}
+                    >
+                      {memor.timeLeft !== "0:00H" && (
+                        <img
+                          src={deleteIcon}
+                          alt="delete"
+                          style={{ width: "20px" }}
+                        />
+                      )}
+                    </IconButton>
+
+                    <IconButton>
+                      {expandedIndex === index ? (
+                        <KeyboardArrowUp sx={{ color: "white" }} />
+                      ) : (
+                        <KeyboardArrowDown sx={{ color: "white" }} />
+                      )}
+                    </IconButton>
+                  </Box>
+                </Box>
+              ))}
+            </Box>
+          )}
+
+          {tab === "teams" && (
+            <Box
+              sx={{
+                width: "100%",
+                marginTop: "20px",
+                borderRadius: "13.576px",
+                border: "2.715px solid #333738",
+                background: "#1E1F20",
+                padding: "20px",
+                backdropFilter: "blur(20px)",
+                marginBottom: "50px",
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  width: "100%",
+                }}
+              >
+                <CustomButton
+                  text="Create a Team"
+                  onClick={() => handleTeamModalOpen()}
+                  sx={{
+                    backgroundColor: "#B5EDE4",
+                    color: "#000",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "8px",
+                    padding: "10px 20px",
+                    borderRadius: "20px",
+                    border: "none",
+                    boxShadow: "none",
+                    marginBottom: "40px",
                     "&:hover": {
                       backgroundColor: "#80ccbc",
                     },
                   }}
+                  icon={
+                    <Typography
+                      component="span"
+                      sx={{
+                        fontWeight: "bold",
+                        fontSize: "18px",
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                    >
+                      +
+                    </Typography>
+                  }
                 />
               </Box>
-            </div>
-          </div>
-        )}
 
-        {/* Feedback Modal */}
-        {feedbackModal.open && (
-          <FeedbackModal
-            type={feedbackModal.type}
-            title={feedbackModal.title}
-            description={feedbackModal.description}
-            actions={[
-              {
-                label: "Close",
-                onClick: () =>
-                  setFeedbackModal({
-                    open: false,
-                    type: "",
-                    title: "",
-                    description: "",
-                  }),
-                style: { backgroundColor: "#4caf50", color: "#fff" },
-              },
-            ]}
-          />
-        )}
-
-        {/* Create Memor Modal */}
-        {isCreateMemorModalOpen && (
-          <div className="modal-overlay-submit-memor">
-            <div
-              className="modal-container"
-              style={{ padding: "20px", maxWidth: "600px" }}
-            >
-              <div className="modal-top" style={{ marginBottom: "20px" }}>
-                <Button
-                  onClick={() => handleCreateMemorModalClose()}
-                  sx={{ minWidth: 0, p: 0, color: "#BEC9C5" }}
+              {filteredTeams.map(([teamName, teamMembers]) => (
+                <Box
+                  key={teamName}
+                  sx={{
+                    marginBottom: "15px",
+                    borderRadius: "10.861px",
+                    border: "2.715px solid #333738",
+                    background: "#272728",
+                    padding: "15px",
+                  }}
                 >
-                  <ArrowBackIcon />
-                </Button>
+                  {!isEditing || editingTeam !== teamName ? (
+                    <Box
+                      sx={{
+                        display: "grid",
+                        gridTemplateColumns: "1fr 4fr 1fr",
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                        }}
+                      >
+                        <Typography
+                          variant="body2"
+                          sx={{ fontWeight: "bold", color: "white" }}
+                        >
+                          {teamName}
+                        </Typography>
+                      </Box>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                        }}
+                      >
+                        <Typography>
+                          Members:{" "}
+                          {teamMembers
+                            .slice(0, 3)
+                            .map(
+                              (email) =>
+                                members.find((member) => member.email === email)
+                                  ?.name
+                            )
+                            .join(", ")}
+                          {teamMembers.length > 3 && "..."}
+                        </Typography>
+                      </Box>
+                      <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+                        <IconButton onClick={() => startEditing(teamName)}>
+                          <img
+                            src={editIcon}
+                            alt="Edit"
+                            style={{ width: "20px" }}
+                          />
+                        </IconButton>
+                        <IconButton
+                          onClick={() => {
+                            setTeamToDelete(teamName);
+                            setDeleteTeamModalOpen(true);
+                          }}
+                        >
+                          <img
+                            src={deleteIcon}
+                            alt="Delete"
+                            style={{ width: "20px" }}
+                          />
+                        </IconButton>
+                      </Box>
+                    </Box>
+                  ) : (
+                    // Edit mode
+                    <Box sx={{ display: "flex", flexDirection: "column" }}>
+                      <Box
+                        sx={{
+                          display: "grid",
+                          gridTemplateColumns: "1fr 6fr",
+                          gap: 5,
+                        }}
+                      >
+                        <Typography variant="body1" sx={{ color: "white" }}>
+                          Editing Team: {teamName}
+                        </Typography>
+                        <Box>
+                          <Typography
+                            variant="body2"
+                            sx={{ color: "white", marginBottom: "10px" }}
+                          >
+                            Members
+                          </Typography>
+                          <TextField
+                            placeholder="Search"
+                            value={searchQuery2}
+                            onChange={(e) => setSearchQuery2(e.target.value)}
+                            variant="outlined"
+                            size="small"
+                            slotProps={{
+                              input: {
+                                startAdornment: (
+                                  <InputAdornment position="start">
+                                    <Search
+                                      fontSize="small"
+                                      sx={{ color: "gray" }}
+                                    />
+                                  </InputAdornment>
+                                ),
+                              },
+                            }}
+                            sx={{
+                              borderRadius: "40px",
+                              input: { color: "white" },
+                              width: "250px",
+                              height: "40px",
+                              border: "0.905px solid #88938F",
+                              marginBottom: "10px",
+                              "& fieldset": { border: "none" },
+                            }}
+                          />
+                          <Box
+                            sx={{
+                              backgroundColor: "#181818",
+                              padding: "10px",
+                              borderRadius: "10.706px",
+                              border: "0.892px solid #88938F",
+                              background: "#181818",
+                              maxHeight: "300px",
+                              minHeight: "90px",
+                              overflowY: "auto",
+                              marginBottom: "10px",
+                            }}
+                          >
+                            {filteredMembers
+                              .sort((a, b) => {
+                                const isInTeamA = teams[editingTeam]?.includes(
+                                  a.email
+                                );
+                                const isInTeamB = teams[editingTeam]?.includes(
+                                  b.email
+                                );
+
+                                const isUnassignedA = a.team === "";
+                                const isUnassignedB = b.team === "";
+
+                                if (isInTeamA && !isInTeamB) return -1;
+                                if (!isInTeamA && isInTeamB) return 1;
+
+                                if (isUnassignedA && !isUnassignedB) return -1;
+                                if (!isUnassignedA && isUnassignedB) return 1;
+
+                                return 0;
+                              })
+                              .map((member) => {
+                                const memberTeam = getMemberTeam(member.email);
+                                const isInAnotherTeam =
+                                  memberTeam && memberTeam !== teamName;
+                                const isInTeam = editedMembers[member.email];
+                                const action = isInTeam ? "remove" : "add";
+
+                                return (
+                                  <Box
+                                    key={member.email}
+                                    sx={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                      justifyContent: "space-between",
+                                      padding: "10px",
+                                      marginBottom: "10px",
+                                      opacity: isInAnotherTeam ? 0.6 : 1,
+                                      borderBottom: "1px solid #333738",
+                                    }}
+                                  >
+                                    <Checkbox
+                                      disabled={isInAnotherTeam}
+                                      checked={isInTeam}
+                                      onChange={() =>
+                                        handleCheckboxToggle(
+                                          member.email,
+                                          member.name,
+                                          action
+                                        )
+                                      }
+                                      sx={{
+                                        color: isInAnotherTeam
+                                          ? "#888888"
+                                          : "#82D5C7",
+                                        "&.Mui-checked": {
+                                          color: "#82D5C7",
+                                        },
+                                      }}
+                                    />
+                                    <Typography
+                                      sx={{
+                                        color: "#DDE4E1",
+                                        flex: 1,
+                                        marginLeft: "10px",
+                                        textDecoration: isInAnotherTeam
+                                          ? "line-through"
+                                          : "none",
+                                      }}
+                                    >
+                                      {member.name}
+                                      {isInAnotherTeam &&
+                                        ` (Team: ${member.team})`}
+                                    </Typography>
+                                    <Typography
+                                      sx={{ color: "#BEC9C5" }}
+                                      variant="body2"
+                                    >
+                                      {member.email}
+                                    </Typography>
+                                  </Box>
+                                );
+                              })}
+                          </Box>
+                        </Box>
+                      </Box>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "flex-end",
+                          gap: 2,
+                        }}
+                      >
+                        <CustomButton
+                          text="Cancel"
+                          onClick={cancelEditing}
+                          sx={{
+                            backgroundColor: "transparent",
+                            border: "1px solid #B5EDE4",
+                            color: "#B5EDE4",
+                            borderRadius: "50px",
+                            "&:hover": {
+                              backgroundColor: "rgba(181, 237, 228, 0.08)",
+                            },
+                          }}
+                        />
+                        <CustomButton
+                          text="Confirm"
+                          onClick={saveChangesEditTeam}
+                          sx={{
+                            borderRadius: "50px",
+                            "&:hover": {
+                              backgroundColor: "#80ccbc",
+                            },
+                          }}
+                        />
+                      </Box>
+                    </Box>
+                  )}
+                </Box>
+              ))}
+            </Box>
+          )}
+
+          {tab === "competition" && (
+            <Box
+              sx={{
+                width: "100%",
+                marginTop: "20px",
+                borderRadius: "13.576px",
+                border: "2.715px solid #333738",
+                background: "#1E1F20",
+                padding: "20px",
+                backdropFilter: "blur(20px)",
+                marginBottom: "50px",
+              }}
+            >
+              <Box>
+                {isCurrentCompetition ? (
+                  <>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        width: "100%",
+                      }}
+                    >
+                      <CustomButton
+                        text="Create a Competition"
+                        disabled={true}
+                        sx={{
+                          backgroundColor: "rgba(49, 49, 49, 1)",
+                          color: "rgba(26, 26, 26, 1)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: "8px",
+                          padding: "10px 20px",
+                          borderRadius: "20px",
+                          border: "none",
+                          boxShadow: "none",
+                          "&:hover": {
+                            backgroundColor: "rgba(49, 49, 49, 1)",
+                          },
+                          cursor: "not-allowed",
+                        }}
+                        icon={
+                          <Typography
+                            component="span"
+                            sx={{
+                              fontWeight: "bold",
+                              fontSize: "18px",
+                              display: "flex",
+                              alignItems: "center",
+                              color: "rgba(26, 26, 26, 1)",
+                            }}
+                          >
+                            +
+                          </Typography>
+                        }
+                      />
+                    </Box>
+                    <Box
+                      sx={{
+                        display: "grid",
+                        gridTemplateColumns: "1fr 4fr",
+                        marginTop: "40px",
+                      }}
+                    >
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          fontWeight: "bold",
+                          color: "#FFFFFF",
+                          marginBottom: "20px",
+                        }}
+                      >
+                        Ongoing Competition
+                      </Typography>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          padding: "25px",
+                          fontWeight: "bold",
+                          color: "white",
+                          borderRadius: "10.861px",
+                          border: "2.715px solid #333738",
+                          background: "#272728",
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            flex: 2,
+                            display: "flex",
+                            gap: "15px",
+                            flexDirection: "column",
+                          }}
+                        >
+                          <Typography
+                            variant="body2"
+                            sx={{ fontWeight: "bold" }}
+                          >
+                            New Year, New Me
+                          </Typography>
+                          <Typography variant="body2">
+                            For this competition, capture in your memors
+                            something that reflects your personal growth. Let
+                            your memors celebrate renewal, progress, and the
+                            journey to becoming your best self. 🌟
+                          </Typography>
+                        </Box>
+                        <Box
+                          sx={{
+                            flex: 2,
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            gap: "20px",
+                          }}
+                        >
+                          <Typography variant="body2">Duration</Typography>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "center",
+                              gap: "5px",
+                            }}
+                          >
+                            <Typography
+                              variant="body2"
+                              sx={{ color: "#9FE9E4" }}
+                            >
+                              16 days remaining
+                            </Typography>
+                            <Typography variant="body2">
+                              01/01/2025 - 31/01/2025
+                            </Typography>
+                          </Box>
+                        </Box>
+                        <Box>
+                          {competitions
+                            .filter((competition) => competition.id === 5)
+                            .map((competition) => (
+                              <IconButton
+                                onClick={() =>
+                                  handleEditCompetitionModalOpen(competition)
+                                }
+                                key={competition.id}
+                              >
+                                <img
+                                  src={editIcon}
+                                  alt="edit"
+                                  style={{ width: "20px" }}
+                                />
+                              </IconButton>
+                            ))}
+                        </Box>
+                      </Box>
+                    </Box>
+                  </>
+                ) : (
+                  <CustomButton
+                    text="Create a Competition"
+                    sx={{
+                      backgroundColor: "#B5EDE4",
+                      color: "#000",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "8px",
+                      padding: "10px 20px",
+                      borderRadius: "20px",
+                      border: "none",
+                      boxShadow: "none",
+                      "&:hover": {
+                        backgroundColor: "#A3DFD8",
+                      },
+                    }}
+                    icon={
+                      <Typography
+                        component="span"
+                        sx={{
+                          fontWeight: "bold",
+                          fontSize: "18px",
+                          display: "flex",
+                          alignItems: "center",
+                        }}
+                      >
+                        +
+                      </Typography>
+                    }
+                  />
+                )}
+
+                {/* Divider */}
+                <Divider
+                  sx={{
+                    backgroundColor: "gray",
+                    marginTop: "40px",
+                    marginBottom: "40px",
+                  }}
+                />
+
+                <Box>
+                  {/* Competition History */}
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      fontWeight: "bold",
+                      color: "#FFFFFF",
+                      marginBottom: "20px",
+                    }}
+                  >
+                    Completed Competitions
+                  </Typography>
+                  {/* Table Header */}
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      padding: "10px",
+                      fontWeight: "bold",
+                      color: "white",
+                      marginTop: "20px",
+                      width: "100%",
+                    }}
+                  >
+                    <Typography variant="body2" sx={{ flex: 2 }}>
+                      Title
+                    </Typography>
+                    <Typography variant="body2" sx={{ flex: 4 }}>
+                      Description
+                    </Typography>
+                    <Typography variant="body2" sx={{ flex: 1 }}>
+                      Duration
+                    </Typography>
+                    <Typography variant="body2" sx={{ flex: 1 }}></Typography>
+                  </Box>
+
+                  {/* Table Rows */}
+                  {filteredCompetitions.map((comp, index) => (
+                    <Box
+                      key={index}
+                      onClick={() => toggleExpand(index)}
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        padding: "15px",
+                        alignItems: "center",
+                        color: "white",
+                        marginBottom: "10px",
+                        borderRadius: "10.861px",
+                        border: "2.715px solid #333738",
+                        background: "#272728",
+                        cursor: "pointer",
+                        width: "100%",
+                        "&:hover": {
+                          backgroundColor: "#3a3b3c",
+                        },
+                      }}
+                    >
+                      <Box sx={{ flex: 2 }}>
+                        <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                          {comp.title}
+                        </Typography>
+                      </Box>
+                      <Typography variant="body2" sx={{ flex: 4 }}>
+                        {expandedIndex === index
+                          ? comp.description
+                          : `${comp.description.substring(0, 50)} (...)`}
+                      </Typography>
+                      <Typography variant="body2" sx={{ flex: 1 }}>
+                        {comp.startDate} - {comp.endDate}
+                      </Typography>
+                      <IconButton>
+                        {expandedIndex === index ? (
+                          <KeyboardArrowUp sx={{ color: "white" }} />
+                        ) : (
+                          <KeyboardArrowDown sx={{ color: "white" }} />
+                        )}
+                      </IconButton>
+                    </Box>
+                  ))}
+                </Box>
+              </Box>
+            </Box>
+          )}
+
+          {/* Confirmation Modal */}
+          <ConfirmationModal
+            open={modalOpen}
+            onClose={handleModalClose}
+            onConfirm={handleModalConfirm}
+            action={modalData.action}
+            context="team"
+            itemName={modalData.memberName}
+            teamName={modalData.teamName}
+          />
+
+          {/* Confirmation Modal for Deleting Team */}
+          {deleteTeamModalOpen && (
+            <ConfirmationModal
+              open={deleteTeamModalOpen}
+              onClose={cancelDeleteTeam}
+              onConfirm={confirmDeleteTeam}
+              action="delete"
+              context="team"
+              itemName={teamToDelete}
+            />
+          )}
+
+          {/* Create Team Modal */}
+          {isCreateModalOpen && (
+            <div className="modal-overlay-submit-memor">
+              <div
+                className="modal-container"
+                style={{ padding: "20px", maxWidth: "600px" }}
+              >
+                <div className="modal-top" style={{ marginBottom: "20px" }}>
+                  <Button
+                    onClick={() => handleTeamModalClose()}
+                    sx={{ minWidth: 0, p: 0, color: "#BEC9C5" }}
+                  >
+                    <ArrowBackIcon />
+                  </Button>
+                  <Typography
+                    variant="h6"
+                    sx={{ marginLeft: "10px", color: "#BEC9C5" }}
+                  >
+                    Admin Board
+                  </Typography>
+                </div>
                 <Typography
                   variant="h5"
-                  sx={{ marginLeft: "10px", color: "#BEC9C5" }}
+                  sx={{
+                    fontWeight: "bold",
+                    color: "#FFFFFF",
+                    marginBottom: "20px",
+                  }}
                 >
-                  Admin Board
+                  Team Configuration
                 </Typography>
-              </div>
-              <Typography
-                variant="h5"
-                sx={{
-                  fontWeight: "bold",
-                  color: "#FFFFFF",
-                  marginBottom: "20px",
-                }}
-              >
-                Memor Configuration
-              </Typography>
-              <TextField
-                label="Title"
-                variant="outlined"
-                value={newMemorTitle}
-                onChange={(e) => setNewMemorTitle(e.target.value)}
-                fullWidth
-                sx={{
-                  marginBottom: "20px",
-                  "& .MuiInputBase-input": { color: "#FFFFFF" },
-                  "& .MuiOutlinedInput-root": {
-                    "& fieldset": { borderColor: "#90948c" },
-                    "&:hover fieldset": { borderColor: "#AAA" },
-                    "&.Mui-focused fieldset": { borderColor: "#CCC" },
-                  },
-                  "& .MuiInputLabel-root": { color: "#888" },
-                }}
-              />
-              <Typography variant="body1" sx={{ color: "#CAC4D0" }}>
-                Due Date
-              </Typography>
-              <TextField
-                type="date"
-                value={newMemorDate || ""}
-                onChange={(e) => setNewMemorDate(e.target.value)}
-                fullWidth
-                inputProps={{
-                  min: getTodayDate(),
-                }}
-                sx={{
-                  marginBottom: "20px",
-                  "& .MuiInputBase-input": { color: "#FFFFFF" },
-                  "& .MuiOutlinedInput-root": {
-                    "& fieldset": { borderColor: "#90948c" },
-                    "&:hover fieldset": { borderColor: "#AAA" },
-                    "&.Mui-focused fieldset": { borderColor: "#CCC" },
-                  },
-                  "&hover": { backgroundColor: "#80ccbc" },
-                }}
-              />
-              <TextField
-                label="Description"
-                variant="outlined"
-                multiline
-                rows={4}
-                value={newMemorDescription}
-                onChange={(e) => setNewMemorDescription(e.target.value)}
-                fullWidth
-                sx={{
-                  marginBottom: "20px",
-                  "& .MuiInputBase-input": { color: "#FFFFFF" },
-                  "& .MuiOutlinedInput-root": {
-                    "& fieldset": { borderColor: "#90948c" },
-                    "&:hover fieldset": { borderColor: "#AAA" },
-                    "&.Mui-focused fieldset": { borderColor: "#CCC" },
-                  },
-                  "& .MuiInputLabel-root": { color: "#888" },
-                }}
-              />
-              <Typography variant="body1" sx={{ color: "#CAC4D0" }}>
-                Points
-              </Typography>
-              <Box
-                sx={{
-                  display: "flex",
-                  gap: 2,
-                  marginBottom: "20px",
-                  justifyContent: "space-between",
-                }}
-              >
-                {[5, 10, 20, 30, 50, 100].map((point) => (
-                  <Button
-                    key={point}
-                    onClick={() => setNewMemorPoints(point)}
-                    sx={{
-                      backgroundColor:
-                        newMemorPoints === point ? "#283434" : "#181c1c",
-                      color: "#82D5C7",
-                      borderRadius: "50%",
-                      width: "50px",
-                      height: "50px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      minWidth: 0,
-                      "&:hover": { backgroundColor: "#1f2c29" },
-                    }}
-                  >
-                    {point}
-                  </Button>
-                ))}
-              </Box>
-
-              <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
-                <CustomButton
-                  text="Cancel"
-                  onClick={() => handleCreateMemorModalClose()}
+                <TextField
+                  label="Team's Name"
+                  variant="outlined"
+                  value={newTeamName}
+                  onChange={(e) => setNewTeamName(e.target.value)}
+                  fullWidth
                   sx={{
-                    backgroundColor: "transparent",
-                    border: "1px solid #B5EDE4",
-                    color: "#B5EDE4",
-                    borderRadius: "50px",
-                    "&:hover": { backgroundColor: "rgba(181, 237, 228, 0.08)" },
+                    marginBottom: "20px",
+                    "& .MuiInputBase-input": { color: "#FFFFFF" },
+                    "& .MuiOutlinedInput-root": {
+                      "& fieldset": { borderColor: "#888" },
+                      "&:hover fieldset": { borderColor: "#AAA" },
+                      "&.Mui-focused fieldset": { borderColor: "#CCC" },
+                    },
+                    "& .MuiInputLabel-root": { color: "#888" },
                   }}
                 />
-                <CustomButton
-                  text="Submit"
-                  onClick={handleCreateMemor}
-                  sx={{
-                    borderRadius: "50px",
-                    "&:hover": { backgroundColor: "#80ccbc" },
-                  }}
-                />
-              </Box>
-            </div>
-          </div>
-        )}
-
-        {/* Confirmation Modal for Deleting Memor */}
-        {deleteMemorModalOpen && (
-          <ConfirmationModal
-            open={deleteMemorModalOpen}
-            onClose={cancelDeleteMemor}
-            onConfirm={confirmDeleteMemor}
-            action="delete"
-            context="memor"
-            itemName={memorToDelete?.title}
-          />
-        )}
-
-        {/* Edit Memor Modal */}
-        {isEditMemorModalOpen && (
-          <div className="modal-overlay-submit-memor">
-            <div
-              className="modal-container"
-              style={{ padding: "20px", maxWidth: "600px" }}
-            >
-              <div className="modal-top" style={{ marginBottom: "20px" }}>
-                <Button
-                  onClick={() => handleEditMemorModalClose()}
-                  sx={{ minWidth: 0, p: 0, color: "#BEC9C5" }}
-                >
-                  <ArrowBackIcon />
-                </Button>
                 <Typography
-                  variant="h6"
-                  sx={{ marginLeft: "10px", color: "#BEC9C5" }}
+                  variant="body1"
+                  sx={{ color: "#CAC4D0", marginBottom: "10px" }}
                 >
-                  Admin Board
+                  Thumbnail
                 </Typography>
-              </div>
-              <Typography
-                variant="h5"
-                sx={{
-                  fontWeight: "bold",
-                  color: "#FFFFFF",
-                  marginBottom: "20px",
-                }}
-              >
-                Edit Memor
-              </Typography>
-              <TextField
-                label="Title"
-                variant="outlined"
-                value={newMemorTitle}
-                onChange={(e) => setNewMemorTitle(e.target.value)}
-                fullWidth
-                sx={{
-                  marginBottom: "20px",
-                  "& .MuiInputBase-input": { color: "#FFFFFF" },
-                  "& .MuiOutlinedInput-root": {
-                    "& fieldset": { borderColor: "#90948c" },
-                    "&:hover fieldset": { borderColor: "#AAA" },
-                    "&.Mui-focused fieldset": { borderColor: "#CCC" },
-                  },
-                  "& .MuiInputLabel-root": { color: "#888" },
-                }}
-              />
-              <Typography variant="body1" sx={{ color: "#CAC4D0" }}>
-                Due Date
-              </Typography>
-              <TextField
-                type="date"
-                value={newMemorDate || ""}
-                onChange={(e) => setNewMemorDate(e.target.value)}
-                fullWidth
-                inputProps={{
-                  min: getTodayDate(),
-                }}
-                sx={{
-                  marginBottom: "20px",
-                  "& .MuiInputBase-input": { color: "#FFFFFF" },
-                  "& .MuiOutlinedInput-root": {
-                    "& fieldset": { borderColor: "#90948c" },
-                    "&:hover fieldset": { borderColor: "#AAA" },
-                    "&.Mui-focused fieldset": { borderColor: "#CCC" },
-                  },
-                  "&hover": { backgroundColor: "#80ccbc" },
-                }}
-              />
-              <TextField
-                label="Description"
-                variant="outlined"
-                multiline
-                rows={4}
-                value={newMemorDescription}
-                onChange={(e) => setNewMemorDescription(e.target.value)}
-                fullWidth
-                sx={{
-                  marginBottom: "20px",
-                  "& .MuiInputBase-input": { color: "#FFFFFF" },
-                  "& .MuiOutlinedInput-root": {
-                    "& fieldset": { borderColor: "#90948c" },
-                    "&:hover fieldset": { borderColor: "#AAA" },
-                    "&.Mui-focused fieldset": { borderColor: "#CCC" },
-                  },
-                  "& .MuiInputLabel-root": { color: "#888" },
-                }}
-              />
-              <Typography variant="body1" sx={{ color: "#CAC4D0" }}>
-                Points
-              </Typography>
-              <Box
-                sx={{
-                  display: "flex",
-                  gap: 2,
-                  marginBottom: "20px",
-                  justifyContent: "space-between",
-                }}
-              >
-                {[5, 10, 20, 30, 50, 100].map((point) => (
-                  <Button
-                    key={point}
-                    onClick={() => setNewMemorPoints(point)}
+                <div
+                  style={{
+                    border: "1px dashed #888",
+                    borderRadius: "10px",
+                    padding: "20px",
+                    textAlign: "center",
+                    marginBottom: "20px",
+                    position: "relative",
+                    background: "#1E1E1E",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  {newTeamThumbnail ? (
+                    <img
+                      src={newTeamThumbnail}
+                      alt="Uploaded Thumbnail"
+                      style={{ borderRadius: "10px", height: "120px" }}
+                    />
+                  ) : (
+                    <>
+                      <label htmlFor="file-input" style={{ cursor: "pointer" }}>
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                          }}
+                        >
+                          <img
+                            src={background3}
+                            alt="Upload Thumbnail"
+                            style={{
+                              width: "50px",
+                              height: "50px",
+                              marginBottom: "10px",
+                            }}
+                          />
+                          <Typography variant="body2" sx={{ color: "#888" }}>
+                            Upload file from computer
+                          </Typography>
+                        </div>
+                      </label>
+                      <input
+                        id="file-input"
+                        type="file"
+                        accept="image/*"
+                        className="file-input"
+                        onChange={handleFileChange}
+                        style={{ display: "none" }}
+                      />
+                    </>
+                  )}
+                </div>
+                <Typography
+                  variant="body1"
+                  sx={{ color: "#CAC4D0", marginBottom: "10px" }}
+                >
+                  Members
+                </Typography>
+                <TextField
+                  placeholder="Search Name"
+                  value={searchQuery3}
+                  onChange={(e) => setSearchQuery3(e.target.value)}
+                  variant="outlined"
+                  size="small"
+                  sx={{
+                    marginBottom: "20px",
+                    "& .MuiInputBase-input": { color: "#FFFFFF" },
+                    "& .MuiOutlinedInput-root": {
+                      "& fieldset": { borderColor: "#888" },
+                      "&:hover fieldset": { borderColor: "#AAA" },
+                      "&.Mui-focused fieldset": { borderColor: "#CCC" },
+                    },
+                    "& .MuiInputLabel-root": { color: "#888" },
+                    "& fieldset": { border: "none" },
+                  }}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Search sx={{ color: "#888" }} />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+                <div
+                  style={{
+                    maxHeight: "200px",
+                    overflowY: "auto",
+                    background: "#1E1E1E",
+                    borderRadius: "10px",
+                    padding: "10px",
+                    border: "1px solid #333",
+                  }}
+                >
+                  {filteredUnassignedMembers.map((member) => (
+                    <Box
+                      key={member.email}
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        padding: "10px",
+                        borderBottom: "1px solid #333",
+                      }}
+                    >
+                      <Checkbox
+                        checked={!!newTeamMembers[member.email]}
+                        onChange={() =>
+                          setNewTeamMembers((prev) => ({
+                            ...prev,
+                            [member.email]: !prev[member.email],
+                          }))
+                        }
+                        sx={{ color: "#82D5C7" }}
+                      />
+                      <Typography sx={{ color: "#FFFFFF" }}>
+                        {member.name}
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: "#888" }}>
+                        {member.email}
+                      </Typography>
+                    </Box>
+                  ))}
+                </div>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    gap: 2,
+                    marginTop: "20px",
+                  }}
+                >
+                  <CustomButton
+                    text="Cancel"
+                    onClick={handleTeamModalClose}
                     sx={{
-                      backgroundColor:
-                        newMemorPoints === point ? "#283434" : "#181c1c",
-                      color: "#82D5C7",
-                      borderRadius: "50%",
-                      width: "50px",
-                      height: "50px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      minWidth: 0,
-                      "&:hover": { backgroundColor: "#1f2c29" },
+                      backgroundColor: "transparent",
+                      border: "1px solid #B5EDE4",
+                      color: "#B5EDE4",
+                      borderRadius: "50px",
+                      "&:hover": {
+                        backgroundColor: "rgba(181, 237, 228, 0.08)",
+                      },
                     }}
-                  >
-                    {point}
-                  </Button>
-                ))}
-              </Box>
-              <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
-                <CustomButton
-                  text="Cancel"
-                  onClick={() => handleEditMemorModalClose()}
-                  sx={{
-                    backgroundColor: "transparent",
-                    border: "1px solid #B5EDE4",
-                    color: "#B5EDE4",
-                    borderRadius: "50px",
-                    "&:hover": { backgroundColor: "rgba(181, 237, 228, 0.08)" },
-                  }}
-                />
-                <CustomButton
-                  text="Submit"
-                  onClick={() => handleEditMemor()}
-                  sx={{
-                    borderRadius: "50px",
-                    "&:hover": { backgroundColor: "#80ccbc" },
-                  }}
-                />
-              </Box>
+                  />
+                  <CustomButton
+                    text="Confirm"
+                    onClick={saveChangesCreateTeam}
+                    sx={{
+                      borderRadius: "50px",
+                      "&:hover": {
+                        backgroundColor: "#80ccbc",
+                      },
+                    }}
+                  />
+                </Box>
+              </div>
             </div>
-          </div>
-        )}
-      </Box>
-    </div>
+          )}
+
+          {/* Feedback Modal */}
+          {feedbackModal.open && (
+            <FeedbackModal
+              type={feedbackModal.type}
+              title={feedbackModal.title}
+              description={feedbackModal.description}
+              actions={[
+                {
+                  label: "Close",
+                  onClick: () =>
+                    setFeedbackModal({
+                      open: false,
+                      type: "",
+                      title: "",
+                      description: "",
+                    }),
+                  style: { backgroundColor: "#4caf50", color: "#fff" },
+                },
+              ]}
+            />
+          )}
+
+          {/* Create Memor Modal */}
+          {isCreateMemorModalOpen && (
+            <div className="modal-overlay-submit-memor">
+              <div
+                className="modal-container"
+                style={{ padding: "20px", maxWidth: "600px" }}
+              >
+                <div className="modal-top" style={{ marginBottom: "20px" }}>
+                  <Button
+                    onClick={() => handleCreateMemorModalClose()}
+                    sx={{ minWidth: 0, p: 0, color: "#BEC9C5" }}
+                  >
+                    <ArrowBackIcon />
+                  </Button>
+                  <Typography
+                    variant="h5"
+                    sx={{ marginLeft: "10px", color: "#BEC9C5" }}
+                  >
+                    Admin Board
+                  </Typography>
+                </div>
+                <Typography
+                  variant="h5"
+                  sx={{
+                    fontWeight: "bold",
+                    color: "#FFFFFF",
+                    marginBottom: "20px",
+                  }}
+                >
+                  Memor Configuration
+                </Typography>
+                <TextField
+                  label="Title"
+                  variant="outlined"
+                  value={newMemorTitle}
+                  onChange={(e) => setNewMemorTitle(e.target.value)}
+                  fullWidth
+                  sx={{
+                    marginBottom: "20px",
+                    "& .MuiInputBase-input": { color: "#FFFFFF" },
+                    "& .MuiOutlinedInput-root": {
+                      "& fieldset": { borderColor: "#90948c" },
+                      "&:hover fieldset": { borderColor: "#AAA" },
+                      "&.Mui-focused fieldset": { borderColor: "#CCC" },
+                    },
+                    "& .MuiInputLabel-root": { color: "#888" },
+                  }}
+                />
+                <Typography variant="body1" sx={{ color: "#CAC4D0" }}>
+                  Due Date
+                </Typography>
+                <TextField
+                  type="date"
+                  value={newMemorDate || ""}
+                  onChange={(e) => setNewMemorDate(e.target.value)}
+                  fullWidth
+                  inputProps={{
+                    min: getTodayDate(),
+                  }}
+                  sx={{
+                    marginBottom: "20px",
+                    "& .MuiInputBase-input": { color: "#FFFFFF" },
+                    "& .MuiOutlinedInput-root": {
+                      "& fieldset": { borderColor: "#90948c" },
+                      "&:hover fieldset": { borderColor: "#AAA" },
+                      "&.Mui-focused fieldset": { borderColor: "#CCC" },
+                    },
+                    "&hover": { backgroundColor: "#80ccbc" },
+                  }}
+                />
+                <TextField
+                  label="Description"
+                  variant="outlined"
+                  multiline
+                  rows={4}
+                  value={newMemorDescription}
+                  onChange={(e) => setNewMemorDescription(e.target.value)}
+                  fullWidth
+                  sx={{
+                    marginBottom: "20px",
+                    "& .MuiInputBase-input": { color: "#FFFFFF" },
+                    "& .MuiOutlinedInput-root": {
+                      "& fieldset": { borderColor: "#90948c" },
+                      "&:hover fieldset": { borderColor: "#AAA" },
+                      "&.Mui-focused fieldset": { borderColor: "#CCC" },
+                    },
+                    "& .MuiInputLabel-root": { color: "#888" },
+                  }}
+                />
+                <Typography variant="body1" sx={{ color: "#CAC4D0" }}>
+                  Points
+                </Typography>
+                <Box
+                  sx={{
+                    display: "flex",
+                    gap: 2,
+                    marginBottom: "20px",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  {[5, 10, 20, 30, 50, 100].map((point) => (
+                    <Button
+                      key={point}
+                      onClick={() => setNewMemorPoints(point)}
+                      sx={{
+                        backgroundColor:
+                          newMemorPoints === point ? "#283434" : "#181c1c",
+                        color: "#82D5C7",
+                        borderRadius: "50%",
+                        width: "50px",
+                        height: "50px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        minWidth: 0,
+                        "&:hover": { backgroundColor: "#1f2c29" },
+                      }}
+                    >
+                      {point}
+                    </Button>
+                  ))}
+                </Box>
+
+                <Box
+                  sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}
+                >
+                  <CustomButton
+                    text="Cancel"
+                    onClick={() => handleCreateMemorModalClose()}
+                    sx={{
+                      backgroundColor: "transparent",
+                      border: "1px solid #B5EDE4",
+                      color: "#B5EDE4",
+                      borderRadius: "50px",
+                      "&:hover": {
+                        backgroundColor: "rgba(181, 237, 228, 0.08)",
+                      },
+                    }}
+                  />
+                  <CustomButton
+                    text="Submit"
+                    onClick={handleCreateMemor}
+                    sx={{
+                      borderRadius: "50px",
+                      "&:hover": { backgroundColor: "#80ccbc" },
+                    }}
+                  />
+                </Box>
+              </div>
+            </div>
+          )}
+
+          {/* Confirmation Modal for Deleting Memor */}
+          {deleteMemorModalOpen && (
+            <ConfirmationModal
+              open={deleteMemorModalOpen}
+              onClose={cancelDeleteMemor}
+              onConfirm={confirmDeleteMemor}
+              action="delete"
+              context="memor"
+              itemName={memorToDelete?.title}
+            />
+          )}
+
+          {/* Edit Memor Modal */}
+          {isEditMemorModalOpen && (
+            <div className="modal-overlay-submit-memor">
+              <div
+                className="modal-container"
+                style={{ padding: "20px", maxWidth: "600px" }}
+              >
+                <div className="modal-top" style={{ marginBottom: "20px" }}>
+                  <Button
+                    onClick={() => handleEditMemorModalClose()}
+                    sx={{ minWidth: 0, p: 0, color: "#BEC9C5" }}
+                  >
+                    <ArrowBackIcon />
+                  </Button>
+                  <Typography
+                    variant="h6"
+                    sx={{ marginLeft: "10px", color: "#BEC9C5" }}
+                  >
+                    Admin Board
+                  </Typography>
+                </div>
+                <Typography
+                  variant="h5"
+                  sx={{
+                    fontWeight: "bold",
+                    color: "#FFFFFF",
+                    marginBottom: "20px",
+                  }}
+                >
+                  Edit Memor
+                </Typography>
+                <TextField
+                  label="Title"
+                  variant="outlined"
+                  value={newMemorTitle}
+                  onChange={(e) => setNewMemorTitle(e.target.value)}
+                  fullWidth
+                  sx={{
+                    marginBottom: "20px",
+                    "& .MuiInputBase-input": { color: "#FFFFFF" },
+                    "& .MuiOutlinedInput-root": {
+                      "& fieldset": { borderColor: "#90948c" },
+                      "&:hover fieldset": { borderColor: "#AAA" },
+                      "&.Mui-focused fieldset": { borderColor: "#CCC" },
+                    },
+                    "& .MuiInputLabel-root": { color: "#888" },
+                  }}
+                />
+                <Typography variant="body1" sx={{ color: "#CAC4D0" }}>
+                  Due Date
+                </Typography>
+                <TextField
+                  type="date"
+                  value={newMemorDate || ""}
+                  onChange={(e) => setNewMemorDate(e.target.value)}
+                  fullWidth
+                  inputProps={{
+                    min: getTodayDate(),
+                  }}
+                  sx={{
+                    marginBottom: "20px",
+                    "& .MuiInputBase-input": { color: "#FFFFFF" },
+                    "& .MuiOutlinedInput-root": {
+                      "& fieldset": { borderColor: "#90948c" },
+                      "&:hover fieldset": { borderColor: "#AAA" },
+                      "&.Mui-focused fieldset": { borderColor: "#CCC" },
+                    },
+                    "&hover": { backgroundColor: "#80ccbc" },
+                  }}
+                />
+                <TextField
+                  label="Description"
+                  variant="outlined"
+                  multiline
+                  rows={4}
+                  value={newMemorDescription}
+                  onChange={(e) => setNewMemorDescription(e.target.value)}
+                  fullWidth
+                  sx={{
+                    marginBottom: "20px",
+                    "& .MuiInputBase-input": { color: "#FFFFFF" },
+                    "& .MuiOutlinedInput-root": {
+                      "& fieldset": { borderColor: "#90948c" },
+                      "&:hover fieldset": { borderColor: "#AAA" },
+                      "&.Mui-focused fieldset": { borderColor: "#CCC" },
+                    },
+                    "& .MuiInputLabel-root": { color: "#888" },
+                  }}
+                />
+                <Typography variant="body1" sx={{ color: "#CAC4D0" }}>
+                  Points
+                </Typography>
+                <Box
+                  sx={{
+                    display: "flex",
+                    gap: 2,
+                    marginBottom: "20px",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  {[5, 10, 20, 30, 50, 100].map((point) => (
+                    <Button
+                      key={point}
+                      onClick={() => setNewMemorPoints(point)}
+                      sx={{
+                        backgroundColor:
+                          newMemorPoints === point ? "#283434" : "#181c1c",
+                        color: "#82D5C7",
+                        borderRadius: "50%",
+                        width: "50px",
+                        height: "50px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        minWidth: 0,
+                        "&:hover": { backgroundColor: "#1f2c29" },
+                      }}
+                    >
+                      {point}
+                    </Button>
+                  ))}
+                </Box>
+                <Box
+                  sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}
+                >
+                  <CustomButton
+                    text="Cancel"
+                    onClick={() => handleEditMemorModalClose()}
+                    sx={{
+                      backgroundColor: "transparent",
+                      border: "1px solid #B5EDE4",
+                      color: "#B5EDE4",
+                      borderRadius: "50px",
+                      "&:hover": {
+                        backgroundColor: "rgba(181, 237, 228, 0.08)",
+                      },
+                    }}
+                  />
+                  <CustomButton
+                    text="Submit"
+                    onClick={() => handleEditMemor()}
+                    sx={{
+                      borderRadius: "50px",
+                      "&:hover": { backgroundColor: "#80ccbc" },
+                    }}
+                  />
+                </Box>
+              </div>
+            </div>
+          )}
+
+          {/* New Confirmation Modal for Editing Memor */}
+          {confirmEditMemorModalOpen && (
+            <ConfirmationModal
+              open={confirmEditMemorModalOpen}
+              onClose={() => setConfirmEditMemorModalOpen(false)}
+              onConfirm={confirmEditMemor}
+              action="edit"
+              context="memor"
+              itemName={memorToEdit?.title}
+            />
+          )}
+
+          {/* Edit Competition Modal */}
+          {isEditCompetitionModalOpen && (
+            <div className="modal-overlay-submit-memor">
+              <div
+                className="modal-container"
+                style={{ padding: "20px", maxWidth: "600px" }}
+              >
+                <div className="modal-top" style={{ marginBottom: "20px" }}>
+                  <Button
+                    onClick={() => handleEditCompetitionModalClose()}
+                    sx={{ minWidth: 0, p: 0, color: "#BEC9C5" }}
+                  >
+                    <ArrowBackIcon />
+                  </Button>
+                  <Typography
+                    variant="h6"
+                    sx={{ marginLeft: "10px", color: "#BEC9C5" }}
+                  >
+                    Admin Board
+                  </Typography>
+                </div>
+                <Typography
+                  variant="h5"
+                  sx={{
+                    fontWeight: "bold",
+                    color: "#FFFFFF",
+                    marginBottom: "20px",
+                  }}
+                >
+                  Edit Competition
+                </Typography>
+                <Typography variant="body1" sx={{ color: "#CAC4D0" }}>
+                  Title
+                </Typography>
+                <TextField
+                  label="Title"
+                  variant="outlined"
+                  value={newCompetitionTitle}
+                  onChange={(e) => setNewCompetitionTitle(e.target.value)}
+                  fullWidth
+                  sx={{
+                    marginBottom: "20px",
+                    "& .MuiInputBase-input": { color: "#FFFFFF" },
+                    "& .MuiOutlinedInput-root": {
+                      "& fieldset": { borderColor: "#90948c" },
+                      "&:hover fieldset": { borderColor: "#AAA" },
+                      "&.Mui-focused fieldset": { borderColor: "#CCC" },
+                    },
+                    "& .MuiInputLabel-root": { color: "#888" },
+                  }}
+                />
+
+                <Typography variant="body1" sx={{ color: "#CAC4D0" }}>
+                  End Date
+                </Typography>
+                <TextField
+                  type="text"
+                  value={newCompetitionEndDate || ""}
+                  onChange={(e) => setNewCompetitionEndDate(e.target.value)}
+                  fullWidth
+                  inputProps={{
+                    min: newCompetitionStartDate,
+                  }}
+                  sx={{
+                    marginBottom: "20px",
+                    "& .MuiInputBase-input": { color: "#FFFFFF" },
+                    "& .MuiOutlinedInput-root": {
+                      "& fieldset": { borderColor: "#90948c" },
+                      "&:hover fieldset": { borderColor: "#AAA" },
+                      "&.Mui-focused fieldset": { borderColor: "#CCC" },
+                    },
+                    "&hover": { backgroundColor: "#80ccbc" },
+                  }}
+                />
+                <TextField
+                  label="Description"
+                  variant="outlined"
+                  multiline
+                  rows={4}
+                  value={newCompetitionDescription}
+                  onChange={(e) => setNewCompetitionDescription(e.target.value)}
+                  fullWidth
+                  sx={{
+                    marginBottom: "20px",
+                    "& .MuiInputBase-input": { color: "#FFFFFF" },
+                    "& .MuiOutlinedInput-root": {
+                      "& fieldset": { borderColor: "#90948c" },
+                      "&:hover fieldset": { borderColor: "#AAA" },
+                      "&.Mui-focused fieldset": { borderColor: "#CCC" },
+                    },
+                    "& .MuiInputLabel-root": { color: "#888" },
+                  }}
+                />
+                <Box
+                  sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}
+                >
+                  <CustomButton
+                    text="Cancel"
+                    onClick={() => handleEditCompetitionModalClose()}
+                    sx={{
+                      backgroundColor: "transparent",
+                      border: "1px solid #B5EDE4",
+                      color: "#B5EDE4",
+                      borderRadius: "50px",
+                      "&:hover": {
+                        backgroundColor: "rgba(181, 237, 228, 0.08)",
+                      },
+                    }}
+                  />
+                  <CustomButton
+                    text="Submit"
+                    onClick={() => handleEditCompetition()}
+                    sx={{
+                      borderRadius: "50px",
+                      "&:hover": { backgroundColor: "#80ccbc" },
+                    }}
+                  />
+                </Box>
+              </div>
+            </div>
+          )}
+
+{confirmEditCompetitionModalOpen && (
+    <ConfirmationModal
+        open={confirmEditCompetitionModalOpen}
+        onClose={() => setConfirmEditCompetitionModalOpen(false)}
+        onConfirm={confirmEditCompetition}
+        action="edit"
+        context="competition"
+        itemName={newCompetitionTitle}
+    />
+)}
+
+        </Box>
+      </div>
+    </>
   );
 };
 

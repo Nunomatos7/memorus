@@ -8,22 +8,21 @@ import Leaderboard from "./pages/Leaderboard/Leaderboard";
 import MemoryBoard from "./pages/MemoryBoard/MemoryBoard";
 import AdminHome from "./pages/Admin/Home/Home";
 import AdminLeaderboard from "./pages/Admin/Leaderboard/Leaderboard";
-import AdminMemoryBoard from "./pages/Admin/MemoryBoard/MemoryBoard";
 import AdminBoard from "./pages/Admin/AdminBoard/AdminBoard";
 import AdminLayout from "./Components/AdminLayout/AdminLayout";
 import CollaboratorLayout from "./Components/CollaboratorLayout/CollaboratorLayout";
 import LoginPage from "./auth/LoginPage";
 import RegisterPage from "./auth/RegisterPage";
 import ChangePassword from "./auth/ChangePassword";
+import Loader from "./Components/Loader/Loader";
 
 function App() {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // Add a loading state
+  const [loading, setLoading] = useState(true);
 
   const demoUsers = [
     { email: "admin@example.com", password: "admin123", role: "Admin" },
     { email: "user@example.com", password: "user123", role: "Regular" },
-    { email: "nengue@nengue.com", password: "nengue", role: "Regular" },
   ];
 
   useEffect(() => {
@@ -31,7 +30,7 @@ function App() {
     if (storedUser) {
       setUser(storedUser);
     }
-    setLoading(false); // Loading complete after checking localStorage
+    setLoading(false);
 
     const handleStorageChange = () => {
       const updatedUser = JSON.parse(localStorage.getItem("user"));
@@ -63,7 +62,7 @@ function App() {
     const location = useLocation();
 
     if (loading) {
-      return <div>Loading...</div>; // Display a loading spinner while checking auth
+      return <Loader />;
     }
 
     if (!user) {
@@ -125,6 +124,7 @@ function App() {
             </ProtectedRoute>
           }
         >
+          <Route path='' element={<Navigate to='home' replace />} />
           <Route path='home' index element={<Home />} />
           <Route path='memors' element={<Memors />} />
           <Route path='leaderboard' element={<Leaderboard />} />
@@ -142,7 +142,7 @@ function App() {
         >
           <Route path='home' element={<AdminHome />} />
           <Route path='leaderboard' element={<AdminLeaderboard />} />
-          <Route path='memoryboard' element={<AdminMemoryBoard />} />
+          <Route path='memoryboard' element={<MemoryBoard />} />
           <Route path='adminboard' element={<AdminBoard />} />
         </Route>
 

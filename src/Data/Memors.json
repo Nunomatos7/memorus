@@ -1,0 +1,567 @@
+{
+  "memorsData": [
+    {
+      "id": 1,
+      "title": "Virtual Coffee Break",
+      "dueDate": "10/12/2024",
+      "submission": "No submission yet",
+      "submittedDate": "01/01/2025",
+      "status": "incomplete",
+      "timeLeft": "1 hour left",
+      "team": "The Debuggers",
+      "description": "For this team-building activity, capture a fun selfie! Show off your personality and creativity. Once you're ready, snap the photo and upload it to complete the task. Let's see your team spirit!",
+      "points": 10,
+      "image": null
+    },
+    {
+      "id": 2,
+      "title": "Fist bump a colleague",
+      "dueDate": "12/12/2024",
+      "submission": "No submission yet",
+      "submittedDate": "01/01/2025",
+      "team": "The Debuggers",
+      "status": "incomplete",
+      "description": "For this team-building activity, capture a fun selfie! Show off your personality and creativity. Once you're ready, snap the photo and upload it to complete the task. Let's see your team spirit!",
+      "points": 20,
+      "image": null
+    },
+    {
+      "id": 3,
+      "title": "Take a photo of your pet",
+      "dueDate": "17/12/2024",
+      "submission": "Submitted by a team member",
+      "submittedDate": "01/01/2025",
+      "team": "The Debuggers",
+      "status": "submitted",
+      "description": "For this team-building activity, capture a fun selfie! Show off your personality and creativity. Once you're ready, snap the photo and upload it to complete the task. Let's see your team spirit!",
+      "points": 30,
+      "image": [
+        "https://placehold.jp/80x80.png",
+        "https://placehold.jp/300x300.png"
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Fist bump a colleague",
+      "dueDate": "12/12/2024",
+      "submission": "No submission yet",
+      "submittedDate": "01/01/2025",
+      "team": "The Debuggers",
+      "status": "incomplete",
+      "description": "For this team-building activity, capture a fun selfie! Show off your personality and creativity. Once you're ready, snap the photo and upload it to complete the task. Let's see your team spirit!",
+      "points": 40,
+      "image": null
+    },
+    {
+      "id": 5,
+      "title": "Take a photo of your pet",
+      "dueDate": "17/12/2024",
+      "submission": "Submitted by a team member",
+      "submittedDate": "01/01/2025",
+      "team": "The Debuggers",
+      "status": "submitted",
+      "description": "For this team-building activity, capture a fun selfie! Show off your personality and creativity. Once you're ready, snap the photo and upload it to complete the task. Let's see your team spirit!",
+      "points": 50,
+      "image": [
+        "https://placehold.jp/1000x1000.png",
+        "https://placehold.jp/10x10.png",
+        "https://placehold.jp/10x10.png",
+        "https://placehold.jp/10x10.png",
+        "https://placehold.jp/10x10.png",
+        "https://placehold.jp/10x10.png"
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Virtual Coffee Break",
+      "dueDate": "10/12/2024",
+      "submission": "No submission yet",
+      "status": "incomplete",
+      "team": "The Debuggers",
+      "timeLeft": "1 hour left",
+      "description": "For this team-building activity, capture a fun selfie! Show off your personality and creativity. Once you're ready, snap the photo and upload it to complete the task. Let's see your team spirit!",
+      "points": 60,
+      "image": null
+    },
+    {
+      "id": 7,
+      "title": "Team Lunch",
+      "dueDate": "20/12/2024",
+      "submission": "No submission yet",
+      "submittedDate": "01/01/2025",
+      "status": "incomplete",
+      "timeLeft": "2 hours left",
+      "team": "The Coders",
+      "description": "Enjoy a team lunch and capture the moment with a photo. Upload it to complete the task.",
+      "points": 15,
+      "image": [
+        "https://placehold.jp/10x10.png",
+        "https://placehold.jp/20x20.png",
+        "https://placehold.jp/30x30.png",
+        "https://placehold.jp/40x40.png",
+        "https://placehold.jp/50x50.png",
+        "https://placehold.jp/60x60.png"
+      ]
+    },
+    {
+      "id": 8,
+      "title": "Office Decoration",
+      "dueDate": "25/12/2024",
+      "submission": "No submission yet",
+      "submittedDate": "01/01/2025",
+      "status": "incomplete",
+      "timeLeft": "3 hours left",
+      "team": "The Innovators",
+      "description": "Decorate your office space and take a photo. Upload it to complete the task.",
+      "points": 25,
+      "image": [
+        "https://placehold.jp/70x70.png",
+        "https://placehold.jp/80x80.png",
+        "https://placehold.jp/90x90.png",
+        "https://placehold.jp/100x100.png",
+        "https://placehold.jp/110x110.png",
+        "https://placehold.jp/120x120.png"
+      ]
+    },
+    {
+      "id": 9,
+      "title": "Team Meeting",
+      "dueDate": "30/12/2024",
+      "submission": "No submission yet",
+      "submittedDate": "01/01/2025",
+      "status": "incomplete",
+      "timeLeft": "4 hours left",
+      "team": "The Creators",
+      "description": "Capture a photo during your team meeting and upload it to complete the task.",
+      "points": 35,
+      "image": [
+        "https://placehold.jp/130x130.png",
+        "https://placehold.jp/140x140.png",
+        "https://placehold.jp/150x150.png",
+        "https://placehold.jp/160x160.png",
+        "https://placehold.jp/170x170.png",
+        "https://placehold.jp/180x180.png"
+      ]
+    },
+    {
+      "id": 10,
+      "title": "Brainstorming Session",
+      "dueDate": "05/01/2025",
+      "submission": "No submission yet",
+      "submittedDate": "01/01/2025",
+      "status": "incomplete",
+      "timeLeft": "5 hours left",
+      "team": "The Thinkers",
+      "description": "Take a photo during your brainstorming session and upload it to complete the task.",
+      "points": 45,
+      "image": [
+        "https://placehold.jp/190x190.png",
+        "https://placehold.jp/200x200.png",
+        "https://placehold.jp/210x210.png",
+        "https://placehold.jp/220x220.png",
+        "https://placehold.jp/230x230.png",
+        "https://placehold.jp/240x240.png"
+      ]
+    },
+    {
+      "id": 11,
+      "title": "Team Outing",
+      "dueDate": "10/01/2025",
+      "submission": "No submission yet",
+      "submittedDate": "01/01/2025",
+      "status": "incomplete",
+      "timeLeft": "6 hours left",
+      "team": "The Explorers",
+      "description": "Capture a photo during your team outing and upload it to complete the task.",
+      "points": 55,
+      "image": [
+        "https://placehold.jp/250x250.png",
+        "https://placehold.jp/260x260.png",
+        "https://placehold.jp/270x270.png",
+        "https://placehold.jp/280x280.png",
+        "https://placehold.jp/290x290.png",
+        "https://placehold.jp/300x300.png"
+      ]
+    },
+    {
+      "id": 12,
+      "title": "Team Building Exercise",
+      "dueDate": "15/01/2025",
+      "submission": "No submission yet",
+      "submittedDate": "01/01/2025",
+      "status": "incomplete",
+      "timeLeft": "7 hours left",
+      "team": "The Builders",
+      "description": "Take a photo during your team building exercise and upload it to complete the task.",
+      "points": 65,
+      "image": [
+        "https://placehold.jp/310x310.png",
+        "https://placehold.jp/320x320.png",
+        "https://placehold.jp/330x330.png",
+        "https://placehold.jp/340x340.png",
+        "https://placehold.jp/350x350.png",
+        "https://placehold.jp/360x360.png"
+      ]
+    },
+    {
+      "id": 13,
+      "title": "Team Presentation",
+      "dueDate": "20/01/2025",
+      "submission": "No submission yet",
+      "submittedDate": "01/01/2025",
+      "status": "incomplete",
+      "timeLeft": "8 hours left",
+      "team": "The Presenters",
+      "description": "Capture a photo during your team presentation and upload it to complete the task.",
+      "points": 75,
+      "image": [
+        "https://placehold.jp/370x370.png",
+        "https://placehold.jp/380x380.png",
+        "https://placehold.jp/390x390.png",
+        "https://placehold.jp/400x400.png",
+        "https://placehold.jp/410x410.png",
+        "https://placehold.jp/420x420.png"
+      ]
+    },
+    {
+      "id": 14,
+      "title": "Team Workshop",
+      "dueDate": "25/01/2025",
+      "submission": "No submission yet",
+      "submittedDate": "01/01/2025",
+      "status": "incomplete",
+      "timeLeft": "9 hours left",
+      "team": "The Trainers",
+      "description": "Take a photo during your team workshop and upload it to complete the task.",
+      "points": 85,
+      "image": [
+        "https://placehold.jp/430x430.png",
+        "https://placehold.jp/440x440.png",
+        "https://placehold.jp/450x450.png",
+        "https://placehold.jp/460x460.png",
+        "https://placehold.jp/470x470.png",
+        "https://placehold.jp/480x480.png"
+      ]
+    },
+    {
+      "id": 15,
+      "title": "Team Celebration",
+      "dueDate": "30/01/2025",
+      "submission": "No submission yet",
+      "submittedDate": "01/01/2025",
+      "status": "incomplete",
+      "timeLeft": "10 hours left",
+      "team": "The Celebrators",
+      "description": "Capture a photo during your team celebration and upload it to complete the task.",
+      "points": 95,
+      "image": [
+        "https://placehold.jp/490x490.png",
+        "https://placehold.jp/500x500.png",
+        "https://placehold.jp/510x510.png",
+        "https://placehold.jp/520x520.png",
+        "https://placehold.jp/530x530.png",
+        "https://placehold.jp/540x540.png"
+      ]
+    },
+    {
+      "id": 16,
+      "title": "Team Brainstorm",
+      "dueDate": "05/02/2025",
+      "submission": "No submission yet",
+      "submittedDate": "01/01/2025",
+      "status": "incomplete",
+      "timeLeft": "11 hours left",
+      "team": "The Strategists",
+      "description": "Take a photo during your team brainstorm session and upload it to complete the task.",
+      "points": 105,
+      "image": [
+        "https://placehold.jp/550x550.png",
+        "https://placehold.jp/560x560.png",
+        "https://placehold.jp/570x570.png",
+        "https://placehold.jp/580x580.png",
+        "https://placehold.jp/590x590.png",
+        "https://placehold.jp/600x600.png"
+      ]
+    },
+    {
+      "id": 17,
+      "title": "Team Picnic",
+      "dueDate": "10/02/2025",
+      "submission": "No submission yet",
+      "submittedDate": "01/01/2025",
+      "status": "incomplete",
+      "timeLeft": "12 hours left",
+      "team": "The Adventurers",
+      "description": "Capture a photo during your team picnic and upload it to complete the task.",
+      "points": 115,
+      "image": [
+        "https://placehold.jp/610x610.png",
+        "https://placehold.jp/620x620.png",
+        "https://placehold.jp/630x630.png",
+        "https://placehold.jp/640x640.png",
+        "https://placehold.jp/650x650.png",
+        "https://placehold.jp/660x660.png"
+      ]
+    },
+    {
+      "id": 18,
+      "title": "Team Sports Event",
+      "dueDate": "15/02/2025",
+      "submission": "No submission yet",
+      "submittedDate": "01/01/2025",
+      "status": "incomplete",
+      "timeLeft": "13 hours left",
+      "team": "The Athletes",
+      "description": "Capture a photo during your team sports event and upload it to complete the task.",
+      "points": 125,
+      "image": [
+        "https://placehold.jp/670x670.png",
+        "https://placehold.jp/680x680.png",
+        "https://placehold.jp/690x690.png",
+        "https://placehold.jp/700x700.png",
+        "https://placehold.jp/710x710.png",
+        "https://placehold.jp/720x720.png"
+      ]
+    },
+    {
+      "id": 19,
+      "title": "Team Charity Event",
+      "dueDate": "20/02/2025",
+      "submission": "No submission yet",
+      "submittedDate": "01/01/2025",
+      "status": "incomplete",
+      "timeLeft": "14 hours left",
+      "team": "The Helpers",
+      "description": "Capture a photo during your team charity event and upload it to complete the task.",
+      "points": 135,
+      "image": [
+        "https://placehold.jp/730x730.png",
+        "https://placehold.jp/740x740.png",
+        "https://placehold.jp/750x750.png",
+        "https://placehold.jp/760x760.png",
+        "https://placehold.jp/770x770.png",
+        "https://placehold.jp/780x780.png"
+      ]
+    },
+    {
+      "id": 20,
+      "title": "Team Movie Night",
+      "dueDate": "25/02/2025",
+      "submission": "No submission yet",
+      "submittedDate": "01/01/2025",
+      "status": "incomplete",
+      "timeLeft": "15 hours left",
+      "team": "The Movie Buffs",
+      "description": "Capture a photo during your team movie night and upload it to complete the task.",
+      "points": 145,
+      "image": [
+        "https://placehold.jp/790x790.png",
+        "https://placehold.jp/800x800.png",
+        "https://placehold.jp/810x810.png",
+        "https://placehold.jp/820x820.png",
+        "https://placehold.jp/830x830.png",
+        "https://placehold.jp/840x840.png"
+      ]
+    },
+    {
+      "id": 21,
+      "title": "Team Game Night",
+      "dueDate": "01/03/2025",
+      "submission": "No submission yet",
+      "submittedDate": "01/01/2025",
+      "status": "incomplete",
+      "timeLeft": "16 hours left",
+      "team": "The Gamers",
+      "description": "Capture a photo during your team game night and upload it to complete the task.",
+      "points": 155,
+      "image": [
+        "https://placehold.jp/850x850.png",
+        "https://placehold.jp/860x860.png",
+        "https://placehold.jp/870x870.png",
+        "https://placehold.jp/880x880.png",
+        "https://placehold.jp/890x890.png",
+        "https://placehold.jp/900x900.png"
+      ]
+    },
+    {
+      "id": 22,
+      "title": "Team Hike",
+      "dueDate": "05/03/2025",
+      "submission": "No submission yet",
+      "submittedDate": "01/01/2025",
+      "status": "incomplete",
+      "timeLeft": "17 hours left",
+      "team": "The Hikers",
+      "description": "Capture a photo during your team hike and upload it to complete the task.",
+      "points": 165,
+      "image": [
+        "https://placehold.jp/910x910.png",
+        "https://placehold.jp/920x920.png",
+        "https://placehold.jp/930x930.png",
+        "https://placehold.jp/940x940.png",
+        "https://placehold.jp/950x950.png",
+        "https://placehold.jp/960x960.png"
+      ]
+    },
+    {
+      "id": 23,
+      "title": "Team Cooking Class",
+      "dueDate": "10/03/2025",
+      "submission": "No submission yet",
+      "submittedDate": "01/01/2025",
+      "status": "incomplete",
+      "timeLeft": "18 hours left",
+      "team": "The Chefs",
+      "description": "Capture a photo during your team cooking class and upload it to complete the task.",
+      "points": 175,
+      "image": [
+        "https://placehold.jp/970x970.png",
+        "https://placehold.jp/980x980.png",
+        "https://placehold.jp/990x990.png",
+        "https://placehold.jp/1000x1000.png",
+        "https://placehold.jp/1010x1010.png",
+        "https://placehold.jp/1020x1020.png"
+      ]
+    },
+    {
+      "id": 24,
+      "title": "Team Book Club",
+      "dueDate": "15/03/2025",
+      "submission": "No submission yet",
+      "submittedDate": "01/01/2025",
+      "status": "incomplete",
+      "timeLeft": "19 hours left",
+      "team": "The Readers",
+      "description": "Capture a photo during your team book club meeting and upload it to complete the task.",
+      "points": 185,
+      "image": [
+        "https://placehold.jp/1030x1030.png",
+        "https://placehold.jp/1040x1040.png",
+        "https://placehold.jp/1050x1050.png",
+        "https://placehold.jp/1060x1060.png",
+        "https://placehold.jp/1070x1070.png",
+        "https://placehold.jp/1080x1080.png"
+      ]
+    },
+    {
+      "id": 25,
+      "title": "Team Yoga Session",
+      "dueDate": "20/03/2025",
+      "submission": "No submission yet",
+      "submittedDate": "01/01/2025",
+      "status": "incomplete",
+      "timeLeft": "20 hours left",
+      "team": "The Yogis",
+      "description": "Capture a photo during your team yoga session and upload it to complete the task.",
+      "points": 195,
+      "image": [
+        "https://placehold.jp/1090x1090.png",
+        "https://placehold.jp/1100x1100.png",
+        "https://placehold.jp/1110x1110.png",
+        "https://placehold.jp/1120x1120.png",
+        "https://placehold.jp/1130x1130.png",
+        "https://placehold.jp/1140x1140.png"
+      ]
+    },
+    {
+      "id": 26,
+      "title": "Team Volunteer Work",
+      "dueDate": "25/03/2025",
+      "submission": "No submission yet",
+      "submittedDate": "01/01/2025",
+      "status": "incomplete",
+      "timeLeft": "21 hours left",
+      "team": "The Volunteers",
+      "description": "Capture a photo during your team volunteer work and upload it to complete the task.",
+      "points": 205,
+      "image": [
+        "https://placehold.jp/1150x1150.png",
+        "https://placehold.jp/1160x1160.png",
+        "https://placehold.jp/1170x1170.png",
+        "https://placehold.jp/1180x1180.png",
+        "https://placehold.jp/1190x1190.png",
+        "https://placehold.jp/1200x1200.png"
+      ]
+    },
+    {
+      "id": 27,
+      "title": "Team Dance Party",
+      "dueDate": "30/03/2025",
+      "submission": "No submission yet",
+      "submittedDate": "01/01/2025",
+      "status": "incomplete",
+      "timeLeft": "22 hours left",
+      "team": "The Dancers",
+      "description": "Capture a photo during your team dance party and upload it to complete the task.",
+      "points": 215,
+      "image": [
+        "https://placehold.jp/1210x1210.png",
+        "https://placehold.jp/1220x1220.png",
+        "https://placehold.jp/1230x1230.png",
+        "https://placehold.jp/1240x1240.png",
+        "https://placehold.jp/1250x1250.png",
+        "https://placehold.jp/1260x1260.png"
+      ]
+    },
+    {
+      "id": 28,
+      "title": "Team Karaoke Night",
+      "dueDate": "05/04/2025",
+      "submission": "No submission yet",
+      "submittedDate": "01/01/2025",
+      "status": "incomplete",
+      "timeLeft": "23 hours left",
+      "team": "The Singers",
+      "description": "Capture a photo during your team karaoke night and upload it to complete the task.",
+      "points": 225,
+      "image": [
+        "https://placehold.jp/1270x1270.png",
+        "https://placehold.jp/1280x1280.png",
+        "https://placehold.jp/1290x1290.png",
+        "https://placehold.jp/1300x1300.png",
+        "https://placehold.jp/1310x1310.png",
+        "https://placehold.jp/1320x1320.png"
+      ]
+    },
+    {
+      "id": 29,
+      "title": "Team Art Class",
+      "dueDate": "10/04/2025",
+      "submission": "No submission yet",
+      "submittedDate": "01/01/2025",
+      "status": "incomplete",
+      "timeLeft": "24 hours left",
+      "team": "The Artists",
+      "description": "Capture a photo during your team art class and upload it to complete the task.",
+      "points": 235,
+      "image": [
+        "https://placehold.jp/1330x1330.png",
+        "https://placehold.jp/1340x1340.png",
+        "https://placehold.jp/1350x1350.png",
+        "https://placehold.jp/1360x1360.png",
+        "https://placehold.jp/1370x1370.png",
+        "https://placehold.jp/1380x1380.png"
+      ]
+    },
+    {
+      "id": 30,
+      "title": "Team Gardening",
+      "dueDate": "15/04/2025",
+      "submission": "No submission yet",
+      "submittedDate": "01/01/2025",
+      "status": "incomplete",
+      "timeLeft": "25 hours left",
+      "team": "The Gardeners",
+      "description": "Capture a photo during your team gardening session and upload it to complete the task.",
+      "points": 245,
+      "image": [
+        "https://placehold.jp/1390x1390.png",
+        "https://placehold.jp/1400x1400.png",
+        "https://placehold.jp/1410x1410.png",
+        "https://placehold.jp/1420x1420.png",
+        "https://placehold.jp/1430x1430.png",
+        "https://placehold.jp/1440x1440.png"
+      ]
+    }
+  ]
+}

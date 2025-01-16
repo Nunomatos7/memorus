@@ -1,202 +1,293 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import { ReactInfiniteCanvas } from "react-infinite-canvas";
-import MemorPicture from "../../Components/MemorPicture/MemorPicture";
-import imgTest from "../../assets/images/goat.png";
+import seedrandom from "seedrandom";
 import { COMPONENT_POSITIONS } from "../../assets/Helpers/constants";
+import { memorsData } from "../../Data/Memors.json";
+import MemorPicture from "../../Components/MemorPicture/MemorPicture";
+import "./MemoryBoard.css";
+import Loader from "../../Components/Loader/Loader";
 
-const MIN_SPACING = 250;
+const canvasWidth = 2000;
+const canvasHeight = 2000;
+const cardWidth = 350;
+const cardHeight = 400;
+const spacing = 200;
 
-// Function to check if a new position overlaps with existing positions
-const doesOverlap = (position, existingPositions) => {
-  return existingPositions.some((existing) => {
-    return (
-      Math.abs(existing.x - position.x) < MIN_SPACING &&
-      Math.abs(existing.y - position.y) < MIN_SPACING
-    );
-  });
-};
+const rng = seedrandom("fixed-seed");
 
-// Function to generate a single new non-overlapping position
-const generateNonOverlappingPosition = (existingPositions, width, height) => {
+const generateNonOverlappingPosition = (positions) => {
   let position;
-  let attempts = 0;
+  let overlaps;
 
   do {
     position = {
-      x: Math.floor(Math.random() * (width - 200)), // Subtract card width to keep within bounds
-      y: Math.floor(Math.random() * (height - 200)), // Subtract card height to keep within bounds
+      x: rng() * canvasWidth - canvasWidth / 2,
+      y: rng() * canvasHeight - canvasHeight / 2,
     };
 
-    if (attempts++ > 100) {
-      // Avoid infinite loops
-      throw new Error("Too many attempts to find a non-overlapping position");
-    }
-  } while (doesOverlap(position, existingPositions));
+    overlaps = positions.some(
+      (pos) =>
+        Math.abs(pos.x - position.x) < cardWidth + spacing &&
+        Math.abs(pos.y - position.y) < cardHeight + spacing
+    );
+  } while (overlaps);
 
-  console.log("Generated position: ", position); // Debug log
   return position;
 };
 
-const posts = [
-  {
-    date: "16/12/2024",
-    imgSrc:
-      "https://cdn.shopify.com/s/files/1/0469/3927/5428/files/Bildschirmfoto_2024-04-22_um_10.45.24.png?v=1713775565",
-    title: "Share Di Maria",
-    teamName: "Visual Voyagers",
-  },
-  {
-    date: "01/12/2024",
-    imgSrc: "src/assets/images/lunch.jpg",
-    title: "Share Di Maria",
-    teamName: "Visual Voyagers",
-  },
-  {
-    date: "16/12/2024",
-    imgSrc: "src/assets/images/colages.jpg",
-    title: "Share Di Maria",
-    teamName: "Visual Voyagers",
-  },
-  {
-    date: "16/12/2024",
-    imgSrc: "src/assets/images/hats.jpg",
-    title: "Share Di Maria",
-    teamName: "Visual Voyagers",
-  },
-  {
-    date: "01/12/2024",
-    imgSrc: imgTest,
-    title: "Share Di Maria",
-    teamName: "Visual Voyagers",
-  },
-  {
-    date: "16/12/2024",
-    imgSrc: imgTest,
-    title: "Share Di Maria",
-    teamName: "Visual Voyagers",
-  },
-  {
-    date: "16/12/2024",
-    imgSrc: imgTest,
-    title: "Share Di Maria",
-    teamName: "Visual Voyagers",
-  },
-];
-
 const MemoryBoard = () => {
   const canvasRef = useRef();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentPost, setCurrentPost] = useState({});
-  const [positions, setPositions] = useState([]);
+  const [posts, setPosts] = useState([]);
+  const [selectedMemor, setSelectedMemor] = useState(null);
+  const [zoomLevel, setZoomLevel] = useState(1);
+  const [loadedImages, setLoadedImages] = useState(new Set());
+  const [filteredTeam, setFilteredTeam] = useState("The Debuggers");
+
+  const teams = ["All", ...new Set(memorsData.map((memor) => memor.team))];
 
   useEffect(() => {
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-    const newPositions = posts.reduce((acc, _) => {
-      const newPos = generateNonOverlappingPosition(acc, width, height);
-      return [...acc, newPos];
-    }, []);
-    setPositions(newPositions);
-    console.log("Initial positions set: ", newPositions); // Debug log
-  }, []); // Empty dependency array ensures this runs only once
+    const positions = [];
+    const memorsWithImages = memorsData.filter(
+      (memor) =>
+        memor.image &&
+        memor.image.length > 0 &&
+        (filteredTeam === "All" || memor.team === filteredTeam)
+    );
 
-  const handleCardClick = (post, index) => {
-    setCurrentPost(post);
-    setIsModalOpen(true);
+    const newPosts = memorsWithImages.map((post) => {
+      const position = generateNonOverlappingPosition(positions);
+      positions.push(position);
+      return { ...post, ...position };
+    });
+
+    setPosts(newPosts);
+  }, [filteredTeam]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setLoadedImages(
+              (prev) => new Set([...prev, entry.target.dataset.src])
+            );
+          }
+        });
+      },
+      { root: null, rootMargin: "150px" }
+    );
+
+    const imageElements = document.querySelectorAll("[data-src]");
+    imageElements.forEach((img) => observer.observe(img));
+
+    return () => observer.disconnect();
+  }, [posts]);
+
+  useEffect(() => {
+    const handleWheel = (e) => {
+      if (e.ctrlKey) {
+        e.preventDefault();
+        const canvasState = canvasRef.current?.getCanvasState?.();
+        if (canvasState) {
+          const { currentPosition } = canvasState;
+          const { k: currentScale } = currentPosition || {};
+          const newScale = currentScale + (e.deltaY > 0 ? -0.1 : 0.1);
+          if (newScale >= 0.1 && newScale <= 3) {
+            canvasState.d3Zoom.scaleTo(
+              canvasState.canvasNode.transition().duration(0),
+              newScale
+            );
+            setZoomLevel(newScale);
+          }
+        }
+      }
+    };
+
+    const syncZoomLevel = () => {
+      const canvasState = canvasRef.current?.getCanvasState?.();
+      if (canvasState) {
+        const { currentPosition } = canvasState;
+        const { k: currentScale } = currentPosition || {};
+        setZoomLevel(currentScale);
+      }
+    };
+
+    window.addEventListener("wheel", handleWheel, { passive: false });
+    const interval = setInterval(syncZoomLevel, 200); // Sync every 200ms
+
+    return () => {
+      window.removeEventListener("wheel", handleWheel);
+      clearInterval(interval);
+    };
+  }, []);
+
+  const openModal = (image, title, submittedDate, team) => {
+    setSelectedMemor({ image, title, submittedDate, team });
   };
 
-  const renderPosts = () => {
-    return positions.map((position, index) => {
-      const post = posts[index];
-      return (
-        <div
-          key={index}
-          style={{
-            position: "absolute",
-            top: position.y,
-            left: position.x,
-            height: "200px", // Set a consistent height
-            width: "200px", // Set a consistent width
-            border: "5px solid white",
-            backgroundColor: "white",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "start",
-            cursor: "pointer",
-            overflow: "hidden", // Ensures nothing extends outside the card
-          }}
-          onClick={() => handleCardClick(post, index)}
-        >
-          <p
-            style={{
-              color: "black",
-              textAlign: "left",
-              fontFamily: "cursive",
-              fontSize: "10px",
-              margin: "5px",
-            }}
-          >
-            {post.date}
-          </p>
-          <img
-            src={post.imgSrc}
-            alt="Post Image"
-            style={{
-              height: "70%",
-              width: "100%",
-              objectFit: "cover",
-              overflow: "hidden",
-            }}
-          />
-          <p
-            style={{
-              color: "black",
-              textAlign: "center",
-              fontFamily: "cursive",
-              marginTop: "10px",
-              margin: "5px",
-            }}
-          >
-            {post.title}
-          </p>
-        </div>
-      );
-    });
+  const closeModal = () => {
+    setSelectedMemor(null);
+  };
+
+  const handleZoom = (action = "out") => {
+    const canvasState = canvasRef.current?.getCanvasState?.();
+    if (!canvasState) return;
+
+    const { canvasNode, currentPosition, d3Zoom } = canvasState;
+    const { k: currentScale } = currentPosition || {};
+    const diff = action === "out" ? -0.25 : 0.25;
+
+    const newScale = currentScale + diff;
+    if (newScale >= 0.1 && newScale <= 3) {
+      d3Zoom.scaleTo(canvasNode.transition().duration(500), newScale);
+      setZoomLevel(newScale);
+    }
   };
 
   return (
-    <div style={{ width: "100%", height: "90vh", position: "relative" }}>
-      {isModalOpen && (
-        <MemorPicture
-          image={currentPost.imgSrc}
-          teamName={currentPost.teamName}
-          title={currentPost.title}
-          submitDate={currentPost.date}
-          onClose={() => setIsModalOpen(false)}
-        />
-      )}
-      <ReactInfiniteCanvas
-        ref={canvasRef}
-        onCanvasMount={(mountFunc) => mountFunc.fitContentToView({ scale: 1 })}
-        customComponents={[
-          {
-            component: (
-              <button
-                onClick={() =>
-                  canvasRef.current?.fitContentToView({ scale: 1 })
-                }
-              >
-                Start
-              </button>
-            ),
-            position: COMPONENT_POSITIONS.TOP_LEFT,
-            offset: { x: 120, y: 10 },
-          },
-        ]}
+    <>
+      <Loader />
+      <div
+        style={{
+          width: "100%",
+          height: "93vh",
+          position: "relative",
+          backgroundColor: "#9990d8",
+        }}
       >
-        {renderPosts()}
-      </ReactInfiniteCanvas>
-    </div>
+        <div className='filter-controls'>
+          <select
+            value={filteredTeam}
+            onChange={(e) => setFilteredTeam(e.target.value)}
+            className='filter-dropdown'
+          >
+            {teams.map((team, index) => (
+              <option key={index} value={team}>
+                {team}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <ReactInfiniteCanvas
+          ref={canvasRef}
+          onCanvasMount={(mountFunc) => {
+            mountFunc.fitContentToView({ scale: 0.5 });
+          }}
+          customComponents={[
+            {
+              component: (
+                <button
+                  className='start-btn'
+                  onClick={() => {
+                    canvasRef.current?.fitContentToView({ scale: 1 });
+                  }}
+                >
+                  Start
+                </button>
+              ),
+              position: COMPONENT_POSITIONS.BOTTOM_LEFT,
+              offset: { x: 20, y: 70 },
+            },
+          ]}
+        >
+          {posts.map((post, index) => (
+            <div
+              key={index}
+              className='polaroid-container'
+              style={{
+                position: "absolute",
+                top: post.y + canvasHeight / 2,
+                left: post.x + canvasWidth / 2,
+                width: `${cardWidth}px`,
+                height: `${cardHeight}px`,
+              }}
+            >
+              <div
+                style={{ position: "relative", width: "100%", height: "100%" }}
+              >
+                {post.image
+                  .slice()
+                  .reverse()
+                  .map((imgSrc, cardIndex, reversedArray) => (
+                    <div
+                      key={cardIndex}
+                      className='polaroid-card'
+                      onClick={() =>
+                        openModal(
+                          imgSrc,
+                          post.title,
+                          post.submittedDate,
+                          post.team
+                        )
+                      }
+                      style={{
+                        position: "absolute",
+                        top: `${cardIndex * 5}px`,
+                        left: `${cardIndex * 25}px`,
+                        width: "100%",
+                        height: "100%",
+                        backgroundColor: "white",
+                        border: "2px solid white",
+                        boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)",
+                        borderRadius: "8px",
+                        transform: `rotate(${cardIndex % 2 === 0 ? -1 : 1}deg)`,
+                        zIndex: cardIndex,
+                        cursor: "pointer",
+                      }}
+                    >
+                      {/* Submitted Date */}
+                      {cardIndex === reversedArray.length - 1 && (
+                        <p className='card-date'>{post.submittedDate}</p>
+                      )}
+
+                      {/* Image */}
+                      <img
+                        data-src={imgSrc}
+                        src={loadedImages.has(imgSrc) ? imgSrc : ""}
+                        alt={`Post image ${cardIndex}`}
+                        style={{
+                          width: "90%",
+                          height: "60%",
+                          objectFit: "cover",
+                          borderRadius: "8px",
+                          margin: "10px auto",
+                          display: "block",
+                        }}
+                      />
+
+                      {/* Title - Only for the first image */}
+                      {cardIndex === reversedArray.length - 1 && (
+                        <p className='card-title'>{post.title}</p>
+                      )}
+                    </div>
+                  ))}
+              </div>
+            </div>
+          ))}
+        </ReactInfiniteCanvas>
+
+        {selectedMemor && (
+          <MemorPicture
+            image={selectedMemor.image}
+            title={selectedMemor.title}
+            submitDate={selectedMemor.submittedDate}
+            teamName={selectedMemor.team}
+            onClose={closeModal}
+          />
+        )}
+
+        <div className='zoom-controls'>
+          <button className='zoom-btn' onClick={() => handleZoom("out")}>
+            -
+          </button>
+          <span className='zoom-display'>{Math.round(zoomLevel * 100)}%</span>
+          <button className='zoom-btn' onClick={() => handleZoom("in")}>
+            +
+          </button>
+        </div>
+      </div>
+    </>
   );
 };
 
