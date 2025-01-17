@@ -233,10 +233,10 @@ const Navbar = () => {
               <MenuItem>
                 <Box sx={{ cursor: "default" }}>
                   <Typography variant='body1' sx={{ fontWeight: 600 }}>
-                    Jane Doe
+                    Rui Silva
                   </Typography>
                   <Typography variant='body2' color='gray'>
-                    jane.doe@example.com
+                    rui.silva@fanduel.com
                   </Typography>
                   <Typography variant='body2' sx={{ color: "#00C896" }}>
                     The Debuggers

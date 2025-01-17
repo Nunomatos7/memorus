@@ -18,14 +18,14 @@
     },
     {
       "id": 12,
-      "title": "Virtual Coffee Break",
+      "title": "Coffee Break",
       "dueDate": "25/01/2025",
       "submission": "No submission yet",
       "submittedDate": "25/01/2025",
       "status": "incomplete",
       "timeLeft": "1 hour left",
       "team": "Visual Voyagers",
-      "description": "Join the virtual coffee break, where you can share a cup and a story online. Make sure to have your favorite mug!",
+      "description": "Join the coffee break, where you can share a cup and a story online. Make sure to have your favorite mug!",
       "points": 30,
       "image": [
         "https://cdn.pixabay.com/photo/2016/03/26/13/09/cup-of-coffee-1280537_1280.jpg",
@@ -34,14 +34,14 @@
     },
     {
       "id": 13,
-      "title": "Virtual Coffee Break",
+      "title": "Coffee Break",
       "dueDate": "10/12/2024",
       "submission": "No submission yet",
       "submittedDate": "25/01/2025",
       "status": "incomplete",
       "timeLeft": "1 hour left",
       "team": "Capital Crew",
-      "description": "Join the virtual coffee break, where you can share a cup and a story online. Make sure to have your favorite mug!",
+      "description": "Join the coffee break, where you can share a cup and a story online. Make sure to have your favorite mug!",
       "points": 30,
       "image": [
         "https://cdn.pixabay.com/photo/2016/03/26/13/09/cup-of-coffee-1280537_1280.jpg",
@@ -50,14 +50,14 @@
     },
     {
       "id": 14,
-      "title": "Virtual Coffee Break",
+      "title": "Coffee Break",
       "dueDate": "10/12/2024",
       "submission": "No submission yet",
       "submittedDate": "25/01/2025",
       "status": "incomplete",
       "timeLeft": "1 hour left",
       "team": "The Hackers",
-      "description": "Join the virtual coffee break, where you can share a cup and a story online. Make sure to have your favorite mug!",
+      "description": "Join the coffee break, where you can share a cup and a story online. Make sure to have your favorite mug!",
       "points": 30,
       "image": [
         "https://cdn.pixabay.com/photo/2016/03/26/13/09/cup-of-coffee-1280537_1280.jpg",
@@ -66,14 +66,14 @@
     },
     {
       "id": 15,
-      "title": "Virtual Coffee Break",
+      "title": "Coffee Break",
       "dueDate": "10/12/2024",
       "submission": "No submission yet",
       "submittedDate": "25/01/2025",
       "status": "incomplete",
       "timeLeft": "1 hour left",
       "team": "The Coders",
-      "description": "Join the virtual coffee break, where you can share a cup and a story online. Make sure to have your favorite mug!",
+      "description": "Join the coffee break, where you can share a cup and a story online. Make sure to have your favorite mug!",
       "points": 30,
       "image": [
         "https://cdn.pixabay.com/photo/2016/03/26/13/09/cup-of-coffee-1280537_1280.jpg",
@@ -82,14 +82,14 @@
     },
     {
       "id": 16,
-      "title": "Virtual Coffee Break",
+      "title": "Coffee Break",
       "dueDate": "10/12/2024",
       "submission": "No submission yet",
       "submittedDate": "25/01/2025",
       "status": "incomplete",
       "timeLeft": "1 hour left",
       "team": "The Programmers",
-      "description": "Join the virtual coffee break, where you can share a cup and a story online. Make sure to have your favorite mug!",
+      "description": "Join the coffee break, where you can share a cup and a story online. Make sure to have your favorite mug!",
       "points": 30,
       "image": [
         "https://cdn.pixabay.com/photo/2016/03/26/13/09/cup-of-coffee-1280537_1280.jpg",
@@ -98,14 +98,14 @@
     },
     {
       "id": 17,
-      "title": "Virtual Coffee Break",
+      "title": "Coffee Break",
       "dueDate": "10/12/2024",
       "submission": "No submission yet",
       "submittedDate": "25/01/2025",
       "status": "incomplete",
       "timeLeft": "1 hour left",
       "team": "The Developers",
-      "description": "Join the virtual coffee break, where you can share a cup and a story online. Make sure to have your favorite mug!",
+      "description": "Join the coffee break, where you can share a cup and a story online. Make sure to have your favorite mug!",
       "points": 30,
       "image": [
         "https://cdn.pixabay.com/photo/2016/03/26/13/09/cup-of-coffee-1280537_1280.jpg",
@@ -114,14 +114,14 @@
     },
     {
       "id": 18,
-      "title": "Virtual Coffee Break",
+      "title": "Coffee Break",
       "dueDate": "25/01/2025",
       "submission": "No submission yet",
       "submittedDate": "25/01/2025",
       "status": "incomplete",
       "timeLeft": "1 hour left",
       "team": "The Designers",
-      "description": "Join the virtual coffee break, where you can share a cup and a story online. Make sure to have your favorite mug!",
+      "description": "Join the coffee break, where you can share a cup and a story online. Make sure to have your favorite mug!",
       "points": 30,
       "image": [
         "https://cdn.pixabay.com/photo/2016/03/26/13/09/cup-of-coffee-1280537_1280.jpg",
@@ -514,7 +514,7 @@
     },
     {
       "id": 51,
-      "title": "Office Decoration Challenge",
+      "title": "Office Decoration",
       "dueDate": "12/01/2025",
       "submission": "Submitted by a team member",
       "submittedDate": "01/01/2025",
@@ -530,7 +530,7 @@
     },
     {
       "id": 52,
-      "title": "Office Decoration Challenge",
+      "title": "Office Decoration",
       "dueDate": "12/01/2025",
       "submission": "Submitted by a team member",
       "submittedDate": "01/01/2025",
@@ -546,7 +546,7 @@
     },
     {
       "id": 53,
-      "title": "Office Decoration Challenge",
+      "title": "Office Decoration",
       "dueDate": "12/01/2025",
       "submission": "Submitted by a team member",
       "submittedDate": "01/01/2025",
@@ -562,7 +562,7 @@
     },
     {
       "id": 54,
-      "title": "Office Decoration Challenge",
+      "title": "Office Decoration",
       "dueDate": "12/01/2025",
       "submission": "Submitted by a team member",
       "submittedDate": "01/01/2025",
@@ -578,7 +578,7 @@
     },
     {
       "id": 55,
-      "title": "Office Decoration Challenge",
+      "title": "Office Decoration",
       "dueDate": "12/01/2025",
       "submission": "Submitted by a team member",
       "submittedDate": "01/01/2025",
@@ -594,7 +594,7 @@
     },
     {
       "id": 56,
-      "title": "Office Decoration Challenge",
+      "title": "Office Decoration",
       "dueDate": "12/01/2025",
       "submission": "Submitted by a team member",
       "submittedDate": "01/01/2025",
@@ -610,7 +610,7 @@
     },
     {
       "id": 57,
-      "title": "Office Decoration Challenge",
+      "title": "Office Decoration",
       "dueDate": "12/01/2025",
       "submission": "Submitted by a team member",
       "submittedDate": "01/01/2025",
@@ -626,7 +626,7 @@
     },
     {
       "id": 58,
-      "title": "Office Decoration Challenge",
+      "title": "Office Decoration",
       "dueDate": "12/01/2025",
       "submission": "Submitted by a team member",
       "submittedDate": "01/01/2025",
@@ -647,12 +647,13 @@
       "submission": "No submission yet",
       "status": "incomplete",
       "team": "The Debuggers",
+      "submittedDate": "01/01/2025",
       "timeLeft": "1 hour left",
       "description": "Capture a moment from your weekly team meeting. It's about learning and growing together.",
       "points": 10,
       "image": [
         "https://cdn.pixabay.com/photo/2017/07/31/11/21/people-2557396_1280.jpg",
-        "https://pixabay.com/pt/photos/pessoas-garotas-mulheres-alunos-2557399/"
+        "https://cdn.pixabay.com/photo/2015/01/09/11/08/startup-594090_1280.jpg"
       ]
     },
     {
@@ -662,12 +663,13 @@
       "submission": "No submission yet",
       "status": "incomplete",
       "team": "Visual Voyagers",
+      "submittedDate": "01/01/2025",
       "timeLeft": "1 hour left",
       "description": "Capture a moment from your weekly team meeting. It's about learning and growing together.",
       "points": 10,
       "image": [
         "https://cdn.pixabay.com/photo/2017/07/31/11/21/people-2557396_1280.jpg",
-        "https://pixabay.com/pt/photos/pessoas-garotas-mulheres-alunos-2557399/"
+        "https://cdn.pixabay.com/photo/2015/01/09/11/08/startup-594090_1280.jpg"
       ]
     },
     {
@@ -677,12 +679,13 @@
       "submission": "No submission yet",
       "status": "incomplete",
       "team": "Capital Crew",
+      "submittedDate": "01/01/2025",
       "timeLeft": "1 hour left",
       "description": "Capture a moment from your weekly team meeting. It's about learning and growing together.",
       "points": 10,
       "image": [
         "https://cdn.pixabay.com/photo/2017/07/31/11/21/people-2557396_1280.jpg",
-        "https://pixabay.com/pt/photos/pessoas-garotas-mulheres-alunos-2557399/"
+        "https://cdn.pixabay.com/photo/2015/01/09/11/08/startup-594090_1280.jpg"
       ]
     },
     {
@@ -692,12 +695,13 @@
       "submission": "No submission yet",
       "status": "incomplete",
       "team": "The Hackers",
+      "submittedDate": "01/01/2025",
       "timeLeft": "1 hour left",
       "description": "Capture a moment from your weekly team meeting. It's about learning and growing together.",
       "points": 10,
       "image": [
         "https://cdn.pixabay.com/photo/2017/07/31/11/21/people-2557396_1280.jpg",
-        "https://pixabay.com/pt/photos/pessoas-garotas-mulheres-alunos-2557399/"
+        "https://cdn.pixabay.com/photo/2015/01/09/11/08/startup-594090_1280.jpg"
       ]
     },
     {
@@ -707,12 +711,13 @@
       "submission": "No submission yet",
       "status": "incomplete",
       "team": "The Coders",
+      "submittedDate": "01/01/2025",
       "timeLeft": "1 hour left",
       "description": "Capture a moment from your weekly team meeting. It's about learning and growing together.",
       "points": 10,
       "image": [
         "https://cdn.pixabay.com/photo/2017/07/31/11/21/people-2557396_1280.jpg",
-        "https://pixabay.com/pt/photos/pessoas-garotas-mulheres-alunos-2557399/"
+        "https://cdn.pixabay.com/photo/2015/01/09/11/08/startup-594090_1280.jpg"
       ]
     },
     {
@@ -722,12 +727,13 @@
       "submission": "No submission yet",
       "status": "incomplete",
       "team": "The Programmers",
+      "submittedDate": "01/01/2025",
       "timeLeft": "1 hour left",
       "description": "Capture a moment from your weekly team meeting. It's about learning and growing together.",
       "points": 10,
       "image": [
         "https://cdn.pixabay.com/photo/2017/07/31/11/21/people-2557396_1280.jpg",
-        "https://pixabay.com/pt/photos/pessoas-garotas-mulheres-alunos-2557399/"
+        "https://cdn.pixabay.com/photo/2015/01/09/11/08/startup-594090_1280.jpg"
       ]
     },
     {
@@ -737,12 +743,13 @@
       "submission": "No submission yet",
       "status": "incomplete",
       "team": "The Developers",
+      "submittedDate": "01/01/2025",
       "timeLeft": "1 hour left",
       "description": "Capture a moment from your weekly team meeting. It's about learning and growing together.",
       "points": 10,
       "image": [
         "https://cdn.pixabay.com/photo/2017/07/31/11/21/people-2557396_1280.jpg",
-        "https://pixabay.com/pt/photos/pessoas-garotas-mulheres-alunos-2557399/"
+        "https://cdn.pixabay.com/photo/2015/01/09/11/08/startup-594090_1280.jpg"
       ]
     },
     {
@@ -752,12 +759,13 @@
       "submission": "No submission yet",
       "status": "incomplete",
       "team": "The Designers",
+      "submittedDate": "01/01/2025",
       "timeLeft": "1 hour left",
       "description": "Capture a moment from your weekly team meeting. It's about learning and growing together.",
       "points": 10,
       "image": [
         "https://cdn.pixabay.com/photo/2017/07/31/11/21/people-2557396_1280.jpg",
-        "https://pixabay.com/pt/photos/pessoas-garotas-mulheres-alunos-2557399/"
+        "https://cdn.pixabay.com/photo/2015/01/09/11/08/startup-594090_1280.jpg"
       ]
     },
     {

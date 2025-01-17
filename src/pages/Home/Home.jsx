@@ -18,39 +18,13 @@ import Loader from "../../Components/Loader/Loader";
 import background1 from "../../assets/images/background1.svg";
 import background2 from "../../assets/images/background2.svg";
 import background3 from "../../assets/images/background3.svg";
+import { memorsData } from "../../Data/Memors.json";
 
 const rankImages = {
   1: rank1,
   2: rank2,
   3: rank3,
 };
-
-const slidesData = [
-  {
-    id: 1,
-    teamName: "The Debuggers",
-    title: "Coffee break",
-    description: "A nice coffee break with friends",
-    submitDate: "2 days ago",
-    image:
-      "https://cdn.pixabay.com/photo/2023/10/23/16/24/bird-8336436_1280.jpg",
-  },
-  {
-    id: 2,
-    teamName: "The Debuggers",
-    title: "Show us your city",
-    description: "We bet it must look nice :)",
-    submitDate: "8 days ago",
-    image:
-      "https://media.istockphoto.com/id/1368628035/photo/brooklyn-bridge-at-sunset.jpg?s=612x612&w=0&k=20&c=hPbMbTYRAVNYWAUMkl6r62fPIjGVJTXzRURCyCfoG08=",
-  },
-  { id: 3, image: "" },
-  { id: 4, image: "" },
-  { id: 5, image: "" },
-  { id: 6, image: "" },
-  { id: 7, image: "" },
-  { id: 8, image: "" },
-];
 
 const Home = () => {
   const [selectedSlide, setSelectedSlide] = useState(null);
@@ -75,38 +49,38 @@ const Home = () => {
           style={{ marginBottom: "1rem", marginTop: "2rem" }}
         >
           <img
-                    src={background1}
-                    alt='leaderboard-bg1'
-                    style={{
-                      position: "absolute",
-                      top: "2",
-                      right: "0",
-                      width: "15%",
-                      zIndex: "0",
-                    }}
-                  />
-                  <img
-                    src={background2}
-                    alt='leaderboard-bg2'
-                    style={{
-                      position: "absolute",
-                      top: "25%",
-                      left: "5%",
-                      width: "5%",
-                      zIndex: "0",
-                    }}
-                  />
-                  <img
-                    src={background3}
-                    alt='leaderboard-bg3'
-                    style={{
-                      position: "absolute",
-                      top: "35%",
-                      right: "6%",
-                      width: "5%",
-                      zIndex: "0",
-                    }}
-                  />
+            src={background1}
+            alt='leaderboard-bg1'
+            style={{
+              position: "absolute",
+              top: "2",
+              right: "0",
+              width: "15%",
+              zIndex: "0",
+            }}
+          />
+          <img
+            src={background2}
+            alt='leaderboard-bg2'
+            style={{
+              position: "absolute",
+              top: "25%",
+              left: "5%",
+              width: "5%",
+              zIndex: "0",
+            }}
+          />
+          <img
+            src={background3}
+            alt='leaderboard-bg3'
+            style={{
+              position: "absolute",
+              top: "35%",
+              right: "6%",
+              width: "5%",
+              zIndex: "0",
+            }}
+          />
           <h1
             className='home-title'
             style={{ display: "flex", alignItems: "center", gap: "1rem" }}
@@ -142,34 +116,36 @@ const Home = () => {
               modules={[Mousewheel, FreeMode]}
             >
               {/* Slides */}
-              {slidesData.map((slide) => (
-                <SwiperSlide
-                  key={slide.id}
-                  className={
-                    slide.image ? "latest-memors-pic" : "latest-memors"
-                  }
-                >
-                  {slide.image && (
-                    <div onClick={() => handleImageClick(slide)}>
-                      <div className='image-wrapper'>
-                        <img
-                          width={"100%"}
-                          height={"100%"}
-                          style={{ objectFit: "cover" }}
-                          src={slide.image}
-                          alt=''
-                        />
+              {memorsData
+                .filter((slide) => slide.team === "The Debuggers")
+                .map((slide) => (
+                  <SwiperSlide
+                    key={slide.id}
+                    className={
+                      slide.image ? "latest-memors-pic" : "latest-memors"
+                    }
+                  >
+                    {slide.image && (
+                      <div onClick={() => handleImageClick(slide)}>
+                        <div className='image-wrapper'>
+                          <img
+                            width={"100%"}
+                            height={"100%"}
+                            style={{ objectFit: "cover" }}
+                            src={slide.image[0]}
+                            alt=''
+                          />
+                        </div>
+                        <div className='latest-memors-content'>
+                          <h3>{slide.submittedDate}</h3>
+                          <p style={{ fontSize: "0.9rem" }}>
+                            &quot;{slide.title}&quot;
+                          </p>
+                        </div>
                       </div>
-                      <div className='latest-memors-content'>
-                        <h3>{slide.submitDate}</h3>
-                        <p style={{ fontSize: "0.9rem" }}>
-                          &quot;{slide.title}&quot;
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </SwiperSlide>
-              ))}
+                    )}
+                  </SwiperSlide>
+                ))}
             </Swiper>
           </div>
         </div>
@@ -177,10 +153,10 @@ const Home = () => {
         {/* Modal Component */}
         {selectedSlide && (
           <MemorPicture
-            image={selectedSlide.image}
-            teamName={selectedSlide.teamName}
+            image={selectedSlide.image[0]}
+            teamName={selectedSlide.team}
             title={selectedSlide.title}
-            submitDate={selectedSlide.submitDate}
+            submitDate={selectedSlide.submittedDate}
             onClose={closeModal}
           />
         )}
@@ -205,7 +181,7 @@ const Home = () => {
                   justifyContent='space-between'
                 >
                   <Typography variant='h4' fontWeight='bold'>
-                    3
+                    6
                   </Typography>
                   <img src={pending} alt='pending' />
                 </Box>
@@ -230,7 +206,7 @@ const Home = () => {
                   justifyContent='space-between'
                 >
                   <Typography variant='h4' fontWeight='bold'>
-                    --
+                    2
                   </Typography>
                   <img src={completed} alt='Completed memeors icon' />
                 </Box>
@@ -256,12 +232,12 @@ const Home = () => {
                     <Typography variant='h6' style={{ color: "white" }}>
                       The competition{" "}
                       <span style={{ color: "#5547bf", fontWeight: "bold" }}>
-                        Christmas
+                        New Year New Us
                       </span>{" "}
                       ends in
                     </Typography>
                   </Box>
-                  <Countdown endDate='2025-12-25T00:00:00' role="user" />
+                  <Countdown endDate='2025-01-31T00:00:00' role='user' />
                 </Box>
               </CardContent>
             </Card>

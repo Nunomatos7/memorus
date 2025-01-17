@@ -21,8 +21,8 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   const demoUsers = [
-    { email: "admin@example.com", password: "admin123", role: "Admin" },
-    { email: "user@example.com", password: "user123", role: "Regular" },
+    { email: "admin@blip.com", password: "admin123", role: "Admin" },
+    { email: "rui@blip.com", password: "user123", role: "Regular" },
   ];
 
   useEffect(() => {
