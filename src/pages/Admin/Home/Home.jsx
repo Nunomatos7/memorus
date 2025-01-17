@@ -31,8 +31,8 @@ export const mockUser = {
   id: 1,
   name: "John Doe",
   email: "john.doe@example.com",
-  pending_memors: 5,
-  complete_memors: 10,
+  pending_memors: 3,
+  complete_memors: 5,
   admin: false,
 };
 
@@ -225,7 +225,7 @@ const Home = () => {
 
       <section id='myMemors' className='container'>
         <Typography variant='h6' gutterBottom style={{ color: "white" }}>
-          My Memors
+          Memors Dashboard
         </Typography>
         <Grid container spacing={3}>
           {/* Pending Memors */}
@@ -249,7 +249,7 @@ const Home = () => {
                   <img src={ongoing} alt='ongoing' />
                 </Box>
                 <Typography variant='body2' color='#B0B0B0'>
-                  Pending Memors
+                  Ongoing Memors
                 </Typography>
               </CardContent>
             </Card>
@@ -314,7 +314,7 @@ const Home = () => {
         <Typography variant='h6' gutterBottom style={{ color: "white" }}>
           Current Leaders
         </Typography>
-        <Grid container spacing={3}>
+        <Grid container spacing={2}>
           {leaderboardData
             .filter((team) => team.rank <= 3)
             .map((team) => (

@@ -26,33 +26,6 @@ const rankImages = {
   3: rank3,
 };
 
-// const slidesData = [
-//   {
-//     id: 1,
-//     teamName: "The Debuggers",
-//     title: "Coffee break",
-//     description: "A nice coffee break with friends",
-//     submitDate: "2 days ago",
-//     image:
-//       "https://cdn.pixabay.com/photo/2023/10/23/16/24/bird-8336436_1280.jpg",
-//   },
-//   {
-//     id: 2,
-//     teamName: "The Debuggers",
-//     title: "Show us your city",
-//     description: "We bet it must look nice :)",
-//     submitDate: "8 days ago",
-//     image:
-//       "https://media.istockphoto.com/id/1368628035/photo/brooklyn-bridge-at-sunset.jpg?s=612x612&w=0&k=20&c=hPbMbTYRAVNYWAUMkl6r62fPIjGVJTXzRURCyCfoG08=",
-//   },
-//   { id: 3, image: "" },
-//   { id: 4, image: "" },
-//   { id: 5, image: "" },
-//   { id: 6, image: "" },
-//   { id: 7, image: "" },
-//   { id: 8, image: "" },
-// ];
-
 const Home = () => {
   const [selectedSlide, setSelectedSlide] = useState(null);
 
@@ -208,7 +181,7 @@ const Home = () => {
                   justifyContent='space-between'
                 >
                   <Typography variant='h4' fontWeight='bold'>
-                    0
+                    6
                   </Typography>
                   <img src={pending} alt='pending' />
                 </Box>
@@ -233,7 +206,7 @@ const Home = () => {
                   justifyContent='space-between'
                 >
                   <Typography variant='h4' fontWeight='bold'>
-                    8
+                    2
                   </Typography>
                   <img src={completed} alt='Completed memeors icon' />
                 </Box>
