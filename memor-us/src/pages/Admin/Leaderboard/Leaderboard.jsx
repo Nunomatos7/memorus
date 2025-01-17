@@ -13,7 +13,7 @@ export const leaderboardData = [
     points: 510,
     memors: 51,
     rank: 1,
-    avatar: "../../../src/assets/images/team1logo.png",
+    avatar: "./../../../src/assets/images/team1logo.png",
   },
   {
     teamName: "The Debuggers",
