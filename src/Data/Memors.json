@@ -11,10 +11,7 @@
       "team": "The Debuggers",
       "description": "Join the coffee break, where you can share a cup and a story online. Make sure to have your favorite mug!",
       "points": 30,
-      "image": [
-        "https://cdn.pixabay.com/photo/2016/03/26/13/09/cup-of-coffee-1280537_1280.jpg",
-        "https://cdn.pixabay.com/photo/2016/02/03/17/38/coffee-break-1177540_1280.jpg"
-      ]
+      "image": ""
     },
     {
       "id": 12,

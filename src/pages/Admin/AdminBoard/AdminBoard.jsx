@@ -92,7 +92,7 @@ const AdminBoard = () => {
       title: "Pet Showcase",
       description:
         "Take a photo with your pet during your workday to share with the team. Pets can be great stress relievers!",
-      date: "01/16/2025",
+      date: "01/17/2025",
       points: "+ 10 pts",
       teamsLeft: 2,
     },
