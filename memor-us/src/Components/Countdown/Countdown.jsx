@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { Typography, Box } from '@mui/material';
-import { styled, keyframes } from '@mui/system';
-import PropTypes from 'prop-types';
+import React, { useState, useEffect } from "react";
+import { Typography, Box } from "@mui/material";
+import { styled, keyframes } from "@mui/system";
+import PropTypes from "prop-types";
 
 const dropAnimation = keyframes`
   from {
@@ -25,29 +25,47 @@ const appearAnimation = keyframes`
   }
 `;
 
-const PaperSheet = styled(Box)(({ theme, animateDrop, animateAppear }) => ({
+const PaperSheetUser = styled(Box)(({ theme, animateDrop, animateAppear }) => ({
   width: 120,
   height: 100,
-  backgroundColor: '#5547bf',
-  borderRadius: '8px',
-  margin: '0 12px',
-  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)',
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-  position: 'relative',
-  overflow: 'hidden',
-  animation: `${animateDrop ? dropAnimation : animateAppear ? appearAnimation : ''} 0.5s ease-out forwards`
+  backgroundColor: "#5547bf",
+  borderRadius: "8px",
+  margin: "0 12px",
+  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.5)",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  position: "relative",
+  overflow: "hidden",
+  animation: `${animateDrop ? dropAnimation : animateAppear ? appearAnimation : ""} 0.5s ease-out forwards`,
 }));
 
+const PaperSheetAdmin = styled(Box)(
+  ({ theme, animateDrop, animateAppear }) => ({
+    width: 120,
+    height: 100,
+    backgroundColor: "#215952",
+    borderRadius: "8px",
+    margin: "0 12px",
+    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.5)",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    position: "relative",
+    overflow: "hidden",
+    animation: `${animateDrop ? dropAnimation : animateAppear ? appearAnimation : ""} 0.5s ease-out forwards`,
+  })
+);
+
 const StyledTypography = styled(Typography)({
-  fontWeight: 'bold',
-  fontSize: '1.75rem',
-  color: '#ffffff'
+  fontWeight: "bold",
+  fontSize: "1.75rem",
+  color: "#ffffff",
 });
 
-const Countdown = ({ endDate }) => {
+const Countdown = ({ endDate, role }) => {
   const [timeLeft, setTimeLeft] = useState(calculateTimeLeft(endDate));
   const [lastTimeLeft, setLastTimeLeft] = useState(timeLeft);
 
@@ -64,18 +82,41 @@ const Countdown = ({ endDate }) => {
   return (
     <Box display="flex" justifyContent="center" marginTop={2}>
       {Object.keys(timeLeft).map((interval) => (
-        <PaperSheet
-          key={interval}
-          animateDrop={interval !== 'seconds' && timeLeft[interval] !== lastTimeLeft[interval]}
-          animateAppear={interval === 'seconds' || timeLeft[interval] === lastTimeLeft[interval]}
-        >
-          <StyledTypography>
-            {timeLeft[interval]}
-          </StyledTypography>
-          <Typography variant="caption" style={{ marginTop: '5px' }}>
-            {interval.toUpperCase()}
-          </Typography>
-        </PaperSheet>
+        <React.Fragment key={interval}>
+          {role === "user" ? (
+            <PaperSheetUser
+              animateDrop={
+                interval !== "seconds" &&
+                timeLeft[interval] !== lastTimeLeft[interval]
+              }
+              animateAppear={
+                interval === "seconds" ||
+                timeLeft[interval] === lastTimeLeft[interval]
+              }
+            >
+              <StyledTypography>{timeLeft[interval]}</StyledTypography>
+              <Typography variant="caption" style={{ marginTop: "5px" }}>
+                {interval.toUpperCase()}
+              </Typography>
+            </PaperSheetUser>
+          ) : (
+            <PaperSheetAdmin
+              animateDrop={
+                interval !== "seconds" &&
+                timeLeft[interval] !== lastTimeLeft[interval]
+              }
+              animateAppear={
+                interval === "seconds" ||
+                timeLeft[interval] === lastTimeLeft[interval]
+              }
+            >
+              <StyledTypography>{timeLeft[interval]}</StyledTypography>
+              <Typography variant="caption" style={{ marginTop: "5px" }}>
+                {interval.toUpperCase()}
+              </Typography>
+            </PaperSheetAdmin>
+          )}
+        </React.Fragment>
       ))}
     </Box>
   );
@@ -97,7 +138,7 @@ function calculateTimeLeft(endDate) {
 }
 
 Countdown.propTypes = {
-  endDate: PropTypes.string.isRequired
+  endDate: PropTypes.string.isRequired,
 };
 
 export default Countdown;

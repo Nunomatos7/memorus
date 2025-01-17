@@ -73,58 +73,68 @@ const AdminBoard = () => {
   const [newMemorPoints, setNewMemorPoints] = useState(null);
   const [memors, setMemors] = useState([
     {
-      title: "Virtual Coffee Break",
+      title: "Coffee Break",
       description:
-        "For this team-building activity, capture a fun selfie! Show off your personality and creativity. Once you're ready, snap the photo and upload it to complete the task. Let's see your team spirit!",
-      date: "10/12/2024",
+        "Join the coffee break, where you can share a cup and a story online. Make sure to have your favorite mug!",
+      date: "01/25/2025",
+      points: "+ 30 pts",
+      teamsLeft: 5,
+    },
+    {
+      title: "Fist Bump a Colleague",
+      description:
+        "Give a fist bump to a colleague and snap a quick photo. It's a simple gesture to boost team morale and promote connectivity.",
+      date: "01/22/2025",
+      points: "+ 20 pts",
+      teamsLeft: 3,
+    },
+    {
+      title: "Pet Showcase",
+      description:
+        "Take a photo with your pet during your workday to share with the team. Pets can be great stress relievers!",
+      date: "01/17/2025",
       points: "+ 10 pts",
-      timeLeft: "9:00H",
+      teamsLeft: 2,
+    },
+    {
+      title: "Team Lunch",
+      description:
+        "Organize a team lunch either in-office or virtually. Capture the moment of camaraderie and good food.",
+      date: "01/13/2025",
+      points: "+ 30 pts",
+      teamsLeft: 4,
+    },
+    {
+      title: "Office Decoration Challenge",
+      description:
+        "Decorate your workspace and showcase your creativity. The best decoration wins extra points!",
+      date: "01/12/2025",
+      points: "+ 20 pts",
       teamsLeft: 1,
     },
     {
-      title: "Fist Bump",
+      title: "Weekly Team Meeting",
       description:
-        "For this team-building activity, capture a fun selfie! Show off your personality and creativity. Once you're ready, snap the photo and upload it to complete the task. Let's see your team spirit!",
-      date: "10/12/2024",
+        "Capture a moment from your weekly team meeting. It's about learning and growing together.",
+      date: "01/11/2025",
       points: "+ 10 pts",
-      timeLeft: "9:00H",
-      teamsLeft: 1,
+      teamsLeft: 2,
     },
     {
-      title: "Pet Photo",
+      title: "Karaoke Night",
       description:
-        "For this team-building activity, capture a fun selfie! Show off your personality and creativity. Once you're ready, snap the photo and upload it to complete the task. Let's see your team spirit!",
-      date: "10/12/2024",
-      points: "+ 10 pts",
-      timeLeft: "0:00H",
-      teamsLeft: 1,
+        "Share a video or photo from a team karaoke session. Let’s see those singing skills and team spirit in action!",
+      date: "01/10/2025",
+      points: "+ 30 pts",
+      teamsLeft: 5,
     },
     {
-      title: "Ugly Sweater",
+      title: "Team Picnic",
       description:
-        "For this team-building activity, capture a fun selfie! Show off your personality and creativity. Once you're ready, snap the photo and upload it to complete the task. Let's see your team spirit!",
-      date: "10/12/2024",
-      points: "+ 10 pts",
-      timeLeft: "0:00H",
-      teamsLeft: 1,
-    },
-    {
-      title: "Take a Selfie",
-      description:
-        "For this team-building activity, capture a fun selfie! Show off your personality and creativity. Once you're ready, snap the photo and upload it to complete the task. Let's see your team spirit!",
-      date: "10/12/2024",
-      points: "+ 10 pts",
-      timeLeft: "9:00H",
-      teamsLeft: 1,
-    },
-    {
-      title: "Cookie Monster",
-      description:
-        "For this team-building activity, capture a fun selfie! Show off your personality and creativity. Once you're ready, snap the photo and upload it to complete the task. Let's see your team spirit!",
-      date: "10/12/2024",
-      points: "+ 10 pts",
-      timeLeft: "0:00H",
-      teamsLeft: 1,
+        "Have a relaxing day out with a team picnic. Capture the fun and outdoors as you bond over games and snacks.",
+      date: "01/09/2025",
+      points: "+ 20 pts",
+      teamsLeft: 3,
     },
   ]);
 
@@ -135,22 +145,43 @@ const AdminBoard = () => {
       "johnsmith@abc.com",
       "janesmith@abc.com",
     ],
-    "Code Crushers": [
+    "The Debuggers": [
       "charliebrown@abc.com",
       "lucybrown@abc.com",
       "snoopybrown@abc.com",
       "woodstockbrown@abc.com",
     ],
-    "Design Divas": ["alice@abc.com", "bob@abc.com", "eve@abc.com"],
-    "Marketing Mavericks": [
+    "Capital Crew": ["alice@abc.com", "bob@abc.com", "eve@abc.com"],
+    "The Hackers": [
       "tonystark@abc.com",
       "pepperpotts@abc.com",
       "peterparker@abc.com",
     ],
-    "Sales Superstars": [
+    "The Coders": [
       "steverogers@abc.com",
       "natasharomanoff@abc.com",
       "brucebanner@abc.com",
+    ],
+    "The Programmers": [
+      "thorodinson@abc.com",
+      "perpos@abc.com",
+      "abcdef@abc.com",
+      "jklmno@abc.com",
+      "lokilaufeyson@abc.com",
+    ],
+    "The Developers": [
+      "harrypotter@abc.com",
+      "hermionegranger@abc.com",
+      "ronweasley@abc.com",
+      "ginnyweasley@abc.com",
+      "dracomalfoy@abc.com",
+    ],
+    "The Designers": [
+      "bilbobaggins@abc.com",
+      "frodobaggins@abc.com",
+      "samwisegamgee@abc.com",
+      "gandalfthewhite@abc.com",
+      "legolasgreenleaf@abc.com",
     ],
   });
 
@@ -216,26 +247,6 @@ const AdminBoard = () => {
       team: "Marketing Mavericks",
     },
     {
-      name: "Thor Odinson",
-      email: "thorOdinson@abc.com",
-      team: "",
-    },
-    {
-      name: "Per Pos",
-      email: "perpos@abc.com",
-      team: "",
-    },
-    {
-      name: "ABC DEF",
-      email: "abcdef@abc.com",
-      team: "",
-    },
-    {
-      name: "JKL MNO",
-      email: "jklmno@abc.com",
-      team: "",
-    },
-    {
       name: "Pepper Potts",
       email: "pepperpotts@abc.com",
       team: "Marketing Mavericks",
@@ -261,8 +272,158 @@ const AdminBoard = () => {
       team: "Sales Superstars",
     },
     {
+      name: "Thor Odinson",
+      email: "thorodinson@abc.com",
+      team: "HR Heroes",
+    },
+    {
+      name: "Per Pos",
+      email: "perpos@abc.com",
+      team: "HR Heroes",
+    },
+    {
+      name: "ABC DEF",
+      email: "abcdef@abc.com",
+      team: "HR Heroes",
+    },
+    {
+      name: "JKL MNO",
+      email: "jklmno@abc.com",
+      team: "HR Heroes",
+    },
+    {
       name: "Loki Laufeyson",
-      email: "lokilaufaeyson@abc.com",
+      email: "lokilaufeyson@abc.com",
+      team: "HR Heroes",
+    },
+    {
+      name: "Harry Potter",
+      email: "harrypotter@abc.com",
+      team: "Finance Falcons",
+    },
+    {
+      name: "Hermione Granger",
+      email: "hermionegranger@abc.com",
+      team: "Finance Falcons",
+    },
+    {
+      name: "Ron Weasley",
+      email: "ronweasley@abc.com",
+      team: "Finance Falcons",
+    },
+    {
+      name: "Ginny Weasley",
+      email: "ginnyweasley@abc.com",
+      team: "Finance Falcons",
+    },
+    {
+      name: "Draco Malfoy",
+      email: "dracomalfoy@abc.com",
+      team: "Finance Falcons",
+    },
+    {
+      name: "Bilbo Baggins",
+      email: "bilbobaggins@abc.com",
+      team: "Product Pioneers",
+    },
+    {
+      name: "Frodo Baggins",
+      email: "frodobaggins@abc.com",
+      team: "Product Pioneers",
+    },
+    {
+      name: "Samwise Gamgee",
+      email: "samwisegamgee@abc.com",
+      team: "Product Pioneers",
+    },
+    {
+      name: "Gandalf the White",
+      email: "gandalfthewhite@abc.com",
+      team: "Product Pioneers",
+    },
+    {
+      name: "Legolas Greenleaf",
+      email: "legolasgreenleaf@abc.com",
+      team: "Product Pioneers",
+    },
+    {
+      name: "Elon Musk",
+      email: "elonmusk@abc.com",
+      team: "Tech Titans",
+    },
+    {
+      name: "Mark Zuckerberg",
+      email: "markzuckerberg@abc.com",
+      team: "Tech Titans",
+    },
+    {
+      name: "Steve Jobs",
+      email: "stevejobs@abc.com",
+      team: "Tech Titans",
+    },
+    {
+      name: "Bill Gates",
+      email: "billgates@abc.com",
+      team: "Tech Titans",
+    },
+    {
+      name: "Jeff Bezos",
+      email: "jeffbezos@abc.com",
+      team: "Tech Titans",
+    },
+    {
+      name: "Warren Buffet",
+      email: "warrenbuffet@abc.com",
+      team: "Strategy Stars",
+    },
+    {
+      name: "Ray Dalio",
+      email: "raydalio@abc.com",
+      team: "Strategy Stars",
+    },
+    {
+      name: "Jamie Dimon",
+      email: "jamiedimon@abc.com",
+      team: "Strategy Stars",
+    },
+    {
+      name: "Lloyd Blankfein",
+      email: "lloydblankfein@abc.com",
+      team: "Strategy Stars",
+    },
+    {
+      name: "Henry Kravis",
+      email: "henrykravis@abc.com",
+      team: "Strategy Stars",
+    },
+    {
+      name: "Rodrigo Silva",
+      email: "rodrigosilva@abc.com",
+      team: "",
+    },
+    {
+      name: "Rui Silva",
+      email: "rui@blip.com",
+      team: "",
+    },
+    {
+      name: "Nuno Matos",
+      email: "nunomatos@abc.com",
+      team: "",
+    },
+    {
+      name: "Miguel Pereira",
+      email: "miguelpereira@abc.com",
+      team: "",
+    },
+    {
+      name: "Tatiana Aires",
+      email: "tatianaaires@abc.com",
+      team: "",
+    },
+    {
+      name: "Ana João",
+      email: "anajoao@abc.com",
       team: "",
     },
   ];
@@ -458,7 +619,10 @@ const AdminBoard = () => {
         description: newMemorDescription,
         date: formatDate(newMemorDate),
         points: `+ ${newMemorPoints} pts`,
-        timeLeft: "9:00H",
+        timeLeft:
+          calculateDaysLeft(newMemorDate) > 0
+            ? `${calculateDaysLeft(newMemorDate)} days left`
+            : "0:00H",
         teamsLeft: Object.keys(teams).length,
       };
 
@@ -619,44 +783,76 @@ const AdminBoard = () => {
 
   const [competitions, setCompetitions] = useState([
     {
-      id: 1,
-      title: "Christmas",
+      id: 9,
+      title: "New Year New Us",
       description:
-        "For this competition, capture in your memors something that reflects your personal growth. Let your memors celebrate renewal, progress, and the journey to becoming your best self. 🌟",
-      startDate: "2024/12/25",
+        "For this competition, focus on capturing moments that highlight our team's spirit and the memories we're creating together. Let your entries celebrate our collective growth, the bonds we're strengthening, and the journey we're sharing in striving to achieve our best. 🌟",
+      startDate: "2025/01/01",
+      endDate: "2025/01/31",
+    },
+    {
+      id: 8,
+      title: "Winter Wonderland",
+      description:
+        "December invites you to capture wintry scenes, holiday lights, and festive cheer. Let’s see your best winter wonderland moments as we approach the year's end. ❄️",
+      startDate: "2024/12/01",
       endDate: "2024/12/31",
     },
     {
-      id: 2,
-      title: "New Year",
+      id: 7,
+      title: "Thanksgiving Gatherings",
       description:
-        "For this competition, capture in your memors something that reflects your personal growth. Let your memors celebrate renewal, progress, and the journey to becoming your best self. 🌟",
-      startDate: "2024/12/26",
-      endDate: "2024/12/31",
+        "For November's competition, submit photos that showcase Thanksgiving celebrations, family reunions, or expressions of gratitude. Highlight the warmth and joy of gathering with loved ones. 🦃",
+      startDate: "2024/11/06",
+      endDate: "2024/11/30",
     },
     {
-      id: 3,
-      title: "Valentine's Time",
+      id: 6,
+      title: "Halloween Haunts",
       description:
-        "For this competition, capture in your memors something that reflects your personal growth. Let your memors celebrate renewal, progress, and the journey to becoming your best self. 🌟",
-      startDate: "2024/02/02",
-      endDate: "2024/02/14",
-    },
-    {
-      id: 4,
-      title: "Easter",
-      description:
-        "For this competition, capture in your memors something that reflects your personal growth. Let your memors celebrate renewal, progress, and the journey to becoming your best self. 🌟",
-      startDate: "2024/04/01",
-      endDate: "2024/04/30",
+        "This October, show us your best Halloween-themed photos. From spooky decorations and costumes to creative pumpkin carvings, let's see how you celebrate this eerie, fun-filled holiday. 🎃",
+      startDate: "2024/10/16",
+      endDate: "2024/11/05",
     },
     {
       id: 5,
-      title: "New Year New Me",
+      title: "Autumn Colors",
       description:
-        "For this competition, capture in your memors something that reflects your personal growth. Let your memors celebrate renewal, progress, and the journey to becoming your best self. 🌟",
-      startDate: "2025/01/01",
-      endDate: "2025/01/31",
+        "Capture the essence of autumn with its rich colors and serene landscapes. We're looking for stunning photos that highlight the beauty of the season, from fall foliage to harvest festivals. Embrace the season's beauty! 🍂",
+      startDate: "2024/09/01",
+      endDate: "2024/10/15",
+    },
+    {
+      id: 4,
+      title: "Patriotic Celebrations",
+      description:
+        "In July, capture the spirit of patriotism with photos from national day celebrations, fireworks, parades, and family gatherings. Show us what pride in your country looks like! 🎆",
+      startDate: "2024/07/01",
+      endDate: "2024/07/31",
+    },
+    {
+      id: 3,
+      title: "Summer Solstice",
+      description:
+        "Celebrate the longest day of the year with photos that capture the essence of summer. Think beach days, barbecues, or festivals—anything that represents the heat and excitement of the season. ☀️",
+      startDate: "2024/06/01",
+      endDate: "2024/06/30",
+    },
+    {
+      id: 2,
+      title: "Spring Into Nature",
+      description:
+        "As spring transitions into summer, let's capture the explosion of life in nature. Focus on landscapes, wildlife, and plant growth that define this vibrant season. 🌼",
+      startDate: "2024/04/20",
+      endDate: "2024/05/20",
+    },
+    {
+      id: 1,
+      title: "Easter Spring Awakening",
+      description:
+        "Easter is a time of renewal and joy. For this competition, submit your best shots of Easter celebrations, spring flowers, or family gatherings. Let's see how you capture the essence of spring and rebirth. 🌷",
+      startDate: "2024/03/15",
+      endDate: "2024/04/15",
     },
   ]);
 
@@ -727,6 +923,30 @@ const AdminBoard = () => {
     setConfirmEditCompetitionModalOpen(false);
     handleEditCompetitionModalClose();
   };
+
+  // Function to return the ongoing competition
+  const ongoingCompetition = competitions.find((comp) => {
+    const status = checkCompStatus(comp.startDate, comp.endDate);
+    return status === "Ongoing";
+  });
+
+  // Function to calculate the days left for the ongoing competition
+  const calculateDaysLeft = (endDate) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const end = new Date(endDate);
+    end.setHours(23, 59, 59, 999);
+
+    const timeLeft = end - today;
+    const daysLeft = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+    return daysLeft;
+  };
+
+  function formatDate(dateStr) {
+    const parts = dateStr.split("/");
+    return `${parts[2]}/${parts[1]}/${parts[0]}`;
+  }
 
   return (
     <>
@@ -1006,7 +1226,20 @@ const AdminBoard = () => {
                     {memor.points}
                   </Typography>
                   <Typography variant='body2' sx={{ flex: 1 }}>
-                    {memor.timeLeft !== "0:00H" && memor.timeLeft}
+                    {(() => {
+                      const daysLeft = calculateDaysLeft(memor.date);
+                      if (daysLeft > 0) {
+                        return `${daysLeft} days left`;
+                      } else if (daysLeft === 0) {
+                        return (
+                          <span style={{ color: "#d8504d" }}>
+                            &lt; 1 day left
+                          </span>
+                        );
+                      } else {
+                        return "";
+                      }
+                    })()}
                   </Typography>
                   <Typography variant='body2' sx={{ flex: 1 }}>
                     {memor.teamsLeft}
@@ -1025,14 +1258,16 @@ const AdminBoard = () => {
                         e.stopPropagation();
                         handleEditMemorModalOpen(memor);
                       }}
+                      sx={{
+                        display:
+                          calculateDaysLeft(memor.date) < 0 ? "none" : "block",
+                      }}
                     >
-                      {memor.timeLeft !== "0:00H" && (
-                        <img
-                          src={editIcon}
-                          alt='edit'
-                          style={{ width: "20px" }}
-                        />
-                      )}
+                      <img
+                        src={editIcon}
+                        alt='edit'
+                        style={{ width: "20px" }}
+                      />
                     </IconButton>
 
                     <IconButton
@@ -1041,14 +1276,16 @@ const AdminBoard = () => {
                         setMemorToDelete(memor);
                         setDeleteMemorModalOpen(true);
                       }}
+                      sx={{
+                        display:
+                          calculateDaysLeft(memor.date) < 0 ? "none" : "block",
+                      }}
                     >
-                      {memor.timeLeft !== "0:00H" && (
-                        <img
-                          src={deleteIcon}
-                          alt='delete'
-                          style={{ width: "20px" }}
-                        />
-                      )}
+                      <img
+                        src={deleteIcon}
+                        alt='delete'
+                        style={{ width: "20px" }}
+                      />
                     </IconButton>
 
                     <IconButton>
@@ -1474,13 +1711,10 @@ const AdminBoard = () => {
                             variant='body2'
                             sx={{ fontWeight: "bold" }}
                           >
-                            New Year, New Me
+                            {ongoingCompetition.title}
                           </Typography>
                           <Typography variant='body2'>
-                            For this competition, capture in your memors
-                            something that reflects your personal growth. Let
-                            your memors celebrate renewal, progress, and the
-                            journey to becoming your best self. 🌟
+                            {ongoingCompetition.description}
                           </Typography>
                         </Box>
                         <Box
@@ -1505,16 +1739,18 @@ const AdminBoard = () => {
                               variant='body2'
                               sx={{ color: "#9FE9E4" }}
                             >
-                              16 days remaining
+                              {calculateDaysLeft(ongoingCompetition.endDate)}{" "}
+                              days remaining
                             </Typography>
                             <Typography variant='body2'>
-                              01/01/2025 - 31/01/2025
+                              {formatDate(ongoingCompetition.startDate)} -{" "}
+                              {formatDate(ongoingCompetition.endDate)}
                             </Typography>
                           </Box>
                         </Box>
                         <Box>
                           {competitions
-                            .filter((competition) => competition.id === 5)
+                            .filter((comp) => comp.id === ongoingCompetition.id)
                             .map((competition) => (
                               <IconButton
                                 onClick={() =>

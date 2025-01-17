@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -41,7 +41,16 @@ const Memors = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedMemor, setSelectedMemor] = useState(null);
-  const [ongoingMemors, setOngoingMemors] = useState(memorsData);
+  const [ongoingMemors, setOngoingMemors] = useState(
+    memorsData.filter((memor) => memor.team === "The Debuggers")
+  );
+
+  useEffect(() => {
+    setOngoingMemors(
+      memorsData.filter((memor) => memor.team === "The Debuggers")
+    );
+  }, []);
+
   const handleTabChange = (_, newValue) => {
     setTab(newValue);
   };
@@ -80,7 +89,7 @@ const Memors = () => {
     const matchesSearch = memor.title
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
-    const matchesTeam = memor.team === "The Debuggers"; // Filter by team name
+    const matchesTeam = memor.team === "The Debuggers";
     if (tab === "completed") {
       return memor.status === "submitted" && matchesSearch && matchesTeam;
     }

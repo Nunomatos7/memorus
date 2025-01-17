@@ -43,15 +43,13 @@ const MemoryBoard = () => {
   const [loadedImages, setLoadedImages] = useState(new Set());
   const [filteredTeam, setFilteredTeam] = useState("The Debuggers");
 
-  const teams = ["All", ...new Set(memorsData.map((memor) => memor.team))];
+  const teams = [...new Set(memorsData.map((memor) => memor.team))];
 
   useEffect(() => {
     const positions = [];
     const memorsWithImages = memorsData.filter(
       (memor) =>
-        memor.image &&
-        memor.image.length > 0 &&
-        (filteredTeam === "All" || memor.team === filteredTeam)
+        memor.image && memor.image.length > 0 && memor.team === filteredTeam
     );
 
     const newPosts = memorsWithImages.map((post) => {
@@ -224,7 +222,7 @@ const MemoryBoard = () => {
                       style={{
                         position: "absolute",
                         top: `${cardIndex * 5}px`,
-                        left: `${cardIndex * 25}px`,
+                        left: `${cardIndex * 40}px`,
                         width: "100%",
                         height: "100%",
                         backgroundColor: "white",
@@ -237,9 +235,7 @@ const MemoryBoard = () => {
                       }}
                     >
                       {/* Submitted Date */}
-                      {cardIndex === reversedArray.length - 1 && (
-                        <p className='card-date'>{post.submittedDate}</p>
-                      )}
+                      <p className='card-date'>{post.submittedDate}</p>
 
                       {/* Image */}
                       <img

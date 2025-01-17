@@ -18,6 +18,8 @@ import Loader from "../../../Components/Loader/Loader";
 import background1 from "../../../assets/images/background1.svg";
 import background2 from "../../../assets/images/background2.svg";
 import background3 from "../../../assets/images/background3.svg";
+import Countdown from "../../../Components/Countdown/Countdown";
+import { memorsData } from "../../../Data/Memors.json";
 
 const rankImages = {
   1: rank1,
@@ -29,37 +31,37 @@ export const mockUser = {
   id: 1,
   name: "John Doe",
   email: "john.doe@example.com",
-  pending_memors: 5,
-  complete_memors: 10,
+  pending_memors: 3,
+  complete_memors: 5,
   admin: false,
 };
 
-const slidesData = [
-  {
-    id: 1,
-    teamName: "The Debuggers",
-    title: "Coffee break",
-    description: "A nice coffee break with friends",
-    submitDate: "2 days ago",
-    image:
-      "https://cdn.pixabay.com/photo/2023/10/23/16/24/bird-8336436_1280.jpg",
-  },
-  {
-    id: 2,
-    teamName: "Capital Crew",
-    title: "Show us your city",
-    description: "We bet it must look nice :)",
-    submitDate: "8 days ago",
-    image:
-      "https://media.istockphoto.com/id/1368628035/photo/brooklyn-bridge-at-sunset.jpg?s=612x612&w=0&k=20&c=hPbMbTYRAVNYWAUMkl6r62fPIjGVJTXzRURCyCfoG08=",
-  },
-  { id: 3, image: "" },
-  { id: 4, image: "" },
-  { id: 5, image: "" },
-  { id: 6, image: "" },
-  { id: 7, image: "" },
-  { id: 8, image: "" },
-];
+// const slidesData = [
+//   {
+//     id: 1,
+//     teamName: "The Debuggers",
+//     title: "Coffee break",
+//     description: "A nice coffee break with friends",
+//     submitDate: "2 days ago",
+//     image:
+//       "https://cdn.pixabay.com/photo/2023/10/23/16/24/bird-8336436_1280.jpg",
+//   },
+//   {
+//     id: 2,
+//     teamName: "Capital Crew",
+//     title: "Show us your city",
+//     description: "We bet it must look nice :)",
+//     submitDate: "8 days ago",
+//     image:
+//       "https://media.istockphoto.com/id/1368628035/photo/brooklyn-bridge-at-sunset.jpg?s=612x612&w=0&k=20&c=hPbMbTYRAVNYWAUMkl6r62fPIjGVJTXzRURCyCfoG08=",
+//   },
+//   { id: 3, image: "" },
+//   { id: 4, image: "" },
+//   { id: 5, image: "" },
+//   { id: 6, image: "" },
+//   { id: 7, image: "" },
+//   { id: 8, image: "" },
+// ];
 
 const Home = () => {
   const [selectedSlide, setSelectedSlide] = useState(null);
@@ -84,38 +86,38 @@ const Home = () => {
           style={{ marginBottom: "1rem", marginTop: "2rem" }}
         >
           <img
-                    src={background1}
-                    alt='leaderboard-bg1'
-                    style={{
-                      position: "absolute",
-                      top: "2",
-                      right: "0",
-                      width: "15%",
-                      zIndex: "0",
-                    }}
-                  />
-                  <img
-                    src={background2}
-                    alt='leaderboard-bg2'
-                    style={{
-                      position: "absolute",
-                      top: "25%",
-                      left: "5%",
-                      width: "5%",
-                      zIndex: "0",
-                    }}
-                  />
-                  <img
-                    src={background3}
-                    alt='leaderboard-bg3'
-                    style={{
-                      position: "absolute",
-                      top: "35%",
-                      right: "6%",
-                      width: "5%",
-                      zIndex: "0",
-                    }}
-                  />
+            src={background1}
+            alt='leaderboard-bg1'
+            style={{
+              position: "absolute",
+              top: "2",
+              right: "0",
+              width: "15%",
+              zIndex: "0",
+            }}
+          />
+          <img
+            src={background2}
+            alt='leaderboard-bg2'
+            style={{
+              position: "absolute",
+              top: "25%",
+              left: "5%",
+              width: "5%",
+              zIndex: "0",
+            }}
+          />
+          <img
+            src={background3}
+            alt='leaderboard-bg3'
+            style={{
+              position: "absolute",
+              top: "35%",
+              right: "6%",
+              width: "5%",
+              zIndex: "0",
+            }}
+          />
           <h1 className='home-title'>Latest Memors</h1>
         </div>
 
@@ -142,48 +144,92 @@ const Home = () => {
               }}
               modules={[Mousewheel, FreeMode]}
             >
-              {/* Slides */}
-              {slidesData.map((slide) => (
-                <SwiperSlide
-                  key={slide.id}
-                  className={
-                    slide.image ? "latest-memors-pic" : "latest-memors"
+              {/* Filter unique titles */}
+              {Object.values(
+                memorsData.reduce((acc, memor) => {
+                  if (!acc[memor.title] && memor.image?.length > 0) {
+                    acc[memor.title] = memor;
                   }
-                >
-                  {slide.image && (
-                    <div onClick={() => handleImageClick(slide)}>
-                      <div className='image-wrapper'>
-                        <img
-                          width={"100%"}
-                          height={"100%"}
-                          style={{ objectFit: "cover" }}
-                          src={slide.image}
-                          alt=''
-                        />
-                      </div>
-                      <div className='latest-memors-content'>
-                        <CustomButton
-                          text={slide.teamName}
-                          onClick={() => handleImageClick(slide)}
-                          sx={{
-                            display: "flex",
-                            padding: "3.147px 15.953px",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            flex: "1 0 0",
-                            alignSelf: "stretch",
-                            fontSize: "0.8rem",
-                            color: "#003731",
-                            fontWeight: "600",
-                          }}
-                        />
-                        <h3>{slide.submitDate}</h3>
-                        <p style={{ fontSize: "0.9rem" }}>"{slide.title}"</p>
-                      </div>
+                  return acc;
+                }, {})
+              )
+                .sort((a, b) => a.id - b.id) // Sort titles by ID or some ordering criterion
+                .map((memor, index) => {
+                  // Map the memor data to SwiperSlide components
+                  return (
+                    <SwiperSlide
+                      key={memor.id}
+                      className={
+                        memor.image ? "latest-memors-pic" : "latest-memors"
+                      }
+                    >
+                      {memor.image && (
+                        <div onClick={() => handleImageClick(memor)}>
+                          <div className='image-wrapper'>
+                            <img
+                              width={"100%"}
+                              height={"100%"}
+                              style={{ objectFit: "cover" }}
+                              src={memor.image[0]} // Use the first image
+                              alt='Memor Image'
+                            />
+                          </div>
+                          <div className='latest-memors-content'>
+                            <CustomButton
+                              text={memor.team}
+                              onClick={() => handleImageClick(memor)}
+                              sx={{
+                                display: "flex",
+                                padding: "3.147px 15.953px",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                flex: "1 0 0",
+                                alignSelf: "stretch",
+                                fontSize: "0.8rem",
+                                color: "#003731",
+                                fontWeight: "600",
+                              }}
+                            />
+                            <h3>{memor.submittedDate}</h3>
+                            <p style={{ fontSize: "0.9rem" }}>
+                              &quot;{memor.title}&quot;
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </SwiperSlide>
+                  );
+                })}
+
+              {/* Add placeholders only at the end */}
+              {Array.from(
+                {
+                  length: Math.max(
+                    0,
+                    5 -
+                      Object.values(
+                        memorsData.reduce((acc, memor) => {
+                          if (!acc[memor.title] && memor.image?.length > 0) {
+                            acc[memor.title] = memor;
+                          }
+                          return acc;
+                        }, {})
+                      ).length
+                  ),
+                },
+                (_, index) => (
+                  <SwiperSlide
+                    key={`placeholder-${index}`}
+                    className='placeholder-slide'
+                  >
+                    <div className='placeholder-content'>
+                      <p style={{ fontSize: "0.9rem", color: "#aaa" }}>
+                        Placeholder
+                      </p>
                     </div>
-                  )}
-                </SwiperSlide>
-              ))}
+                  </SwiperSlide>
+                )
+              )}
             </Swiper>
           </div>
         </div>
@@ -191,10 +237,10 @@ const Home = () => {
         {/* Modal Component */}
         {selectedSlide && (
           <MemorPicture
-            image={selectedSlide.image}
-            teamName={selectedSlide.teamName}
+            image={selectedSlide.image[0]}
+            teamName={selectedSlide.team}
             title={selectedSlide.title}
-            submitDate={selectedSlide.submitDate}
+            submitDate={selectedSlide.submittedDate}
             onClose={closeModal}
           />
         )}
@@ -202,7 +248,7 @@ const Home = () => {
 
       <section id='myMemors' className='container'>
         <Typography variant='h6' gutterBottom style={{ color: "white" }}>
-          My Memors
+          Memors Dashboard
         </Typography>
         <Grid container spacing={3}>
           {/* Pending Memors */}
@@ -226,7 +272,7 @@ const Home = () => {
                   <img src={ongoing} alt='ongoing' />
                 </Box>
                 <Typography variant='body2' color='#B0B0B0'>
-                  Pending Memors
+                  Ongoing Memors
                 </Typography>
               </CardContent>
             </Card>
@@ -263,23 +309,24 @@ const Home = () => {
           <Grid item xs={12} sm={6}>
             <Card className='card'>
               <CardContent>
-                <div className='flex justify-between items-center'>
-                  <Typography
-                    variant='h4'
-                    fontWeight='bold'
-                    fontSize={"1.5rem"}
-                  >
-                    Remaining time
-                  </Typography>
-                  <Typography
-                    variant='h3'
-                    fontWeight='bold'
-                    color='white'
-                    style={{ margin: "10px 0", fontSize: "2rem" }}
-                  >
-                    20 days
-                  </Typography>
-                </div>
+                <Box
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    flexDirection: "column",
+                  }}
+                >
+                  <Box>
+                    <Typography variant='h6' style={{ color: "white" }}>
+                      The competition{" "}
+                      <span style={{ color: "#215952", fontWeight: "bold" }}>
+                        New Year New Us
+                      </span>{" "}
+                      ends in
+                    </Typography>
+                  </Box>
+                  <Countdown endDate='2025-01-31T00:00:00' role='admin' />
+                </Box>
               </CardContent>
             </Card>
           </Grid>
@@ -290,7 +337,7 @@ const Home = () => {
         <Typography variant='h6' gutterBottom style={{ color: "white" }}>
           Current Leaders
         </Typography>
-        <Grid container spacing={3}>
+        <Grid container spacing={2}>
           {leaderboardData
             .filter((team) => team.rank <= 3)
             .map((team) => (
