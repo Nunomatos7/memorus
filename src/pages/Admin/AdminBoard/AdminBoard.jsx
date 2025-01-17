@@ -145,57 +145,43 @@ const AdminBoard = () => {
       "johnsmith@abc.com",
       "janesmith@abc.com",
     ],
-    "Code Crushers": [
+    "The Debuggers": [
       "charliebrown@abc.com",
       "lucybrown@abc.com",
       "snoopybrown@abc.com",
       "woodstockbrown@abc.com",
     ],
-    "Design Divas": ["alice@abc.com", "bob@abc.com", "eve@abc.com"],
-    "Marketing Mavericks": [
+    "Capital Crew": ["alice@abc.com", "bob@abc.com", "eve@abc.com"],
+    "The Hackers": [
       "tonystark@abc.com",
       "pepperpotts@abc.com",
       "peterparker@abc.com",
     ],
-    "Sales Superstars": [
+    "The Coders": [
       "steverogers@abc.com",
       "natasharomanoff@abc.com",
       "brucebanner@abc.com",
     ],
-    "HR Heroes": [
+    "The Programmers": [
       "thorodinson@abc.com",
       "perpos@abc.com",
       "abcdef@abc.com",
       "jklmno@abc.com",
       "lokilaufeyson@abc.com",
     ],
-    "Finance Falcons": [
+    "The Developers": [
       "harrypotter@abc.com",
       "hermionegranger@abc.com",
       "ronweasley@abc.com",
       "ginnyweasley@abc.com",
       "dracomalfoy@abc.com",
     ],
-    "Product Pioneers": [
+    "The Designers": [
       "bilbobaggins@abc.com",
       "frodobaggins@abc.com",
       "samwisegamgee@abc.com",
       "gandalfthewhite@abc.com",
       "legolasgreenleaf@abc.com",
-    ],
-    "Tech Titans": [
-      "elonmusk@abc.com",
-      "markzuckerberg@abc.com",
-      "stevejobs@abc.com",
-      "billgates@abc.com",
-      "jeffbezos@abc.com",
-    ],
-    "Strategy Stars": [
-      "warrenbuffet@abc.com",
-      "raydalio@abc.com",
-      "jamiedimon@abc.com",
-      "lloydblankfein@abc.com",
-      "henrykravis@abc.com",
     ],
   });
 
@@ -413,6 +399,11 @@ const AdminBoard = () => {
     {
       name: "Rodrigo Silva",
       email: "rodrigosilva@abc.com",
+      team: "",
+    },
+    {
+      name: "Rui Silva",
+      email: "rui@blip.com",
       team: "",
     },
     {

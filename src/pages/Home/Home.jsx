@@ -93,6 +93,7 @@ const Home = () => {
         </div>
 
         {/* Swiper */}
+        {/* Swiper */}
         <div className='overflow-hidden w-full'>
           <div className='container'>
             <Swiper
@@ -117,35 +118,55 @@ const Home = () => {
             >
               {/* Slides */}
               {memorsData
-                .filter((slide) => slide.team === "The Debuggers")
+                .filter(
+                  (slide) => slide.team === "The Debuggers" && slide.image
+                )
                 .map((slide) => (
-                  <SwiperSlide
-                    key={slide.id}
-                    className={
-                      slide.image ? "latest-memors-pic" : "latest-memors"
-                    }
-                  >
-                    {slide.image && (
-                      <div onClick={() => handleImageClick(slide)}>
-                        <div className='image-wrapper'>
-                          <img
-                            width={"100%"}
-                            height={"100%"}
-                            style={{ objectFit: "cover" }}
-                            src={slide.image[0]}
-                            alt=''
-                          />
-                        </div>
-                        <div className='latest-memors-content'>
-                          <h3>{slide.submittedDate}</h3>
-                          <p style={{ fontSize: "0.9rem" }}>
-                            &quot;{slide.title}&quot;
-                          </p>
-                        </div>
+                  <SwiperSlide key={slide.id} className='latest-memors-pic'>
+                    <div onClick={() => handleImageClick(slide)}>
+                      <div className='image-wrapper'>
+                        <img
+                          width={"100%"}
+                          height={"100%"}
+                          style={{ objectFit: "cover" }}
+                          src={slide.image[0]}
+                          alt=''
+                        />
                       </div>
-                    )}
+                      <div className='latest-memors-content'>
+                        <h3>{slide.submittedDate}</h3>
+                        <p style={{ fontSize: "0.9rem" }}>
+                          &quot;{slide.title}&quot;
+                        </p>
+                      </div>
+                    </div>
                   </SwiperSlide>
                 ))}
+
+              {/* Add placeholders at the end only if necessary */}
+              {Array.from(
+                {
+                  length: Math.max(
+                    0,
+                    5 -
+                      memorsData.filter(
+                        (slide) => slide.team === "The Debuggers" && slide.image
+                      ).length
+                  ),
+                },
+                (_, index) => (
+                  <SwiperSlide
+                    key={`placeholder-${index}`}
+                    className='placeholder-slide'
+                  >
+                    <div className='placeholder-content'>
+                      <p style={{ fontSize: "0.9rem", color: "#aaa" }}>
+                        Placeholder
+                      </p>
+                    </div>
+                  </SwiperSlide>
+                )
+              )}
             </Swiper>
           </div>
         </div>

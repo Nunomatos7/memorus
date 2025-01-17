@@ -144,11 +144,10 @@ const Home = () => {
               }}
               modules={[Mousewheel, FreeMode]}
             >
-              {/* Slides */}
+              {/* Filter unique titles */}
               {Object.values(
                 memorsData.reduce((acc, memor) => {
-                  // Ensure we only include one memor per title
-                  if (!acc[memor.title]) {
+                  if (!acc[memor.title] && memor.image?.length > 0) {
                     acc[memor.title] = memor;
                   }
                   return acc;
@@ -156,57 +155,81 @@ const Home = () => {
               )
                 .sort((a, b) => a.id - b.id) // Sort titles by ID or some ordering criterion
                 .map((memor, index) => {
-                  // Distribute memors cyclically across teams
-                  const teamIndex = index % memorsData.length;
-                  const team = memorsData[teamIndex].team;
-                  return {
-                    ...memor,
-                    team, // Assign a team to the memor
-                  };
-                })
-                .map((slide) => (
+                  // Map the memor data to SwiperSlide components
+                  return (
+                    <SwiperSlide
+                      key={memor.id}
+                      className={
+                        memor.image ? "latest-memors-pic" : "latest-memors"
+                      }
+                    >
+                      {memor.image && (
+                        <div onClick={() => handleImageClick(memor)}>
+                          <div className='image-wrapper'>
+                            <img
+                              width={"100%"}
+                              height={"100%"}
+                              style={{ objectFit: "cover" }}
+                              src={memor.image[0]} // Use the first image
+                              alt='Memor Image'
+                            />
+                          </div>
+                          <div className='latest-memors-content'>
+                            <CustomButton
+                              text={memor.team}
+                              onClick={() => handleImageClick(memor)}
+                              sx={{
+                                display: "flex",
+                                padding: "3.147px 15.953px",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                flex: "1 0 0",
+                                alignSelf: "stretch",
+                                fontSize: "0.8rem",
+                                color: "#003731",
+                                fontWeight: "600",
+                              }}
+                            />
+                            <h3>{memor.submittedDate}</h3>
+                            <p style={{ fontSize: "0.9rem" }}>
+                              &quot;{memor.title}&quot;
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </SwiperSlide>
+                  );
+                })}
+
+              {/* Add placeholders only at the end */}
+              {Array.from(
+                {
+                  length: Math.max(
+                    0,
+                    5 -
+                      Object.values(
+                        memorsData.reduce((acc, memor) => {
+                          if (!acc[memor.title] && memor.image?.length > 0) {
+                            acc[memor.title] = memor;
+                          }
+                          return acc;
+                        }, {})
+                      ).length
+                  ),
+                },
+                (_, index) => (
                   <SwiperSlide
-                    key={slide.id}
-                    className={
-                      slide.image ? "latest-memors-pic" : "latest-memors"
-                    }
+                    key={`placeholder-${index}`}
+                    className='placeholder-slide'
                   >
-                    {slide.image && slide.image.length > 0 && (
-                      <div onClick={() => handleImageClick(slide)}>
-                        <div className='image-wrapper'>
-                          <img
-                            width={"100%"}
-                            height={"100%"}
-                            style={{ objectFit: "cover" }}
-                            src={slide.image[0]} // Use the first image
-                            alt='Memor Image'
-                          />
-                        </div>
-                        <div className='latest-memors-content'>
-                          <CustomButton
-                            text={slide.team}
-                            onClick={() => handleImageClick(slide)}
-                            sx={{
-                              display: "flex",
-                              padding: "3.147px 15.953px",
-                              justifyContent: "center",
-                              alignItems: "center",
-                              flex: "1 0 0",
-                              alignSelf: "stretch",
-                              fontSize: "0.8rem",
-                              color: "#003731",
-                              fontWeight: "600",
-                            }}
-                          />
-                          <h3>{slide.submittedDate}</h3>
-                          <p style={{ fontSize: "0.9rem" }}>
-                            &quot;{slide.title}&quot;
-                          </p>
-                        </div>
-                      </div>
-                    )}
+                    <div className='placeholder-content'>
+                      <p style={{ fontSize: "0.9rem", color: "#aaa" }}>
+                        Placeholder
+                      </p>
+                    </div>
                   </SwiperSlide>
-                ))}
+                )
+              )}
             </Swiper>
           </div>
         </div>
