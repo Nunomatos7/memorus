@@ -164,7 +164,7 @@ const Home = () => {
                           />
                         </div>
                         <div className='latest-memors-content'>
-                          <h3>{slide.submitDate}</h3>
+                          <h3>{slide.submittedDate}</h3>
                           <p style={{ fontSize: "0.9rem" }}>
                             &quot;{slide.title}&quot;
                           </p>
