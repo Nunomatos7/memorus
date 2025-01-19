@@ -1,0 +1,483 @@
+{
+  "memors": [
+    {
+      "memorId": "1",
+      "memorTitle": "Lunch w/ friends",
+      "memorDescription": "Lunch at the park",
+      "memorDueDate": "25/12/2024",
+      "memorPoints": 10,
+      "memorStatus": "Submitted",
+      "memorTeamsLeft": 1
+    },
+    {
+      "memorId": "2",
+      "memorTitle": "Virtual Coffee Break",
+      "memorDescription": "For this team-building activity, capture a fun selfie! Show off your personality and creativity. Once you're ready, snap the photo and upload it to complete the task. Let's see your team spirit!",
+      "memorDueDate": "10/12/2024",
+      "memorPoints": 10,
+      "memorStatus": "incomplete"
+    },
+    {
+      "memorId": "3",
+      "memorTitle": "Fist bump a colleague",
+      "memorDescription": "For this team-building activity, capture a fun selfie! Show off your personality and creativity. Once you're ready, snap the photo and upload it to complete the task. Let's see your team spirit!",
+      "memorDueDate": "12/12/2024",
+      "memorPoints": 20,
+      "memorStatus": "incomplete"
+    },
+    {
+      "memorId": "4",
+      "memorTitle": "Take a photo of your pet",
+      "memorDescription": "For this team-building activity, capture a fun selfie! Show off your personality and creativity. Once you're ready, snap the photo and upload it to complete the task. Let's see your team spirit!",
+      "memorDueDate": "17/12/2024",
+      "memorPoints": 30,
+      "memorStatus": "submitted"
+    },
+    {
+      "memorId": "5",
+      "memorTitle": "Fist bump a colleague",
+      "memorDescription": "For this team-building activity, capture a fun selfie! Show off your personality and creativity. Once you're ready, snap the photo and upload it to complete the task. Let's see your team spirit!",
+      "memorDueDate": "12/12/2024",
+      "memorPoints": 40,
+      "memorStatus": "incomplete"
+    },
+    {
+      "memorId": "6",
+      "memorTitle": "Take a photo of your pet",
+      "memorDescription": "For this team-building activity, capture a fun selfie! Show off your personality and creativity. Once you're ready, snap the photo and upload it to complete the task. Let's see your team spirit!",
+      "memorDueDate": "17/12/2024",
+      "memorPoints": 50,
+      "memorStatus": "submitted"
+    },
+    {
+      "memorId": "7",
+      "memorTitle": "Virtual Coffee Break",
+      "memorDescription": "For this team-building activity, capture a fun selfie! Show off your personality and creativity. Once you're ready, snap the photo and upload it to complete the task. Let's see your team spirit!",
+      "memorDueDate": "10/12/2024",
+      "memorPoints": 60,
+      "memorStatus": "incomplete"
+    }
+  ],
+  "users": [
+    {
+      "userID": "user1",
+      "firstName": "Admin",
+      "lastName": "Memor'us",
+      "email": "admin@example.com",
+      "password": "admin123",
+      "role": "Admin"
+    },
+    {
+      "userID": "user2",
+      "teamID": "team1",
+      "firstName": "John",
+      "lastName": "Doe",
+      "email": "user@example.com",
+      "password": "user123",
+      "role": "Regular"
+    },
+    {
+      "userID": "user3",
+      "firstName": "John",
+      "lastName": "Doe",
+      "email": "johndoe@abc.com",
+      "password": "123",
+      "role": "Regular",
+      "team": "Visual Voyagers"
+    },
+    {
+      "userID": "user4",
+      "firstName": "Jane",
+      "lastName": "Doe",
+      "email": "janedoe@abc.com",
+      "password": "123",
+      "role": "Regular",
+      "team": "Visual Voyagers"
+    },
+    {
+      "userID": "user5",
+      "firstName": "John",
+      "lastName": "Smith",
+      "email": "johnsmith@abc.com",
+      "password": "123",
+      "role": "Regular",
+      "team": "Visual Voyagers"
+    },
+    {
+      "userID": "user6",
+      "firstName": "Jane",
+      "lastName": "Smith",
+      "email": "janesmith@abc.com",
+      "password": "123",
+      "role": "Regular",
+      "team": "Visual Voyagers"
+    },
+    {
+      "userID": "user7",
+      "firstName": "Charlie",
+      "lastName": "Brown",
+      "email": "charliebrown@abc.com",
+      "password": "123",
+      "role": "Regular",
+      "team": "Code Crushers"
+    },
+    {
+      "userID": "user8",
+      "firstName": "Lucy",
+      "lastName": "Brown",
+      "email": "lucybrown@abc.com",
+      "password": "123",
+      "role": "Regular",
+      "team": "Code Crushers"
+    },
+    {
+      "userID": "user9",
+      "firstName": "Snoopy",
+      "lastName": "Brown",
+      "email": "snoopybrown@abc.com",
+      "password": "123",
+      "role": "Regular",
+      "team": "Code Crushers"
+    },
+    {
+      "userID": "user10",
+      "firstName": "Woodstock",
+      "lastName": "Brown",
+      "email": "woodstockbrown@abc.com",
+      "password": "123",
+      "role": "Regular",
+      "team": "Code Crushers"
+    },
+    {
+      "userID": "user11",
+      "firstName": "Alice",
+      "lastName": "",
+      "email": "alice@abc.com",
+      "password": "123",
+      "role": "Regular",
+      "team": "Design Divas"
+    },
+    {
+      "userID": "user12",
+      "firstName": "Bob",
+      "lastName": "",
+      "email": "bob@abc.com",
+      "password": "123",
+      "role": "Regular",
+      "team": "Design Divas"
+    },
+    {
+      "userID": "user13",
+      "firstName": "Eve",
+      "lastName": "",
+      "email": "eve@abc.com",
+      "password": "123",
+      "role": "Regular",
+      "team": "Design Divas"
+    },
+    {
+      "userID": "user14",
+      "firstName": "Tony",
+      "lastName": "Stark",
+      "email": "tonystark@abc.com",
+      "password": "123",
+      "role": "Regular",
+      "team": "Marketing Mavericks"
+    },
+    {
+      "userID": "user15",
+      "firstName": "Pepper",
+      "lastName": "Potts",
+      "email": "pepperpotts@abc.com",
+      "password": "123",
+      "role": "Regular",
+      "team": "Marketing Mavericks"
+    },
+    {
+      "userID": "user16",
+      "firstName": "Peter",
+      "lastName": "Parker",
+      "email": "peterparker@abc.com",
+      "password": "123",
+      "role": "Regular",
+      "team": "Marketing Mavericks"
+    },
+    {
+      "userID": "user17",
+      "firstName": "Steve",
+      "lastName": "Rogers",
+      "email": "steverogers@abc.com",
+      "password": "123",
+      "role": "Regular",
+      "team": "Sales Superstars"
+    },
+    {
+      "userID": "user18",
+      "firstName": "Natasha",
+      "lastName": "Romanoff",
+      "email": "natasharomanoff@abc.com",
+      "password": "123",
+      "role": "Regular",
+      "team": "Sales Superstars"
+    },
+    {
+      "userID": "user19",
+      "firstName": "Bruce",
+      "lastName": "Banner",
+      "email": "brucebanner@abc.com",
+      "password": "123",
+      "role": "Regular",
+      "team": "Sales Superstars"
+    },
+    {
+      "userID": "user20",
+      "firstName": "Thor",
+      "lastName": "Odinson",
+      "email": "thorOdinson@abc.com",
+      "password": "123",
+      "role": "Regular",
+      "team": ""
+    },
+    {
+      "userID": "user21",
+      "firstName": "Per",
+      "lastName": "Pos",
+      "email": "perpos@abc.com",
+      "password": "123",
+      "role": "Regular",
+      "team": ""
+    },
+    {
+      "userID": "user22",
+      "firstName": "ABC",
+      "lastName": "DEF",
+      "email": "abcdef@abc.com",
+      "password": "123",
+      "role": "Regular",
+      "team": ""
+    },
+    {
+      "userID": "user23",
+      "firstName": "JKL",
+      "lastName": "MNO",
+      "email": "jklmno@abc.com",
+      "password": "123",
+      "role": "Regular",
+      "team": ""
+    },
+    {
+      "userID": "user24",
+      "firstName": "Loki",
+      "lastName": "Laufeyson",
+      "email": "lokilaufaeyson@abc.com",
+      "password": "123",
+      "role": "Regular",
+      "team": ""
+    }
+  ],
+  "memorsPicture": [
+    {
+      "memorPictureId": "memorPic1",
+      "memorID": "1",
+      "userID": "user2",
+      "imgSrc": "../src/assets/images/lunch.jpg",
+      "submitDate": "01/12/2024",
+      "teamId": "team1",
+      "teamName": "Visual Voyagers"
+    },
+    {
+      "memorPictureId": "placeholder",
+      "memorID": "placeholder",
+      "userID": "placeholder",
+      "imgSrc": "https://cdn.shopify.com/s/files/1/0469/3927/5428/files/Bildschirmfoto_2024-04-22_um_10.45.24.png?v=1713775565",
+      "submitDate": "16/12/2024",
+      "teamId": "placeholder",
+      "teamName": "Visual Voyagers"
+    },
+    {
+      "memorPictureId": "placeholder",
+      "memorID": "placeholder",
+      "userID": "placeholder",
+      "imgSrc": "../src/assets/images/lunch.jpg",
+      "submitDate": "01/12/2024",
+      "teamId": "placeholder",
+      "teamName": "Visual Voyagers"
+    },
+    {
+      "memorPictureId": "placeholder",
+      "memorID": "placeholder",
+      "userID": "placeholder",
+      "imgSrc": "../src/assets/images/colages.jpg",
+      "submitDate": "16/12/2024",
+      "teamId": "placeholder",
+      "teamName": "Visual Voyagers"
+    },
+    {
+      "memorPictureId": "placeholder",
+      "memorID": "placeholder",
+      "userID": "placeholder",
+      "imgSrc": "../src/assets/images/hats.jpg",
+      "submitDate": "16/12/2024",
+      "teamId": "placeholder",
+      "teamName": "Visual Voyagers"
+    },
+    {
+      "memorPictureId": "placeholder",
+      "memorID": "placeholder",
+      "userID": "placeholder",
+      "imgSrc": "https://media.istockphoto.com/id/1368628035/photo/brooklyn-bridge-at-sunset.jpg?s=612x612&w=0&k=20&c=hPbMbTYRAVNYWAUMkl6r62fPIjGVJTXzRURCyCfoG08=",
+      "submitDate": "01/12/2024",
+      "teamId": "placeholder",
+      "teamName": "Visual Voyagers"
+    },
+    {
+      "memorPictureId": "placeholder",
+      "memorID": "placeholder",
+      "userID": "placeholder",
+      "imgSrc": "https://media.istockphoto.com/id/1368628035/photo/brooklyn-bridge-at-sunset.jpg?s=612x612&w=0&k=20&c=hPbMbTYRAVNYWAUMkl6r62fPIjGVJTXzRURCyCfoG08=",
+      "submitDate": "16/12/2024",
+      "teamId": "placeholder",
+      "teamName": "Visual Voyagers"
+    },
+    {
+      "memorPictureId": "placeholder",
+      "memorID": "placeholder",
+      "userID": "placeholder",
+      "imgSrc": "https://media.istockphoto.com/id/1368628035/photo/brooklyn-bridge-at-sunset.jpg?s=612x612&w=0&k=20&c=hPbMbTYRAVNYWAUMkl6r62fPIjGVJTXzRURCyCfoG08=",
+      "submitDate": "16/12/2024",
+      "teamId": "placeholder",
+      "teamName": "Visual Voyagers"
+    }
+  ],
+  "teams": [
+    {
+      "teamID": "team1",
+      "teamName": "Visual Voyagers",
+      "points": 510,
+      "memors": 51,
+      "avatar": "./src/assets/images/team10logo.png",
+      "members": [
+        "johndoe@abc.com",
+        "janedoe@abc.com",
+        "johnsmith@abc.com",
+        "janesmith@abc.com"
+      ]
+    },
+    {
+      "teamID": "team2",
+      "name": "Code Crushers",
+      "points": 360,
+      "memors": 36,
+      "avatar": "src/assets/images/team2logo.png",
+      "members": [
+        "charliebrown@abc.com",
+        "lucybrown@abc.com",
+        "snoopybrown@abc.com",
+        "woodstockbrown@abc.com"
+      ]
+    },
+    {
+      "teamID": "team3",
+      "name": "Design Divas",
+      "points": 190,
+      "memors": 19,
+      "avatar": "./src/assets/images/team3logo.png",
+      "members": ["alice@abc.com", "bob@abc.com", "eve@abc.com"]
+    },
+    {
+      "teamID": "team4",
+      "name": "Marketing Mavericks",
+      "points": 150,
+      "memors": 15,
+      "avatar": "./src/assets/images/team4logo.png",
+      "members": [
+        "tonystark@abc.com",
+        "pepperpotts@abc.com",
+        "peterparker@abc.com"
+      ]
+    },
+    {
+      "teamID": "team5",
+      "name": "Sales Superstars",
+      "points": 120,
+      "memors": 12,
+      "avatar": "./src/assets/images/team5logo.png",
+      "members": [
+        "steverogers@abc.com",
+        "natasharomanoff@abc.com",
+        "brucebanner@abc.com"
+      ]
+    },
+    {
+      "teamID": "team6",
+      "teamName": "The Programmers",
+      "points": 100,
+      "memors": 10,
+      "rank": 6,
+      "avatar": "./src/assets/images/team6logo.png",
+      "members": []
+    },
+    {
+      "teamID": "team7",
+      "teamName": "The Developers",
+      "points": 90,
+      "memors": 9,
+      "rank": 7,
+      "avatar": "./src/assets/images/team7logo.png",
+      "members": []
+    },
+    {
+      "teamID": "team8",
+      "teamName": "The Designers",
+      "points": 80,
+      "memors": 8,
+      "rank": 8,
+      "avatar": "./src/assets/images/team8logo.png",
+      "members": []
+    },
+    {
+      "teamID": "team9",
+      "teamName": "The Creators",
+      "points": 70,
+      "memors": 7,
+      "rank": 9,
+      "avatar": "./src/assets/images/team9logo.png",
+      "members": []
+    },
+    {
+      "teamID": "team10",
+      "teamName": "The Innovators",
+      "points": 60,
+      "memors": 6,
+      "rank": 10,
+      "avatar": "./src/assets/images/team10logo.png",
+      "members": []
+    }
+  ],
+  "competitions": [
+    {
+      "competitionID": "comp1",
+      "competitionName": "New Year, New Me",
+      "competitionDescription": "For this competition, capture in your memors some things you want to change in the new year. It could be a new habit, a new hobby, or a new goal. Share your memors with your team to inspire each other!",
+      "competitionStartDate": "01/01/2025",
+      "competitionEndDate": "20/01/2025",
+      "competitionStatus": false
+    },
+    {
+      "competitionID": "comp2",
+      "competitionName": "Winter Wonderland",
+      "competitionDescription": "For this competition, capture in your memors the beauty of winter. It could be a snowy landscape, a cozy fireplace, or a cup of hot cocoa. Share your memors with your team to spread the winter cheer!",
+      "competitionStartDate": "01/12/2024",
+      "competitionEndDate": "31/12/2024",
+      "competitionStatus": true
+    },
+    {
+      "competitionID": "comp3",
+      "competitionName": "Holiday Spirit",
+      "competitionDescription": "For this competition, capture in your memors the holiday spirit. It could be a festive decoration, a holiday tradition, or a joyful moment. Share your memors with your team to celebrate the season!",
+      "competitionStartDate": "01/12/2024",
+      "competitionEndDate": "25/12/2024",
+      "competitionStatus": true
+    }
+  ]
+}
