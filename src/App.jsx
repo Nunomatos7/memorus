@@ -22,7 +22,7 @@ function App() {
 
   const demoUsers = [
     { email: "admin@blip.com", password: "admin123", role: "Admin" },
-    { email: "rui@blip.com", password: "user123", role: "Regular" },
+    { email: "user@blip.com", password: "user123", role: "Regular" },
   ];
 
   useEffect(() => {
