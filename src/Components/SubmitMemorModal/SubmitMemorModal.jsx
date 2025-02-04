@@ -9,6 +9,7 @@ import QrCode from "../../assets/images/QRcode.svg";
 import UploadButton from "../../assets/images/UploadButton.svg";
 import CustomButton from "../CustomButton/CustomButton";
 import FeedbackModal from "../FeedbackModal/FeedbackModal";
+import MemorPicture from "../MemorPicture/MemorPicture";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Mousewheel, FreeMode } from "swiper/modules";
 import "swiper/css";
@@ -19,13 +20,21 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
   const [uploadedImage, setUploadedImage] = useState(null);
   const [feedback, setFeedback] = useState(null);
   const [isSubmitMemorOpen, setIsSubmitMemorOpen] = useState(true);
+  const [selectedImage, setSelectedImage] = useState(null);
 
-  // Normalize images array to always have at least 6 items
   const normalizedImages = (() => {
-    const images = memor.image || []; // Use memor.image or an empty array
-    const placeholderCount = Math.max(6 - images.length, 0); // Calculate the number of placeholders needed
-    return [...images, ...Array(placeholderCount).fill(null)]; // Fill placeholders with null
+    const images = memor.image || [];
+    const placeholderCount = Math.max(6 - images.length, 0);
+    return [...images, ...Array(placeholderCount).fill(null)];
   })();
+
+  const handleImageClick = (image) => {
+    setSelectedImage(image);
+  };
+
+  const closeMemorPicture = () => {
+    setSelectedImage(null);
+  };
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -223,22 +232,33 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
               className='uploaded-photos-slider'
             >
               {normalizedImages.map((image, index) => (
-                <SwiperSlide key={index} className='photo-slide'>
+                <SwiperSlide
+                  key={index}
+                  className='photo-slide'
+                  onClick={() => image && handleImageClick(image)}
+                >
                   {image ? (
-                    (console.log(image),
-                    (
-                      <img
-                        src={image}
-                        alt={`Team photo ${index + 1}`}
-                        className='photo'
-                      />
-                    ))
+                    <img
+                      src={image}
+                      alt={`Team photo ${index + 1}`}
+                      className='photo'
+                    />
                   ) : (
                     <div className='photo-placeholder'></div>
                   )}
                 </SwiperSlide>
               ))}
             </Swiper>
+
+            {selectedImage && (
+              <MemorPicture
+                image={selectedImage}
+                title={memor.title}
+                submitDate={memor.dueDate}
+                teamName={memor.team}
+                onClose={closeMemorPicture}
+              />
+            )}
 
             {(memor.image?.length ?? 0) === 0 && (
               <Typography variant='body2' className='no-photos-text'>
@@ -286,6 +306,7 @@ SubmitMemorModal.propTypes = {
     submission: PropTypes.string,
     dueDate: PropTypes.string.isRequired,
     points: PropTypes.number.isRequired,
+    team: PropTypes.string.isRequired,
   }).isRequired,
 
   onClose: PropTypes.func.isRequired,
