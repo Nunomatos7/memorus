@@ -281,9 +281,7 @@
       "memorID": "1",
       "userID": "user2",
       "imgSrc": "../src/assets/images/lunch.jpg",
-      "submitDate": "01/12/2024",
-      "teamId": "team1",
-      "teamName": "Visual Voyagers"
+      "submitDate": "01/12/2024"
     },
     {
       "memorPictureId": "placeholder",
@@ -353,15 +351,7 @@
     {
       "teamID": "team1",
       "teamName": "Visual Voyagers",
-      "points": 510,
-      "memors": 51,
-      "avatar": "./src/assets/images/team10logo.png",
-      "members": [
-        "johndoe@abc.com",
-        "janedoe@abc.com",
-        "johnsmith@abc.com",
-        "janesmith@abc.com"
-      ]
+      "avatar": "./src/assets/images/team10logo.png"
     },
     {
       "teamID": "team2",
