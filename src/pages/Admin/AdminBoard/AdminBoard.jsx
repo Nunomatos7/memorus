@@ -787,8 +787,8 @@ const AdminBoard = () => {
       title: "New Year New Us",
       description:
         "For this competition, focus on capturing moments that highlight our team's spirit and the memories we're creating together. Let your entries celebrate our collective growth, the bonds we're strengthening, and the journey we're sharing in striving to achieve our best. 🌟",
-      startDate: "2025/01/01",
-      endDate: "2025/01/31",
+      startDate: "2024/02/01",
+      endDate: "2024/03/01",
     },
     {
       id: 8,
@@ -1699,72 +1699,96 @@ const AdminBoard = () => {
                           background: "#272728",
                         }}
                       >
-                        <Box
-                          sx={{
-                            flex: 2,
-                            display: "flex",
-                            gap: "15px",
-                            flexDirection: "column",
-                          }}
-                        >
+                        {ongoingCompetition ? (
+                          <>
+                            <Box
+                              sx={{
+                                flex: 2,
+                                display: "flex",
+                                gap: "15px",
+                                flexDirection: "column",
+                              }}
+                            >
+                              <Typography
+                                variant='body2'
+                                sx={{ fontWeight: "bold" }}
+                              >
+                                {ongoingCompetition.title}
+                              </Typography>
+                              <Typography variant='body2'>
+                                {ongoingCompetition.description}
+                              </Typography>
+                            </Box>
+
+                            <Box
+                              sx={{
+                                flex: 2,
+                                display: "flex",
+                                flexDirection: "column",
+                                alignItems: "center",
+                                gap: "20px",
+                              }}
+                            >
+                              <Typography variant='body2'>Duration</Typography>
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  alignItems: "center",
+                                  gap: "5px",
+                                }}
+                              >
+                                <Typography
+                                  variant='body2'
+                                  sx={{ color: "#9FE9E4" }}
+                                >
+                                  {calculateDaysLeft(
+                                    ongoingCompetition.endDate
+                                  )}{" "}
+                                  days remaining
+                                </Typography>
+                                <Typography variant='body2'>
+                                  {formatDate(ongoingCompetition.startDate)} -{" "}
+                                  {formatDate(ongoingCompetition.endDate)}
+                                </Typography>
+                              </Box>
+                            </Box>
+                          </>
+                        ) : (
                           <Typography
                             variant='body2'
-                            sx={{ fontWeight: "bold" }}
+                            sx={{ color: "#9FE9E4", textAlign: "center" }}
                           >
-                            {ongoingCompetition.title}
+                            No ongoing competition available
                           </Typography>
-                          <Typography variant='body2'>
-                            {ongoingCompetition.description}
-                          </Typography>
-                        </Box>
-                        <Box
-                          sx={{
-                            flex: 2,
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "center",
-                            gap: "20px",
-                          }}
-                        >
-                          <Typography variant='body2'>Duration</Typography>
-                          <Box
-                            sx={{
-                              display: "flex",
-                              flexDirection: "column",
-                              alignItems: "center",
-                              gap: "5px",
-                            }}
-                          >
-                            <Typography
-                              variant='body2'
-                              sx={{ color: "#9FE9E4" }}
-                            >
-                              {calculateDaysLeft(ongoingCompetition.endDate)}{" "}
-                              days remaining
-                            </Typography>
-                            <Typography variant='body2'>
-                              {formatDate(ongoingCompetition.startDate)} -{" "}
-                              {formatDate(ongoingCompetition.endDate)}
-                            </Typography>
-                          </Box>
-                        </Box>
+                        )}
+
                         <Box>
-                          {competitions
-                            .filter((comp) => comp.id === ongoingCompetition.id)
-                            .map((competition) => (
-                              <IconButton
-                                onClick={() =>
-                                  handleEditCompetitionModalOpen(competition)
-                                }
-                                key={competition.id}
-                              >
-                                <img
-                                  src={editIcon}
-                                  alt='edit'
-                                  style={{ width: "20px" }}
-                                />
-                              </IconButton>
-                            ))}
+                          {ongoingCompetition &&
+                          competitions.some(
+                            (comp) => comp.id === ongoingCompetition.id
+                          ) ? (
+                            competitions
+                              .filter(
+                                (comp) => comp.id === ongoingCompetition.id
+                              )
+                              .map((competition) => (
+                                <IconButton
+                                  onClick={() =>
+                                    handleEditCompetitionModalOpen(competition)
+                                  }
+                                  key={competition.id}
+                                >
+                                  <img
+                                    src={editIcon}
+                                    alt='edit'
+                                    style={{ width: "20px" }}
+                                  />
+                                </IconButton>
+                              ))
+                          ) : (
+                            <p></p>
+                          )}
                         </Box>
                       </Box>
                     </Box>
