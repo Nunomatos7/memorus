@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Mousewheel, FreeMode } from "swiper/modules";
 import { Grid, Card, CardContent, Typography, Box } from "@mui/material";
@@ -36,35 +36,9 @@ export const mockUser = {
   admin: false,
 };
 
-// const slidesData = [
-//   {
-//     id: 1,
-//     teamName: "The Debuggers",
-//     title: "Coffee break",
-//     description: "A nice coffee break with friends",
-//     submitDate: "2 days ago",
-//     image:
-//       "https://cdn.pixabay.com/photo/2023/10/23/16/24/bird-8336436_1280.jpg",
-//   },
-//   {
-//     id: 2,
-//     teamName: "Capital Crew",
-//     title: "Show us your city",
-//     description: "We bet it must look nice :)",
-//     submitDate: "8 days ago",
-//     image:
-//       "https://media.istockphoto.com/id/1368628035/photo/brooklyn-bridge-at-sunset.jpg?s=612x612&w=0&k=20&c=hPbMbTYRAVNYWAUMkl6r62fPIjGVJTXzRURCyCfoG08=",
-//   },
-//   { id: 3, image: "" },
-//   { id: 4, image: "" },
-//   { id: 5, image: "" },
-//   { id: 6, image: "" },
-//   { id: 7, image: "" },
-//   { id: 8, image: "" },
-// ];
-
 const Home = () => {
   const [selectedSlide, setSelectedSlide] = useState(null);
+  const swiperRef = useRef(null);
 
   const handleImageClick = (slide) => {
     setSelectedSlide(slide);
@@ -125,24 +99,18 @@ const Home = () => {
         <div className='overflow-hidden w-full'>
           <div className='container'>
             <Swiper
+              ref={swiperRef}
               spaceBetween={20}
               breakpoints={{
-                640: {
-                  slidesPerView: 2.3,
-                },
-                768: {
-                  slidesPerView: 4.3,
-                },
-                1024: {
-                  slidesPerView: 5.3,
-                },
+                640: { slidesPerView: 2.3 },
+                768: { slidesPerView: 4.3 },
+                1024: { slidesPerView: 5.3 },
               }}
               className='latest-wrapper'
               freeMode={true}
-              mousewheel={{
-                releaseOnEdges: true,
-              }}
+              mousewheel={{ releaseOnEdges: true }}
               modules={[Mousewheel, FreeMode]}
+              keyboard={{ enabled: true, onlyInViewport: true }}
             >
               {/* Filter unique titles */}
               {Object.values(
@@ -154,54 +122,79 @@ const Home = () => {
                 }, {})
               )
                 .sort((a, b) => a.id - b.id) // Sort titles by ID or some ordering criterion
-                .map((memor, index) => {
-                  // Map the memor data to SwiperSlide components
-                  return (
-                    <SwiperSlide
-                      key={memor.id}
-                      className={
-                        memor.image ? "latest-memors-pic" : "latest-memors"
+                .map((memor, index) => (
+                  <SwiperSlide
+                    key={memor.id}
+                    className={
+                      memor.image ? "latest-memors-pic" : "latest-memors"
+                    }
+                    tabIndex='0' // Make slides focusable
+                    role='button'
+                    aria-label={`Open memor titled ${memor.title}, submitted on ${memor.submittedDate}`}
+                    onClick={() => handleImageClick(memor)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        handleImageClick(memor);
                       }
-                    >
-                      {memor.image && (
-                        <div onClick={() => handleImageClick(memor)}>
-                          <div className='image-wrapper'>
-                            <img
-                              width={"100%"}
-                              height={"100%"}
-                              style={{ objectFit: "cover" }}
-                              src={memor.image[0]} // Use the first image
-                              alt='Memor Image'
-                            />
-                          </div>
-                          <div className='latest-memors-content'>
-                            <CustomButton
-                              text={memor.team}
-                              onClick={() => handleImageClick(memor)}
-                              sx={{
-                                display: "flex",
-                                padding: "3.147px 15.953px",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                flex: "1 0 0",
-                                alignSelf: "stretch",
-                                fontSize: "0.8rem",
-                                color: "#003731",
-                                fontWeight: "600",
-                              }}
-                            />
-                            <h3>{memor.submittedDate}</h3>
-                            <p style={{ fontSize: "0.9rem" }}>
-                              &quot;{memor.title}&quot;
-                            </p>
-                          </div>
-                        </div>
-                      )}
-                    </SwiperSlide>
-                  );
-                })}
 
-              {/* Add placeholders only at the end */}
+                      if (e.key === "Tab") {
+                        e.preventDefault(); // Prevents default browser scroll behavior
+
+                        let newIndex;
+                        if (e.shiftKey) {
+                          // Move to previous slide if Shift + Tab
+                          newIndex = Math.max(index - 1, 0);
+                        } else {
+                          // Move to next slide if Tab
+                          newIndex = Math.min(index + 1, memorsData.length - 1);
+                        }
+
+                        swiperRef.current?.swiper.slideTo(newIndex);
+                        // Move focus to the new slide
+                        const nextSlide =
+                          document.querySelectorAll(".latest-memors-pic")[
+                            newIndex
+                          ];
+                        if (nextSlide) nextSlide.focus();
+                      }
+                    }}
+                  >
+                    {memor.image && (
+                      <div onClick={() => handleImageClick(memor)}>
+                        <div className='image-wrapper'>
+                          <img
+                            width={"100%"}
+                            height={"100%"}
+                            style={{ objectFit: "cover" }}
+                            src={memor.image[0]}
+                            alt='Memor Image'
+                          />
+                        </div>
+                        <div className='latest-memors-content'>
+                          <CustomButton
+                            text={memor.team}
+                            onClick={() => handleImageClick(memor)}
+                            sx={{
+                              display: "flex",
+                              padding: "3.147px 15.953px",
+                              justifyContent: "center",
+                              alignItems: "center",
+                              flex: "1 0 0",
+                              alignSelf: "stretch",
+                              fontSize: "0.8rem",
+                              color: "#003731",
+                              fontWeight: "600",
+                            }}
+                          />
+                          <h3>{memor.submittedDate}</h3>
+                          <p style={{ fontSize: "0.9rem" }}>"{memor.title}"</p>
+                        </div>
+                      </div>
+                    )}
+                  </SwiperSlide>
+                ))}
+
               {Array.from(
                 {
                   length: Math.max(

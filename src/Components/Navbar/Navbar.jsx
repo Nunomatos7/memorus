@@ -158,7 +158,6 @@ const Navbar = () => {
       title: "You've received a new memor",
       description: "A new memor was added to your team's memors.",
     },
-    
   ]);
 
   const classes = useStyles();
