@@ -75,6 +75,7 @@ const Leaderboard = () => {
         <img
           src={background1}
           alt='leaderboard-bg1'
+          aria-hidden='true'
           style={{
             position: "absolute",
             top: "2",
@@ -86,6 +87,7 @@ const Leaderboard = () => {
         <img
           src={background2}
           alt='leaderboard-bg2'
+          aria-hidden='true'
           style={{
             position: "absolute",
             top: "25%",
@@ -97,6 +99,7 @@ const Leaderboard = () => {
         <img
           src={background3}
           alt='leaderboard-bg3'
+          aria-hidden='true'
           style={{
             position: "absolute",
             top: "35%",
@@ -121,6 +124,8 @@ const Leaderboard = () => {
               color: "white",
               marginBottom: "30px",
             }}
+            tabIndex={0}
+            aria-label="Leaderboard"
           >
             Leaderboard
           </Typography>
@@ -156,6 +161,8 @@ const Leaderboard = () => {
                   position: "relative",
                   height: "15rem",
                 }}
+                tabIndex={0}
+                aria-labelledby={`team-${leaderboardData[1].rank}`}
               >
                 <Box
                   sx={{
@@ -170,7 +177,6 @@ const Leaderboard = () => {
                 >
                   <Avatar
                     src={leaderboardData[1].avatar}
-                    alt={leaderboardData[1].teamName}
                     sx={{
                       width: "40px",
                       height: "40px",
@@ -241,6 +247,8 @@ const Leaderboard = () => {
                   position: "relative",
                   height: "20rem",
                 }}
+                tabIndex={0}
+                aria-labelledby={`team-${leaderboardData[0].rank}`}
               >
                 <Box
                   sx={{
@@ -255,7 +263,6 @@ const Leaderboard = () => {
                 >
                   <Avatar
                     src={leaderboardData[0].avatar}
-                    alt={leaderboardData[0].teamName}
                     sx={{
                       width: "40px",
                       height: "40px",
@@ -335,6 +342,8 @@ const Leaderboard = () => {
                   position: "relative",
                   height: "12rem",
                 }}
+                tabIndex={0}
+                aria-labelledby={`team-${leaderboardData[2].rank}`}
               >
                 <Box
                   sx={{
@@ -349,7 +358,6 @@ const Leaderboard = () => {
                 >
                   <Avatar
                     src={leaderboardData[2].avatar}
-                    alt={leaderboardData[2].teamName}
                     sx={{
                       width: "40px",
                       height: "40px",
@@ -476,6 +484,8 @@ const Leaderboard = () => {
                     padding: "10px",
                     marginTop: "-2px",
                   }}
+                  tabIndex={0}
+                  aria-label={`Rank ${team.rank}: ${team.teamName}, ${team.memors} Memors, ${team.points} Points`}
                 >
                   <Typography
                     variant='h6'

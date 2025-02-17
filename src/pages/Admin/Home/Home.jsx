@@ -36,33 +36,6 @@ export const mockUser = {
   admin: false,
 };
 
-// const slidesData = [
-//   {
-//     id: 1,
-//     teamName: "The Debuggers",
-//     title: "Coffee break",
-//     description: "A nice coffee break with friends",
-//     submitDate: "2 days ago",
-//     image:
-//       "https://cdn.pixabay.com/photo/2023/10/23/16/24/bird-8336436_1280.jpg",
-//   },
-//   {
-//     id: 2,
-//     teamName: "Capital Crew",
-//     title: "Show us your city",
-//     description: "We bet it must look nice :)",
-//     submitDate: "8 days ago",
-//     image:
-//       "https://media.istockphoto.com/id/1368628035/photo/brooklyn-bridge-at-sunset.jpg?s=612x612&w=0&k=20&c=hPbMbTYRAVNYWAUMkl6r62fPIjGVJTXzRURCyCfoG08=",
-//   },
-//   { id: 3, image: "" },
-//   { id: 4, image: "" },
-//   { id: 5, image: "" },
-//   { id: 6, image: "" },
-//   { id: 7, image: "" },
-//   { id: 8, image: "" },
-// ];
-
 const Home = () => {
   const [selectedSlide, setSelectedSlide] = useState(null);
 
@@ -76,18 +49,26 @@ const Home = () => {
     document.body.style.overflow = "auto";
   };
 
+  // Handle keyboard events for clickable elements
+  const handleKeyPress = (event, callback) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      callback();
+    }
+  };
+
   return (
     <>
       <Loader />
       <WelcomeModal />
-      <section className='mb-10'>
+      <section className='mb-10' aria-labelledby="latest-memors-heading">
         <div
           className='container'
           style={{ marginBottom: "1rem", marginTop: "2rem" }}
         >
           <img
             src={background1}
-            alt='leaderboard-bg1'
+            alt='Decorative background 1'
             style={{
               position: "absolute",
               top: "2",
@@ -95,10 +76,11 @@ const Home = () => {
               width: "15%",
               zIndex: "0",
             }}
+            aria-hidden="true"
           />
           <img
             src={background2}
-            alt='leaderboard-bg2'
+            alt='Decorative background 2'
             style={{
               position: "absolute",
               top: "25%",
@@ -106,10 +88,11 @@ const Home = () => {
               width: "5%",
               zIndex: "0",
             }}
+            aria-hidden="true"
           />
           <img
             src={background3}
-            alt='leaderboard-bg3'
+            alt='Decorative background 3'
             style={{
               position: "absolute",
               top: "35%",
@@ -117,8 +100,9 @@ const Home = () => {
               width: "5%",
               zIndex: "0",
             }}
+            aria-hidden="true"
           />
-          <h1 className='home-title'>Latest Memors</h1>
+          <h1 id="latest-memors-heading" className='home-title'>Latest Memors</h1>
         </div>
 
         {/* Swiper */}
@@ -143,8 +127,8 @@ const Home = () => {
                 releaseOnEdges: true,
               }}
               modules={[Mousewheel, FreeMode]}
+              aria-label="Latest Memors"
             >
-              {/* Filter unique titles */}
               {Object.values(
                 memorsData.reduce((acc, memor) => {
                   if (!acc[memor.title] && memor.image?.length > 0) {
@@ -153,55 +137,59 @@ const Home = () => {
                   return acc;
                 }, {})
               )
-                .sort((a, b) => a.id - b.id) // Sort titles by ID or some ordering criterion
-                .map((memor, index) => {
-                  // Map the memor data to SwiperSlide components
-                  return (
-                    <SwiperSlide
-                      key={memor.id}
-                      className={
-                        memor.image ? "latest-memors-pic" : "latest-memors"
-                      }
-                    >
-                      {memor.image && (
-                        <div onClick={() => handleImageClick(memor)}>
-                          <div className='image-wrapper'>
-                            <img
-                              width={"100%"}
-                              height={"100%"}
-                              style={{ objectFit: "cover" }}
-                              src={memor.image[0]} // Use the first image
-                              alt='Memor Image'
-                            />
-                          </div>
-                          <div className='latest-memors-content'>
-                            <CustomButton
-                              text={memor.team}
-                              onClick={() => handleImageClick(memor)}
-                              sx={{
-                                display: "flex",
-                                padding: "3.147px 15.953px",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                flex: "1 0 0",
-                                alignSelf: "stretch",
-                                fontSize: "0.8rem",
-                                color: "#003731",
-                                fontWeight: "600",
-                              }}
-                            />
-                            <h3>{memor.submittedDate}</h3>
-                            <p style={{ fontSize: "0.9rem" }}>
-                              &quot;{memor.title}&quot;
-                            </p>
-                          </div>
+                .sort((a, b) => a.id - b.id)
+                .map((memor, index) => (
+                  <SwiperSlide
+                    key={memor.id}
+                    className={memor.image ? "latest-memors-pic" : "latest-memors"}
+                    role="group"
+                    aria-label={`Memor ${index + 1}`}
+                  >
+                    {memor.image && (
+                      <div
+                        onClick={() => handleImageClick(memor)}
+                        onKeyPress={(e) => handleKeyPress(e, () => handleImageClick(memor))}
+                        tabIndex="0"
+                        role="button"
+                        aria-label={`View details for ${memor.title}`}
+                      >
+                        <div className='image-wrapper'>
+                          <img
+                            width={"100%"}
+                            height={"100%"}
+                            style={{ objectFit: "cover" }}
+                            src={memor.image[0]}
+                            alt={`Memor titled "${memor.title}"`}
+                          />
                         </div>
-                      )}
-                    </SwiperSlide>
-                  );
-                })}
+                        <div className='latest-memors-content'>
+                          <CustomButton
+                            text={memor.team}
+                            onClick={() => handleImageClick(memor)}
+                            onKeyPress={(e) => handleKeyPress(e, () => handleImageClick(memor))}
+                            sx={{
+                              display: "flex",
+                              padding: "3.147px 15.953px",
+                              justifyContent: "center",
+                              alignItems: "center",
+                              flex: "1 0 0",
+                              alignSelf: "stretch",
+                              fontSize: "0.8rem",
+                              color: "#003731",
+                              fontWeight: "600",
+                            }}
+                            aria-label={`View details for ${memor.team}`}
+                          />
+                          <h3>{memor.submittedDate}</h3>
+                          <p style={{ fontSize: "0.9rem" }}>
+                            &quot;{memor.title}&quot;
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </SwiperSlide>
+                ))}
 
-              {/* Add placeholders only at the end */}
               {Array.from(
                 {
                   length: Math.max(
@@ -221,6 +209,8 @@ const Home = () => {
                   <SwiperSlide
                     key={`placeholder-${index}`}
                     className='placeholder-slide'
+                    role="group"
+                    aria-label="Placeholder"
                   >
                     <div className='placeholder-content'>
                       <p style={{ fontSize: "0.9rem", color: "#aaa" }}>
@@ -234,7 +224,6 @@ const Home = () => {
           </div>
         </div>
 
-        {/* Modal Component */}
         {selectedSlide && (
           <MemorPicture
             image={selectedSlide.image[0]}
@@ -242,34 +231,32 @@ const Home = () => {
             title={selectedSlide.title}
             submitDate={selectedSlide.submittedDate}
             onClose={closeModal}
+            aria-labelledby="memor-picture-modal"
           />
         )}
       </section>
 
-      <section id='myMemors' className='container'>
-        <Typography variant='h6' gutterBottom style={{ color: "white" }}>
+      <section id='myMemors' className='container' aria-labelledby="memors-dashboard-heading">
+        <Typography variant='h6' gutterBottom style={{ color: "white" }} id="memors-dashboard-heading">
           Memors Dashboard
         </Typography>
         <Grid container spacing={3}>
-          {/* Pending Memors */}
           <Grid item xs={12} sm={3}>
             <Card
               className='card'
-              onClick={() =>
-                (window.location.href = "/admin/adminBoard?tab=ongoing")
-              }
+              onClick={() => (window.location.href = "/admin/adminBoard?tab=ongoing")}
+              onKeyPress={(e) => handleKeyPress(e, () => (window.location.href = "/admin/adminBoard?tab=ongoing"))}
               style={{ cursor: "pointer" }}
+              tabIndex="0"
+              role="button"
+              aria-label="View ongoing Memors"
             >
               <CardContent>
-                <Box
-                  display='flex'
-                  alignItems='center'
-                  justifyContent='space-between'
-                >
+                <Box display='flex' alignItems='center' justifyContent='space-between'>
                   <Typography variant='h4' fontWeight='bold'>
                     {mockUser.pending_memors}
                   </Typography>
-                  <img src={ongoing} alt='ongoing' />
+                  <img src={ongoing} alt='Ongoing Memors' />
                 </Box>
                 <Typography variant='body2' color='#B0B0B0'>
                   Ongoing Memors
@@ -278,25 +265,22 @@ const Home = () => {
             </Card>
           </Grid>
 
-          {/* Closed Memors */}
           <Grid item xs={12} sm={3}>
             <Card
               className='card'
-              onClick={() =>
-                (window.location.href = "/admin/adminBoard?tab=closed")
-              }
+              onClick={() => (window.location.href = "/admin/adminBoard?tab=closed")}
+              onKeyPress={(e) => handleKeyPress(e, () => (window.location.href = "/admin/adminBoard?tab=closed"))}
               style={{ cursor: "pointer" }}
+              tabIndex="0"
+              role="button"
+              aria-label="View closed Memors"
             >
               <CardContent>
-                <Box
-                  display='flex'
-                  alignItems='center'
-                  justifyContent='space-between'
-                >
+                <Box display='flex' alignItems='center' justifyContent='space-between'>
                   <Typography variant='h4' fontWeight='bold'>
                     {mockUser.complete_memors}
                   </Typography>
-                  <img src={closed} alt='ongoing' />
+                  <img src={closed} alt='Closed Memors' />
                 </Box>
                 <Typography variant='body2' color='#B0B0B0'>
                   Closed Memors
@@ -305,36 +289,44 @@ const Home = () => {
             </Card>
           </Grid>
 
-          {/* Remaining Time */}
           <Grid item xs={12} sm={6}>
-            <Card className='card'>
-              <CardContent>
-                <Box
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    flexDirection: "column",
-                  }}
-                >
-                  <Box>
-                    <Typography variant='h6' style={{ color: "white" }}>
-                      The competition{" "}
-                      <span style={{ color: "#215952", fontWeight: "bold" }}>
-                        New Year New Us
-                      </span>{" "}
-                      ends in
-                    </Typography>
-                  </Box>
-                  <Countdown endDate='2025-01-31T00:00:00' role='admin' />
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
+  <Card className='card' aria-labelledby="competition-heading">
+    <CardContent>
+      <Box
+        style={{
+          display: "flex",
+          alignItems: "center",
+          flexDirection: "column",
+        }}
+      >
+        <Box>
+          <Typography
+            variant='h6'
+            style={{ color: "white" }}
+            id="competition-heading"
+          >
+            The competition{" "}
+            <span style={{ color: "#215952", fontWeight: "bold" }}>
+              New Year New Us
+            </span>{" "}
+            ends in
+          </Typography>
+        </Box>
+        <Countdown
+          endDate='2025-01-31T00:00:00'
+          role='admin'
+          aria-label="Countdown to competition end: New Year New Us"
+          aria-live="polite" // Ensures screen readers announce updates
+        />
+      </Box>
+    </CardContent>
+  </Card>
+</Grid> 
         </Grid>
       </section>
 
-      <section id='currentLeaders' className='pb-10 container'>
-        <Typography variant='h6' gutterBottom style={{ color: "white" }}>
+      <section id='currentLeaders' className='pb-10 container' aria-labelledby="current-leaders-heading">
+        <Typography variant='h6' gutterBottom style={{ color: "white" }} id="current-leaders-heading">
           Current Leaders
         </Typography>
         <Grid container spacing={2}>
@@ -350,14 +342,13 @@ const Home = () => {
                 <Card
                   className='card'
                   onClick={() => (window.location.href = "/admin/leaderboard")}
+                  onKeyPress={(e) => handleKeyPress(e, () => (window.location.href = "/admin/leaderboard"))}
                   style={{ cursor: "pointer" }}
+                  tabIndex="0"
+                  role="button"
+                  aria-label={`View details for ${team.teamName}`}
                 >
-                  <Box
-                    display='flex'
-                    alignItems='center'
-                    style={{ width: "100%" }}
-                  >
-                    {/* Left Column - Rank Image */}
+                  <Box display='flex' alignItems='center' style={{ width: "100%" }}>
                     <Box style={{ flex: 1, textAlign: "center" }}>
                       <img
                         src={rankImages[team.rank]}
@@ -370,19 +361,8 @@ const Home = () => {
                         }}
                       />
                     </Box>
-
-                    {/* Right Column - Team Details */}
-                    <Box
-                      style={{
-                        flex: team.rank === 1 ? 1 : 1.5,
-                        paddingRight: "20px",
-                      }}
-                    >
-                      <Box
-                        className='team-header'
-                        display='flex'
-                        justifyContent='space-between'
-                      >
+                    <Box style={{ flex: team.rank === 1 ? 1 : 1.5, paddingRight: "20px" }}>
+                      <Box className='team-header' display='flex' justifyContent='space-between'>
                         <Typography variant='h6' className='team-name'>
                           {team.teamName}
                         </Typography>
@@ -398,12 +378,7 @@ const Home = () => {
                           }}
                         />
                       </Box>
-                      <Box
-                        className='stats'
-                        display='flex'
-                        justifyContent='space-between'
-                        marginTop='10px'
-                      >
+                      <Box className='stats' display='flex' justifyContent='space-between' marginTop='10px'>
                         <div>
                           <Typography variant='body2' className='label'>
                             Total Points
