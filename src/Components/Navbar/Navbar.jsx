@@ -14,6 +14,7 @@ import {
   Button,
 } from "@mui/material";
 import { styled } from "@mui/system";
+import PropTypes from "prop-types";
 import MenuIcon from "@mui/icons-material/Menu";
 import logo from "../../assets/images/logoText.svg";
 import profileIcon from "../../assets/images/profile.svg";
@@ -438,6 +439,27 @@ const Navbar = () => {
       </Toolbar>
     </AppBar>
   );
+};
+NotificationItem.propTypes = {
+  notification: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    image: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+  }).isRequired,
+  onDelete: PropTypes.func.isRequired,
+};
+
+Navbar.propTypes = {
+  notifications: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      image: PropTypes.string.isRequired,
+      title: PropTypes.string.isRequired,
+      description: PropTypes.string.isRequired,
+    })
+  ).isRequired,
+  handleDeleteNotification: PropTypes.func.isRequired,
 };
 
 export default Navbar;

@@ -188,7 +188,9 @@ const Home = () => {
                             }}
                           />
                           <h3>{memor.submittedDate}</h3>
-                          <p style={{ fontSize: "0.9rem" }}>"{memor.title}"</p>
+                          <p style={{ fontSize: "0.9rem" }}>
+                            &quot;{memor.title}&quot;
+                          </p>
                         </div>
                       </div>
                     )}
