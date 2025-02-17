@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Mousewheel, FreeMode } from "swiper/modules";
 import { Grid, Card, CardContent, Typography, Box } from "@mui/material";
@@ -38,6 +38,7 @@ export const mockUser = {
 
 const Home = () => {
   const [selectedSlide, setSelectedSlide] = useState(null);
+  const swiperRef = useRef(null);
 
   const handleImageClick = (slide) => {
     setSelectedSlide(slide);
@@ -109,25 +110,19 @@ const Home = () => {
         <div className='overflow-hidden w-full'>
           <div className='container'>
             <Swiper
+              ref={swiperRef}
               spaceBetween={20}
               breakpoints={{
-                640: {
-                  slidesPerView: 2.3,
-                },
-                768: {
-                  slidesPerView: 4.3,
-                },
-                1024: {
-                  slidesPerView: 5.3,
-                },
+                640: { slidesPerView: 2.3 },
+                768: { slidesPerView: 4.3 },
+                1024: { slidesPerView: 5.3 },
               }}
               className='latest-wrapper'
               freeMode={true}
-              mousewheel={{
-                releaseOnEdges: true,
-              }}
+              mousewheel={{ releaseOnEdges: true }}
               modules={[Mousewheel, FreeMode]}
               aria-label="Latest Memors"
+              keyboard={{ enabled: true, onlyInViewport: true }}
             >
               {Object.values(
                 memorsData.reduce((acc, memor) => {
@@ -137,36 +132,60 @@ const Home = () => {
                   return acc;
                 }, {})
               )
-                .sort((a, b) => a.id - b.id)
+                .sort((a, b) => a.id - b.id) // Sort titles by ID or some ordering criterion
                 .map((memor, index) => (
                   <SwiperSlide
                     key={memor.id}
-                    className={memor.image ? "latest-memors-pic" : "latest-memors"}
-                    role="group"
-                    aria-label={`Memor ${index + 1}`}
+                    className={
+                      memor.image ? "latest-memors-pic" : "latest-memors"
+                    }
+                    tabIndex='0' // Make slides focusable
+                    role='button'
+                    aria-label={`Open memor titled ${memor.title}, submitted on ${memor.submittedDate}`}
+                    onClick={() => handleImageClick(memor)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        handleImageClick(memor);
+                      }
+
+                      if (e.key === "Tab") {
+                        e.preventDefault(); // Prevents default browser scroll behavior
+
+                        let newIndex;
+                        if (e.shiftKey) {
+                          // Move to previous slide if Shift + Tab
+                          newIndex = Math.max(index - 1, 0);
+                        } else {
+                          // Move to next slide if Tab
+                          newIndex = Math.min(index + 1, memorsData.length - 1);
+                        }
+
+                        swiperRef.current?.swiper.slideTo(newIndex);
+                        // Move focus to the new slide
+                        const nextSlide =
+                          document.querySelectorAll(".latest-memors-pic")[
+                            newIndex
+                          ];
+                        if (nextSlide) nextSlide.focus();
+                      }
+                    }}
                   >
                     {memor.image && (
-                      <div
-                        onClick={() => handleImageClick(memor)}
-                        onKeyPress={(e) => handleKeyPress(e, () => handleImageClick(memor))}
-                        tabIndex="0"
-                        role="button"
-                        aria-label={`View details for ${memor.title}`}
-                      >
+                      <div onClick={() => handleImageClick(memor)}>
                         <div className='image-wrapper'>
                           <img
                             width={"100%"}
                             height={"100%"}
                             style={{ objectFit: "cover" }}
                             src={memor.image[0]}
-                            alt={`Memor titled "${memor.title}"`}
+                            alt='Memor Image'
                           />
                         </div>
                         <div className='latest-memors-content'>
                           <CustomButton
                             text={memor.team}
                             onClick={() => handleImageClick(memor)}
-                            onKeyPress={(e) => handleKeyPress(e, () => handleImageClick(memor))}
                             sx={{
                               display: "flex",
                               padding: "3.147px 15.953px",
@@ -178,7 +197,6 @@ const Home = () => {
                               color: "#003731",
                               fontWeight: "600",
                             }}
-                            aria-label={`View details for ${memor.team}`}
                           />
                           <h3>{memor.submittedDate}</h3>
                           <p style={{ fontSize: "0.9rem" }}>

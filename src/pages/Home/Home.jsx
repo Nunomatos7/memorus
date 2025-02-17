@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Mousewheel, FreeMode } from "swiper/modules";
 import "swiper/css";
@@ -28,6 +28,7 @@ const rankImages = {
 
 const Home = () => {
   const [selectedSlide, setSelectedSlide] = useState(null);
+  const swiperRef = useRef(null);
 
   const handleImageClick = (slide) => {
     setSelectedSlide(slide);
@@ -91,54 +92,74 @@ const Home = () => {
             </span>
           </h1>
         </div>
-
-        {/* Swiper */}
         {/* Swiper */}
         <div className='overflow-hidden w-full'>
           <div className='container'>
             <Swiper
+              ref={swiperRef}
               spaceBetween={20}
               breakpoints={{
-                640: {
-                  slidesPerView: 2.3,
-                },
-                768: {
-                  slidesPerView: 4.3,
-                },
-                1024: {
-                  slidesPerView: 5.3,
-                },
+                640: { slidesPerView: 2.3 },
+                768: { slidesPerView: 4.3 },
+                1024: { slidesPerView: 5.3 },
               }}
               className='latest-wrapper'
               freeMode={true}
-              mousewheel={{
-                releaseOnEdges: true,
-              }}
+              mousewheel={{ releaseOnEdges: true }}
               modules={[Mousewheel, FreeMode]}
+              keyboard={{ enabled: true, onlyInViewport: true }}
             >
-              {/* Slides */}
               {memorsData
                 .filter(
                   (slide) => slide.team === "The Debuggers" && slide.image
                 )
-                .map((slide) => (
-                  <SwiperSlide key={slide.id} className='latest-memors-pic'>
-                    <div onClick={() => handleImageClick(slide)}>
-                      <div className='image-wrapper'>
-                        <img
-                          width={"100%"}
-                          height={"100%"}
-                          style={{ objectFit: "cover" }}
-                          src={slide.image[0]}
-                          alt=''
-                        />
-                      </div>
-                      <div className='latest-memors-content'>
-                        <h3>{slide.submittedDate}</h3>
-                        <p style={{ fontSize: "0.9rem" }}>
-                          &quot;{slide.title}&quot;
-                        </p>
-                      </div>
+                .map((slide, index) => (
+                  <SwiperSlide
+                    key={slide.id}
+                    className='latest-memors-pic'
+                    tabIndex='0'
+                    role='button'
+                    aria-label={`Open memor titled ${slide.title}, submitted on ${slide.submittedDate}`}
+                    onClick={() => handleImageClick(slide)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        handleImageClick(slide);
+                      }
+
+                      if (e.key === "Tab") {
+                        e.preventDefault();
+                        let newIndex;
+                        if (e.shiftKey) {
+                          newIndex = Math.max(index - 1, 0);
+                        } else {
+                          newIndex = Math.min(index + 1, memorsData.length - 1);
+                        }
+
+                        swiperRef.current?.swiper.slideTo(newIndex);
+
+                        const nextSlide =
+                          document.querySelectorAll(".latest-memors-pic")[
+                            newIndex
+                          ];
+                        if (nextSlide) nextSlide.focus();
+                      }
+                    }}
+                  >
+                    <div className='image-wrapper'>
+                      <img
+                        width={"100%"}
+                        height={"100%"}
+                        style={{ objectFit: "cover" }}
+                        src={slide.image[0]}
+                        alt={`Memor image: ${slide.title}`}
+                      />
+                    </div>
+                    <div className='latest-memors-content'>
+                      <h3>{slide.submittedDate}</h3>
+                      <p style={{ fontSize: "0.9rem" }}>
+                        &quot;{slide.title}&quot;
+                      </p>
                     </div>
                   </SwiperSlide>
                 ))}
@@ -158,6 +179,8 @@ const Home = () => {
                   <SwiperSlide
                     key={`placeholder-${index}`}
                     className='placeholder-slide'
+                    tabIndex='0'
+                    aria-label='Empty memor placeholder'
                   >
                     <div className='placeholder-content'>
                       <p style={{ fontSize: "0.9rem", color: "#aaa" }}>
@@ -170,7 +193,6 @@ const Home = () => {
             </Swiper>
           </div>
         </div>
-
         {/* Modal Component */}
         {selectedSlide && (
           <MemorPicture
