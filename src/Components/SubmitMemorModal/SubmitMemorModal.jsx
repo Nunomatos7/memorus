@@ -5,7 +5,7 @@ import { Typography, Button } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { Groups, Stars } from "@mui/icons-material";
 import TodayIcon from "@mui/icons-material/Today";
-import QrCode from "../../assets/images/QRcode.svg";
+import QRCode from "react-qr-code";
 import UploadButton from "../../assets/images/UploadButton.svg";
 import CustomButton from "../CustomButton/CustomButton";
 import FeedbackModal from "../FeedbackModal/FeedbackModal";
@@ -187,7 +187,13 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
                 ) : (
                   <>
                     <div className='qr-code-placeholder'>
-                      <img src={QrCode} alt='QR code' />
+                      <QRCode
+                        value={`https://memor-us.com/memors/${memor.id}`}
+                        size={128}
+                        bgColor='transparent'
+                        fgColor='#d0bcfe'
+                        style={{ padding: "8px", borderRadius: "8px" }}
+                      />
                       <Typography variant='body2' style={{ color: "#DDDAF2" }}>
                         Scan it with your phone
                       </Typography>
@@ -239,6 +245,7 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
                 >
                   {image ? (
                     <img
+                      style={{ cursor: "pointer" }}
                       src={image}
                       alt={`Team photo ${index + 1}`}
                       className='photo'
