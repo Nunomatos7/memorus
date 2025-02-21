@@ -314,6 +314,7 @@ SubmitMemorModal.propTypes = {
     dueDate: PropTypes.string.isRequired,
     points: PropTypes.number.isRequired,
     team: PropTypes.string.isRequired,
+    id: PropTypes.number.isRequired,
   }).isRequired,
 
   onClose: PropTypes.func.isRequired,
