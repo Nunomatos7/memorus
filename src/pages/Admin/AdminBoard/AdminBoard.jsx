@@ -76,7 +76,7 @@ const AdminBoard = () => {
       title: "Coffee Break",
       description:
         "Join the coffee break, where you can share a cup and a story online. Make sure to have your favorite mug!",
-      date: "01/25/2025",
+      date: "02/25/2025",
       points: "+ 30 pts",
       teamsLeft: 5,
     },
@@ -1237,7 +1237,13 @@ const AdminBoard = () => {
                           </span>
                         );
                       } else {
-                        return "";
+                        return (
+                          <span style={{ opacity: 0 }}>
+                            <span style={{ color: "#d8504d" }}>
+                              0 days left
+                            </span>
+                          </span>
+                        );
                       }
                     })()}
                   </Typography>
@@ -1831,14 +1837,17 @@ const AdminBoard = () => {
                           flexDirection: "column",
                         }}
                       >
-                        <Typography variant="body2" sx={{ fontWeight: "bold", color: "#C3AAAA" }}>
+                        <Typography
+                          variant="body2"
+                          sx={{ fontWeight: "bold", color: "#C3AAAA" }}
+                        >
                           No Ongoing Competition
                         </Typography>
-                        <Typography variant="body2" sx={{color: "#C3AAAA"}}>
+                        <Typography variant="body2" sx={{ color: "#C3AAAA" }}>
                           It looks like there are no active competitions right
                           now. To get started, simply create a new competition
                           by clicking the button. You can define the rules and
-                          set timelines.  
+                          set timelines.
                         </Typography>
                       </Box>
                     </Box>
@@ -1962,6 +1971,8 @@ const AdminBoard = () => {
             context="team"
             itemName={modalData.memberName}
             teamName={modalData.teamName}
+            aria-labelledby="confirmation-modal-title"
+            aria-describedby="confirmation-modal-description"
           />
 
           {/* Confirmation Modal for Deleting Team */}
@@ -1978,21 +1989,30 @@ const AdminBoard = () => {
 
           {/* Create Team Modal */}
           {isCreateModalOpen && (
-            <div className="modal-overlay-submit-memor">
+            <div
+              className="modal-overlay-submit-memor"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="create-team-modal-title"
+              aria-describedby="create-team-modal-description"
+            >
               <div
                 className="modal-container"
                 style={{ padding: "20px", maxWidth: "600px" }}
+                tabIndex={-1} // Make the modal focusable
               >
                 <div className="modal-top" style={{ marginBottom: "20px" }}>
                   <Button
                     onClick={() => handleTeamModalClose()}
                     sx={{ minWidth: 0, p: 0, color: "#BEC9C5" }}
+                    aria-label="Close modal"
                   >
                     <ArrowBackIcon />
                   </Button>
                   <Typography
                     variant="h6"
                     sx={{ marginLeft: "10px", color: "#BEC9C5" }}
+                    id="create-team-modal-title"
                   >
                     Admin Board
                   </Typography>
@@ -2023,6 +2043,9 @@ const AdminBoard = () => {
                     },
                     "& .MuiInputLabel-root": { color: "#888" },
                   }}
+                  inputProps={{
+                    "aria-label": "Team's Name",
+                  }}
                 />
                 <Typography
                   variant="body1"
@@ -2049,6 +2072,7 @@ const AdminBoard = () => {
                       src={newTeamThumbnail}
                       alt="Uploaded Thumbnail"
                       style={{ borderRadius: "10px", height: "120px" }}
+                      aria-label="Uploaded Thumbnail"
                     />
                   ) : (
                     <>
@@ -2081,6 +2105,7 @@ const AdminBoard = () => {
                         className="file-input"
                         onChange={handleFileChange}
                         style={{ display: "none" }}
+                        aria-label="Upload Thumbnail"
                       />
                     </>
                   )}
@@ -2115,6 +2140,9 @@ const AdminBoard = () => {
                       </InputAdornment>
                     ),
                   }}
+                  inputProps={{
+                    "aria-label": "Search Members",
+                  }}
                 />
                 <div
                   style={{
@@ -2146,6 +2174,9 @@ const AdminBoard = () => {
                           }))
                         }
                         sx={{ color: "#82D5C7" }}
+                        inputProps={{
+                          "aria-label": `Select ${member.name}`,
+                        }}
                       />
                       <Typography sx={{ color: "#FFFFFF" }}>
                         {member.name}
@@ -2176,6 +2207,7 @@ const AdminBoard = () => {
                         backgroundColor: "rgba(181, 237, 228, 0.08)",
                       },
                     }}
+                    aria-label="Cancel"
                   />
                   <CustomButton
                     text="Confirm"
@@ -2186,6 +2218,7 @@ const AdminBoard = () => {
                         backgroundColor: "#80ccbc",
                       },
                     }}
+                    aria-label="Confirm"
                   />
                 </Box>
               </div>
@@ -2211,15 +2244,24 @@ const AdminBoard = () => {
                   style: { backgroundColor: "#4caf50", color: "#fff" },
                 },
               ]}
+              aria-labelledby="feedback-modal-title"
+              aria-describedby="feedback-modal-description"
             />
           )}
 
           {/* Create Memor Modal */}
           {isCreateMemorModalOpen && (
-            <div className="modal-overlay-submit-memor">
+            <div
+              className="modal-overlay-submit-memor"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="create-memor-modal-title"
+              aria-describedby="create-memor-modal-description"
+            >
               <div
                 className="modal-container"
                 style={{ padding: "20px", maxWidth: "600px" }}
+                tabIndex={-1}
               >
                 <div className="modal-top" style={{ marginBottom: "20px" }}>
                   <Button
@@ -2380,10 +2422,17 @@ const AdminBoard = () => {
 
           {/* Edit Memor Modal */}
           {isEditMemorModalOpen && (
-            <div className="modal-overlay-submit-memor">
+            <div
+              className="modal-overlay-submit-memor"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="edit-memor-modal-title"
+              aria-describedby="edit-memor-modal-description"
+            >
               <div
                 className="modal-container"
                 style={{ padding: "20px", maxWidth: "600px" }}
+                tabIndex={-1}
               >
                 <div className="modal-top" style={{ marginBottom: "20px" }}>
                   <Button
@@ -2543,10 +2592,17 @@ const AdminBoard = () => {
 
           {/* Edit Competition Modal */}
           {isEditCompetitionModalOpen && (
-            <div className="modal-overlay-submit-memor">
+            <div
+              className="modal-overlay-submit-memor"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="edit-competition-modal-title"
+              aria-describedby="edit-competition-modal-description"
+            >
               <div
                 className="modal-container"
                 style={{ padding: "20px", maxWidth: "600px" }}
+                tabIndex={-1}
               >
                 <div className="modal-top" style={{ marginBottom: "20px" }}>
                   <Button
