@@ -287,7 +287,7 @@ const Home = () => {
                       ends in
                     </Typography>
                   </Box>
-                  <Countdown endDate='2025-01-31T00:00:00' role='user' />
+                  <Countdown endDate='2025-05-31T00:00:00' role='user' />
                 </Box>
               </CardContent>
             </Card>

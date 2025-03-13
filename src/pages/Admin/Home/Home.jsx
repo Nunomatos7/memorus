@@ -364,7 +364,7 @@ const Home = () => {
                     </Typography>
                   </Box>
                   <Countdown
-                    endDate='2025-01-31T00:00:00'
+                    endDate='2025-05-31T00:00:00'
                     role='admin'
                     aria-label='Countdown to competition end: New Year New Us'
                     aria-live='polite' // Ensures screen readers announce updates

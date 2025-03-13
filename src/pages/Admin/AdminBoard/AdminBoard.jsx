@@ -787,8 +787,8 @@ const AdminBoard = () => {
       title: "New Year New Us",
       description:
         "For this competition, focus on capturing moments that highlight our team's spirit and the memories we're creating together. Let your entries celebrate our collective growth, the bonds we're strengthening, and the journey we're sharing in striving to achieve our best. 🌟",
-      startDate: "2024/02/01",
-      endDate: "2024/03/01",
+      startDate: "2025/02/01",
+      endDate: "2025/05/31",
     },
     {
       id: 8,
