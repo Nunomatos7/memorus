@@ -3,7 +3,16 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Mousewheel, FreeMode } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/free-mode";
-import { Grid, Card, CardContent, Typography, Box } from "@mui/material";
+import {
+  Grid,
+  Card,
+  CardContent,
+  Typography,
+  Box,
+  IconButton,
+  FormControlLabel,
+  Switch,
+} from "@mui/material";
 import MemorPicture from "./../../Components/MemorPicture/MemorPicture";
 import "./Home.css";
 import rank1 from "../../assets/images/rank1home.svg";
@@ -19,6 +28,8 @@ import background1 from "../../assets/images/background1.svg";
 import background2 from "../../assets/images/background2.svg";
 import background3 from "../../assets/images/background3.svg";
 import { memorsData } from "../../Data/Memors.json";
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 const rankImages = {
   1: rank1,
@@ -28,6 +39,7 @@ const rankImages = {
 
 const Home = () => {
   const [selectedSlide, setSelectedSlide] = useState(null);
+  const [showLeaderboard, setShowLeaderboard] = useState(true);
   const swiperRef = useRef(null);
 
   const handleImageClick = (slide) => {
@@ -40,18 +52,46 @@ const Home = () => {
     document.body.style.overflow = "auto";
   };
 
+  const toggleLeaderboard = () => {
+    setShowLeaderboard(!showLeaderboard);
+  };
+
   return (
     <>
       <Loader />
       <WelcomeModal />
-      <section className='mb-10'>
+      <section className="mb-10">
         <div
-          className='container'
-          style={{ marginBottom: "1rem", marginTop: "2rem" }}
+          className="container"
+          style={{
+            marginBottom: "1rem",
+            marginTop: "2rem",
+            position: "relative",
+          }}
         >
+          {/* Toggle Button with Label */}
+          <Box
+  style={{
+    position: "absolute",
+    top: 0,
+    right: 0,
+    zIndex: 1,
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: "4px", // Adds spacing between the icon and the label
+  }}
+>
+  <IconButton onClick={toggleLeaderboard} style={{ color: "white" }}>
+    {showLeaderboard ? <VisibilityIcon /> : <VisibilityOffIcon />}
+  </IconButton>
+  <Typography variant="body2" style={{ color: "white" }}>
+    {showLeaderboard ? "Hide Leaderboard" : "Show Leaderboard"}
+  </Typography>
+</Box>
           <img
             src={background1}
-            alt='leaderboard-bg1'
+            alt="leaderboard-bg1"
             style={{
               position: "absolute",
               top: "2",
@@ -62,7 +102,7 @@ const Home = () => {
           />
           <img
             src={background2}
-            alt='leaderboard-bg2'
+            alt="leaderboard-bg2"
             style={{
               position: "absolute",
               top: "25%",
@@ -73,7 +113,7 @@ const Home = () => {
           />
           <img
             src={background3}
-            alt='leaderboard-bg3'
+            alt="leaderboard-bg3"
             style={{
               position: "absolute",
               top: "35%",
@@ -83,7 +123,7 @@ const Home = () => {
             }}
           />
           <h1
-            className='home-title'
+            className="home-title"
             style={{ display: "flex", alignItems: "center", gap: "1rem" }}
           >
             Latest Memors <span>•</span>{" "}
@@ -93,8 +133,8 @@ const Home = () => {
           </h1>
         </div>
         {/* Swiper */}
-        <div className='overflow-hidden w-full'>
-          <div className='container'>
+        <div className="overflow-hidden w-full">
+          <div className="container">
             <Swiper
               ref={swiperRef}
               spaceBetween={20}
@@ -103,7 +143,7 @@ const Home = () => {
                 768: { slidesPerView: 4.3 },
                 1024: { slidesPerView: 5.3 },
               }}
-              className='latest-wrapper'
+              className="latest-wrapper"
               freeMode={true}
               mousewheel={{ releaseOnEdges: true }}
               modules={[Mousewheel, FreeMode]}
@@ -116,9 +156,9 @@ const Home = () => {
                 .map((slide, index) => (
                   <SwiperSlide
                     key={slide.id}
-                    className='latest-memors-pic'
-                    tabIndex='0'
-                    role='button'
+                    className="latest-memors-pic"
+                    tabIndex="0"
+                    role="button"
                     aria-label={`Open memor titled ${slide.title}, submitted on ${slide.submittedDate}`}
                     onClick={() => handleImageClick(slide)}
                     onKeyDown={(e) => {
@@ -146,7 +186,7 @@ const Home = () => {
                       }
                     }}
                   >
-                    <div className='image-wrapper'>
+                    <div className="image-wrapper">
                       <img
                         width={"100%"}
                         height={"100%"}
@@ -155,7 +195,7 @@ const Home = () => {
                         alt={`Memor image: ${slide.title}`}
                       />
                     </div>
-                    <div className='latest-memors-content'>
+                    <div className="latest-memors-content">
                       <h3>{slide.submittedDate}</h3>
                       <p style={{ fontSize: "0.9rem" }}>
                         &quot;{slide.title}&quot;
@@ -178,11 +218,11 @@ const Home = () => {
                 (_, index) => (
                   <SwiperSlide
                     key={`placeholder-${index}`}
-                    className='placeholder-slide'
-                    tabIndex='0'
-                    aria-label='Empty memor placeholder'
+                    className="placeholder-slide"
+                    tabIndex="0"
+                    aria-label="Empty memor placeholder"
                   >
-                    <div className='placeholder-content'>
+                    <div className="placeholder-content">
                       <p style={{ fontSize: "0.9rem", color: "#aaa" }}>
                         Placeholder
                       </p>
@@ -205,30 +245,30 @@ const Home = () => {
         )}
       </section>
 
-      <section id='myMemors' className='container'>
-        <Typography variant='h6' gutterBottom style={{ color: "white" }}>
+      <section id="myMemors" className="container">
+        <Typography variant="h6" gutterBottom style={{ color: "white" }}>
           My Memors
         </Typography>
         <Grid container spacing={3}>
           {/* Pending Memors */}
           <Grid item xs={12} sm={3}>
             <Card
-              className='card'
+              className="card"
               onClick={() => (window.location.href = "/memors?tab=incomplete")}
               style={{ cursor: "pointer" }}
             >
               <CardContent>
                 <Box
-                  display='flex'
-                  alignItems='center'
-                  justifyContent='space-between'
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="space-between"
                 >
-                  <Typography variant='h4' fontWeight='bold'>
+                  <Typography variant="h4" fontWeight="bold">
                     6
                   </Typography>
-                  <img src={pending} alt='pending' />
+                  <img src={pending} alt="pending" />
                 </Box>
-                <Typography variant='body2' color='#B0B0B0'>
+                <Typography variant="body2" color="#B0B0B0">
                   Pending Memors
                 </Typography>
               </CardContent>
@@ -238,22 +278,22 @@ const Home = () => {
           {/* Completed Memors */}
           <Grid item xs={12} sm={3}>
             <Card
-              className='card'
+              className="card"
               onClick={() => (window.location.href = "/memors?tab=completed")}
               style={{ cursor: "pointer" }}
             >
               <CardContent>
                 <Box
-                  display='flex'
-                  alignItems='center'
-                  justifyContent='space-between'
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="space-between"
                 >
-                  <Typography variant='h4' fontWeight='bold'>
+                  <Typography variant="h4" fontWeight="bold">
                     2
                   </Typography>
-                  <img src={completed} alt='Completed memeors icon' />
+                  <img src={completed} alt="Completed memeors icon" />
                 </Box>
-                <Typography variant='body2' color='#B0B0B0'>
+                <Typography variant="body2" color="#B0B0B0">
                   Completed Memors
                 </Typography>
               </CardContent>
@@ -262,7 +302,7 @@ const Home = () => {
 
           {/* Remaining Time */}
           <Grid item xs={12} sm={6}>
-            <Card className='card'>
+            <Card className="card">
               <CardContent>
                 <Box
                   style={{
@@ -272,7 +312,7 @@ const Home = () => {
                   }}
                 >
                   <Box>
-                    <Typography variant='h6' style={{ color: "white" }}>
+                    <Typography variant="h6" style={{ color: "white" }}>
                       The competition{" "}
                       <span style={{ color: "#9282F9", fontWeight: "bold" }}>
                         New Year New Us
@@ -280,7 +320,7 @@ const Home = () => {
                       ends in
                     </Typography>
                   </Box>
-                  <Countdown endDate='2025-01-31T00:00:00' role='user' />
+                  <Countdown endDate="2025-01-31T00:00:00" role="user" />
                 </Box>
               </CardContent>
             </Card>
@@ -289,11 +329,15 @@ const Home = () => {
       </section>
 
       {/* Current Leaders */}
-      <section id='currentLeaders' className='pb-10 container'>
-        <Typography variant='h6' gutterBottom style={{ color: "white" }}>
+      <section id="currentLeaders" className="pb-10 container">
+        <Typography variant="h6" gutterBottom style={{ color: "white" }}>
           Current Leaders
         </Typography>
-        <Grid container spacing={3}>
+        <Grid
+          container
+          spacing={3}
+          style={{ filter: showLeaderboard ? "none" : "blur(15px)" }}
+        >
           {leaderboardData
             .filter((team) => team.rank <= 3)
             .map((team) => (
@@ -304,15 +348,15 @@ const Home = () => {
                 key={team.rank}
               >
                 <Card
-                  className='card'
+                  className="card"
                   onClick={() => {
                     window.location.href = "/leaderboard";
                   }}
                   style={{ cursor: "pointer" }}
                 >
                   <Box
-                    display='flex'
-                    alignItems='center'
+                    display="flex"
+                    alignItems="center"
                     style={{ width: "100%" }}
                   >
                     {/* Left Column - Rank Image */}
@@ -337,17 +381,17 @@ const Home = () => {
                       }}
                     >
                       <Box
-                        className='team-header'
-                        display='flex'
-                        justifyContent='space-between'
+                        className="team-header"
+                        display="flex"
+                        justifyContent="space-between"
                       >
-                        <Typography variant='h6' className='team-name'>
+                        <Typography variant="h6" className="team-name">
                           {team.teamName}
                         </Typography>
                         <img
                           src={team.avatar}
                           alt={team.teamName}
-                          className='team-avatar-admin'
+                          className="team-avatar-admin"
                           style={{
                             width: "50px",
                             height: "50px",
@@ -357,24 +401,24 @@ const Home = () => {
                         />
                       </Box>
                       <Box
-                        className='stats'
-                        display='flex'
-                        justifyContent='space-between'
-                        marginTop='10px'
+                        className="stats"
+                        display="flex"
+                        justifyContent="space-between"
+                        marginTop="10px"
                       >
                         <div>
-                          <Typography variant='body2' className='label'>
+                          <Typography variant="body2" className="label">
                             Total Points
                           </Typography>
-                          <Typography variant='h5' className='value'>
+                          <Typography variant="h5" className="value">
                             {team.points}
                           </Typography>
                         </div>
                         <div>
-                          <Typography variant='body2' className='label'>
+                          <Typography variant="body2" className="label">
                             Total Memors
                           </Typography>
-                          <Typography variant='h5' className='value'>
+                          <Typography variant="h5" className="value">
                             {team.memors}
                           </Typography>
                         </div>
