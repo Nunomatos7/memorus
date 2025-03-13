@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
   AppBar,
@@ -24,6 +24,13 @@ import notifDelete from "../../assets/images/notifDelete.svg";
 import NotificationsNoneRoundedIcon from "@mui/icons-material/NotificationsNoneRounded";
 import { Badge } from "@mui/material";
 import { makeStyles } from "@mui/styles";
+
+import {
+  getLeaderboardVisibility,
+  setLeaderboardVisibility,
+} from "../../assets/utils/leaderboardUtils";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 
 const useStyles = makeStyles({
   customBadge: {
@@ -98,6 +105,38 @@ const Navbar = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const navigate = useNavigate();
+
+  const [showLeaderboard, setShowLeaderboard] = useState(
+    getLeaderboardVisibility()
+  );
+
+  const toggleLeaderboard = () => {
+    const newValue = !showLeaderboard;
+    setShowLeaderboard(newValue);
+    setLeaderboardVisibility(newValue);
+
+    if (!newValue) {
+      navigate("/home");
+    }
+    // Dispatch storage event to sync across components
+    window.dispatchEvent(new Event("storage"));
+  };
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setShowLeaderboard(getLeaderboardVisibility());
+    };
+
+    // Set initial value
+    setShowLeaderboard(getLeaderboardVisibility());
+
+    // Listen for changes in localStorage
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -205,7 +244,9 @@ const Navbar = () => {
             Home
           </StyledNavLink>
           <StyledNavLink to='/memors'>Memors</StyledNavLink>
-          <StyledNavLink to='/leaderboard'>Leaderboard</StyledNavLink>
+          {showLeaderboard && (
+            <StyledNavLink to='/leaderboard'>Leaderboard</StyledNavLink>
+          )}
           <StyledNavLink to='/memoryBoard'>Memory Board</StyledNavLink>
           <Box>
             <IconButton onClick={handleMenuOpen}>
@@ -244,6 +285,25 @@ const Navbar = () => {
                 </Box>
               </MenuItem>
               <Divider sx={{ backgroundColor: "gray" }} />
+              <MenuItem
+                onClick={() => {
+                  toggleLeaderboard();
+                  handleMenuClose();
+                }}
+                sx={{
+                  "&:hover": {
+                    backgroundColor: "#181818",
+                    color: "#FFFFFF",
+                  },
+                  display: "flex",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Typography>Show Leaderboard</Typography>
+                <IconButton sx={{ color: "white" }}>
+                  {showLeaderboard ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                </IconButton>
+              </MenuItem>
               <MenuItem
                 onClick={() => {
                   navigate("/change-password");
@@ -390,9 +450,11 @@ const Navbar = () => {
               <StyledNavLink to='/memors' onClick={toggleDrawer(false)}>
                 Memors
               </StyledNavLink>
-              <StyledNavLink to='/leaderboard' onClick={toggleDrawer(false)}>
-                Leaderboard
-              </StyledNavLink>
+              {showLeaderboard && (
+                <StyledNavLink to='/leaderboard' onClick={toggleDrawer(false)}>
+                  Leaderboard
+                </StyledNavLink>
+              )}
               <StyledNavLink to='/memoryBoard' onClick={toggleDrawer(false)}>
                 Memory Board
               </StyledNavLink>
