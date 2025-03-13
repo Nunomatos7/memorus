@@ -87,7 +87,7 @@ const Home = () => {
             style={{ display: "flex", alignItems: "center", gap: "1rem" }}
           >
             Latest Memors <span>•</span>{" "}
-            <span className='team-name' style={{ color: "#5547bf" }}>
+            <span className='team-name' style={{ color: "#9282F9" }}>
               The Debuggers
             </span>
           </h1>
@@ -274,7 +274,7 @@ const Home = () => {
                   <Box>
                     <Typography variant='h6' style={{ color: "white" }}>
                       The competition{" "}
-                      <span style={{ color: "#5547bf", fontWeight: "bold" }}>
+                      <span style={{ color: "#9282F9", fontWeight: "bold" }}>
                         New Year New Us
                       </span>{" "}
                       ends in
