@@ -25,7 +25,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Mousewheel, FreeMode } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/free-mode";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams, useNavigate } from "react-router-dom";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import Loader from "../../Components/Loader/Loader";
 import BackupRoundedIcon from "@mui/icons-material/BackupRounded";
@@ -35,6 +35,9 @@ const Memors = () => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const tabParam = searchParams.get("tab") || "all";
+
+  const navigate = useNavigate();
+  const { memorId } = useParams();
 
   const [tab, setTab] = useState(tabParam);
   const [expandedIndex, setExpandedIndex] = useState(null);
@@ -63,13 +66,25 @@ const Memors = () => {
     setSelectedMemor(memor);
     setIsModalOpen(true);
     document.body.style.overflow = "hidden";
+    navigate(`/memors/${memor.id}`);
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedMemor(null);
     document.body.style.overflow = "auto";
+    navigate("/memors");
   };
+
+  useEffect(() => {
+    if (memorId) {
+      const memorData = memorsData.find((m) => m.id.toString() === memorId);
+      if (memorData) {
+        setSelectedMemor(memorData);
+        setIsModalOpen(true);
+      }
+    }
+  }, [memorId]);
 
   const handleSubmitMemor = (id) => {
     setOngoingMemors((prevMemors) =>

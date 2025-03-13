@@ -62,7 +62,7 @@ const Home = () => {
     <>
       <Loader />
       <WelcomeModal />
-      <section className='mb-10' aria-labelledby="latest-memors-heading">
+      <section className='mb-10' aria-labelledby='latest-memors-heading'>
         <div
           className='container'
           style={{ marginBottom: "1rem", marginTop: "2rem" }}
@@ -77,7 +77,7 @@ const Home = () => {
               width: "15%",
               zIndex: "0",
             }}
-            aria-hidden="true"
+            aria-hidden='true'
           />
           <img
             src={background2}
@@ -89,7 +89,7 @@ const Home = () => {
               width: "5%",
               zIndex: "0",
             }}
-            aria-hidden="true"
+            aria-hidden='true'
           />
           <img
             src={background3}
@@ -101,9 +101,11 @@ const Home = () => {
               width: "5%",
               zIndex: "0",
             }}
-            aria-hidden="true"
+            aria-hidden='true'
           />
-          <h1 id="latest-memors-heading" className='home-title'>Latest Memors</h1>
+          <h1 id='latest-memors-heading' className='home-title'>
+            Latest Memors
+          </h1>
         </div>
 
         {/* Swiper */}
@@ -121,7 +123,7 @@ const Home = () => {
               freeMode={true}
               mousewheel={{ releaseOnEdges: true }}
               modules={[Mousewheel, FreeMode]}
-              aria-label="Latest Memors"
+              aria-label='Latest Memors'
               keyboard={{ enabled: true, onlyInViewport: true }}
             >
               {Object.values(
@@ -227,8 +229,8 @@ const Home = () => {
                   <SwiperSlide
                     key={`placeholder-${index}`}
                     className='placeholder-slide'
-                    role="group"
-                    aria-label="Placeholder"
+                    role='group'
+                    aria-label='Placeholder'
                   >
                     <div className='placeholder-content'>
                       <p style={{ fontSize: "0.9rem", color: "#aaa" }}>
@@ -249,28 +251,48 @@ const Home = () => {
             title={selectedSlide.title}
             submitDate={selectedSlide.submittedDate}
             onClose={closeModal}
-            aria-labelledby="memor-picture-modal"
+            aria-labelledby='memor-picture-modal'
           />
         )}
       </section>
 
-      <section id='myMemors' className='container' aria-labelledby="memors-dashboard-heading">
-        <Typography variant='h6' gutterBottom style={{ color: "white" }} id="memors-dashboard-heading">
+      <section
+        id='myMemors'
+        className='container'
+        aria-labelledby='memors-dashboard-heading'
+      >
+        <Typography
+          variant='h6'
+          gutterBottom
+          style={{ color: "white" }}
+          id='memors-dashboard-heading'
+        >
           Memors Dashboard
         </Typography>
         <Grid container spacing={3}>
           <Grid item xs={12} sm={3}>
             <Card
               className='card'
-              onClick={() => (window.location.href = "/admin/adminBoard?tab=ongoing")}
-              onKeyPress={(e) => handleKeyPress(e, () => (window.location.href = "/admin/adminBoard?tab=ongoing"))}
+              onClick={() =>
+                (window.location.href = "/admin/adminBoard?tab=ongoing")
+              }
+              onKeyPress={(e) =>
+                handleKeyPress(
+                  e,
+                  () => (window.location.href = "/admin/adminBoard?tab=ongoing")
+                )
+              }
               style={{ cursor: "pointer" }}
-              tabIndex="0"
-              role="button"
-              aria-label="View ongoing Memors"
+              tabIndex='0'
+              role='button'
+              aria-label='View ongoing Memors'
             >
               <CardContent>
-                <Box display='flex' alignItems='center' justifyContent='space-between'>
+                <Box
+                  display='flex'
+                  alignItems='center'
+                  justifyContent='space-between'
+                >
                   <Typography variant='h4' fontWeight='bold'>
                     {mockUser.pending_memors}
                   </Typography>
@@ -286,15 +308,26 @@ const Home = () => {
           <Grid item xs={12} sm={3}>
             <Card
               className='card'
-              onClick={() => (window.location.href = "/admin/adminBoard?tab=closed")}
-              onKeyPress={(e) => handleKeyPress(e, () => (window.location.href = "/admin/adminBoard?tab=closed"))}
+              onClick={() =>
+                (window.location.href = "/admin/adminBoard?tab=closed")
+              }
+              onKeyPress={(e) =>
+                handleKeyPress(
+                  e,
+                  () => (window.location.href = "/admin/adminBoard?tab=closed")
+                )
+              }
               style={{ cursor: "pointer" }}
-              tabIndex="0"
-              role="button"
-              aria-label="View closed Memors"
+              tabIndex='0'
+              role='button'
+              aria-label='View closed Memors'
             >
               <CardContent>
-                <Box display='flex' alignItems='center' justifyContent='space-between'>
+                <Box
+                  display='flex'
+                  alignItems='center'
+                  justifyContent='space-between'
+                >
                   <Typography variant='h4' fontWeight='bold'>
                     {mockUser.complete_memors}
                   </Typography>
@@ -308,43 +341,52 @@ const Home = () => {
           </Grid>
 
           <Grid item xs={12} sm={6}>
-  <Card className='card' aria-labelledby="competition-heading">
-    <CardContent>
-      <Box
-        style={{
-          display: "flex",
-          alignItems: "center",
-          flexDirection: "column",
-        }}
-      >
-        <Box>
-          <Typography
-            variant='h6'
-            style={{ color: "white" }}
-            id="competition-heading"
-          >
-            The competition{" "}
-            <span style={{ color: "#20948c", fontWeight: "bold" }}>
-              New Year New Us
-            </span>{" "}
-            ends in
-          </Typography>
-        </Box>
-        <Countdown
-          endDate='2025-01-31T00:00:00'
-          role='admin'
-          aria-label="Countdown to competition end: New Year New Us"
-          aria-live="polite" // Ensures screen readers announce updates
-        />
-      </Box>
-    </CardContent>
-  </Card>
-</Grid> 
+            <Card className='card' aria-labelledby='competition-heading'>
+              <CardContent>
+                <Box
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    flexDirection: "column",
+                  }}
+                >
+                  <Box>
+                    <Typography
+                      variant='h6'
+                      style={{ color: "white" }}
+                      id='competition-heading'
+                    >
+                      The competition{" "}
+                      <span style={{ color: "#409C90", fontWeight: "bold" }}>
+                        New Year New Us
+                      </span>{" "}
+                      ends in
+                    </Typography>
+                  </Box>
+                  <Countdown
+                    endDate='2025-01-31T00:00:00'
+                    role='admin'
+                    aria-label='Countdown to competition end: New Year New Us'
+                    aria-live='polite' // Ensures screen readers announce updates
+                  />
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
         </Grid>
       </section>
 
-      <section id='currentLeaders' className='pb-10 container' aria-labelledby="current-leaders-heading">
-        <Typography variant='h6' gutterBottom style={{ color: "white" }} id="current-leaders-heading">
+      <section
+        id='currentLeaders'
+        className='pb-10 container'
+        aria-labelledby='current-leaders-heading'
+      >
+        <Typography
+          variant='h6'
+          gutterBottom
+          style={{ color: "white" }}
+          id='current-leaders-heading'
+        >
           Current Leaders
         </Typography>
         <Grid container spacing={2}>
@@ -360,13 +402,22 @@ const Home = () => {
                 <Card
                   className='card'
                   onClick={() => (window.location.href = "/admin/leaderboard")}
-                  onKeyPress={(e) => handleKeyPress(e, () => (window.location.href = "/admin/leaderboard"))}
+                  onKeyPress={(e) =>
+                    handleKeyPress(
+                      e,
+                      () => (window.location.href = "/admin/leaderboard")
+                    )
+                  }
                   style={{ cursor: "pointer" }}
-                  tabIndex="0"
-                  role="button"
+                  tabIndex='0'
+                  role='button'
                   aria-label={`View details for ${team.teamName}`}
                 >
-                  <Box display='flex' alignItems='center' style={{ width: "100%" }}>
+                  <Box
+                    display='flex'
+                    alignItems='center'
+                    style={{ width: "100%" }}
+                  >
                     <Box style={{ flex: 1, textAlign: "center" }}>
                       <img
                         src={rankImages[team.rank]}
@@ -379,8 +430,17 @@ const Home = () => {
                         }}
                       />
                     </Box>
-                    <Box style={{ flex: team.rank === 1 ? 1 : 1.5, paddingRight: "20px" }}>
-                      <Box className='team-header' display='flex' justifyContent='space-between'>
+                    <Box
+                      style={{
+                        flex: team.rank === 1 ? 1 : 1.5,
+                        paddingRight: "20px",
+                      }}
+                    >
+                      <Box
+                        className='team-header'
+                        display='flex'
+                        justifyContent='space-between'
+                      >
                         <Typography variant='h6' className='team-name'>
                           {team.teamName}
                         </Typography>
@@ -396,7 +456,12 @@ const Home = () => {
                           }}
                         />
                       </Box>
-                      <Box className='stats' display='flex' justifyContent='space-between' marginTop='10px'>
+                      <Box
+                        className='stats'
+                        display='flex'
+                        justifyContent='space-between'
+                        marginTop='10px'
+                      >
                         <div>
                           <Typography variant='body2' className='label'>
                             Total Points
