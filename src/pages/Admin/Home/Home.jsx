@@ -324,7 +324,7 @@ const Home = () => {
             id="competition-heading"
           >
             The competition{" "}
-            <span style={{ color: "#215952", fontWeight: "bold" }}>
+            <span style={{ color: "#20948c", fontWeight: "bold" }}>
               New Year New Us
             </span>{" "}
             ends in

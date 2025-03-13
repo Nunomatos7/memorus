@@ -165,8 +165,8 @@ const Memors = () => {
                         mb: 1,
                       }}
                     >
-                      <Groups fontSize='small' sx={{ mr: 1, color: "gray" }} />
-                      <Typography color='gray' sx={{ fontSize: "0.8rem" }}>
+                      <Groups fontSize='small' sx={{ mr: 1, color: "#CBCBCB" }} />
+                      <Typography color='#CBCBCB' sx={{ fontSize: "0.8rem" }}>
                         {memor.submission}
                       </Typography>
                     </Box>
@@ -179,11 +179,11 @@ const Memors = () => {
                     >
                       <TodayIcon
                         fontSize='small'
-                        sx={{ mr: 1, color: "gray" }}
+                        sx={{ mr: 1, color: "#CBCBCB" }}
                       />
                       <Typography
                         variant='body2'
-                        color='gray'
+                        color='#CBCBCB'
                         sx={{ fontSize: "0.8rem" }}
                       >
                         Due on {memor.dueDate}
@@ -232,6 +232,7 @@ const Memors = () => {
                   >
                     <Button
                       variant='contained'
+                      aria-label="Add"
                       sx={{
                         backgroundColor: "#7E57C2",
                         color: "white",
@@ -322,6 +323,7 @@ const Memors = () => {
             <Tab value='incomplete' label='Incomplete' />
           </Tabs>
 
+
           <TextField
             placeholder='Search Memors'
             value={searchQuery}
@@ -332,17 +334,22 @@ const Memors = () => {
               input: {
                 startAdornment: (
                   <InputAdornment position='start'>
-                    <Search fontSize='small' sx={{ color: "gray" }} />
+                    <Search fontSize='small' sx={{ color: "#CBCBCB" }} />
                   </InputAdornment>
                 ),
               },
+            }}
+            inputProps={{
+              "aria-label": "Search Memors",
             }}
             sx={{
               backgroundColor: "#1E1F20",
               borderRadius: "40px",
               input: { color: "white" },
               width: "250px",
+              border: "0.905px solid #88938F",
               "& fieldset": { border: "none" },
+              "&:hover": { backgroundColor: "#2E2F30" },
             }}
           />
         </Box>
@@ -383,7 +390,7 @@ const Memors = () => {
                       <Typography
                         variant='body2'
                         sx={{
-                          color: "gray",
+                          color: "#CBCBCB",
                           fontSize: "0.8rem",
                         }}
                       >
@@ -395,7 +402,7 @@ const Memors = () => {
                         ? memor.description
                         : `${memor.description.substring(0, 50)}...`}
                     </div>
-                    <div className='submission'>{memor.dueDate}</div>
+                    
                     <div className='status'>
                       <Chip
                         label={
@@ -421,7 +428,7 @@ const Memors = () => {
                     <div className='submissions'>
                       <BackupRoundedIcon
                         sx={{
-                          color: "gray",
+                          color: "#CBCBCB",
                           fontSize: "35px",
                           cursor: "pointer",
                           "&:hover": { color: "white" },
@@ -431,6 +438,7 @@ const Memors = () => {
                     </div>
                     <div className='arrowIcon'>
                       <Button
+                        aria-label="expand"
                         sx={{
                           width: "30px",
                           height: "30px",
@@ -447,7 +455,7 @@ const Memors = () => {
                           variant='body'
                           sx={{
                             fontSize: "14px",
-                            color: "white",
+                            color: "#CBCBCB",
                           }}
                         >
                           {expandedIndex === index ? (

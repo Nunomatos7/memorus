@@ -100,7 +100,7 @@ const AdminBoard = () => {
       title: "Team Lunch",
       description:
         "Organize a team lunch either in-office or virtually. Capture the moment of camaraderie and good food.",
-      date: "01/13/2025",
+      date: "01/13/2026",
       points: "+ 30 pts",
       teamsLeft: 4,
     },
@@ -1059,12 +1059,16 @@ const AdminBoard = () => {
                   ),
                 },
               }}
+              inputProps={{
+                "aria-label": "Search Memors",
+              }}
               sx={{
                 borderRadius: "40px",
                 input: { color: "white" },
                 width: "250px",
                 border: "0.905px solid #88938F",
                 "& fieldset": { border: "none" },
+                "&:hover": { backgroundColor: "#2E2F30" },
               }}
             />
           </Box>
@@ -1212,7 +1216,7 @@ const AdminBoard = () => {
                       {memor.title}
                     </Typography>
                     {expandedIndex === index && (
-                      <Typography variant="caption" sx={{ color: "gray" }}>
+                      <Typography variant="caption" sx={{ color: "#CBCBCB" }}>
                         {memor.date}
                       </Typography>
                     )}
@@ -1294,7 +1298,7 @@ const AdminBoard = () => {
                       />
                     </IconButton>
 
-                    <IconButton>
+                    <IconButton aria-label="expand">
                       {expandedIndex === index ? (
                         <KeyboardArrowUp sx={{ color: "white" }} />
                       ) : (
@@ -1471,6 +1475,9 @@ const AdminBoard = () => {
                                   </InputAdornment>
                                 ),
                               },
+                            }}
+                            inputProps={{
+                              "aria-label": "Search Memors",
                             }}
                             sx={{
                               borderRadius: "40px",
@@ -1993,8 +2000,6 @@ const AdminBoard = () => {
               className="modal-overlay-submit-memor"
               role="dialog"
               aria-modal="true"
-              aria-labelledby="create-team-modal-title"
-              aria-describedby="create-team-modal-description"
             >
               <div
                 className="modal-container"
@@ -2123,15 +2128,13 @@ const AdminBoard = () => {
                   variant="outlined"
                   size="small"
                   sx={{
-                    marginBottom: "20px",
-                    "& .MuiInputBase-input": { color: "#FFFFFF" },
-                    "& .MuiOutlinedInput-root": {
-                      "& fieldset": { borderColor: "#888" },
-                      "&:hover fieldset": { borderColor: "#AAA" },
-                      "&.Mui-focused fieldset": { borderColor: "#CCC" },
-                    },
-                    "& .MuiInputLabel-root": { color: "#888" },
+                    borderRadius: "40px",
+                    input: { color: "white" },
+                    width: "250px",
+                    border: "0.905px solid #88938F",
                     "& fieldset": { border: "none" },
+                    "&:hover": { backgroundColor: "#2E2F30" },
+                    marginBottom: "20px",
                   }}
                   InputProps={{
                     startAdornment: (
@@ -2153,6 +2156,8 @@ const AdminBoard = () => {
                     padding: "10px",
                     border: "1px solid #333",
                   }}
+                  role="listbox"
+                  aria-label="Members List"
                 >
                   {filteredUnassignedMembers.map((member) => (
                     <Box
@@ -2255,8 +2260,6 @@ const AdminBoard = () => {
               className="modal-overlay-submit-memor"
               role="dialog"
               aria-modal="true"
-              aria-labelledby="create-memor-modal-title"
-              aria-describedby="create-memor-modal-description"
             >
               <div
                 className="modal-container"
@@ -2267,6 +2270,7 @@ const AdminBoard = () => {
                   <Button
                     onClick={() => handleCreateMemorModalClose()}
                     sx={{ minWidth: 0, p: 0, color: "#BEC9C5" }}
+                    aria-label="Close modal"
                   >
                     <ArrowBackIcon />
                   </Button>
@@ -2304,9 +2308,6 @@ const AdminBoard = () => {
                     "& .MuiInputLabel-root": { color: "#888" },
                   }}
                 />
-                <Typography variant="body1" sx={{ color: "#CAC4D0" }}>
-                  Due Date
-                </Typography>
                 <TextField
                   type="date"
                   value={newMemorDate || ""}
@@ -2314,6 +2315,7 @@ const AdminBoard = () => {
                   fullWidth
                   inputProps={{
                     min: getTodayDate(),
+                    "aria-label": "Due Date",
                   }}
                   sx={{
                     marginBottom: "20px",
@@ -2324,6 +2326,13 @@ const AdminBoard = () => {
                       "&.Mui-focused fieldset": { borderColor: "#CCC" },
                     },
                     "&hover": { backgroundColor: "#80ccbc" },
+                    // Add these new styles for the calendar icon
+                    "& .MuiSvgIcon-root": { color: "#FFFFFF" }, // This targets the calendar icon
+                    "& .MuiInputAdornment-root": { color: "#FFFFFF" }, // This targets the container of the icon
+                    // For older versions of Material UI, you might need this
+                    "& input::-webkit-calendar-picker-indicator": {
+                      filter: "invert(1)", // This will make the native calendar icon white
+                    },
                   }}
                 />
                 <TextField
@@ -2343,6 +2352,9 @@ const AdminBoard = () => {
                       "&.Mui-focused fieldset": { borderColor: "#CCC" },
                     },
                     "& .MuiInputLabel-root": { color: "#888" },
+                  }}
+                  inputProps={{
+                    "aria-label": "memor description",
                   }}
                 />
                 <Typography variant="body1" sx={{ color: "#CAC4D0" }}>

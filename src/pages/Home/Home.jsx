@@ -28,8 +28,8 @@ import background1 from "../../assets/images/background1.svg";
 import background2 from "../../assets/images/background2.svg";
 import background3 from "../../assets/images/background3.svg";
 import { memorsData } from "../../Data/Memors.json";
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 
 const rankImages = {
   1: rank1,
@@ -71,24 +71,24 @@ const Home = () => {
         >
           {/* Toggle Button with Label */}
           <Box
-  style={{
-    position: "absolute",
-    top: 0,
-    right: 0,
-    zIndex: 1,
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: "4px", // Adds spacing between the icon and the label
-  }}
->
-  <IconButton onClick={toggleLeaderboard} style={{ color: "white" }}>
-    {showLeaderboard ? <VisibilityIcon /> : <VisibilityOffIcon />}
-  </IconButton>
-  <Typography variant="body2" style={{ color: "white" }}>
-    {showLeaderboard ? "Hide Leaderboard" : "Show Leaderboard"}
-  </Typography>
-</Box>
+            style={{
+              position: "absolute",
+              top: 0,
+              right: 0,
+              zIndex: 1,
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              gap: "4px", // Adds spacing between the icon and the label
+            }}
+          >
+            <IconButton onClick={toggleLeaderboard} style={{ color: "white" }}>
+              {showLeaderboard ? <VisibilityIcon /> : <VisibilityOffIcon />}
+            </IconButton>
+            <Typography variant="body2" style={{ color: "white" }}>
+              {showLeaderboard ? "Hide Leaderboard" : "Show Leaderboard"}
+            </Typography>
+          </Box>
           <img
             src={background1}
             alt="leaderboard-bg1"
@@ -127,7 +127,7 @@ const Home = () => {
             style={{ display: "flex", alignItems: "center", gap: "1rem" }}
           >
             Latest Memors <span>•</span>{" "}
-            <span className="team-name" style={{ color: "#5547bf" }}>
+            <span className="team-name" style={{ color: "9282f9" }}>
               The Debuggers
             </span>
           </h1>
@@ -314,7 +314,7 @@ const Home = () => {
                   <Box>
                     <Typography variant="h6" style={{ color: "white" }}>
                       The competition{" "}
-                      <span style={{ color: "#5547bf", fontWeight: "bold" }}>
+                      <span style={{ color: "#9282f9", fontWeight: "bold" }}>
                         New Year New Us
                       </span>{" "}
                       ends in
