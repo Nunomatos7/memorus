@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Mousewheel, FreeMode } from "swiper/modules";
 import { Grid, Card, CardContent, Typography, Box } from "@mui/material";
@@ -39,6 +39,10 @@ export const mockUser = {
 const Home = () => {
   const [selectedSlide, setSelectedSlide] = useState(null);
   const swiperRef = useRef(null);
+
+  useEffect(() => {
+    document.title = `Memor'us | Home`;
+  }, []);
 
   const handleImageClick = (slide) => {
     setSelectedSlide(slide);

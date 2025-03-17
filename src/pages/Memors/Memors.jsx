@@ -49,6 +49,10 @@ const Memors = () => {
   );
 
   useEffect(() => {
+    document.title = `Memor'us | Memors`;
+  }, []);
+
+  useEffect(() => {
     setOngoingMemors(
       memorsData.filter((memor) => memor.team === "The Debuggers")
     );
@@ -180,7 +184,10 @@ const Memors = () => {
                         mb: 1,
                       }}
                     >
-                      <Groups fontSize='small' sx={{ mr: 1, color: "#CBCBCB" }} />
+                      <Groups
+                        fontSize='small'
+                        sx={{ mr: 1, color: "#CBCBCB" }}
+                      />
                       <Typography color='#CBCBCB' sx={{ fontSize: "0.8rem" }}>
                         {memor.submission}
                       </Typography>
@@ -247,7 +254,7 @@ const Memors = () => {
                   >
                     <Button
                       variant='contained'
-                      aria-label="Add"
+                      aria-label='Add'
                       sx={{
                         backgroundColor: "#7E57C2",
                         color: "white",
@@ -338,7 +345,6 @@ const Memors = () => {
             <Tab value='incomplete' label='Incomplete' />
           </Tabs>
 
-
           <TextField
             placeholder='Search Memors'
             value={searchQuery}
@@ -417,7 +423,7 @@ const Memors = () => {
                         ? memor.description
                         : `${memor.description.substring(0, 50)}...`}
                     </div>
-                    
+
                     <div className='status'>
                       <Chip
                         label={
@@ -453,7 +459,7 @@ const Memors = () => {
                     </div>
                     <div className='arrowIcon'>
                       <Button
-                        aria-label="expand"
+                        aria-label='expand'
                         sx={{
                           width: "30px",
                           height: "30px",

@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Mousewheel, FreeMode } from "swiper/modules";
 import "swiper/css";
@@ -31,6 +31,10 @@ const Home = () => {
   const [selectedSlide, setSelectedSlide] = useState(null);
   const [showLeaderboard] = useState(getLeaderboardVisibility());
   const swiperRef = useRef(null);
+
+  useEffect(() => {
+    document.title = `Memor'us | Home`;
+  }, []);
 
   const handleImageClick = (slide) => {
     setSelectedSlide(slide);
