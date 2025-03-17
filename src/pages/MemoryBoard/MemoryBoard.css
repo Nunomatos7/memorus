@@ -1,3 +1,7 @@
+body {
+  overflow: hidden;
+}
+
 .zoom-controls {
   position: absolute;
   bottom: 20px;

@@ -1,14 +1,18 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import "./MemorPicture.css";
 
-const MemorPicture = ({ image, teamName, title, submitDate, onClose }) => {
-  if (!image) return null;
+const MemorPicture = ({ images, currentIndex, teamName, title, submitDate, onClose, onNavigate }) => {
+  const [activeIndex, setActiveIndex] = useState(currentIndex || 0);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.key === "Escape") {
         onClose();
+      } else if (event.key === "ArrowLeft") {
+        handlePrevious();
+      } else if (event.key === "ArrowRight") {
+        handleNext();
       }
     };
 
@@ -16,7 +20,21 @@ const MemorPicture = ({ image, teamName, title, submitDate, onClose }) => {
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [onClose]);
+  }, [onClose, activeIndex]);
+
+  if (!images || images.length === 0) return null;
+
+  const handlePrevious = () => {
+    const newIndex = activeIndex <= 0 ? images.length - 1 : activeIndex - 1;
+    setActiveIndex(newIndex);
+    if (onNavigate) onNavigate(newIndex);
+  };
+
+  const handleNext = () => {
+    const newIndex = activeIndex >= images.length - 1 ? 0 : activeIndex + 1;
+    setActiveIndex(newIndex);
+    if (onNavigate) onNavigate(newIndex);
+  };
 
   return (
     <div className='modal-overlay' onClick={onClose}>
@@ -24,7 +42,26 @@ const MemorPicture = ({ image, teamName, title, submitDate, onClose }) => {
         &times;
       </button>
       <div className='modal-content' onClick={(e) => e.stopPropagation()}>
-        <img src={image} alt='Selected Memor' />
+        <img src={images[activeIndex]} alt='Selected Memor' />
+        
+        <div className='modal-navigation'>
+          <button 
+            className='nav-button prev-button' 
+            onClick={handlePrevious}
+            aria-label="Previous image"
+          >
+            &#10094;
+          </button>
+          <span className="image-counter">{activeIndex + 1} / {images.length}</span>
+          <button 
+            className='nav-button next-button' 
+            onClick={handleNext}
+            aria-label="Next image"
+          >
+            &#10095;
+          </button>
+        </div>
+        
         <div className='modal-sub-content'>
           <h2>{title}</h2>
           <p>
@@ -37,11 +74,13 @@ const MemorPicture = ({ image, teamName, title, submitDate, onClose }) => {
 };
 
 MemorPicture.propTypes = {
-  image: PropTypes.string,
+  images: PropTypes.arrayOf(PropTypes.string),
+  currentIndex: PropTypes.number,
   teamName: PropTypes.string,
   title: PropTypes.string,
   submitDate: PropTypes.string,
   onClose: PropTypes.func.isRequired,
+  onNavigate: PropTypes.func
 };
 
 export default MemorPicture;

@@ -209,7 +209,6 @@ const Navbar = () => {
         backgroundColor: "#111315",
         height: "60px",
         boxShadow: "none",
-        marginBottom: "10px",
         borderBottom: "1px solid #444444",
       }}
     >

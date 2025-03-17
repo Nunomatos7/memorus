@@ -119,12 +119,27 @@ const MemoryBoard = () => {
     };
   }, []);
 
-  const openModal = (image, title, submittedDate, team) => {
-    setSelectedMemor({ image, title, submittedDate, team });
+  const openModal = (imageIndex, postIndex) => {
+    const post = posts[postIndex];
+    setSelectedMemor({
+      images: post.image,
+      currentIndex: imageIndex,
+      title: post.title,
+      submittedDate: post.submittedDate,
+      team: post.team,
+      postIndex
+    });
   };
 
   const closeModal = () => {
     setSelectedMemor(null);
+  };
+
+  const handleImageNavigation = (newIndex) => {
+    setSelectedMemor(prev => ({
+      ...prev,
+      currentIndex: newIndex
+    }));
   };
 
   const handleZoom = (action = "out") => {
@@ -193,9 +208,9 @@ const MemoryBoard = () => {
             },
           ]}
         >
-          {posts.map((post, index) => (
+          {posts.map((post, postIndex) => (
             <div
-              key={index}
+              key={postIndex}
               className="polaroid-container"
               style={{
                 position: "absolute",
@@ -215,14 +230,7 @@ const MemoryBoard = () => {
                     <div
                       key={cardIndex}
                       className="polaroid-card"
-                      onClick={() =>
-                        openModal(
-                          imgSrc,
-                          post.title,
-                          post.submittedDate,
-                          post.team
-                        )
-                      }
+                      onClick={() => openModal(reversedArray.length - 1 - cardIndex, postIndex)}
                       style={{
                         position: "absolute",
                         top: `${cardIndex * 5}px`,
@@ -269,11 +277,13 @@ const MemoryBoard = () => {
 
         {selectedMemor && (
           <MemorPicture
-            image={selectedMemor.image}
+            images={selectedMemor.images}
+            currentIndex={selectedMemor.currentIndex}
             title={selectedMemor.title}
             submitDate={selectedMemor.submittedDate}
             teamName={selectedMemor.team}
             onClose={closeModal}
+            onNavigate={handleImageNavigation}
           />
         )}
 
