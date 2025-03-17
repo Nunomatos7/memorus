@@ -79,6 +79,7 @@ const LoginPage = ({ login }) => {
             variant='outlined'
             fullWidth
             value={email}
+            required
             onChange={(e) => setEmail(e.target.value)}
             sx={{
               mb: 2,
@@ -110,6 +111,7 @@ const LoginPage = ({ login }) => {
             type='password'
             variant='outlined'
             fullWidth
+            required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             sx={{

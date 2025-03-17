@@ -62,6 +62,7 @@ const RegisterPage = () => {
             label='Email'
             type='email'
             value={email}
+            required
             onChange={(e) => setEmail(e.target.value)}
             fullWidth
             variant='outlined'
@@ -93,6 +94,7 @@ const RegisterPage = () => {
             label='Password'
             type='password'
             value={password}
+            required
             onChange={(e) => setPassword(e.target.value)}
             fullWidth
             variant='outlined'
@@ -124,6 +126,7 @@ const RegisterPage = () => {
             label='Confirm Password'
             type='password'
             value={confirmPassword}
+            required
             onChange={(e) => setConfirmPassword(e.target.value)}
             fullWidth
             variant='outlined'
@@ -168,9 +171,9 @@ const RegisterPage = () => {
             Register
           </Button>
         </form>
-        <p className='admin-link'>
-          Already have an account? <a href='/login'>Login here</a>.
-        </p>
+        <a href='/login' className='admin-link'>
+          Already have an account? Login here
+        </a>
       </div>
       <img className='left-background' src={leftBackground} alt='' />
       <img className='right-background' src={rightBackground} alt='' />
