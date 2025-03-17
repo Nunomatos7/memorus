@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Box, Typography, Card, Avatar } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import rank1 from "../../../assets/images/adminRank1.svg";
@@ -67,6 +68,10 @@ export const leaderboardData = [
 ];
 
 const Leaderboard = () => {
+  useEffect(() => {
+    document.title = `Memor'us | Leaderboard`;
+  }, []);
+
   return (
     <>
       <Loader />
@@ -125,7 +130,7 @@ const Leaderboard = () => {
               marginBottom: "30px",
             }}
             tabIndex={0}
-            aria-label="Leaderboard"
+            aria-label='Leaderboard'
           >
             Leaderboard
           </Typography>

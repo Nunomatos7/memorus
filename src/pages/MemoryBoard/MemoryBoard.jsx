@@ -46,6 +46,10 @@ const MemoryBoard = () => {
   const teams = [...new Set(memorsData.map((memor) => memor.team))];
 
   useEffect(() => {
+    document.title = `Memor'us | Memory Board`;
+  }, []);
+
+  useEffect(() => {
     const positions = [];
     const memorsWithImages = memorsData.filter(
       (memor) =>
@@ -168,15 +172,19 @@ const MemoryBoard = () => {
           backgroundColor: "#9990d8",
         }}
       >
-        <div className="filter-controls">
-          <label htmlFor="team-filter" className="sr-only" style={{ color: "#341881", fontWeight: "600" }}>
+        <div className='filter-controls'>
+          <label
+            htmlFor='team-filter'
+            className='sr-only'
+            style={{ color: "#341881", fontWeight: "600" }}
+          >
             Filter by team:
           </label>
           <select
-            id="team-filter"
+            id='team-filter'
             value={filteredTeam}
             onChange={(e) => setFilteredTeam(e.target.value)}
-            className="filter-dropdown"
+            className='filter-dropdown'
           >
             {teams.map((team, index) => (
               <option key={index} value={team}>
@@ -195,7 +203,7 @@ const MemoryBoard = () => {
             {
               component: (
                 <button
-                  className="start-btn"
+                  className='start-btn'
                   onClick={() => {
                     canvasRef.current?.fitContentToView({ scale: 1 });
                   }}
@@ -247,7 +255,7 @@ const MemoryBoard = () => {
                       }}
                     >
                       {/* Submitted Date */}
-                      <p className="card-date">{post.submittedDate}</p>
+                      <p className='card-date'>{post.submittedDate}</p>
 
                       {/* Image */}
                       <img
@@ -266,7 +274,7 @@ const MemoryBoard = () => {
 
                       {/* Title - Only for the first image */}
                       {cardIndex === reversedArray.length - 1 && (
-                        <p className="card-title">{post.title}</p>
+                        <p className='card-title'>{post.title}</p>
                       )}
                     </div>
                   ))}
@@ -287,12 +295,12 @@ const MemoryBoard = () => {
           />
         )}
 
-        <div className="zoom-controls">
-          <button className="zoom-btn" onClick={() => handleZoom("out")}>
+        <div className='zoom-controls'>
+          <button className='zoom-btn' onClick={() => handleZoom("out")}>
             -
           </button>
-          <span className="zoom-display">{Math.round(zoomLevel * 100)}%</span>
-          <button className="zoom-btn" onClick={() => handleZoom("in")}>
+          <span className='zoom-display'>{Math.round(zoomLevel * 100)}%</span>
+          <button className='zoom-btn' onClick={() => handleZoom("in")}>
             +
           </button>
         </div>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./LoginPage.css";
 import logo from "../assets/images/logo.svg";
@@ -19,7 +19,11 @@ const LoginPage = ({ login }) => {
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
+
   const navigate = useNavigate();
+  useEffect(() => {
+    document.title = `Memor'us | Login`;
+  }, []);
 
   const handleLogin = (e) => {
     e.preventDefault();

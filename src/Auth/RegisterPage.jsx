@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import logo from "../assets/images/logo.svg";
 import leftBackground from "../assets/images/left-auth.svg";
 import rightBackground from "../assets/images/right-auth.svg";
@@ -11,7 +11,10 @@ const RegisterPage = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  // Demo user database (in-memory)
+  useEffect(() => {
+    document.title = `Memor'us | Register`;
+  }, []);
+
   const demoUsers = [];
 
   const handleRegister = (e) => {
