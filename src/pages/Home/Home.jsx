@@ -175,7 +175,7 @@ const Home = () => {
                   </SwiperSlide>
                 ))}
 
-              {/* Add placeholders at the end only if necessary */}
+              {/* placeholders */}
               {Array.from(
                 {
                   length: Math.max(
