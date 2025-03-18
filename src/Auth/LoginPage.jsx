@@ -74,8 +74,10 @@ const LoginPage = ({ login }) => {
         </Typography>
         <Typography variant='body2' className='login-subtitle' sx={{ mb: 2 }}>
           This device is currently not logged in. Please enter the credentials
-          to access your account.
+          to access your account.{" "}
+          <span style={{ color: "rgb(146,130,249)" }}>* = required </span>
         </Typography>
+
         <form onSubmit={handleLogin} className='login-form'>
           {error && <Typography className='error-message'>{error}</Typography>}
           <TextField
