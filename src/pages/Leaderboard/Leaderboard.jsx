@@ -70,8 +70,9 @@ export const leaderboardData = [
 
 const Leaderboard = () => {
   useEffect(() => {
-    document.title = `Memor'us | `;
+    document.title = `Memor'us | Leaderboard`;
   }, []);
+
   return (
     <>
       <Loader />
@@ -120,6 +121,7 @@ const Leaderboard = () => {
           {/* Header */}
           <Typography
             variant='h4'
+            component='h1'
             sx={{
               fontWeight: "bold",
               color: "white",
@@ -139,6 +141,7 @@ const Leaderboard = () => {
               alignItems: "end",
             }}
           >
+            {/* Rank 2 */}
             <Grid
               sx={{
                 width: "calc(30% - 20px)",
@@ -157,7 +160,9 @@ const Leaderboard = () => {
                   padding: "20px",
                   position: "relative",
                   height: "15rem",
+                  
                 }}
+                tabIndex={0}
               >
                 <Box
                   sx={{
@@ -212,7 +217,7 @@ const Leaderboard = () => {
                 </Box>
                 <img
                   src={rank2}
-                  alt='rank'
+                  alt='rank 2'
                   style={{
                     position: "absolute",
                     bottom: "0px",
@@ -223,6 +228,7 @@ const Leaderboard = () => {
               </Card>
             </Grid>
 
+            {/* Rank 1 */}
             <Grid
               sx={{
                 width: "calc(38% - 20px)",
@@ -242,6 +248,7 @@ const Leaderboard = () => {
                   position: "relative",
                   height: "20rem",
                 }}
+                tabIndex={0}
               >
                 <Box
                   sx={{
@@ -304,7 +311,7 @@ const Leaderboard = () => {
                 </Box>
                 <img
                   src={rank1}
-                  alt='rank'
+                  alt='rank 1'
                   style={{
                     position: "absolute",
                     bottom: "0px",
@@ -315,6 +322,7 @@ const Leaderboard = () => {
               </Card>
             </Grid>
 
+            {/* Rank 3 */}
             <Grid
               sx={{
                 width: "calc(30% - 20px)",
@@ -334,6 +342,7 @@ const Leaderboard = () => {
                   position: "relative",
                   height: "12rem",
                 }}
+                tabIndex={0}
               >
                 <Box
                   sx={{
@@ -388,7 +397,7 @@ const Leaderboard = () => {
                 </Box>
                 <img
                   src={rank3}
-                  alt='rank'
+                  alt='rank 3'
                   style={{
                     position: "absolute",
                     bottom: "0px",
@@ -404,6 +413,7 @@ const Leaderboard = () => {
           {/* Global Ranking */}
           <Typography
             variant='h5'
+            component='h2'
             sx={{
               color: "white",
               marginBottom: "20px",
@@ -427,37 +437,16 @@ const Leaderboard = () => {
                 marginBottom: "20px",
               }}
             >
-              <Typography
-                variant='h6'
-                sx={{
-                  color: "white",
-                }}
-              >
+              <Typography variant='h6' sx={{ color: "white" }}>
                 Rank
               </Typography>
-              <Typography
-                variant='h6'
-                sx={{
-                  color: "white",
-                  textAlign: "center",
-                }}
-              >
+              <Typography variant='h6' sx={{ color: "white", textAlign: "center" }}>
                 Team
               </Typography>
-              <Typography
-                variant='h6'
-                sx={{
-                  color: "white",
-                }}
-              >
+              <Typography variant='h6' sx={{ color: "white" }}>
                 Memors Completed
               </Typography>
-              <Typography
-                variant='h6'
-                sx={{
-                  color: "white",
-                }}
-              >
+              <Typography variant='h6' sx={{ color: "white" }}>
                 Total Points
               </Typography>
             </Box>
@@ -465,6 +454,7 @@ const Leaderboard = () => {
               .filter((team) => team.rank >= 4)
               .map((team) => (
                 <Box
+                  key={team.rank}
                   sx={{
                     display: "grid",
                     gridTemplateColumns: "1fr 1fr 1fr 1fr",
@@ -474,15 +464,11 @@ const Leaderboard = () => {
                     border: "2.715px solid #333738",
                     padding: "10px",
                     marginTop: "-2px",
+                    
                   }}
+                  tabIndex={0}
                 >
-                  <Typography
-                    variant='h6'
-                    sx={{
-                      color: "white",
-                      textAlign: "center",
-                    }}
-                  >
+                  <Typography variant='h6' sx={{ color: "white", textAlign: "center" }}>
                     {team.rank}
                   </Typography>
                   <Box
@@ -502,32 +488,14 @@ const Leaderboard = () => {
                         border: "2px solid white",
                       }}
                     />
-                    <Typography
-                      variant='h6'
-                      sx={{
-                        color: "white",
-                        textAlign: "center",
-                      }}
-                    >
+                    <Typography variant='h6' sx={{ color: "white", textAlign: "center" }}>
                       {team.teamName}
                     </Typography>
                   </Box>
-                  <Typography
-                    variant='h6'
-                    sx={{
-                      color: "white",
-                      textAlign: "center",
-                    }}
-                  >
+                  <Typography variant='h6' sx={{ color: "white", textAlign: "center" }}>
                     {team.memors}
                   </Typography>
-                  <Typography
-                    variant='h6'
-                    sx={{
-                      color: "white",
-                      textAlign: "center",
-                    }}
-                  >
+                  <Typography variant='h6' sx={{ color: "white", textAlign: "center" }}>
                     {team.points}
                   </Typography>
                 </Box>
