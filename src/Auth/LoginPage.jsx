@@ -47,7 +47,7 @@ const LoginPage = ({ login }) => {
   };
 
   return (
-    <div className='login-container'>
+    <div className='login-container' role='main'>
       <div style={{ position: "absolute", top: "20px", left: "20px" }}>
         <Button
           variant='text'
@@ -61,15 +61,16 @@ const LoginPage = ({ login }) => {
               backgroundColor: "rgba(255, 255, 255, 0.1)",
             },
           }}
+          aria-label='Back to Landing Page'
         >
           Back to Landing
         </Button>
       </div>
       <div className='login-card'>
         <div className='logo-container'>
-          <img src={logo} alt='Logo' className='logo' />
+          <img src={logo} alt='Memor-us Logo' className='logo' />
         </div>
-        <Typography variant='h5' className='login-title'>
+        <Typography variant='h5' className='login-title' id='login-title'>
           Login
         </Typography>
         <Typography variant='body2' className='login-subtitle' sx={{ mb: 2 }}>
@@ -77,16 +78,33 @@ const LoginPage = ({ login }) => {
           to access your account.{" "}
           <span style={{ color: "rgb(146,130,249)" }}>* = required </span>
         </Typography>
-
-        <form onSubmit={handleLogin} className='login-form'>
-          {error && <Typography className='error-message'>{error}</Typography>}
+        <form
+          onSubmit={handleLogin}
+          className='login-form'
+          aria-labelledby='login-title'
+        >
+          {error && (
+            <Typography
+              className='error-message'
+              role='alert'
+              aria-live='assertive'
+            >
+              {error}
+            </Typography>
+          )}
           <TextField
+            id='email-input'
             label='Email'
             variant='outlined'
             fullWidth
             value={email}
             required
             onChange={(e) => setEmail(e.target.value)}
+            aria-required='true'
+            aria-invalid={email === "" && error ? "true" : "false"}
+            inputProps={{
+              "aria-label": "Email address",
+            }}
             sx={{
               mb: 2,
               "& .MuiInputBase-root": {
@@ -111,8 +129,8 @@ const LoginPage = ({ login }) => {
             }}
           />
 
-          {/* Material-UI Password Field */}
           <TextField
+            id='password-input'
             label='Password'
             type='password'
             variant='outlined'
@@ -120,6 +138,11 @@ const LoginPage = ({ login }) => {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            aria-required='true'
+            aria-invalid={password === "" && error ? "true" : "false"}
+            inputProps={{
+              "aria-label": "Password",
+            }}
             sx={{
               mb: 2,
               "& .MuiInputBase-root": {
@@ -144,13 +167,16 @@ const LoginPage = ({ login }) => {
             }}
           />
 
-          {/* Remember Me + Forgot Password */}
           <div className='remember-container'>
             <FormControlLabel
               control={
                 <Checkbox
+                  id='remember-me-checkbox'
                   checked={rememberMe}
                   onChange={handleRememberMeChange}
+                  inputProps={{
+                    "aria-label": "Remember me checkbox",
+                  }}
                   sx={{
                     color: "white",
                     "&.Mui-checked": {
@@ -165,7 +191,11 @@ const LoginPage = ({ login }) => {
                 </Typography>
               }
             />
-            <a href='/forgot-password' className='forgot-password'>
+            <a
+              href='/forgot-password'
+              className='forgot-password'
+              aria-label='Forgot Password'
+            >
               Forgot Password?
             </a>
           </div>
@@ -174,6 +204,7 @@ const LoginPage = ({ login }) => {
             fullWidth
             variant='contained'
             className='login-button'
+            aria-label='Login to your account'
             sx={{
               backgroundColor: "#6200ea",
               "&:hover": { backgroundColor: "#4e00d1" },
@@ -182,12 +213,26 @@ const LoginPage = ({ login }) => {
             Login
           </Button>
         </form>
-        <a href='/register' className='admin-link'>
+        <a
+          href='/register'
+          className='admin-link'
+          aria-label='Register for a new account'
+        >
           Don&apos;t have an account? Register here
         </a>
       </div>
-      <img className='left-background' src={leftBackground} alt='' />
-      <img className='right-background' src={rightBackground} alt='' />
+      <img
+        className='left-background'
+        src={leftBackground}
+        alt=''
+        aria-hidden='true'
+      />
+      <img
+        className='right-background'
+        src={rightBackground}
+        alt=''
+        aria-hidden='true'
+      />
     </div>
   );
 };

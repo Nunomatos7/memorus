@@ -120,13 +120,13 @@ const Memors = () => {
 
   return (
     <>
-      {" "}
       <Loader />
       <div className='container'>
         <Box>
           <div className='memors-header'>
             <Typography
               variant='h4'
+              component='h1'
               sx={{ fontWeight: "bold", color: "white" }}
             >
               Ongoing Memors
@@ -171,6 +171,8 @@ const Memors = () => {
                     paddingBottom: "8px",
                     flexShrink: 0,
                   }}
+                  tabIndex={0}
+                  aria-label={`Memor: ${memor.title}`}
                 >
                   <CardContent>
                     <Typography variant='h6' sx={{ mb: 1, fontWeight: "bold" }}>
@@ -187,6 +189,7 @@ const Memors = () => {
                       <Groups
                         fontSize='small'
                         sx={{ mr: 1, color: "#CBCBCB" }}
+                        aria-hidden='true'
                       />
                       <Typography color='#CBCBCB' sx={{ fontSize: "0.8rem" }}>
                         {memor.submission}
@@ -202,6 +205,7 @@ const Memors = () => {
                       <TodayIcon
                         fontSize='small'
                         sx={{ mr: 1, color: "#CBCBCB" }}
+                        aria-hidden='true'
                       />
                       <Typography
                         variant='body2'
@@ -251,10 +255,13 @@ const Memors = () => {
                       width: "fit-content",
                     }}
                     onClick={() => handleOpenModal(memor)}
+                    role='button'
+                    tabIndex={0}
+                    aria-label={`View details for ${memor.title}`}
                   >
                     <Button
                       variant='contained'
-                      aria-label='Add'
+                      aria-label='Add picture'
                       sx={{
                         backgroundColor: "#7E57C2",
                         color: "white",
@@ -339,6 +346,7 @@ const Memors = () => {
                 },
               },
             }}
+            aria-label='Memor Tabs'
           >
             <Tab value='all' label='All Memors' />
             <Tab value='completed' label='Completed' />
@@ -351,14 +359,12 @@ const Memors = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
             variant='outlined'
             size='small'
-            slotProps={{
-              input: {
-                startAdornment: (
-                  <InputAdornment position='start'>
-                    <Search fontSize='small' sx={{ color: "#CBCBCB" }} />
-                  </InputAdornment>
-                ),
-              },
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position='start'>
+                  <Search fontSize='small' sx={{ color: "#CBCBCB" }} />
+                </InputAdornment>
+              ),
             }}
             inputProps={{
               "aria-label": "Search Memors",
@@ -380,6 +386,7 @@ const Memors = () => {
               display: "flex",
               flexDirection: "column",
             }}
+            aria-label='Memors List'
           >
             {filteredMemors.map((memor, index) => (
               <Box key={index}>
@@ -395,6 +402,9 @@ const Memors = () => {
                     "&:hover": { backgroundColor: "#2E2F30" },
                   }}
                   onClick={() => toggleExpand(index)}
+                  role='button'
+                  tabIndex={0}
+                  aria-label={`Expand ${memor.title}`}
                 >
                   <div className='memor'>
                     <div className='title_date'>
@@ -455,6 +465,7 @@ const Memors = () => {
                           "&:hover": { color: "white" },
                         }}
                         onClick={() => handleOpenModal(memor)}
+                        aria-label={`Submit ${memor.title}`}
                       />
                     </div>
                     <div className='arrowIcon'>
