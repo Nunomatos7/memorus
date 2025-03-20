@@ -298,7 +298,9 @@ const Navbar = () => {
                   justifyContent: "space-between",
                 }}
               >
-                <Typography>Show Leaderboard</Typography>
+                <Typography>
+                  {showLeaderboard ? "Hide" : "Show"} Leaderboard
+                </Typography>
                 <IconButton sx={{ color: "white" }}>
                   {showLeaderboard ? <VisibilityIcon /> : <VisibilityOffIcon />}
                 </IconButton>
