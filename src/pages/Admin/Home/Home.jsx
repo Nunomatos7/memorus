@@ -71,7 +71,7 @@ const Home = () => {
         >
           <img
             src={background1}
-            alt='Decorative background 1'
+            alt=''
             style={{
               position: "absolute",
               top: "2",
@@ -83,7 +83,7 @@ const Home = () => {
           />
           <img
             src={background2}
-            alt='Decorative background 2'
+            alt=''
             style={{
               position: "absolute",
               top: "25%",
@@ -95,7 +95,7 @@ const Home = () => {
           />
           <img
             src={background3}
-            alt='Decorative background 3'
+            alt=''
             style={{
               position: "absolute",
               top: "35%",
