@@ -58,8 +58,9 @@ const Home = () => {
       if (
         !e.shiftKey &&
         index ===
-          memorsData.filter((slide) => slide.team === "The Debuggers" && slide.image)
-            .length -
+          memorsData.filter(
+            (slide) => slide.team === "The Debuggers" && slide.image
+          ).length -
             1
       ) {
         e.preventDefault();
@@ -159,7 +160,9 @@ const Home = () => {
               aria-label='Latest Memors Carousel'
             >
               {memorsData
-                .filter((slide) => slide.team === "The Debuggers" && slide.image)
+                .filter(
+                  (slide) => slide.team === "The Debuggers" && slide.image
+                )
                 .map((slide, index) => (
                   <SwiperSlide
                     key={slide.id}
@@ -168,7 +171,30 @@ const Home = () => {
                     role='button'
                     aria-label={`Open memor titled ${slide.title}, submitted on ${slide.submittedDate}`}
                     onClick={() => handleImageClick(slide)}
-                    onKeyDown={(e) => handleKeyDown(e, index)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        handleImageClick(slide);
+                      }
+
+                      if (e.key === "Tab") {
+                        e.preventDefault();
+                        let newIndex;
+                        if (e.shiftKey) {
+                          newIndex = Math.max(index - 1, 0);
+                        } else {
+                          newIndex = Math.min(index + 1, memorsData.length - 1);
+                        }
+
+                        swiperRef.current?.swiper.slideTo(newIndex);
+
+                        const nextSlide =
+                          document.querySelectorAll(".latest-memors-pic")[
+                            newIndex
+                          ];
+                        if (nextSlide) nextSlide.focus();
+                      }
+                    }}
                   >
                     <div className='image-wrapper'>
                       <img
@@ -294,7 +320,11 @@ const Home = () => {
 
           {/* Countdown Card */}
           <Grid item xs={12} sm={6}>
-            <Card className='card' tabIndex='0' aria-label='Competition countdown'>
+            <Card
+              className='card'
+              tabIndex='0'
+              aria-label='Competition countdown'
+            >
               <CardContent>
                 <Box
                   style={{
