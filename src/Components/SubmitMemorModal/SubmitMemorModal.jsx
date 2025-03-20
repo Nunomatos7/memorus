@@ -335,11 +335,10 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
               ))}
             </Swiper>
 
-            {/* ✅ Pass correct props to MemorPicture */}
             {selectedImage && (
               <MemorPicture
-                images={memor.image} // ✅ Pass full array
-                currentIndex={memor.image.indexOf(selectedImage)} // ✅ Set correct index
+                images={memor.image}
+                currentIndex={memor.image.indexOf(selectedImage)}
                 title={memor.title}
                 submitDate={memor.dueDate}
                 teamName={memor.team}
