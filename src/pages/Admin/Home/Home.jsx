@@ -11,7 +11,6 @@ import rank2 from "../../../assets/images/rank2admin.svg";
 import rank3 from "../../../assets/images/rank3admin.svg";
 import ongoing from "../../../assets/images/ongoingAdmin.svg";
 import closed from "../../../assets/images/closedAdmin.svg";
-import WelcomeModal from "../../../Components/WelcomeModal/WelcomeModal";
 import { leaderboardData } from "../Leaderboard/Leaderboard";
 import CustomButton from "../../../Components/CustomButton/CustomButton";
 import Loader from "../../../Components/Loader/Loader";
@@ -65,7 +64,6 @@ const Home = () => {
   return (
     <>
       <Loader />
-      <WelcomeModal />
       <section className='mb-10' aria-labelledby='latest-memors-heading'>
         <div
           className='container'
