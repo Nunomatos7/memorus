@@ -92,7 +92,7 @@ const Home = () => {
           {/* Background Images */}
           <img
             src={background1}
-            alt='leaderboard-bg1'
+            alt=''
             style={{
               position: "absolute",
               top: "2",
@@ -104,7 +104,7 @@ const Home = () => {
           />
           <img
             src={background2}
-            alt='leaderboard-bg2'
+            alt=''
             style={{
               position: "absolute",
               top: "25%",
@@ -116,7 +116,7 @@ const Home = () => {
           />
           <img
             src={background3}
-            alt='leaderboard-bg3'
+            alt=''
             style={{
               position: "absolute",
               top: "35%",

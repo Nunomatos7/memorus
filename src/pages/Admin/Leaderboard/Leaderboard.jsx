@@ -79,7 +79,7 @@ const Leaderboard = () => {
       <div className='container'>
         <img
           src={background1}
-          alt='leaderboard-bg1'
+          alt=''
           aria-hidden='true'
           style={{
             position: "absolute",
@@ -91,7 +91,7 @@ const Leaderboard = () => {
         />
         <img
           src={background2}
-          alt='leaderboard-bg2'
+          alt=''
           aria-hidden='true'
           style={{
             position: "absolute",
@@ -103,7 +103,7 @@ const Leaderboard = () => {
         />
         <img
           src={background3}
-          alt='leaderboard-bg3'
+          alt=''
           aria-hidden='true'
           style={{
             position: "absolute",
@@ -182,6 +182,7 @@ const Leaderboard = () => {
                 >
                   <Avatar
                     src={leaderboardData[1].avatar}
+                    alt="Rank 2"
                     sx={{
                       width: "40px",
                       height: "40px",
@@ -221,7 +222,7 @@ const Leaderboard = () => {
                 </Box>
                 <img
                   src={rank2}
-                  alt='rank'
+                  alt=''
                   style={{
                     position: "absolute",
                     bottom: "0px",
@@ -268,6 +269,7 @@ const Leaderboard = () => {
                 >
                   <Avatar
                     src={leaderboardData[0].avatar}
+                    alt="Rank 1"
                     sx={{
                       width: "40px",
                       height: "40px",
@@ -316,7 +318,7 @@ const Leaderboard = () => {
                 </Box>
                 <img
                   src={rank1}
-                  alt='rank'
+                  alt=''
                   style={{
                     position: "absolute",
                     bottom: "0px",
@@ -363,6 +365,7 @@ const Leaderboard = () => {
                 >
                   <Avatar
                     src={leaderboardData[2].avatar}
+                    alt="Rank 3"
                     sx={{
                       width: "40px",
                       height: "40px",
@@ -402,7 +405,7 @@ const Leaderboard = () => {
                 </Box>
                 <img
                   src={rank3}
-                  alt='rank'
+                  alt=''
                   style={{
                     position: "absolute",
                     bottom: "0px",
