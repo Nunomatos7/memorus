@@ -53,14 +53,14 @@ const ChangePasswordPage = () => {
         {/* Back Button */}
         <Button
           startIcon={<ArrowBackIcon />}
-          onClick={() => window.history.back()} // Use history.back() to navigate to the previous page
+          onClick={() => window.history.back()}
           sx={{
-            color: "#ffffff", // Adjust the color to match your theme
-            position: "absolute", // Position it at the top-left corner of the card
-            top: 16, // Top margin
-            left: 16, // Left margin
+            color: "#ffffff",
+            position: "absolute",
+            top: 16,
+            left: 16,
             "&:hover": {
-              backgroundColor: "rgba(255, 255, 255, 0.1)", // Slightly darker hover effect
+              backgroundColor: "rgba(255, 255, 255, 0.1)",
             },
           }}
         >

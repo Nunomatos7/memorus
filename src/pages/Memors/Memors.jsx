@@ -455,7 +455,6 @@ const Memors = () => {
                         }}
                       />
                     </div>
-
                     <div className='submissions'>
                       <BackupRoundedIcon
                         sx={{
@@ -464,10 +463,18 @@ const Memors = () => {
                           cursor: "pointer",
                           "&:hover": { color: "white" },
                         }}
+                        tabIndex={0}
                         onClick={() => handleOpenModal(memor)}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            handleOpenModal(memor);
+                          }
+                        }}
                         aria-label={`Submit ${memor.title}`}
                       />
                     </div>
+
                     <div className='arrowIcon'>
                       <Button
                         aria-label='expand'
@@ -485,6 +492,7 @@ const Memors = () => {
                       >
                         <Typography
                           variant='body'
+                          alt='expand'
                           sx={{
                             fontSize: "14px",
                             color: "#CBCBCB",
