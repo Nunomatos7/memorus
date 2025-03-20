@@ -311,9 +311,15 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
               {normalizedImages.map((image, index) => (
                 <SwiperSlide
                   key={index}
-                  tabIndex={image ? 0 : -1}
+                  tabIndex={image ? 0 : -1} // Make slide focusable only if there's an image
                   className='photo-slide'
                   onClick={(event) => image && handleImageClick(image, event)}
+                  onKeyDown={(event) => {
+                    if (image && (event.key === "Enter" || event.key === " ")) {
+                      event.preventDefault(); // Prevent default scrolling behavior for Space key
+                      handleImageClick(image, event);
+                    }
+                  }}
                 >
                   {image ? (
                     <img
