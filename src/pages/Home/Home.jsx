@@ -46,35 +46,9 @@ const Home = () => {
     document.body.style.overflow = "auto";
   };
 
-  // Handle keyboard navigation for Swiper
-  const handleKeyDown = (e, index) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      handleImageClick(memorsData[index]);
-    }
-
-    if (e.key === "Tab") {
-      // If at the last slide and not shifting, move focus to the next element outside Swiper
-      if (
-        !e.shiftKey &&
-        index ===
-          memorsData.filter((slide) => slide.team === "The Debuggers" && slide.image)
-            .length -
-            1
-      ) {
-        e.preventDefault();
-        const nextElement = document.querySelector("#myMemors");
-        if (nextElement) nextElement.focus();
-      }
-
-      // If at the first slide and shifting, move focus to the previous element outside Swiper
-      if (e.shiftKey && index === 0) {
-        e.preventDefault();
-        const prevElement = document.querySelector(".home-title");
-        if (prevElement) prevElement.focus();
-      }
-    }
-  };
+  const debuggerSlides = memorsData.filter(
+    (slide) => slide.team === "The Debuggers" && slide.image
+  );
 
   return (
     <>
@@ -159,7 +133,9 @@ const Home = () => {
               aria-label='Latest Memors Carousel'
             >
               {memorsData
-                .filter((slide) => slide.team === "The Debuggers" && slide.image)
+                .filter(
+                  (slide) => slide.team === "The Debuggers" && slide.image
+                )
                 .map((slide, index) => (
                   <SwiperSlide
                     key={slide.id}
@@ -168,7 +144,58 @@ const Home = () => {
                     role='button'
                     aria-label={`Open memor titled ${slide.title}, submitted on ${slide.submittedDate}`}
                     onClick={() => handleImageClick(slide)}
-                    onKeyDown={(e) => handleKeyDown(e, index)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        handleImageClick(slide);
+                      }
+
+                      // Se for o último slide e Tab (sem Shift), salta para a secção seguinte
+                      if (e.key === "Tab") {
+                        if (
+                          !e.shiftKey &&
+                          index === debuggerSlides.length - 1
+                        ) {
+                          e.preventDefault();
+                          const nextSection =
+                            document.querySelector("#myMemors");
+                          if (nextSection) {
+                            const focusable = nextSection.querySelector(
+                              'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+                            );
+                            if (focusable) {
+                              focusable.focus();
+                            } else {
+                              nextSection.focus();
+                            }
+                          }
+                          return; // Impede o resto da lógica de correr
+                        }
+
+                        // Shift+Tab no primeiro slide volta ao título
+                        if (e.shiftKey && index === 0) {
+                          e.preventDefault();
+                          const prevElement =
+                            document.querySelector(".home-title");
+                          if (prevElement) prevElement.focus();
+                          return;
+                        }
+
+                        // Caso contrário: navega entre os slides
+                        e.preventDefault();
+                        let newIndex = e.shiftKey
+                          ? Math.max(index - 1, 0)
+                          : Math.min(index + 1, debuggerSlides.length - 1);
+
+                        swiperRef.current?.swiper.slideTo(newIndex);
+
+                        const nextSlide =
+                          document.querySelectorAll(".latest-memors-pic")[
+                            newIndex
+                          ];
+                        if (nextSlide) nextSlide.focus();
+                      }
+                    }}
                   >
                     <div className='image-wrapper'>
                       <img
@@ -195,7 +222,7 @@ const Home = () => {
                     0,
                     5 -
                       memorsData.filter(
-                        (slide) => slide.team === "The Debuggers" && slide.image
+                        (slide) => slide.team === "The Debuggers" && slide.image // Trocar para a equipe do user
                       ).length
                   ),
                 },
@@ -221,7 +248,7 @@ const Home = () => {
         {/* Memor Picture Modal */}
         {selectedSlide && (
           <MemorPicture
-            image={selectedSlide.image[0]}
+            images={selectedSlide.image}
             teamName={selectedSlide.team}
             title={selectedSlide.title}
             submitDate={selectedSlide.submittedDate}
@@ -294,7 +321,11 @@ const Home = () => {
 
           {/* Countdown Card */}
           <Grid item xs={12} sm={6}>
-            <Card className='card' tabIndex='0' aria-label='Competition countdown'>
+            <Card
+              className='card'
+              tabIndex='0'
+              aria-label='Competition countdown'
+            >
               <CardContent>
                 <Box
                   style={{

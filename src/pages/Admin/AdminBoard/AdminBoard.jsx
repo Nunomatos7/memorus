@@ -1424,7 +1424,7 @@ const AdminBoard = () => {
                         <IconButton onClick={() => startEditing(teamName)}>
                           <img
                             src={editIcon}
-                            alt='Edit'
+                            alt='Edit teams'
                             style={{ width: "20px" }}
                           />
                         </IconButton>
@@ -2114,7 +2114,6 @@ const AdminBoard = () => {
                         className='file-input'
                         onChange={handleFileChange}
                         style={{ display: "none" }}
-                        aria-label='Upload Thumbnail'
                       />
                     </>
                   )}

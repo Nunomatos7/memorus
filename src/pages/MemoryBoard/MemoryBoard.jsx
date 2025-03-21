@@ -131,7 +131,7 @@ const MemoryBoard = () => {
       title: post.title,
       submittedDate: post.submittedDate,
       team: post.team,
-      postIndex
+      postIndex,
     });
   };
 
@@ -140,9 +140,9 @@ const MemoryBoard = () => {
   };
 
   const handleImageNavigation = (newIndex) => {
-    setSelectedMemor(prev => ({
+    setSelectedMemor((prev) => ({
       ...prev,
-      currentIndex: newIndex
+      currentIndex: newIndex,
     }));
   };
 
@@ -187,7 +187,7 @@ const MemoryBoard = () => {
             className='filter-dropdown'
           >
             {teams.map((team, index) => (
-              <option key={index} value={team}>
+              <option key={index} value={team} alt={`Filter by ${team}`}>
                 {team}
               </option>
             ))}
@@ -219,7 +219,7 @@ const MemoryBoard = () => {
           {posts.map((post, postIndex) => (
             <div
               key={postIndex}
-              className="polaroid-container"
+              className='polaroid-container'
               style={{
                 position: "absolute",
                 top: post.y + canvasHeight / 2,
@@ -237,8 +237,13 @@ const MemoryBoard = () => {
                   .map((imgSrc, cardIndex, reversedArray) => (
                     <div
                       key={cardIndex}
-                      className="polaroid-card"
-                      onClick={() => openModal(reversedArray.length - 1 - cardIndex, postIndex)}
+                      className='polaroid-card'
+                      onClick={() =>
+                        openModal(
+                          reversedArray.length - 1 - cardIndex,
+                          postIndex
+                        )
+                      }
                       style={{
                         position: "absolute",
                         top: `${cardIndex * 5}px`,
