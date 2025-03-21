@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Box, Typography, Card, Avatar } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import rank1 from "../../../assets/images/adminRank1.svg";
@@ -13,60 +14,64 @@ export const leaderboardData = [
     points: 510,
     memors: 51,
     rank: 1,
-    avatar: "https://images.adsttc.com/media/images/5d44/14fa/284d/d1fd/3a00/003d/medium_jpg/eiffel-tower-in-paris-151-medium.jpg?1564742900",
+    avatar: "../../../../src/assets/images/team1logo.png",
   },
   {
     teamName: "The Debuggers",
     points: 360,
     memors: 36,
     rank: 2,
-    avatar: "https://www.girlfromnowhere.pt/wp-content/uploads/2023/02/Passeio-de-moliceiro-nos-canais-de-Aveiro-1024x768.jpg",
+    avatar: "../../../../src/assets/images/team2logo.png",
   },
   {
     teamName: "Capital Crew",
     points: 190,
     memors: 19,
     rank: 3,
-    avatar: "https://cdn-imgix.headout.com/microbrands-content-image/image/848bbbd82180ddf262893075f225b20d-Christmas%20in%20Prague%20-%20Why%20Spend%20Christmas%20in%20Prague%3F.jpg?auto=format&w=1222.3999999999999&h=687.6&q=90&fit=crop&ar=16%3A9&crop=faces",
+    avatar: "../../../../src/assets/images/team3logo.png",
   },
   {
     teamName: "The Hackers",
     points: 150,
     memors: 15,
     rank: 4,
-    avatar: "https://www.vivernocentrodeportugal.com/Assets/Img/Galeria-regioes/f6f230cf.jpg",
+    avatar: "../../../../src/assets/images/team4logo.png",
   },
   {
     teamName: "The Coders",
     points: 120,
     memors: 12,
     rank: 5,
-    avatar: "https://www.rotadaluz.pt/wp-content/uploads/2021/07/praia-furadouro-topo.jpg",
+    avatar: "../../../../src/assets/images/team5logo.png",
   },
   {
     teamName: "The Programmers",
     points: 100,
     memors: 10,
     rank: 6,
-    avatar: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Cidade_Maravilhosa.jpg/800px-Cidade_Maravilhosa.jpg",
+    avatar: "../../../../src/assets/images/team6logo.png",
   },
   {
     teamName: "The Developers",
     points: 90,
     memors: 9,
     rank: 7,
-    avatar: "https://www.pelago.com/img/destinations/bali/0619-0941_bali.jpg",
+    avatar: "../../../../src/assets/images/team7logo.png",
   },
   {
     teamName: "The Designers",
     points: 80,
     memors: 8,
     rank: 8,
-    avatar: "https://static.nationalgeographicbrasil.com/files/styles/image_3200/public/nationalgeographic2710344.jpg?w=1900&h=1272",
+    avatar: "../../../../src/assets/images/team8logo.png",
   },
 ];
 
 const Leaderboard = () => {
+  useEffect(() => {
+    document.title = `Memor'us | Leaderboard`;
+  }, []);
+
   return (
     <>
       <Loader />
@@ -74,7 +79,8 @@ const Leaderboard = () => {
       <div className='container'>
         <img
           src={background1}
-          alt='leaderboard-bg1'
+          alt=''
+          aria-hidden='true'
           style={{
             position: "absolute",
             top: "2",
@@ -85,7 +91,8 @@ const Leaderboard = () => {
         />
         <img
           src={background2}
-          alt='leaderboard-bg2'
+          alt=''
+          aria-hidden='true'
           style={{
             position: "absolute",
             top: "25%",
@@ -96,7 +103,8 @@ const Leaderboard = () => {
         />
         <img
           src={background3}
-          alt='leaderboard-bg3'
+          alt=''
+          aria-hidden='true'
           style={{
             position: "absolute",
             top: "35%",
@@ -121,6 +129,8 @@ const Leaderboard = () => {
               color: "white",
               marginBottom: "30px",
             }}
+            tabIndex={0}
+            aria-label='Leaderboard'
           >
             Leaderboard
           </Typography>
@@ -156,6 +166,8 @@ const Leaderboard = () => {
                   position: "relative",
                   height: "15rem",
                 }}
+                tabIndex={0}
+                aria-labelledby={`team-${leaderboardData[1].rank}`}
               >
                 <Box
                   sx={{
@@ -170,7 +182,7 @@ const Leaderboard = () => {
                 >
                   <Avatar
                     src={leaderboardData[1].avatar}
-                    alt={leaderboardData[1].teamName}
+                    alt="Rank 2"
                     sx={{
                       width: "40px",
                       height: "40px",
@@ -210,7 +222,7 @@ const Leaderboard = () => {
                 </Box>
                 <img
                   src={rank2}
-                  alt='rank'
+                  alt=''
                   style={{
                     position: "absolute",
                     bottom: "0px",
@@ -241,6 +253,8 @@ const Leaderboard = () => {
                   position: "relative",
                   height: "20rem",
                 }}
+                tabIndex={0}
+                aria-labelledby={`team-${leaderboardData[0].rank}`}
               >
                 <Box
                   sx={{
@@ -255,7 +269,7 @@ const Leaderboard = () => {
                 >
                   <Avatar
                     src={leaderboardData[0].avatar}
-                    alt={leaderboardData[0].teamName}
+                    alt="Rank 1"
                     sx={{
                       width: "40px",
                       height: "40px",
@@ -304,7 +318,7 @@ const Leaderboard = () => {
                 </Box>
                 <img
                   src={rank1}
-                  alt='rank'
+                  alt=''
                   style={{
                     position: "absolute",
                     bottom: "0px",
@@ -335,6 +349,8 @@ const Leaderboard = () => {
                   position: "relative",
                   height: "12rem",
                 }}
+                tabIndex={0}
+                aria-labelledby={`team-${leaderboardData[2].rank}`}
               >
                 <Box
                   sx={{
@@ -349,7 +365,7 @@ const Leaderboard = () => {
                 >
                   <Avatar
                     src={leaderboardData[2].avatar}
-                    alt={leaderboardData[2].teamName}
+                    alt="Rank 3"
                     sx={{
                       width: "40px",
                       height: "40px",
@@ -389,7 +405,7 @@ const Leaderboard = () => {
                 </Box>
                 <img
                   src={rank3}
-                  alt='rank'
+                  alt=''
                   style={{
                     position: "absolute",
                     bottom: "0px",
@@ -476,6 +492,8 @@ const Leaderboard = () => {
                     padding: "10px",
                     marginTop: "-2px",
                   }}
+                  tabIndex={0}
+                  aria-label={`Rank ${team.rank}: ${team.teamName}, ${team.memors} Memors, ${team.points} Points`}
                 >
                   <Typography
                     variant='h6'

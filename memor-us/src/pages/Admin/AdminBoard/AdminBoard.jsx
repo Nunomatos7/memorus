@@ -13,7 +13,7 @@ import {
 import background1 from "../../../assets/images/adminBackground1.svg";
 import background3 from "../../../assets/images/adminBackground2.svg";
 import background2 from "../../../assets/images/adminBackground3.svg";
-import { act, useState } from "react";
+import { useEffect, useState } from "react";
 import CustomButton from "../../../Components/CustomButton/CustomButton";
 import editIcon from "../../../assets/images/editIcon.svg";
 import deleteIcon from "../../../assets/images/deleteIcon.svg";
@@ -76,7 +76,7 @@ const AdminBoard = () => {
       title: "Coffee Break",
       description:
         "Join the coffee break, where you can share a cup and a story online. Make sure to have your favorite mug!",
-      date: "01/25/2025",
+      date: "02/25/2025",
       points: "+ 30 pts",
       teamsLeft: 5,
     },
@@ -100,7 +100,7 @@ const AdminBoard = () => {
       title: "Team Lunch",
       description:
         "Organize a team lunch either in-office or virtually. Capture the moment of camaraderie and good food.",
-      date: "01/13/2025",
+      date: "01/13/2026",
       points: "+ 30 pts",
       teamsLeft: 4,
     },
@@ -427,6 +427,10 @@ const AdminBoard = () => {
       team: "",
     },
   ];
+
+  useEffect(() => {
+    document.title = `Memor'us | Admin board`;
+  }, []);
 
   const [expandedIndex, setExpandedIndex] = useState(null);
 
@@ -787,8 +791,8 @@ const AdminBoard = () => {
       title: "New Year New Us",
       description:
         "For this competition, focus on capturing moments that highlight our team's spirit and the memories we're creating together. Let your entries celebrate our collective growth, the bonds we're strengthening, and the journey we're sharing in striving to achieve our best. 🌟",
-      startDate: "2025/01/01",
-      endDate: "2025/01/31",
+      startDate: "2025/02/01",
+      endDate: "2025/05/31",
     },
     {
       id: 8,
@@ -1059,12 +1063,16 @@ const AdminBoard = () => {
                   ),
                 },
               }}
+              inputProps={{
+                "aria-label": "Search Memors",
+              }}
               sx={{
                 borderRadius: "40px",
                 input: { color: "white" },
                 width: "250px",
                 border: "0.905px solid #88938F",
                 "& fieldset": { border: "none" },
+                "&:hover": { backgroundColor: "#2E2F30" },
               }}
             />
           </Box>
@@ -1212,7 +1220,7 @@ const AdminBoard = () => {
                       {memor.title}
                     </Typography>
                     {expandedIndex === index && (
-                      <Typography variant='caption' sx={{ color: "gray" }}>
+                      <Typography variant='caption' sx={{ color: "#CBCBCB" }}>
                         {memor.date}
                       </Typography>
                     )}
@@ -1237,7 +1245,13 @@ const AdminBoard = () => {
                           </span>
                         );
                       } else {
-                        return "";
+                        return (
+                          <span style={{ opacity: 0 }}>
+                            <span style={{ color: "#d8504d" }}>
+                              0 days left
+                            </span>
+                          </span>
+                        );
                       }
                     })()}
                   </Typography>
@@ -1288,7 +1302,7 @@ const AdminBoard = () => {
                       />
                     </IconButton>
 
-                    <IconButton>
+                    <IconButton aria-label='expand'>
                       {expandedIndex === index ? (
                         <KeyboardArrowUp sx={{ color: "white" }} />
                       ) : (
@@ -1410,7 +1424,7 @@ const AdminBoard = () => {
                         <IconButton onClick={() => startEditing(teamName)}>
                           <img
                             src={editIcon}
-                            alt='Edit'
+                            alt='Edit teams'
                             style={{ width: "20px" }}
                           />
                         </IconButton>
@@ -1465,6 +1479,9 @@ const AdminBoard = () => {
                                   </InputAdornment>
                                 ),
                               },
+                            }}
+                            inputProps={{
+                              "aria-label": "Search Memors",
                             }}
                             sx={{
                               borderRadius: "40px",
@@ -1626,67 +1643,102 @@ const AdminBoard = () => {
               }}
             >
               <Box>
-                {isCurrentCompetition ? (
-                  <>
-                    <Box
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    width: "100%",
+                  }}
+                >
+                  {ongoingCompetition ? (
+                    <CustomButton
+                      text='Create a Competition'
+                      disabled={true}
                       sx={{
+                        backgroundColor: "rgba(49, 49, 49, 1)",
+                        color: "rgba(26, 26, 26, 1)",
                         display: "flex",
-                        justifyContent: "space-between",
-                        width: "100%",
-                      }}
-                    >
-                      <CustomButton
-                        text='Create a Competition'
-                        disabled={true}
-                        sx={{
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "8px",
+                        padding: "10px 20px",
+                        borderRadius: "20px",
+                        border: "none",
+                        boxShadow: "none",
+                        "&:hover": {
                           backgroundColor: "rgba(49, 49, 49, 1)",
-                          color: "rgba(26, 26, 26, 1)",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          gap: "8px",
-                          padding: "10px 20px",
-                          borderRadius: "20px",
-                          border: "none",
-                          boxShadow: "none",
-                          "&:hover": {
-                            backgroundColor: "rgba(49, 49, 49, 1)",
-                          },
-                          cursor: "not-allowed",
-                        }}
-                        icon={
-                          <Typography
-                            component='span'
-                            sx={{
-                              fontWeight: "bold",
-                              fontSize: "18px",
-                              display: "flex",
-                              alignItems: "center",
-                              color: "rgba(26, 26, 26, 1)",
-                            }}
-                          >
-                            +
-                          </Typography>
-                        }
-                      />
-                    </Box>
-                    <Box
-                      sx={{
-                        display: "grid",
-                        gridTemplateColumns: "1fr 4fr",
-                        marginTop: "40px",
+                        },
+                        cursor: "not-allowed",
                       }}
-                    >
-                      <Typography
-                        variant='body1'
-                        sx={{
-                          fontWeight: "bold",
-                          color: "#FFFFFF",
-                          marginBottom: "20px",
-                        }}
-                      >
-                        Ongoing Competition
-                      </Typography>
+                      icon={
+                        <Typography
+                          component='span'
+                          sx={{
+                            fontWeight: "bold",
+                            fontSize: "18px",
+                            display: "flex",
+                            alignItems: "center",
+                            color: "rgba(26, 26, 26, 1)",
+                          }}
+                        >
+                          +
+                        </Typography>
+                      }
+                    />
+                  ) : (
+                    <CustomButton
+                      text='Create a Competition'
+                      onClick={() => handleCreateCompetitionModalOpen()}
+                      sx={{
+                        backgroundColor: "#B5EDE4",
+                        color: "#000",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "8px",
+                        padding: "10px 20px",
+                        borderRadius: "20px",
+                        border: "none",
+                        boxShadow: "none",
+                        "&:hover": {
+                          backgroundColor: "#80ccbc",
+                        },
+                      }}
+                      icon={
+                        <Typography
+                          component='span'
+                          sx={{
+                            fontWeight: "bold",
+                            fontSize: "18px",
+                            display: "flex",
+                            alignItems: "center",
+                          }}
+                        >
+                          +
+                        </Typography>
+                      }
+                    />
+                  )}
+                </Box>
+                <Box
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 4fr",
+                    marginTop: "40px",
+                  }}
+                >
+                  <Typography
+                    variant='body1'
+                    sx={{
+                      fontWeight: "bold",
+                      color: "#FFFFFF",
+                      marginBottom: "20px",
+                    }}
+                  >
+                    Ongoing Competition
+                  </Typography>
+                  {ongoingCompetition ? (
+                    <>
                       <Box
                         sx={{
                           display: "flex",
@@ -1717,6 +1769,7 @@ const AdminBoard = () => {
                             {ongoingCompetition.description}
                           </Typography>
                         </Box>
+
                         <Box
                           sx={{
                             flex: 2,
@@ -1749,59 +1802,68 @@ const AdminBoard = () => {
                           </Box>
                         </Box>
                         <Box>
-                          {competitions
-                            .filter((comp) => comp.id === ongoingCompetition.id)
-                            .map((competition) => (
-                              <IconButton
-                                onClick={() =>
-                                  handleEditCompetitionModalOpen(competition)
-                                }
-                                key={competition.id}
-                              >
-                                <img
-                                  src={editIcon}
-                                  alt='edit'
-                                  style={{ width: "20px" }}
-                                />
-                              </IconButton>
-                            ))}
+                          {ongoingCompetition &&
+                          competitions.some(
+                            (comp) => comp.id === ongoingCompetition.id
+                          ) ? (
+                            competitions
+                              .filter(
+                                (comp) => comp.id === ongoingCompetition.id
+                              )
+                              .map((competition) => (
+                                <IconButton
+                                  onClick={() =>
+                                    handleEditCompetitionModalOpen(competition)
+                                  }
+                                  key={competition.id}
+                                >
+                                  <img
+                                    src={editIcon}
+                                    alt='edit'
+                                    style={{ width: "20px" }}
+                                  />
+                                </IconButton>
+                              ))
+                          ) : (
+                            <p></p>
+                          )}
                         </Box>
                       </Box>
-                    </Box>
-                  </>
-                ) : (
-                  <CustomButton
-                    text='Create a Competition'
-                    sx={{
-                      backgroundColor: "#B5EDE4",
-                      color: "#000",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: "8px",
-                      padding: "10px 20px",
-                      borderRadius: "20px",
-                      border: "none",
-                      boxShadow: "none",
-                      "&:hover": {
-                        backgroundColor: "#A3DFD8",
-                      },
-                    }}
-                    icon={
-                      <Typography
-                        component='span'
+                    </>
+                  ) : (
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        padding: "0px 25px 25px 25px",
+                        fontWeight: "bold",
+                        color: "white",
+                      }}
+                    >
+                      <Box
                         sx={{
-                          fontWeight: "bold",
-                          fontSize: "18px",
+                          flex: 2,
                           display: "flex",
-                          alignItems: "center",
+                          gap: "15px",
+                          flexDirection: "column",
                         }}
                       >
-                        +
-                      </Typography>
-                    }
-                  />
-                )}
+                        <Typography
+                          variant='body2'
+                          sx={{ fontWeight: "bold", color: "#C3AAAA" }}
+                        >
+                          No Ongoing Competition
+                        </Typography>
+                        <Typography variant='body2' sx={{ color: "#C3AAAA" }}>
+                          It looks like there are no active competitions right
+                          now. To get started, simply create a new competition
+                          by clicking the button. You can define the rules and
+                          set timelines.
+                        </Typography>
+                      </Box>
+                    </Box>
+                  )}
+                </Box>
 
                 {/* Divider */}
                 <Divider
@@ -1920,6 +1982,8 @@ const AdminBoard = () => {
             context='team'
             itemName={modalData.memberName}
             teamName={modalData.teamName}
+            aria-labelledby='confirmation-modal-title'
+            aria-describedby='confirmation-modal-description'
           />
 
           {/* Confirmation Modal for Deleting Team */}
@@ -1936,21 +2000,28 @@ const AdminBoard = () => {
 
           {/* Create Team Modal */}
           {isCreateModalOpen && (
-            <div className='modal-overlay-submit-memor'>
+            <div
+              className='modal-overlay-submit-memor'
+              role='dialog'
+              aria-modal='true'
+            >
               <div
                 className='modal-container'
                 style={{ padding: "20px", maxWidth: "600px" }}
+                tabIndex={-1} // Make the modal focusable
               >
                 <div className='modal-top' style={{ marginBottom: "20px" }}>
                   <Button
                     onClick={() => handleTeamModalClose()}
                     sx={{ minWidth: 0, p: 0, color: "#BEC9C5" }}
+                    aria-label='Close modal'
                   >
                     <ArrowBackIcon />
                   </Button>
                   <Typography
                     variant='h6'
                     sx={{ marginLeft: "10px", color: "#BEC9C5" }}
+                    id='create-team-modal-title'
                   >
                     Admin Board
                   </Typography>
@@ -1981,6 +2052,9 @@ const AdminBoard = () => {
                     },
                     "& .MuiInputLabel-root": { color: "#888" },
                   }}
+                  inputProps={{
+                    "aria-label": "Team's Name",
+                  }}
                 />
                 <Typography
                   variant='body1'
@@ -2007,6 +2081,7 @@ const AdminBoard = () => {
                       src={newTeamThumbnail}
                       alt='Uploaded Thumbnail'
                       style={{ borderRadius: "10px", height: "120px" }}
+                      aria-label='Uploaded Thumbnail'
                     />
                   ) : (
                     <>
@@ -2056,15 +2131,13 @@ const AdminBoard = () => {
                   variant='outlined'
                   size='small'
                   sx={{
-                    marginBottom: "20px",
-                    "& .MuiInputBase-input": { color: "#FFFFFF" },
-                    "& .MuiOutlinedInput-root": {
-                      "& fieldset": { borderColor: "#888" },
-                      "&:hover fieldset": { borderColor: "#AAA" },
-                      "&.Mui-focused fieldset": { borderColor: "#CCC" },
-                    },
-                    "& .MuiInputLabel-root": { color: "#888" },
+                    borderRadius: "40px",
+                    input: { color: "white" },
+                    width: "250px",
+                    border: "0.905px solid #88938F",
                     "& fieldset": { border: "none" },
+                    "&:hover": { backgroundColor: "#2E2F30" },
+                    marginBottom: "20px",
                   }}
                   InputProps={{
                     startAdornment: (
@@ -2072,6 +2145,9 @@ const AdminBoard = () => {
                         <Search sx={{ color: "#888" }} />
                       </InputAdornment>
                     ),
+                  }}
+                  inputProps={{
+                    "aria-label": "Search Members",
                   }}
                 />
                 <div
@@ -2083,6 +2159,8 @@ const AdminBoard = () => {
                     padding: "10px",
                     border: "1px solid #333",
                   }}
+                  role='listbox'
+                  aria-label='Members List'
                 >
                   {filteredUnassignedMembers.map((member) => (
                     <Box
@@ -2104,6 +2182,9 @@ const AdminBoard = () => {
                           }))
                         }
                         sx={{ color: "#82D5C7" }}
+                        inputProps={{
+                          "aria-label": `Select ${member.name}`,
+                        }}
                       />
                       <Typography sx={{ color: "#FFFFFF" }}>
                         {member.name}
@@ -2134,6 +2215,7 @@ const AdminBoard = () => {
                         backgroundColor: "rgba(181, 237, 228, 0.08)",
                       },
                     }}
+                    aria-label='Cancel'
                   />
                   <CustomButton
                     text='Confirm'
@@ -2144,6 +2226,7 @@ const AdminBoard = () => {
                         backgroundColor: "#80ccbc",
                       },
                     }}
+                    aria-label='Confirm'
                   />
                 </Box>
               </div>
@@ -2169,20 +2252,28 @@ const AdminBoard = () => {
                   style: { backgroundColor: "#4caf50", color: "#fff" },
                 },
               ]}
+              aria-labelledby='feedback-modal-title'
+              aria-describedby='feedback-modal-description'
             />
           )}
 
           {/* Create Memor Modal */}
           {isCreateMemorModalOpen && (
-            <div className='modal-overlay-submit-memor'>
+            <div
+              className='modal-overlay-submit-memor'
+              role='dialog'
+              aria-modal='true'
+            >
               <div
                 className='modal-container'
                 style={{ padding: "20px", maxWidth: "600px" }}
+                tabIndex={-1}
               >
                 <div className='modal-top' style={{ marginBottom: "20px" }}>
                   <Button
                     onClick={() => handleCreateMemorModalClose()}
                     sx={{ minWidth: 0, p: 0, color: "#BEC9C5" }}
+                    aria-label='Close modal'
                   >
                     <ArrowBackIcon />
                   </Button>
@@ -2220,9 +2311,6 @@ const AdminBoard = () => {
                     "& .MuiInputLabel-root": { color: "#888" },
                   }}
                 />
-                <Typography variant='body1' sx={{ color: "#CAC4D0" }}>
-                  Due Date
-                </Typography>
                 <TextField
                   type='date'
                   value={newMemorDate || ""}
@@ -2230,6 +2318,7 @@ const AdminBoard = () => {
                   fullWidth
                   inputProps={{
                     min: getTodayDate(),
+                    "aria-label": "Due Date",
                   }}
                   sx={{
                     marginBottom: "20px",
@@ -2240,6 +2329,13 @@ const AdminBoard = () => {
                       "&.Mui-focused fieldset": { borderColor: "#CCC" },
                     },
                     "&hover": { backgroundColor: "#80ccbc" },
+                    // Add these new styles for the calendar icon
+                    "& .MuiSvgIcon-root": { color: "#FFFFFF" }, // This targets the calendar icon
+                    "& .MuiInputAdornment-root": { color: "#FFFFFF" }, // This targets the container of the icon
+                    // For older versions of Material UI, you might need this
+                    "& input::-webkit-calendar-picker-indicator": {
+                      filter: "invert(1)", // This will make the native calendar icon white
+                    },
                   }}
                 />
                 <TextField
@@ -2259,6 +2355,9 @@ const AdminBoard = () => {
                       "&.Mui-focused fieldset": { borderColor: "#CCC" },
                     },
                     "& .MuiInputLabel-root": { color: "#888" },
+                  }}
+                  inputProps={{
+                    "aria-label": "memor description",
                   }}
                 />
                 <Typography variant='body1' sx={{ color: "#CAC4D0" }}>
@@ -2338,10 +2437,17 @@ const AdminBoard = () => {
 
           {/* Edit Memor Modal */}
           {isEditMemorModalOpen && (
-            <div className='modal-overlay-submit-memor'>
+            <div
+              className='modal-overlay-submit-memor'
+              role='dialog'
+              aria-modal='true'
+              aria-labelledby='edit-memor-modal-title'
+              aria-describedby='edit-memor-modal-description'
+            >
               <div
                 className='modal-container'
                 style={{ padding: "20px", maxWidth: "600px" }}
+                tabIndex={-1}
               >
                 <div className='modal-top' style={{ marginBottom: "20px" }}>
                   <Button
@@ -2501,10 +2607,17 @@ const AdminBoard = () => {
 
           {/* Edit Competition Modal */}
           {isEditCompetitionModalOpen && (
-            <div className='modal-overlay-submit-memor'>
+            <div
+              className='modal-overlay-submit-memor'
+              role='dialog'
+              aria-modal='true'
+              aria-labelledby='edit-competition-modal-title'
+              aria-describedby='edit-competition-modal-description'
+            >
               <div
                 className='modal-container'
                 style={{ padding: "20px", maxWidth: "600px" }}
+                tabIndex={-1}
               >
                 <div className='modal-top' style={{ marginBottom: "20px" }}>
                   <Button

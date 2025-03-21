@@ -1,14 +1,15 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import "./SubmitMemorModal.css";
 import "../FeedbackModal/FeedbackModal.css";
 import { Typography, Button } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { Groups, Stars } from "@mui/icons-material";
 import TodayIcon from "@mui/icons-material/Today";
-import QrCode from "../../assets/images/QRcode.svg";
+import QRCode from "react-qr-code";
 import UploadButton from "../../assets/images/UploadButton.svg";
 import CustomButton from "../CustomButton/CustomButton";
 import FeedbackModal from "../FeedbackModal/FeedbackModal";
+import MemorPicture from "../MemorPicture/MemorPicture";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Mousewheel, FreeMode } from "swiper/modules";
 import "swiper/css";
@@ -19,13 +20,62 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
   const [uploadedImage, setUploadedImage] = useState(null);
   const [feedback, setFeedback] = useState(null);
   const [isSubmitMemorOpen, setIsSubmitMemorOpen] = useState(true);
+  const [selectedImage, setSelectedImage] = useState(null);
 
-  // Normalize images array to always have at least 6 items
+  const modalRef = useRef(null);
+
+  useEffect(() => {
+    if (isSubmitMemorOpen && modalRef.current && !selectedImage) {
+      const focusableElements = modalRef.current?.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+
+      if (focusableElements?.length > 0) {
+        focusableElements[0].focus();
+      }
+
+      const handleKeyDown = (event) => {
+        if (event.key === "Escape") {
+          if (selectedImage) {
+            setSelectedImage(null);
+          } else {
+            onClose();
+          }
+        } else if (event.key === "Tab") {
+          if (!focusableElements || focusableElements.length === 0) return;
+
+          const firstElement = focusableElements[0];
+          const lastElement = focusableElements[focusableElements.length - 1];
+
+          if (event.shiftKey && document.activeElement === firstElement) {
+            event.preventDefault();
+            lastElement.focus();
+          } else if (
+            !event.shiftKey &&
+            document.activeElement === lastElement
+          ) {
+            event.preventDefault();
+            firstElement.focus();
+          }
+        }
+      };
+
+      document.addEventListener("keydown", handleKeyDown);
+      return () => {
+        document.removeEventListener("keydown", handleKeyDown);
+      };
+    }
+  }, [isSubmitMemorOpen, selectedImage, onClose]);
+
   const normalizedImages = (() => {
-    const images = memor.image || []; // Use memor.image or an empty array
-    const placeholderCount = Math.max(6 - images.length, 0); // Calculate the number of placeholders needed
-    return [...images, ...Array(placeholderCount).fill(null)]; // Fill placeholders with null
+    const images = memor.image || [];
+    const placeholderCount = Math.max(6 - images.length, 0);
+    return [...images, ...Array(placeholderCount).fill(null)];
   })();
+
+  const handleImageClick = (image) => {
+    setSelectedImage(image);
+  };
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -137,7 +187,15 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
 
       {isSubmitMemorOpen && !feedback && (
         <div className='modal-overlay-submit-memor'>
-          <div className='modal-container'>
+          <div
+            ref={modalRef}
+            className='modal-container'
+            role='dialog'
+            aria-modal='true'
+            tabIndex={-1}
+            aria-labelledby='modal-title'
+            aria-describedby='modal-description'
+          >
             <div className='modal-top'>
               <Button
                 onClick={onClose}
@@ -148,10 +206,20 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
               <h4>Details</h4>
             </div>
             <div className='modal-header'>
-              <Typography variant='h5' className='modal-title'>
+              <Typography
+                variant='h5'
+                id='modal-title'
+                className='modal-title'
+                aria-live='polite'
+              >
                 {memor.title}
               </Typography>
-              <Typography variant='body2' className='modal-description'>
+              <Typography
+                variant='body2'
+                id='modal-description'
+                className='modal-description'
+                aria-live='polite'
+              >
                 {memor.description}
               </Typography>
             </div>
@@ -178,7 +246,13 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
                 ) : (
                   <>
                     <div className='qr-code-placeholder'>
-                      <img src={QrCode} alt='QR code' />
+                      <QRCode
+                        value={`https://memor-us.com/memors/${memor.id}`}
+                        size={128}
+                        bgColor='transparent'
+                        fgColor='#d0bcfe'
+                        style={{ padding: "8px", borderRadius: "8px" }}
+                      />
                       <Typography variant='body2' style={{ color: "#DDDAF2" }}>
                         Scan it with your phone
                       </Typography>
@@ -187,17 +261,29 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
                       or
                     </Typography>
                     <div className='qr-code-placeholder'>
-                      <label htmlFor='file-input'>
+                      <label
+                        htmlFor='file-input'
+                        tabIndex={0}
+                        role='button'
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            document.getElementById("file-input").click();
+                          }
+                        }}
+                      >
                         <img
                           src={UploadButton}
                           alt='Upload Button'
                           className='upload-button'
                         />
                       </label>
+
                       <input
                         id='file-input'
                         type='file'
                         accept='image/*'
+                        aria-label='Upload photo button'
                         className='file-input'
                         onChange={handleFileChange}
                         style={{ display: "none" }}
@@ -223,22 +309,42 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
               className='uploaded-photos-slider'
             >
               {normalizedImages.map((image, index) => (
-                <SwiperSlide key={index} className='photo-slide'>
+                <SwiperSlide
+                  key={index}
+                  tabIndex={image ? 0 : -1} // Make slide focusable only if there's an image
+                  className='photo-slide'
+                  onClick={(event) => image && handleImageClick(image, event)}
+                  onKeyDown={(event) => {
+                    if (image && (event.key === "Enter" || event.key === " ")) {
+                      event.preventDefault(); // Prevent default scrolling behavior for Space key
+                      handleImageClick(image, event);
+                    }
+                  }}
+                >
                   {image ? (
-                    (console.log(image),
-                    (
-                      <img
-                        src={image}
-                        alt={`Team photo ${index + 1}`}
-                        className='photo'
-                      />
-                    ))
+                    <img
+                      style={{ cursor: "pointer" }}
+                      src={image}
+                      alt={`Team photo ${index + 1}`}
+                      className='photo'
+                    />
                   ) : (
                     <div className='photo-placeholder'></div>
                   )}
                 </SwiperSlide>
               ))}
             </Swiper>
+
+            {selectedImage && (
+              <MemorPicture
+                images={memor.image}
+                currentIndex={memor.image.indexOf(selectedImage)}
+                title={memor.title}
+                submitDate={memor.dueDate}
+                teamName={memor.team}
+                onClose={() => setSelectedImage(null)}
+              />
+            )}
 
             {(memor.image?.length ?? 0) === 0 && (
               <Typography variant='body2' className='no-photos-text'>
@@ -286,6 +392,8 @@ SubmitMemorModal.propTypes = {
     submission: PropTypes.string,
     dueDate: PropTypes.string.isRequired,
     points: PropTypes.number.isRequired,
+    team: PropTypes.string.isRequired,
+    id: PropTypes.number.isRequired,
   }).isRequired,
 
   onClose: PropTypes.func.isRequired,

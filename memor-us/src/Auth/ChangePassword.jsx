@@ -1,10 +1,10 @@
-import { useState } from "react";
-import "./LoginPage.css"; // Reuse the same CSS for consistent styling
+import { useState, useEffect } from "react";
+import "./LoginPage.css";
 import logo from "../assets/images/logo.svg";
 import { TextField, Button, Typography } from "@mui/material";
 import leftBackground from "../assets/images/left-auth.svg";
 import rightBackground from "../assets/images/right-auth.svg";
-import ArrowBackIcon from '@mui/icons-material/ArrowBack'; // Import ArrowBackIcon for the back button
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 const ChangePasswordPage = () => {
   const [username, setUsername] = useState("");
@@ -12,6 +12,10 @@ const ChangePasswordPage = () => {
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  useEffect(() => {
+    document.title = `Memor'us | Change password`;
+  }, []);
 
   const handleChangePassword = (e) => {
     e.preventDefault();
@@ -49,15 +53,15 @@ const ChangePasswordPage = () => {
         {/* Back Button */}
         <Button
           startIcon={<ArrowBackIcon />}
-          onClick={() => window.history.back()} // Use history.back() to navigate to the previous page
+          onClick={() => window.history.back()}
           sx={{
-            color: "#ffffff", // Adjust the color to match your theme
-            position: 'absolute', // Position it at the top-left corner of the card
-            top: 16, // Top margin
-            left: 16, // Left margin
-            '&:hover': {
-              backgroundColor: "rgba(255, 255, 255, 0.1)", // Slightly darker hover effect
-            }
+            color: "#ffffff",
+            position: "absolute",
+            top: 16,
+            left: 16,
+            "&:hover": {
+              backgroundColor: "rgba(255, 255, 255, 0.1)",
+            },
           }}
         >
           Back
@@ -70,7 +74,8 @@ const ChangePasswordPage = () => {
           Change Password
         </Typography>
         <Typography variant='body2' className='login-subtitle' sx={{ mb: 2 }}>
-          Enter your username (email) and a new password to update your credentials.
+          Enter your username (email) and a new password to update your
+          credentials.
         </Typography>
         <form onSubmit={handleChangePassword} className='login-form'>
           {error && <Typography className='error-message'>{error}</Typography>}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Mousewheel, FreeMode } from "swiper/modules";
 import { Grid, Card, CardContent, Typography, Box } from "@mui/material";
@@ -11,7 +11,6 @@ import rank2 from "../../../assets/images/rank2admin.svg";
 import rank3 from "../../../assets/images/rank3admin.svg";
 import ongoing from "../../../assets/images/ongoingAdmin.svg";
 import closed from "../../../assets/images/closedAdmin.svg";
-import WelcomeModal from "../../../Components/WelcomeModal/WelcomeModal";
 import { leaderboardData } from "../Leaderboard/Leaderboard";
 import CustomButton from "../../../Components/CustomButton/CustomButton";
 import Loader from "../../../Components/Loader/Loader";
@@ -36,35 +35,13 @@ export const mockUser = {
   admin: false,
 };
 
-// const slidesData = [
-//   {
-//     id: 1,
-//     teamName: "The Debuggers",
-//     title: "Coffee break",
-//     description: "A nice coffee break with friends",
-//     submitDate: "2 days ago",
-//     image:
-//       "https://cdn.pixabay.com/photo/2023/10/23/16/24/bird-8336436_1280.jpg",
-//   },
-//   {
-//     id: 2,
-//     teamName: "Capital Crew",
-//     title: "Show us your city",
-//     description: "We bet it must look nice :)",
-//     submitDate: "8 days ago",
-//     image:
-//       "https://media.istockphoto.com/id/1368628035/photo/brooklyn-bridge-at-sunset.jpg?s=612x612&w=0&k=20&c=hPbMbTYRAVNYWAUMkl6r62fPIjGVJTXzRURCyCfoG08=",
-//   },
-//   { id: 3, image: "" },
-//   { id: 4, image: "" },
-//   { id: 5, image: "" },
-//   { id: 6, image: "" },
-//   { id: 7, image: "" },
-//   { id: 8, image: "" },
-// ];
-
 const Home = () => {
   const [selectedSlide, setSelectedSlide] = useState(null);
+  const swiperRef = useRef(null);
+
+  useEffect(() => {
+    document.title = `Memor'us | Home`;
+  }, []);
 
   const handleImageClick = (slide) => {
     setSelectedSlide(slide);
@@ -76,18 +53,33 @@ const Home = () => {
     document.body.style.overflow = "auto";
   };
 
+  const uniqueMemors = Object.values(
+    memorsData.reduce((acc, memor) => {
+      if (!acc[memor.title] && memor.image?.length > 0) {
+        acc[memor.title] = memor;
+      }
+      return acc;
+    }, {})
+  ).sort((a, b) => a.id - b.id);
+
+  const handleKeyPress = (event, callback) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      callback();
+    }
+  };
+
   return (
     <>
       <Loader />
-      <WelcomeModal />
-      <section className='mb-10'>
+      <section className='mb-10' aria-labelledby='latest-memors-heading'>
         <div
           className='container'
           style={{ marginBottom: "1rem", marginTop: "2rem" }}
         >
           <img
             src={background1}
-            alt='leaderboard-bg1'
+            alt=''
             style={{
               position: "absolute",
               top: "2",
@@ -95,10 +87,11 @@ const Home = () => {
               width: "15%",
               zIndex: "0",
             }}
+            aria-hidden='true'
           />
           <img
             src={background2}
-            alt='leaderboard-bg2'
+            alt=''
             style={{
               position: "absolute",
               top: "25%",
@@ -106,10 +99,11 @@ const Home = () => {
               width: "5%",
               zIndex: "0",
             }}
+            aria-hidden='true'
           />
           <img
             src={background3}
-            alt='leaderboard-bg3'
+            alt=''
             style={{
               position: "absolute",
               top: "35%",
@@ -117,91 +111,127 @@ const Home = () => {
               width: "5%",
               zIndex: "0",
             }}
+            aria-hidden='true'
           />
-          <h1 className='home-title'>Latest Memors</h1>
+          <h1 id='latest-memors-heading' className='home-title'>
+            Latest Memors
+          </h1>
         </div>
 
         {/* Swiper */}
         <div className='overflow-hidden w-full'>
           <div className='container'>
             <Swiper
+              ref={swiperRef}
               spaceBetween={20}
               breakpoints={{
-                640: {
-                  slidesPerView: 2.3,
-                },
-                768: {
-                  slidesPerView: 4.3,
-                },
-                1024: {
-                  slidesPerView: 5.3,
-                },
+                640: { slidesPerView: 2.3 },
+                768: { slidesPerView: 4.3 },
+                1024: { slidesPerView: 5.3 },
               }}
               className='latest-wrapper'
               freeMode={true}
-              mousewheel={{
-                releaseOnEdges: true,
-              }}
+              mousewheel={{ releaseOnEdges: true }}
               modules={[Mousewheel, FreeMode]}
+              aria-label='Latest Memors'
+              keyboard={{ enabled: true, onlyInViewport: true }}
             >
-              {/* Filter unique titles */}
-              {Object.values(
-                memorsData.reduce((acc, memor) => {
-                  if (!acc[memor.title] && memor.image?.length > 0) {
-                    acc[memor.title] = memor;
+              {uniqueMemors.map((memor, index) => (
+                <SwiperSlide
+                  key={memor.id}
+                  className={
+                    memor.image ? "latest-memors-pic" : "latest-memors"
                   }
-                  return acc;
-                }, {})
-              )
-                .sort((a, b) => a.id - b.id) // Sort titles by ID or some ordering criterion
-                .map((memor, index) => {
-                  // Map the memor data to SwiperSlide components
-                  return (
-                    <SwiperSlide
-                      key={memor.id}
-                      className={
-                        memor.image ? "latest-memors-pic" : "latest-memors"
-                      }
-                    >
-                      {memor.image && (
-                        <div onClick={() => handleImageClick(memor)}>
-                          <div className='image-wrapper'>
-                            <img
-                              width={"100%"}
-                              height={"100%"}
-                              style={{ objectFit: "cover" }}
-                              src={memor.image[0]} // Use the first image
-                              alt='Memor Image'
-                            />
-                          </div>
-                          <div className='latest-memors-content'>
-                            <CustomButton
-                              text={memor.team}
-                              onClick={() => handleImageClick(memor)}
-                              sx={{
-                                display: "flex",
-                                padding: "3.147px 15.953px",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                flex: "1 0 0",
-                                alignSelf: "stretch",
-                                fontSize: "0.8rem",
-                                color: "#003731",
-                                fontWeight: "600",
-                              }}
-                            />
-                            <h3>{memor.submittedDate}</h3>
-                            <p style={{ fontSize: "0.9rem" }}>
-                              &quot;{memor.title}&quot;
-                            </p>
-                          </div>
-                        </div>
-                      )}
-                    </SwiperSlide>
-                  );
-                })}
+                  tabIndex='0'
+                  role='button'
+                  aria-label={`Open memor titled ${memor.title}, submitted on ${memor.submittedDate}`}
+                  onClick={() => handleImageClick(memor)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      handleImageClick(memor);
+                    }
 
-              {/* Add placeholders only at the end */}
+                    if (e.key === "Tab") {
+                      if (!e.shiftKey && index === uniqueMemors.length - 1) {
+                        // Estamos no último slide e foi Tab
+                        e.preventDefault();
+                        const nextSection =
+                          document.querySelector("#adminStats"); // <-- ajusta para o teu próximo bloco
+                        if (nextSection) {
+                          const focusable = nextSection.querySelector(
+                            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+                          );
+                          if (focusable) {
+                            focusable.focus();
+                          } else {
+                            nextSection.focus();
+                          }
+                        }
+                        return;
+                      }
+
+                      if (e.shiftKey && index === 0) {
+                        // Estamos no primeiro slide e foi Shift+Tab
+                        e.preventDefault();
+                        const prevElement =
+                          document.querySelector(".home-title");
+                        if (prevElement) prevElement.focus();
+                        return;
+                      }
+
+                      e.preventDefault();
+                      let newIndex = e.shiftKey
+                        ? Math.max(index - 1, 0)
+                        : Math.min(index + 1, uniqueMemors.length - 1);
+
+                      swiperRef.current?.swiper.slideTo(newIndex);
+
+                      const nextSlide =
+                        document.querySelectorAll(".latest-memors-pic")[
+                          newIndex
+                        ];
+                      if (nextSlide) nextSlide.focus();
+                    }
+                  }}
+                >
+                  {memor.image && (
+                    <div onClick={() => handleImageClick(memor)}>
+                      <div className='image-wrapper'>
+                        <img
+                          width={"100%"}
+                          height={"100%"}
+                          style={{ objectFit: "cover" }}
+                          src={memor.image[0]}
+                          alt='Memor Image'
+                        />
+                      </div>
+                      <div className='latest-memors-content'>
+                        <CustomButton
+                          text={memor.team}
+                          onClick={() => handleImageClick(memor)}
+                          sx={{
+                            display: "flex",
+                            padding: "3.147px 15.953px",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            flex: "1 0 0",
+                            alignSelf: "stretch",
+                            fontSize: "0.8rem",
+                            color: "#003731",
+                            fontWeight: "600",
+                          }}
+                        />
+                        <h3>{memor.submittedDate}</h3>
+                        <p style={{ fontSize: "0.9rem" }}>
+                          &quot;{memor.title}&quot;
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </SwiperSlide>
+              ))}
+
               {Array.from(
                 {
                   length: Math.max(
@@ -221,6 +251,8 @@ const Home = () => {
                   <SwiperSlide
                     key={`placeholder-${index}`}
                     className='placeholder-slide'
+                    role='group'
+                    aria-label='Placeholder'
                   >
                     <div className='placeholder-content'>
                       <p style={{ fontSize: "0.9rem", color: "#aaa" }}>
@@ -234,31 +266,48 @@ const Home = () => {
           </div>
         </div>
 
-        {/* Modal Component */}
         {selectedSlide && (
           <MemorPicture
-            image={selectedSlide.image[0]}
+            images={selectedSlide.image}
             teamName={selectedSlide.team}
             title={selectedSlide.title}
             submitDate={selectedSlide.submittedDate}
             onClose={closeModal}
+            aria-labelledby='memor-picture-modal'
           />
         )}
       </section>
 
-      <section id='myMemors' className='container'>
-        <Typography variant='h6' gutterBottom style={{ color: "white" }}>
+      <section
+        id='adminStats'
+        className='container'
+        aria-labelledby='memors-dashboard-heading'
+      >
+        <Typography
+          variant='h6'
+          gutterBottom
+          style={{ color: "white" }}
+          id='memors-dashboard-heading'
+        >
           Memors Dashboard
         </Typography>
         <Grid container spacing={3}>
-          {/* Pending Memors */}
           <Grid item xs={12} sm={3}>
             <Card
               className='card'
               onClick={() =>
                 (window.location.href = "/admin/adminBoard?tab=ongoing")
               }
+              onKeyPress={(e) =>
+                handleKeyPress(
+                  e,
+                  () => (window.location.href = "/admin/adminBoard?tab=ongoing")
+                )
+              }
               style={{ cursor: "pointer" }}
+              tabIndex='0'
+              role='button'
+              aria-label='View ongoing Memors'
             >
               <CardContent>
                 <Box
@@ -269,7 +318,7 @@ const Home = () => {
                   <Typography variant='h4' fontWeight='bold'>
                     {mockUser.pending_memors}
                   </Typography>
-                  <img src={ongoing} alt='ongoing' />
+                  <img src={ongoing} alt='Ongoing Memors' />
                 </Box>
                 <Typography variant='body2' color='#B0B0B0'>
                   Ongoing Memors
@@ -278,14 +327,22 @@ const Home = () => {
             </Card>
           </Grid>
 
-          {/* Closed Memors */}
           <Grid item xs={12} sm={3}>
             <Card
               className='card'
               onClick={() =>
                 (window.location.href = "/admin/adminBoard?tab=closed")
               }
+              onKeyPress={(e) =>
+                handleKeyPress(
+                  e,
+                  () => (window.location.href = "/admin/adminBoard?tab=closed")
+                )
+              }
               style={{ cursor: "pointer" }}
+              tabIndex='0'
+              role='button'
+              aria-label='View closed Memors'
             >
               <CardContent>
                 <Box
@@ -296,7 +353,7 @@ const Home = () => {
                   <Typography variant='h4' fontWeight='bold'>
                     {mockUser.complete_memors}
                   </Typography>
-                  <img src={closed} alt='ongoing' />
+                  <img src={closed} alt='Closed Memors' />
                 </Box>
                 <Typography variant='body2' color='#B0B0B0'>
                   Closed Memors
@@ -305,9 +362,8 @@ const Home = () => {
             </Card>
           </Grid>
 
-          {/* Remaining Time */}
           <Grid item xs={12} sm={6}>
-            <Card className='card'>
+            <Card className='card' aria-labelledby='competition-heading'>
               <CardContent>
                 <Box
                   style={{
@@ -317,15 +373,24 @@ const Home = () => {
                   }}
                 >
                   <Box>
-                    <Typography variant='h6' style={{ color: "white" }}>
+                    <Typography
+                      variant='h6'
+                      style={{ color: "white" }}
+                      id='competition-heading'
+                    >
                       The competition{" "}
-                      <span style={{ color: "#215952", fontWeight: "bold" }}>
+                      <span style={{ color: "#409C90", fontWeight: "bold" }}>
                         New Year New Us
                       </span>{" "}
                       ends in
                     </Typography>
                   </Box>
-                  <Countdown endDate='2025-01-31T00:00:00' role='admin' />
+                  <Countdown
+                    endDate='2025-05-31T00:00:00'
+                    role='admin'
+                    aria-label='Countdown to competition end: New Year New Us'
+                    aria-live='polite' // Ensures screen readers announce updates
+                  />
                 </Box>
               </CardContent>
             </Card>
@@ -333,8 +398,17 @@ const Home = () => {
         </Grid>
       </section>
 
-      <section id='currentLeaders' className='pb-10 container'>
-        <Typography variant='h6' gutterBottom style={{ color: "white" }}>
+      <section
+        id='currentLeaders'
+        className='pb-10 container'
+        aria-labelledby='current-leaders-heading'
+      >
+        <Typography
+          variant='h6'
+          gutterBottom
+          style={{ color: "white" }}
+          id='current-leaders-heading'
+        >
           Current Leaders
         </Typography>
         <Grid container spacing={2}>
@@ -350,14 +424,22 @@ const Home = () => {
                 <Card
                   className='card'
                   onClick={() => (window.location.href = "/admin/leaderboard")}
+                  onKeyPress={(e) =>
+                    handleKeyPress(
+                      e,
+                      () => (window.location.href = "/admin/leaderboard")
+                    )
+                  }
                   style={{ cursor: "pointer" }}
+                  tabIndex='0'
+                  role='button'
+                  aria-label={`View details for ${team.teamName}`}
                 >
                   <Box
                     display='flex'
                     alignItems='center'
                     style={{ width: "100%" }}
                   >
-                    {/* Left Column - Rank Image */}
                     <Box style={{ flex: 1, textAlign: "center" }}>
                       <img
                         src={rankImages[team.rank]}
@@ -370,8 +452,6 @@ const Home = () => {
                         }}
                       />
                     </Box>
-
-                    {/* Right Column - Team Details */}
                     <Box
                       style={{
                         flex: team.rank === 1 ? 1 : 1.5,

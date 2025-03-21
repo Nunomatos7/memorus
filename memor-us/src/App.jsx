@@ -127,6 +127,7 @@ function App() {
           <Route path='' element={<Navigate to='home' replace />} />
           <Route path='home' index element={<Home />} />
           <Route path='memors' element={<Memors />} />
+          <Route path='memors/:memorId' element={<Memors />} />
           <Route path='leaderboard' element={<Leaderboard />} />
           <Route path='memoryboard' element={<MemoryBoard />} />
         </Route>

@@ -1,3 +1,4 @@
+
 .zoom-controls {
   position: absolute;
   bottom: 20px;
@@ -98,6 +99,9 @@
   margin: 10px 20px;
   z-index: 10;
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
 
 .filter-dropdown {

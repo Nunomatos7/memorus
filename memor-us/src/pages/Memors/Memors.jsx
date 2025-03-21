@@ -25,7 +25,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Mousewheel, FreeMode } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/free-mode";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams, useNavigate } from "react-router-dom";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import Loader from "../../Components/Loader/Loader";
 import BackupRoundedIcon from "@mui/icons-material/BackupRounded";
@@ -36,6 +36,9 @@ const Memors = () => {
   const searchParams = new URLSearchParams(location.search);
   const tabParam = searchParams.get("tab") || "all";
 
+  const navigate = useNavigate();
+  const { memorId } = useParams();
+
   const [tab, setTab] = useState(tabParam);
   const [expandedIndex, setExpandedIndex] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -44,6 +47,10 @@ const Memors = () => {
   const [ongoingMemors, setOngoingMemors] = useState(
     memorsData.filter((memor) => memor.team === "The Debuggers")
   );
+
+  useEffect(() => {
+    document.title = `Memor'us | Memors`;
+  }, []);
 
   useEffect(() => {
     setOngoingMemors(
@@ -63,13 +70,25 @@ const Memors = () => {
     setSelectedMemor(memor);
     setIsModalOpen(true);
     document.body.style.overflow = "hidden";
+    navigate(`/memors/${memor.id}`);
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedMemor(null);
     document.body.style.overflow = "auto";
+    navigate("/memors");
   };
+
+  useEffect(() => {
+    if (memorId) {
+      const memorData = memorsData.find((m) => m.id.toString() === memorId);
+      if (memorData) {
+        setSelectedMemor(memorData);
+        setIsModalOpen(true);
+      }
+    }
+  }, [memorId]);
 
   const handleSubmitMemor = (id) => {
     setOngoingMemors((prevMemors) =>
@@ -101,13 +120,13 @@ const Memors = () => {
 
   return (
     <>
-      {" "}
       <Loader />
       <div className='container'>
         <Box>
           <div className='memors-header'>
             <Typography
               variant='h4'
+              component='h1'
               sx={{ fontWeight: "bold", color: "white" }}
             >
               Ongoing Memors
@@ -152,9 +171,11 @@ const Memors = () => {
                     paddingBottom: "8px",
                     flexShrink: 0,
                   }}
+                  tabIndex={0}
+                  aria-label={`Memor: ${memor.title}`}
                 >
                   <CardContent>
-                    <Typography variant='h6' sx={{ mb: 1, fontWeight: "bold" }}>
+                    <Typography sx={{ mb: 1, fontWeight: "bold" }}>
                       {memor.title}
                     </Typography>
 
@@ -165,8 +186,12 @@ const Memors = () => {
                         mb: 1,
                       }}
                     >
-                      <Groups fontSize='small' sx={{ mr: 1, color: "gray" }} />
-                      <Typography color='gray' sx={{ fontSize: "0.8rem" }}>
+                      <Groups
+                        fontSize='small'
+                        sx={{ mr: 1, color: "#CBCBCB" }}
+                        aria-hidden='true'
+                      />
+                      <Typography color='#CBCBCB' sx={{ fontSize: "0.8rem" }}>
                         {memor.submission}
                       </Typography>
                     </Box>
@@ -179,11 +204,12 @@ const Memors = () => {
                     >
                       <TodayIcon
                         fontSize='small'
-                        sx={{ mr: 1, color: "gray" }}
+                        sx={{ mr: 1, color: "#CBCBCB" }}
+                        aria-hidden='true'
                       />
                       <Typography
                         variant='body2'
-                        color='gray'
+                        color='#CBCBCB'
                         sx={{ fontSize: "0.8rem" }}
                       >
                         Due on {memor.dueDate}
@@ -229,9 +255,13 @@ const Memors = () => {
                       width: "fit-content",
                     }}
                     onClick={() => handleOpenModal(memor)}
+                    role='button'
+                    tabIndex={0}
+                    aria-label={`View details for ${memor.title}`}
                   >
                     <Button
                       variant='contained'
+                      aria-label='Add picture'
                       sx={{
                         backgroundColor: "#7E57C2",
                         color: "white",
@@ -316,6 +346,7 @@ const Memors = () => {
                 },
               },
             }}
+            aria-label='Memor Tabs'
           >
             <Tab value='all' label='All Memors' />
             <Tab value='completed' label='Completed' />
@@ -328,21 +359,24 @@ const Memors = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
             variant='outlined'
             size='small'
-            slotProps={{
-              input: {
-                startAdornment: (
-                  <InputAdornment position='start'>
-                    <Search fontSize='small' sx={{ color: "gray" }} />
-                  </InputAdornment>
-                ),
-              },
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position='start'>
+                  <Search fontSize='small' sx={{ color: "#CBCBCB" }} />
+                </InputAdornment>
+              ),
+            }}
+            inputProps={{
+              "aria-label": "Search Memors",
             }}
             sx={{
               backgroundColor: "#1E1F20",
               borderRadius: "40px",
               input: { color: "white" },
               width: "250px",
+              border: "0.905px solid #88938F",
               "& fieldset": { border: "none" },
+              "&:hover": { backgroundColor: "#2E2F30" },
             }}
           />
         </Box>
@@ -352,6 +386,7 @@ const Memors = () => {
               display: "flex",
               flexDirection: "column",
             }}
+            aria-label='Memors List'
           >
             {filteredMemors.map((memor, index) => (
               <Box key={index}>
@@ -367,6 +402,9 @@ const Memors = () => {
                     "&:hover": { backgroundColor: "#2E2F30" },
                   }}
                   onClick={() => toggleExpand(index)}
+                  role='button'
+                  tabIndex={0}
+                  aria-label={`Expand ${memor.title}`}
                 >
                   <div className='memor'>
                     <div className='title_date'>
@@ -383,7 +421,7 @@ const Memors = () => {
                       <Typography
                         variant='body2'
                         sx={{
-                          color: "gray",
+                          color: "#CBCBCB",
                           fontSize: "0.8rem",
                         }}
                       >
@@ -395,7 +433,7 @@ const Memors = () => {
                         ? memor.description
                         : `${memor.description.substring(0, 50)}...`}
                     </div>
-                    <div className='submission'>{memor.dueDate}</div>
+
                     <div className='status'>
                       <Chip
                         label={
@@ -417,20 +455,29 @@ const Memors = () => {
                         }}
                       />
                     </div>
-
                     <div className='submissions'>
                       <BackupRoundedIcon
                         sx={{
-                          color: "gray",
+                          color: "#CBCBCB",
                           fontSize: "35px",
                           cursor: "pointer",
                           "&:hover": { color: "white" },
                         }}
+                        tabIndex={0}
                         onClick={() => handleOpenModal(memor)}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            handleOpenModal(memor);
+                          }
+                        }}
+                        aria-label={`Submit ${memor.title}`}
                       />
                     </div>
+
                     <div className='arrowIcon'>
                       <Button
+                        aria-label='expand'
                         sx={{
                           width: "30px",
                           height: "30px",
@@ -445,9 +492,10 @@ const Memors = () => {
                       >
                         <Typography
                           variant='body'
+                          alt='expand'
                           sx={{
                             fontSize: "14px",
-                            color: "white",
+                            color: "#CBCBCB",
                           }}
                         >
                           {expandedIndex === index ? (

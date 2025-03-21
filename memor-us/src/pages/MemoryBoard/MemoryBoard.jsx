@@ -46,6 +46,10 @@ const MemoryBoard = () => {
   const teams = [...new Set(memorsData.map((memor) => memor.team))];
 
   useEffect(() => {
+    document.title = `Memor'us | Memory Board`;
+  }, []);
+
+  useEffect(() => {
     const positions = [];
     const memorsWithImages = memorsData.filter(
       (memor) =>
@@ -119,12 +123,27 @@ const MemoryBoard = () => {
     };
   }, []);
 
-  const openModal = (image, title, submittedDate, team) => {
-    setSelectedMemor({ image, title, submittedDate, team });
+  const openModal = (imageIndex, postIndex) => {
+    const post = posts[postIndex];
+    setSelectedMemor({
+      images: post.image,
+      currentIndex: imageIndex,
+      title: post.title,
+      submittedDate: post.submittedDate,
+      team: post.team,
+      postIndex,
+    });
   };
 
   const closeModal = () => {
     setSelectedMemor(null);
+  };
+
+  const handleImageNavigation = (newIndex) => {
+    setSelectedMemor((prev) => ({
+      ...prev,
+      currentIndex: newIndex,
+    }));
   };
 
   const handleZoom = (action = "out") => {
@@ -154,13 +173,21 @@ const MemoryBoard = () => {
         }}
       >
         <div className='filter-controls'>
+          <label
+            htmlFor='team-filter'
+            className='sr-only'
+            style={{ color: "#341881", fontWeight: "600" }}
+          >
+            Filter by team:
+          </label>
           <select
+            id='team-filter'
             value={filteredTeam}
             onChange={(e) => setFilteredTeam(e.target.value)}
             className='filter-dropdown'
           >
             {teams.map((team, index) => (
-              <option key={index} value={team}>
+              <option key={index} value={team} alt={`Filter by ${team}`}>
                 {team}
               </option>
             ))}
@@ -189,9 +216,9 @@ const MemoryBoard = () => {
             },
           ]}
         >
-          {posts.map((post, index) => (
+          {posts.map((post, postIndex) => (
             <div
-              key={index}
+              key={postIndex}
               className='polaroid-container'
               style={{
                 position: "absolute",
@@ -213,10 +240,8 @@ const MemoryBoard = () => {
                       className='polaroid-card'
                       onClick={() =>
                         openModal(
-                          imgSrc,
-                          post.title,
-                          post.submittedDate,
-                          post.team
+                          reversedArray.length - 1 - cardIndex,
+                          postIndex
                         )
                       }
                       style={{
@@ -265,11 +290,13 @@ const MemoryBoard = () => {
 
         {selectedMemor && (
           <MemorPicture
-            image={selectedMemor.image}
+            images={selectedMemor.images}
+            currentIndex={selectedMemor.currentIndex}
             title={selectedMemor.title}
             submitDate={selectedMemor.submittedDate}
             teamName={selectedMemor.team}
             onClose={closeModal}
+            onNavigate={handleImageNavigation}
           />
         )}
 
