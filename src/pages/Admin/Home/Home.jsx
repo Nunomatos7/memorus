@@ -53,7 +53,15 @@ const Home = () => {
     document.body.style.overflow = "auto";
   };
 
-  // Handle keyboard events for clickable elements
+  const uniqueMemors = Object.values(
+    memorsData.reduce((acc, memor) => {
+      if (!acc[memor.title] && memor.image?.length > 0) {
+        acc[memor.title] = memor;
+      }
+      return acc;
+    }, {})
+  ).sort((a, b) => a.id - b.id);
+
   const handleKeyPress = (event, callback) => {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
@@ -128,89 +136,101 @@ const Home = () => {
               aria-label='Latest Memors'
               keyboard={{ enabled: true, onlyInViewport: true }}
             >
-              {Object.values(
-                memorsData.reduce((acc, memor) => {
-                  if (!acc[memor.title] && memor.image?.length > 0) {
-                    acc[memor.title] = memor;
+              {uniqueMemors.map((memor, index) => (
+                <SwiperSlide
+                  key={memor.id}
+                  className={
+                    memor.image ? "latest-memors-pic" : "latest-memors"
                   }
-                  return acc;
-                }, {})
-              )
-                .sort((a, b) => a.id - b.id) // Sort titles by ID or some ordering criterion
-                .map((memor, index) => (
-                  <SwiperSlide
-                    key={memor.id}
-                    className={
-                      memor.image ? "latest-memors-pic" : "latest-memors"
+                  tabIndex='0'
+                  role='button'
+                  aria-label={`Open memor titled ${memor.title}, submitted on ${memor.submittedDate}`}
+                  onClick={() => handleImageClick(memor)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      handleImageClick(memor);
                     }
-                    tabIndex='0' // Make slides focusable
-                    role='button'
-                    aria-label={`Open memor titled ${memor.title}, submitted on ${memor.submittedDate}`}
-                    onClick={() => handleImageClick(memor)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
+
+                    if (e.key === "Tab") {
+                      if (!e.shiftKey && index === uniqueMemors.length - 1) {
+                        // Estamos no último slide e foi Tab
                         e.preventDefault();
-                        handleImageClick(memor);
-                      }
-
-                      if (e.key === "Tab") {
-                        e.preventDefault(); // Prevents default browser scroll behavior
-
-                        let newIndex;
-                        if (e.shiftKey) {
-                          // Move to previous slide if Shift + Tab
-                          newIndex = Math.max(index - 1, 0);
-                        } else {
-                          // Move to next slide if Tab
-                          newIndex = Math.min(index + 1, memorsData.length - 1);
+                        const nextSection =
+                          document.querySelector("#adminStats"); // <-- ajusta para o teu próximo bloco
+                        if (nextSection) {
+                          const focusable = nextSection.querySelector(
+                            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+                          );
+                          if (focusable) {
+                            focusable.focus();
+                          } else {
+                            nextSection.focus();
+                          }
                         }
-
-                        swiperRef.current?.swiper.slideTo(newIndex);
-                        // Move focus to the new slide
-                        const nextSlide =
-                          document.querySelectorAll(".latest-memors-pic")[
-                            newIndex
-                          ];
-                        if (nextSlide) nextSlide.focus();
+                        return;
                       }
-                    }}
-                  >
-                    {memor.image && (
-                      <div onClick={() => handleImageClick(memor)}>
-                        <div className='image-wrapper'>
-                          <img
-                            width={"100%"}
-                            height={"100%"}
-                            style={{ objectFit: "cover" }}
-                            src={memor.image[0]}
-                            alt='Memor Image'
-                          />
-                        </div>
-                        <div className='latest-memors-content'>
-                          <CustomButton
-                            text={memor.team}
-                            onClick={() => handleImageClick(memor)}
-                            sx={{
-                              display: "flex",
-                              padding: "3.147px 15.953px",
-                              justifyContent: "center",
-                              alignItems: "center",
-                              flex: "1 0 0",
-                              alignSelf: "stretch",
-                              fontSize: "0.8rem",
-                              color: "#003731",
-                              fontWeight: "600",
-                            }}
-                          />
-                          <h3>{memor.submittedDate}</h3>
-                          <p style={{ fontSize: "0.9rem" }}>
-                            &quot;{memor.title}&quot;
-                          </p>
-                        </div>
+
+                      if (e.shiftKey && index === 0) {
+                        // Estamos no primeiro slide e foi Shift+Tab
+                        e.preventDefault();
+                        const prevElement =
+                          document.querySelector(".home-title");
+                        if (prevElement) prevElement.focus();
+                        return;
+                      }
+
+                      e.preventDefault();
+                      let newIndex = e.shiftKey
+                        ? Math.max(index - 1, 0)
+                        : Math.min(index + 1, uniqueMemors.length - 1);
+
+                      swiperRef.current?.swiper.slideTo(newIndex);
+
+                      const nextSlide =
+                        document.querySelectorAll(".latest-memors-pic")[
+                          newIndex
+                        ];
+                      if (nextSlide) nextSlide.focus();
+                    }
+                  }}
+                >
+                  {memor.image && (
+                    <div onClick={() => handleImageClick(memor)}>
+                      <div className='image-wrapper'>
+                        <img
+                          width={"100%"}
+                          height={"100%"}
+                          style={{ objectFit: "cover" }}
+                          src={memor.image[0]}
+                          alt='Memor Image'
+                        />
                       </div>
-                    )}
-                  </SwiperSlide>
-                ))}
+                      <div className='latest-memors-content'>
+                        <CustomButton
+                          text={memor.team}
+                          onClick={() => handleImageClick(memor)}
+                          sx={{
+                            display: "flex",
+                            padding: "3.147px 15.953px",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            flex: "1 0 0",
+                            alignSelf: "stretch",
+                            fontSize: "0.8rem",
+                            color: "#003731",
+                            fontWeight: "600",
+                          }}
+                        />
+                        <h3>{memor.submittedDate}</h3>
+                        <p style={{ fontSize: "0.9rem" }}>
+                          &quot;{memor.title}&quot;
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </SwiperSlide>
+              ))}
 
               {Array.from(
                 {
@@ -248,7 +268,7 @@ const Home = () => {
 
         {selectedSlide && (
           <MemorPicture
-            image={selectedSlide.image[0]}
+            images={selectedSlide.image}
             teamName={selectedSlide.team}
             title={selectedSlide.title}
             submitDate={selectedSlide.submittedDate}
@@ -259,7 +279,7 @@ const Home = () => {
       </section>
 
       <section
-        id='myMemors'
+        id='adminStats'
         className='container'
         aria-labelledby='memors-dashboard-heading'
       >
