@@ -160,7 +160,6 @@ const Leaderboard = () => {
                   padding: "20px",
                   position: "relative",
                   height: "15rem",
-                  
                 }}
                 tabIndex={0}
               >
@@ -440,7 +439,10 @@ const Leaderboard = () => {
               <Typography variant='h6' sx={{ color: "white" }}>
                 Rank
               </Typography>
-              <Typography variant='h6' sx={{ color: "white", textAlign: "center" }}>
+              <Typography
+                variant='h6'
+                sx={{ color: "white", textAlign: "center" }}
+              >
                 Team
               </Typography>
               <Typography variant='h6' sx={{ color: "white" }}>
@@ -464,11 +466,13 @@ const Leaderboard = () => {
                     border: "2.715px solid #333738",
                     padding: "10px",
                     marginTop: "-2px",
-                    
                   }}
                   tabIndex={0}
                 >
-                  <Typography variant='h6' sx={{ color: "white", textAlign: "center" }}>
+                  <Typography
+                    variant='h6'
+                    sx={{ color: "white", textAlign: "center" }}
+                  >
                     {team.rank}
                   </Typography>
                   <Box
@@ -488,14 +492,23 @@ const Leaderboard = () => {
                         border: "2px solid white",
                       }}
                     />
-                    <Typography variant='h6' sx={{ color: "white", textAlign: "center" }}>
+                    <Typography
+                      variant='h6'
+                      sx={{ color: "white", textAlign: "center" }}
+                    >
                       {team.teamName}
                     </Typography>
                   </Box>
-                  <Typography variant='h6' sx={{ color: "white", textAlign: "center" }}>
+                  <Typography
+                    variant='h6'
+                    sx={{ color: "white", textAlign: "center" }}
+                  >
                     {team.memors}
                   </Typography>
-                  <Typography variant='h6' sx={{ color: "white", textAlign: "center" }}>
+                  <Typography
+                    variant='h6'
+                    sx={{ color: "white", textAlign: "center" }}
+                  >
                     {team.points}
                   </Typography>
                 </Box>

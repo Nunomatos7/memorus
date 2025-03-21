@@ -175,7 +175,7 @@ const Memors = () => {
                   aria-label={`Memor: ${memor.title}`}
                 >
                   <CardContent>
-                    <Typography variant='h6' sx={{ mb: 1, fontWeight: "bold" }}>
+                    <Typography sx={{ mb: 1, fontWeight: "bold" }}>
                       {memor.title}
                     </Typography>
 
