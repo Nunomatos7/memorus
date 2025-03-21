@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
   AppBar,
@@ -14,6 +14,7 @@ import {
   Button,
 } from "@mui/material";
 import { styled } from "@mui/system";
+import PropTypes from "prop-types";
 import MenuIcon from "@mui/icons-material/Menu";
 import logo from "../../assets/images/logoText.svg";
 import profileIcon from "../../assets/images/profile.svg";
@@ -23,6 +24,13 @@ import notifDelete from "../../assets/images/notifDelete.svg";
 import NotificationsNoneRoundedIcon from "@mui/icons-material/NotificationsNoneRounded";
 import { Badge } from "@mui/material";
 import { makeStyles } from "@mui/styles";
+
+import {
+  getLeaderboardVisibility,
+  setLeaderboardVisibility,
+} from "../../assets/utils/leaderboardUtils";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 
 const useStyles = makeStyles({
   customBadge: {
@@ -98,6 +106,38 @@ const Navbar = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const navigate = useNavigate();
 
+  const [showLeaderboard, setShowLeaderboard] = useState(
+    getLeaderboardVisibility()
+  );
+
+  const toggleLeaderboard = () => {
+    const newValue = !showLeaderboard;
+    setShowLeaderboard(newValue);
+    setLeaderboardVisibility(newValue);
+
+    if (!newValue) {
+      navigate("/home");
+    }
+    // Dispatch storage event to sync across components
+    window.dispatchEvent(new Event("storage"));
+  };
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setShowLeaderboard(getLeaderboardVisibility());
+    };
+
+    // Set initial value
+    setShowLeaderboard(getLeaderboardVisibility());
+
+    // Listen for changes in localStorage
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
+
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -158,7 +198,6 @@ const Navbar = () => {
       title: "You've received a new memor",
       description: "A new memor was added to your team's memors.",
     },
-    
   ]);
 
   const classes = useStyles();
@@ -170,7 +209,6 @@ const Navbar = () => {
         backgroundColor: "#111315",
         height: "60px",
         boxShadow: "none",
-        marginBottom: "10px",
         borderBottom: "1px solid #444444",
       }}
     >
@@ -205,7 +243,9 @@ const Navbar = () => {
             Home
           </StyledNavLink>
           <StyledNavLink to='/memors'>Memors</StyledNavLink>
-          <StyledNavLink to='/leaderboard'>Leaderboard</StyledNavLink>
+          {showLeaderboard && (
+            <StyledNavLink to='/leaderboard'>Leaderboard</StyledNavLink>
+          )}
           <StyledNavLink to='/memoryBoard'>Memory Board</StyledNavLink>
           <Box>
             <IconButton onClick={handleMenuOpen}>
@@ -244,6 +284,27 @@ const Navbar = () => {
                 </Box>
               </MenuItem>
               <Divider sx={{ backgroundColor: "gray" }} />
+              <MenuItem
+                onClick={() => {
+                  toggleLeaderboard();
+                  handleMenuClose();
+                }}
+                sx={{
+                  "&:hover": {
+                    backgroundColor: "#181818",
+                    color: "#FFFFFF",
+                  },
+                  display: "flex",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Typography>
+                  {showLeaderboard ? "Hide" : "Show"} Leaderboard
+                </Typography>
+                <IconButton sx={{ color: "white" }}>
+                  {showLeaderboard ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                </IconButton>
+              </MenuItem>
               <MenuItem
                 onClick={() => {
                   navigate("/change-password");
@@ -390,9 +451,11 @@ const Navbar = () => {
               <StyledNavLink to='/memors' onClick={toggleDrawer(false)}>
                 Memors
               </StyledNavLink>
-              <StyledNavLink to='/leaderboard' onClick={toggleDrawer(false)}>
-                Leaderboard
-              </StyledNavLink>
+              {showLeaderboard && (
+                <StyledNavLink to='/leaderboard' onClick={toggleDrawer(false)}>
+                  Leaderboard
+                </StyledNavLink>
+              )}
               <StyledNavLink to='/memoryBoard' onClick={toggleDrawer(false)}>
                 Memory Board
               </StyledNavLink>
@@ -439,6 +502,27 @@ const Navbar = () => {
       </Toolbar>
     </AppBar>
   );
+};
+NotificationItem.propTypes = {
+  notification: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    image: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+  }).isRequired,
+  onDelete: PropTypes.func.isRequired,
+};
+
+Navbar.propTypes = {
+  notifications: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      image: PropTypes.string.isRequired,
+      title: PropTypes.string.isRequired,
+      description: PropTypes.string.isRequired,
+    })
+  ).isRequired,
+  handleDeleteNotification: PropTypes.func.isRequired,
 };
 
 export default Navbar;

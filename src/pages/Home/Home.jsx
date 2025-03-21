@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Mousewheel, FreeMode } from "swiper/modules";
 import "swiper/css";
@@ -19,6 +19,7 @@ import background1 from "../../assets/images/background1.svg";
 import background2 from "../../assets/images/background2.svg";
 import background3 from "../../assets/images/background3.svg";
 import { memorsData } from "../../Data/Memors.json";
+import { getLeaderboardVisibility } from "../../assets/utils/leaderboardUtils";
 
 const rankImages = {
   1: rank1,
@@ -28,6 +29,12 @@ const rankImages = {
 
 const Home = () => {
   const [selectedSlide, setSelectedSlide] = useState(null);
+  const [showLeaderboard] = useState(getLeaderboardVisibility());
+  const swiperRef = useRef(null);
+
+  useEffect(() => {
+    document.title = `Memor'us | Home`;
+  }, []);
 
   const handleImageClick = (slide) => {
     setSelectedSlide(slide);
@@ -39,6 +46,10 @@ const Home = () => {
     document.body.style.overflow = "auto";
   };
 
+  const debuggerSlides = memorsData.filter(
+    (slide) => slide.team === "The Debuggers" && slide.image
+  );
+
   return (
     <>
       <Loader />
@@ -46,11 +57,16 @@ const Home = () => {
       <section className='mb-10'>
         <div
           className='container'
-          style={{ marginBottom: "1rem", marginTop: "2rem" }}
+          style={{
+            marginBottom: "1rem",
+            marginTop: "2rem",
+            position: "relative",
+          }}
         >
+          {/* Background Images */}
           <img
             src={background1}
-            alt='leaderboard-bg1'
+            alt=''
             style={{
               position: "absolute",
               top: "2",
@@ -58,10 +74,11 @@ const Home = () => {
               width: "15%",
               zIndex: "0",
             }}
+            aria-hidden='true'
           />
           <img
             src={background2}
-            alt='leaderboard-bg2'
+            alt=''
             style={{
               position: "absolute",
               top: "25%",
@@ -69,10 +86,11 @@ const Home = () => {
               width: "5%",
               zIndex: "0",
             }}
+            aria-hidden='true'
           />
           <img
             src={background3}
-            alt='leaderboard-bg3'
+            alt=''
             style={{
               position: "absolute",
               top: "35%",
@@ -80,77 +98,131 @@ const Home = () => {
               width: "5%",
               zIndex: "0",
             }}
+            aria-hidden='true'
           />
+
+          {/* Page Title */}
           <h1
             className='home-title'
             style={{ display: "flex", alignItems: "center", gap: "1rem" }}
+            tabIndex='0'
           >
             Latest Memors <span>•</span>{" "}
-            <span className='team-name' style={{ color: "#5547bf" }}>
+            <span className='team-name' style={{ color: "#9282F9" }}>
               The Debuggers
             </span>
           </h1>
         </div>
 
-        {/* Swiper */}
-        {/* Swiper */}
+        {/* Swiper Section */}
         <div className='overflow-hidden w-full'>
           <div className='container'>
             <Swiper
+              ref={swiperRef}
               spaceBetween={20}
               breakpoints={{
-                640: {
-                  slidesPerView: 2.3,
-                },
-                768: {
-                  slidesPerView: 4.3,
-                },
-                1024: {
-                  slidesPerView: 5.3,
-                },
+                640: { slidesPerView: 2.3 },
+                768: { slidesPerView: 4.3 },
+                1024: { slidesPerView: 5.3 },
               }}
               className='latest-wrapper'
               freeMode={true}
-              mousewheel={{
-                releaseOnEdges: true,
-              }}
+              mousewheel={{ releaseOnEdges: true }}
               modules={[Mousewheel, FreeMode]}
+              keyboard={{ enabled: true, onlyInViewport: true }}
+              aria-label='Latest Memors Carousel'
             >
-              {/* Slides */}
               {memorsData
                 .filter(
                   (slide) => slide.team === "The Debuggers" && slide.image
                 )
-                .map((slide) => (
-                  <SwiperSlide key={slide.id} className='latest-memors-pic'>
-                    <div onClick={() => handleImageClick(slide)}>
-                      <div className='image-wrapper'>
-                        <img
-                          width={"100%"}
-                          height={"100%"}
-                          style={{ objectFit: "cover" }}
-                          src={slide.image[0]}
-                          alt=''
-                        />
-                      </div>
-                      <div className='latest-memors-content'>
-                        <h3>{slide.submittedDate}</h3>
-                        <p style={{ fontSize: "0.9rem" }}>
-                          &quot;{slide.title}&quot;
-                        </p>
-                      </div>
+                .map((slide, index) => (
+                  <SwiperSlide
+                    key={slide.id}
+                    className='latest-memors-pic'
+                    tabIndex='0'
+                    role='button'
+                    aria-label={`Open memor titled ${slide.title}, submitted on ${slide.submittedDate}`}
+                    onClick={() => handleImageClick(slide)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        handleImageClick(slide);
+                      }
+
+                      // Se for o último slide e Tab (sem Shift), salta para a secção seguinte
+                      if (e.key === "Tab") {
+                        if (
+                          !e.shiftKey &&
+                          index === debuggerSlides.length - 1
+                        ) {
+                          e.preventDefault();
+                          const nextSection =
+                            document.querySelector("#myMemors");
+                          if (nextSection) {
+                            const focusable = nextSection.querySelector(
+                              'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+                            );
+                            if (focusable) {
+                              focusable.focus();
+                            } else {
+                              nextSection.focus();
+                            }
+                          }
+                          return; // Impede o resto da lógica de correr
+                        }
+
+                        // Shift+Tab no primeiro slide volta ao título
+                        if (e.shiftKey && index === 0) {
+                          e.preventDefault();
+                          const prevElement =
+                            document.querySelector(".home-title");
+                          if (prevElement) prevElement.focus();
+                          return;
+                        }
+
+                        // Caso contrário: navega entre os slides
+                        e.preventDefault();
+                        let newIndex = e.shiftKey
+                          ? Math.max(index - 1, 0)
+                          : Math.min(index + 1, debuggerSlides.length - 1);
+
+                        swiperRef.current?.swiper.slideTo(newIndex);
+
+                        const nextSlide =
+                          document.querySelectorAll(".latest-memors-pic")[
+                            newIndex
+                          ];
+                        if (nextSlide) nextSlide.focus();
+                      }
+                    }}
+                  >
+                    <div className='image-wrapper'>
+                      <img
+                        width={"100%"}
+                        height={"100%"}
+                        style={{ objectFit: "cover" }}
+                        src={slide.image[0]}
+                        alt={`Memor image: ${slide.title}`}
+                      />
+                    </div>
+                    <div className='latest-memors-content'>
+                      <h3>{slide.submittedDate}</h3>
+                      <p style={{ fontSize: "0.9rem" }}>
+                        &quot;{slide.title}&quot;
+                      </p>
                     </div>
                   </SwiperSlide>
                 ))}
 
-              {/* Add placeholders at the end only if necessary */}
+              {/* Placeholder Slides */}
               {Array.from(
                 {
                   length: Math.max(
                     0,
                     5 -
                       memorsData.filter(
-                        (slide) => slide.team === "The Debuggers" && slide.image
+                        (slide) => slide.team === "The Debuggers" && slide.image // Trocar para a equipe do user
                       ).length
                   ),
                 },
@@ -158,6 +230,8 @@ const Home = () => {
                   <SwiperSlide
                     key={`placeholder-${index}`}
                     className='placeholder-slide'
+                    tabIndex='0'
+                    aria-label='Empty memor placeholder'
                   >
                     <div className='placeholder-content'>
                       <p style={{ fontSize: "0.9rem", color: "#aaa" }}>
@@ -171,10 +245,10 @@ const Home = () => {
           </div>
         </div>
 
-        {/* Modal Component */}
+        {/* Memor Picture Modal */}
         {selectedSlide && (
           <MemorPicture
-            image={selectedSlide.image[0]}
+            images={selectedSlide.image}
             teamName={selectedSlide.team}
             title={selectedSlide.title}
             submitDate={selectedSlide.submittedDate}
@@ -183,17 +257,21 @@ const Home = () => {
         )}
       </section>
 
-      <section id='myMemors' className='container'>
+      {/* My Memors Section */}
+      <section id='myMemors' className='container' tabIndex='0'>
         <Typography variant='h6' gutterBottom style={{ color: "white" }}>
           My Memors
         </Typography>
         <Grid container spacing={3}>
-          {/* Pending Memors */}
+          {/* Pending Memors Card */}
           <Grid item xs={12} sm={3}>
             <Card
               className='card'
               onClick={() => (window.location.href = "/memors?tab=incomplete")}
               style={{ cursor: "pointer" }}
+              tabIndex='0'
+              role='button'
+              aria-label='View pending memors'
             >
               <CardContent>
                 <Box
@@ -204,7 +282,7 @@ const Home = () => {
                   <Typography variant='h4' fontWeight='bold'>
                     6
                   </Typography>
-                  <img src={pending} alt='pending' />
+                  <img src={pending} alt='Pending memors icon' />
                 </Box>
                 <Typography variant='body2' color='#B0B0B0'>
                   Pending Memors
@@ -213,12 +291,15 @@ const Home = () => {
             </Card>
           </Grid>
 
-          {/* Completed Memors */}
+          {/* Completed Memors Card */}
           <Grid item xs={12} sm={3}>
             <Card
               className='card'
               onClick={() => (window.location.href = "/memors?tab=completed")}
               style={{ cursor: "pointer" }}
+              tabIndex='0'
+              role='button'
+              aria-label='View completed memors'
             >
               <CardContent>
                 <Box
@@ -229,7 +310,7 @@ const Home = () => {
                   <Typography variant='h4' fontWeight='bold'>
                     2
                   </Typography>
-                  <img src={completed} alt='Completed memeors icon' />
+                  <img src={completed} alt='Completed memors icon' />
                 </Box>
                 <Typography variant='body2' color='#B0B0B0'>
                   Completed Memors
@@ -238,9 +319,13 @@ const Home = () => {
             </Card>
           </Grid>
 
-          {/* Remaining Time */}
+          {/* Countdown Card */}
           <Grid item xs={12} sm={6}>
-            <Card className='card'>
+            <Card
+              className='card'
+              tabIndex='0'
+              aria-label='Competition countdown'
+            >
               <CardContent>
                 <Box
                   style={{
@@ -252,13 +337,13 @@ const Home = () => {
                   <Box>
                     <Typography variant='h6' style={{ color: "white" }}>
                       The competition{" "}
-                      <span style={{ color: "#5547bf", fontWeight: "bold" }}>
+                      <span style={{ color: "#9282F9", fontWeight: "bold" }}>
                         New Year New Us
                       </span>{" "}
                       ends in
                     </Typography>
                   </Box>
-                  <Countdown endDate='2025-01-31T00:00:00' role='user' />
+                  <Countdown endDate='2025-05-31T00:00:00' role='user' />
                 </Box>
               </CardContent>
             </Card>
@@ -266,12 +351,16 @@ const Home = () => {
         </Grid>
       </section>
 
-      {/* Current Leaders */}
-      <section id='currentLeaders' className='pb-10 container'>
+      {/* Current Leaders Section */}
+      <section id='currentLeaders' className='pb-10 container' tabIndex='0'>
         <Typography variant='h6' gutterBottom style={{ color: "white" }}>
           Current Leaders
         </Typography>
-        <Grid container spacing={3}>
+        <Grid
+          container
+          spacing={3}
+          style={{ filter: showLeaderboard ? "none" : "blur(15px)" }}
+        >
           {leaderboardData
             .filter((team) => team.rank <= 3)
             .map((team) => (
@@ -287,13 +376,16 @@ const Home = () => {
                     window.location.href = "/leaderboard";
                   }}
                   style={{ cursor: "pointer" }}
+                  tabIndex='0'
+                  role='button'
+                  aria-label={`View leaderboard for ${team.teamName}`}
                 >
                   <Box
                     display='flex'
                     alignItems='center'
                     style={{ width: "100%" }}
                   >
-                    {/* Left Column - Rank Image */}
+                    {/* Rank Image */}
                     <Box style={{ flex: 1, textAlign: "center" }}>
                       <img
                         src={rankImages[team.rank]}
@@ -307,7 +399,7 @@ const Home = () => {
                       />
                     </Box>
 
-                    {/* Right Column - Team Details */}
+                    {/* Team Details */}
                     <Box
                       style={{
                         flex: team.rank === 1 ? 1 : 1.5,

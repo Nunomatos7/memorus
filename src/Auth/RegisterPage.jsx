@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import logo from "../assets/images/logo.svg";
 import leftBackground from "../assets/images/left-auth.svg";
 import rightBackground from "../assets/images/right-auth.svg";
@@ -11,7 +11,10 @@ const RegisterPage = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  // Demo user database (in-memory)
+  useEffect(() => {
+    document.title = `Memor'us | Register`;
+  }, []);
+
   const demoUsers = [];
 
   const handleRegister = (e) => {
@@ -62,6 +65,7 @@ const RegisterPage = () => {
             label='Email'
             type='email'
             value={email}
+            required
             onChange={(e) => setEmail(e.target.value)}
             fullWidth
             variant='outlined'
@@ -93,6 +97,7 @@ const RegisterPage = () => {
             label='Password'
             type='password'
             value={password}
+            required
             onChange={(e) => setPassword(e.target.value)}
             fullWidth
             variant='outlined'
@@ -124,6 +129,7 @@ const RegisterPage = () => {
             label='Confirm Password'
             type='password'
             value={confirmPassword}
+            required
             onChange={(e) => setConfirmPassword(e.target.value)}
             fullWidth
             variant='outlined'
@@ -168,9 +174,9 @@ const RegisterPage = () => {
             Register
           </Button>
         </form>
-        <p className='admin-link'>
-          Already have an account? <a href='/login'>Login here</a>.
-        </p>
+        <a href='/login' className='admin-link'>
+          Already have an account? Login here
+        </a>
       </div>
       <img className='left-background' src={leftBackground} alt='' />
       <img className='right-background' src={rightBackground} alt='' />

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Box, Typography, Card, Avatar } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import rank1 from "../../../assets/images/adminRank1.svg";
@@ -67,6 +68,10 @@ export const leaderboardData = [
 ];
 
 const Leaderboard = () => {
+  useEffect(() => {
+    document.title = `Memor'us | Leaderboard`;
+  }, []);
+
   return (
     <>
       <Loader />
@@ -74,7 +79,8 @@ const Leaderboard = () => {
       <div className='container'>
         <img
           src={background1}
-          alt='leaderboard-bg1'
+          alt=''
+          aria-hidden='true'
           style={{
             position: "absolute",
             top: "2",
@@ -85,7 +91,8 @@ const Leaderboard = () => {
         />
         <img
           src={background2}
-          alt='leaderboard-bg2'
+          alt=''
+          aria-hidden='true'
           style={{
             position: "absolute",
             top: "25%",
@@ -96,7 +103,8 @@ const Leaderboard = () => {
         />
         <img
           src={background3}
-          alt='leaderboard-bg3'
+          alt=''
+          aria-hidden='true'
           style={{
             position: "absolute",
             top: "35%",
@@ -121,6 +129,8 @@ const Leaderboard = () => {
               color: "white",
               marginBottom: "30px",
             }}
+            tabIndex={0}
+            aria-label='Leaderboard'
           >
             Leaderboard
           </Typography>
@@ -156,6 +166,8 @@ const Leaderboard = () => {
                   position: "relative",
                   height: "15rem",
                 }}
+                tabIndex={0}
+                aria-labelledby={`team-${leaderboardData[1].rank}`}
               >
                 <Box
                   sx={{
@@ -170,7 +182,7 @@ const Leaderboard = () => {
                 >
                   <Avatar
                     src={leaderboardData[1].avatar}
-                    alt={leaderboardData[1].teamName}
+                    alt="Rank 2"
                     sx={{
                       width: "40px",
                       height: "40px",
@@ -210,7 +222,7 @@ const Leaderboard = () => {
                 </Box>
                 <img
                   src={rank2}
-                  alt='rank'
+                  alt=''
                   style={{
                     position: "absolute",
                     bottom: "0px",
@@ -241,6 +253,8 @@ const Leaderboard = () => {
                   position: "relative",
                   height: "20rem",
                 }}
+                tabIndex={0}
+                aria-labelledby={`team-${leaderboardData[0].rank}`}
               >
                 <Box
                   sx={{
@@ -255,7 +269,7 @@ const Leaderboard = () => {
                 >
                   <Avatar
                     src={leaderboardData[0].avatar}
-                    alt={leaderboardData[0].teamName}
+                    alt="Rank 1"
                     sx={{
                       width: "40px",
                       height: "40px",
@@ -304,7 +318,7 @@ const Leaderboard = () => {
                 </Box>
                 <img
                   src={rank1}
-                  alt='rank'
+                  alt=''
                   style={{
                     position: "absolute",
                     bottom: "0px",
@@ -335,6 +349,8 @@ const Leaderboard = () => {
                   position: "relative",
                   height: "12rem",
                 }}
+                tabIndex={0}
+                aria-labelledby={`team-${leaderboardData[2].rank}`}
               >
                 <Box
                   sx={{
@@ -349,7 +365,7 @@ const Leaderboard = () => {
                 >
                   <Avatar
                     src={leaderboardData[2].avatar}
-                    alt={leaderboardData[2].teamName}
+                    alt="Rank 3"
                     sx={{
                       width: "40px",
                       height: "40px",
@@ -389,7 +405,7 @@ const Leaderboard = () => {
                 </Box>
                 <img
                   src={rank3}
-                  alt='rank'
+                  alt=''
                   style={{
                     position: "absolute",
                     bottom: "0px",
@@ -476,6 +492,8 @@ const Leaderboard = () => {
                     padding: "10px",
                     marginTop: "-2px",
                   }}
+                  tabIndex={0}
+                  aria-label={`Rank ${team.rank}: ${team.teamName}, ${team.memors} Memors, ${team.points} Points`}
                 >
                   <Typography
                     variant='h6'

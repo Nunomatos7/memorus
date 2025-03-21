@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Box, Typography, Card, Avatar } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import rank1 from "../../assets/images/rank1.svg";
@@ -68,13 +69,17 @@ export const leaderboardData = [
 ];
 
 const Leaderboard = () => {
+  useEffect(() => {
+    document.title = `Memor'us | Leaderboard`;
+  }, []);
+
   return (
     <>
       <Loader />
       <div className='container'>
         <img
           src={background1}
-          alt='leaderboard-bg1'
+          alt=''
           style={{
             position: "absolute",
             top: "2",
@@ -85,7 +90,7 @@ const Leaderboard = () => {
         />
         <img
           src={background2}
-          alt='leaderboard-bg2'
+          alt=''
           style={{
             position: "absolute",
             top: "25%",
@@ -96,7 +101,7 @@ const Leaderboard = () => {
         />
         <img
           src={background3}
-          alt='leaderboard-bg3'
+          alt=''
           style={{
             position: "absolute",
             top: "35%",
@@ -116,6 +121,7 @@ const Leaderboard = () => {
           {/* Header */}
           <Typography
             variant='h4'
+            component='h1'
             sx={{
               fontWeight: "bold",
               color: "white",
@@ -135,6 +141,7 @@ const Leaderboard = () => {
               alignItems: "end",
             }}
           >
+            {/* Rank 2 */}
             <Grid
               sx={{
                 width: "calc(30% - 20px)",
@@ -154,6 +161,7 @@ const Leaderboard = () => {
                   position: "relative",
                   height: "15rem",
                 }}
+                tabIndex={0}
               >
                 <Box
                   sx={{
@@ -168,7 +176,7 @@ const Leaderboard = () => {
                 >
                   <Avatar
                     src={leaderboardData[1].avatar}
-                    alt={leaderboardData[1].teamName}
+                    alt={`rank 2 ${leaderboardData[1].teamName}`}
                     sx={{
                       width: "40px",
                       height: "40px",
@@ -208,7 +216,7 @@ const Leaderboard = () => {
                 </Box>
                 <img
                   src={rank2}
-                  alt='rank'
+                  alt=''
                   style={{
                     position: "absolute",
                     bottom: "0px",
@@ -219,6 +227,7 @@ const Leaderboard = () => {
               </Card>
             </Grid>
 
+            {/* Rank 1 */}
             <Grid
               sx={{
                 width: "calc(38% - 20px)",
@@ -238,6 +247,7 @@ const Leaderboard = () => {
                   position: "relative",
                   height: "20rem",
                 }}
+                tabIndex={0}
               >
                 <Box
                   sx={{
@@ -252,7 +262,7 @@ const Leaderboard = () => {
                 >
                   <Avatar
                     src={leaderboardData[0].avatar}
-                    alt={leaderboardData[0].teamName}
+                    alt={`rank 1 ${leaderboardData[0].teamName}`}
                     sx={{
                       width: "40px",
                       height: "40px",
@@ -300,7 +310,7 @@ const Leaderboard = () => {
                 </Box>
                 <img
                   src={rank1}
-                  alt='rank'
+                  alt=''
                   style={{
                     position: "absolute",
                     bottom: "0px",
@@ -311,6 +321,7 @@ const Leaderboard = () => {
               </Card>
             </Grid>
 
+            {/* Rank 3 */}
             <Grid
               sx={{
                 width: "calc(30% - 20px)",
@@ -330,6 +341,7 @@ const Leaderboard = () => {
                   position: "relative",
                   height: "12rem",
                 }}
+                tabIndex={0}
               >
                 <Box
                   sx={{
@@ -344,7 +356,7 @@ const Leaderboard = () => {
                 >
                   <Avatar
                     src={leaderboardData[2].avatar}
-                    alt={leaderboardData[2].teamName}
+                    alt={`rank 3 ${leaderboardData[2].teamName}`}
                     sx={{
                       width: "40px",
                       height: "40px",
@@ -384,7 +396,7 @@ const Leaderboard = () => {
                 </Box>
                 <img
                   src={rank3}
-                  alt='rank'
+                  alt=''
                   style={{
                     position: "absolute",
                     bottom: "0px",
@@ -400,6 +412,7 @@ const Leaderboard = () => {
           {/* Global Ranking */}
           <Typography
             variant='h5'
+            component='h2'
             sx={{
               color: "white",
               marginBottom: "20px",
@@ -423,37 +436,19 @@ const Leaderboard = () => {
                 marginBottom: "20px",
               }}
             >
-              <Typography
-                variant='h6'
-                sx={{
-                  color: "white",
-                }}
-              >
+              <Typography variant='h6' sx={{ color: "white" }}>
                 Rank
               </Typography>
               <Typography
                 variant='h6'
-                sx={{
-                  color: "white",
-                  textAlign: "center",
-                }}
+                sx={{ color: "white", textAlign: "center" }}
               >
                 Team
               </Typography>
-              <Typography
-                variant='h6'
-                sx={{
-                  color: "white",
-                }}
-              >
+              <Typography variant='h6' sx={{ color: "white" }}>
                 Memors Completed
               </Typography>
-              <Typography
-                variant='h6'
-                sx={{
-                  color: "white",
-                }}
-              >
+              <Typography variant='h6' sx={{ color: "white" }}>
                 Total Points
               </Typography>
             </Box>
@@ -461,6 +456,7 @@ const Leaderboard = () => {
               .filter((team) => team.rank >= 4)
               .map((team) => (
                 <Box
+                  key={team.rank}
                   sx={{
                     display: "grid",
                     gridTemplateColumns: "1fr 1fr 1fr 1fr",
@@ -471,13 +467,11 @@ const Leaderboard = () => {
                     padding: "10px",
                     marginTop: "-2px",
                   }}
+                  tabIndex={0}
                 >
                   <Typography
                     variant='h6'
-                    sx={{
-                      color: "white",
-                      textAlign: "center",
-                    }}
+                    sx={{ color: "white", textAlign: "center" }}
                   >
                     {team.rank}
                   </Typography>
@@ -500,29 +494,20 @@ const Leaderboard = () => {
                     />
                     <Typography
                       variant='h6'
-                      sx={{
-                        color: "white",
-                        textAlign: "center",
-                      }}
+                      sx={{ color: "white", textAlign: "center" }}
                     >
                       {team.teamName}
                     </Typography>
                   </Box>
                   <Typography
                     variant='h6'
-                    sx={{
-                      color: "white",
-                      textAlign: "center",
-                    }}
+                    sx={{ color: "white", textAlign: "center" }}
                   >
                     {team.memors}
                   </Typography>
                   <Typography
                     variant='h6'
-                    sx={{
-                      color: "white",
-                      textAlign: "center",
-                    }}
+                    sx={{ color: "white", textAlign: "center" }}
                   >
                     {team.points}
                   </Typography>
