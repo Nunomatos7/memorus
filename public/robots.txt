@@ -1,0 +1,11 @@
+# Allow all bots access to public pages
+User-agent: *
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /memors
+Disallow: /leaderboard
+Disallow: /memoryboard
+Allow: /login
+Allow: /register
+Allow: /change-password
+Sitemap: https://memor-us.com/sitemap.xml
