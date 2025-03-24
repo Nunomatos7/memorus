@@ -26,7 +26,7 @@ const rankImages = {
   3: rank3,
 };
 
-export const mockUser = {
+const mockUser = {
   id: 1,
   name: "John Doe",
   email: "john.doe@example.com",

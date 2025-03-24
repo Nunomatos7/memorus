@@ -1,7 +1,7 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import "./FeedbackModal.css";
 import CustomButton from "../CustomButton/CustomButton";
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 
 const FeedbackModal = ({ type, title, description, actions }) => {
   useEffect(() => {
@@ -23,12 +23,12 @@ const FeedbackModal = ({ type, title, description, actions }) => {
   };
 
   return (
-    <div className="feedback-modal-overlay">
-      <div className="feedback-modal">
-        <div className="feedback-icon">{getIcon()}</div>
-        <h2 className="feedback-title">{title}</h2>
-        <p className="feedback-description">{description}</p>
-        <div className="feedback-actions">
+    <div className='feedback-modal-overlay'>
+      <div className='feedback-modal'>
+        <div className='feedback-icon'>{getIcon()}</div>
+        <h2 className='feedback-title'>{title}</h2>
+        <p className='feedback-description'>{description}</p>
+        <div className='feedback-actions'>
           {actions.map((action, index) => (
             <CustomButton
               key={index}

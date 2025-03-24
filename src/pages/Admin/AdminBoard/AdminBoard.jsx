@@ -756,7 +756,7 @@ const AdminBoard = () => {
     setSearchQuery("");
   };
 
-  const [isCurrentCompetition, setIsCurrentCompetition] = useState(true);
+  // const [isCurrentCompetition, setIsCurrentCompetition] = useState(true);
   const [isEditCompetitionModalOpen, setIsEditCompetitionModalOpen] =
     useState(false);
   const [competitionToEdit, setCompetitionToEdit] = useState(null);

@@ -25,7 +25,7 @@ const appearAnimation = keyframes`
   }
 `;
 
-const PaperSheetUser = styled(Box)(({ theme, animateDrop, animateAppear }) => ({
+const PaperSheetUser = styled(Box)(({ animateDrop, animateAppear }) => ({
   width: 120,
   height: 100,
   backgroundColor: "#5547bf",
@@ -38,26 +38,28 @@ const PaperSheetUser = styled(Box)(({ theme, animateDrop, animateAppear }) => ({
   justifyContent: "center",
   position: "relative",
   overflow: "hidden",
-  animation: `${animateDrop ? dropAnimation : animateAppear ? appearAnimation : ""} 0.5s ease-out forwards`,
+  animation: `${
+    animateDrop ? dropAnimation : animateAppear ? appearAnimation : ""
+  } 0.5s ease-out forwards`,
 }));
 
-const PaperSheetAdmin = styled(Box)(
-  ({ theme, animateDrop, animateAppear }) => ({
-    width: 120,
-    height: 100,
-    backgroundColor: "#215952",
-    borderRadius: "8px",
-    margin: "0 12px",
-    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.5)",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    position: "relative",
-    overflow: "hidden",
-    animation: `${animateDrop ? dropAnimation : animateAppear ? appearAnimation : ""} 0.5s ease-out forwards`,
-  })
-);
+const PaperSheetAdmin = styled(Box)(({ animateDrop, animateAppear }) => ({
+  width: 120,
+  height: 100,
+  backgroundColor: "#215952",
+  borderRadius: "8px",
+  margin: "0 12px",
+  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.5)",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  position: "relative",
+  overflow: "hidden",
+  animation: `${
+    animateDrop ? dropAnimation : animateAppear ? appearAnimation : ""
+  } 0.5s ease-out forwards`,
+}));
 
 const StyledTypography = styled(Typography)({
   fontWeight: "bold",
@@ -80,7 +82,7 @@ const Countdown = ({ endDate, role }) => {
   }, [endDate, timeLeft]);
 
   return (
-    <Box display="flex" justifyContent="center" marginTop={2}>
+    <Box display='flex' justifyContent='center' marginTop={2}>
       {Object.keys(timeLeft).map((interval) => (
         <React.Fragment key={interval}>
           {role === "user" ? (
@@ -95,7 +97,7 @@ const Countdown = ({ endDate, role }) => {
               }
             >
               <StyledTypography>{timeLeft[interval]}</StyledTypography>
-              <Typography variant="caption" style={{ marginTop: "5px" }}>
+              <Typography variant='caption' style={{ marginTop: "5px" }}>
                 {interval.toUpperCase()}
               </Typography>
             </PaperSheetUser>
@@ -111,7 +113,7 @@ const Countdown = ({ endDate, role }) => {
               }
             >
               <StyledTypography>{timeLeft[interval]}</StyledTypography>
-              <Typography variant="caption" style={{ marginTop: "5px" }}>
+              <Typography variant='caption' style={{ marginTop: "5px" }}>
                 {interval.toUpperCase()}
               </Typography>
             </PaperSheetAdmin>
@@ -139,6 +141,7 @@ function calculateTimeLeft(endDate) {
 
 Countdown.propTypes = {
   endDate: PropTypes.string.isRequired,
+  role: PropTypes.string.isRequired,
 };
 
 export default Countdown;

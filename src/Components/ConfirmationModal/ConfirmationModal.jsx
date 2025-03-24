@@ -1,9 +1,8 @@
-import React from "react";
 import { Modal, Box, Typography } from "@mui/material";
 import CustomButton from "../CustomButton/CustomButton";
 import img1 from "../../assets/images/confirmationModalBack1.svg";
 import img2 from "../../assets/images/confirmationModalBack2.svg";
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 
 const ConfirmationModal = ({
   open,
@@ -50,12 +49,12 @@ const ConfirmationModal = ({
       );
     }
   } else if (context === "competition") {
-      message = (
-        <>
-          Are you sure you want to {action} the current competition{" "}
-          <span style={{ color: "#1E928A" }}>{itemName}</span>?
-        </>
-      );
+    message = (
+      <>
+        Are you sure you want to {action} the current competition{" "}
+        <span style={{ color: "#1E928A" }}>{itemName}</span>?
+      </>
+    );
   }
 
   return (
@@ -91,7 +90,7 @@ const ConfirmationModal = ({
         >
           <img
             src={img1}
-            alt="background"
+            alt='background'
             style={{
               position: "absolute",
               top: "15px",
@@ -102,7 +101,7 @@ const ConfirmationModal = ({
           />
           <img
             src={img2}
-            alt="background"
+            alt='background'
             style={{
               position: "absolute",
               top: "45px",
@@ -113,15 +112,15 @@ const ConfirmationModal = ({
           />
         </Box>
 
-        <Typography variant="h6" sx={{ mb: 2 }}>
+        <Typography variant='h6' sx={{ mb: 2 }}>
           Are you sure?
         </Typography>
-        <Typography variant="body2" sx={{ mb: 3 }}>
+        <Typography variant='body2' sx={{ mb: 3 }}>
           {message}
         </Typography>
         <Box sx={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
           <CustomButton
-            text="Cancel"
+            text='Cancel'
             onClick={onClose}
             sx={{
               backgroundColor: "transparent",
@@ -134,7 +133,7 @@ const ConfirmationModal = ({
             }}
           />
           <CustomButton
-            text="Confirm"
+            text='Confirm'
             onClick={onConfirm}
             sx={{
               borderRadius: "50px",

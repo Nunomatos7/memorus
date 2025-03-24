@@ -8,6 +8,7 @@ import background1 from "../../../assets/images/adminBackground1.svg";
 import background3 from "../../../assets/images/adminBackground2.svg";
 import background2 from "../../../assets/images/adminBackground3.svg";
 import Loader from "../../../Components/Loader/Loader";
+
 export const leaderboardData = [
   {
     teamName: "Visual Voyagers",
@@ -182,7 +183,7 @@ const Leaderboard = () => {
                 >
                   <Avatar
                     src={leaderboardData[1].avatar}
-                    alt="Rank 2"
+                    alt='Rank 2'
                     sx={{
                       width: "40px",
                       height: "40px",
@@ -269,7 +270,7 @@ const Leaderboard = () => {
                 >
                   <Avatar
                     src={leaderboardData[0].avatar}
-                    alt="Rank 1"
+                    alt='Rank 1'
                     sx={{
                       width: "40px",
                       height: "40px",
@@ -365,7 +366,7 @@ const Leaderboard = () => {
                 >
                   <Avatar
                     src={leaderboardData[2].avatar}
-                    alt="Rank 3"
+                    alt='Rank 3'
                     sx={{
                       width: "40px",
                       height: "40px",
@@ -482,6 +483,7 @@ const Leaderboard = () => {
               .filter((team) => team.rank >= 4)
               .map((team) => (
                 <Box
+                  key={team.id || `${team.teamName}-${team.rank}`}
                   sx={{
                     display: "grid",
                     gridTemplateColumns: "1fr 1fr 1fr 1fr",
