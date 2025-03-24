@@ -56,6 +56,7 @@ const RegisterPage = () => {
         <h2 className='login-title'>Register</h2>
         <p className='login-subtitle'>
           Create your account to get started. Enter your details below.
+          <span style={{ color: "rgb(146,130,249)" }}>* = required </span>
         </p>
         <form onSubmit={handleRegister} className='login-form'>
           {error && <p className='error-message'>{error}</p>}

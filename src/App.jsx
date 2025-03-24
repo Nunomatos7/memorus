@@ -15,6 +15,7 @@ import LoginPage from "./Auth/LoginPage";
 import RegisterPage from "./Auth/RegisterPage";
 import ChangePassword from "./Auth/ChangePassword";
 import Loader from "./Components/Loader/Loader";
+import ConsentModal from "./Components/ConsentModal/ConsentModal";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -83,6 +84,7 @@ function App() {
 
   return (
     <>
+      <ConsentModal />
       <Routes>
         {/* Login Route */}
         <Route
