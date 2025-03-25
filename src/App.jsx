@@ -84,7 +84,7 @@ function App() {
 
   return (
     <>
-      <ConsentModal />
+      <ConsentModal setUser={setUser} />
       <Routes>
         {/* Login Route */}
         <Route
