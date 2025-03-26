@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./LoginPage.css";
 import logo from "../assets/images/logo.svg";
-import PropTypes from "prop-types";
 import {
   TextField,
   Button,
@@ -13,32 +12,92 @@ import {
 import leftBackground from "../assets/images/left-auth.svg";
 import rightBackground from "../assets/images/right-auth.svg";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
+import { useAuth } from "../context/AuthContext";
 
-const LoginPage = ({ login }) => {
+const LoginPage = () => {
+  const { setUser, setToken } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
+
+  const getTenantFromSubdomain = () => {
+    const host = window.location.hostname;
+
+    // Em dev: "loba.localhost" → ["loba", "localhost"]
+    // Em prod: "loba.memor-us.com" → ["loba", "memor-us", "com"]
+    const parts = host.split(".");
+
+    if (host.includes("localhost")) {
+      return parts.length > 1 ? parts[0] : null;
+    }
+
+    // produção — assume que subdomínio está no início
+    if (parts.length >= 3) {
+      return parts[0];
+    }
+
+    return null;
+  };
 
   const navigate = useNavigate();
   useEffect(() => {
     document.title = `Memor'us | Login`;
   }, []);
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
 
     try {
-      const user = login(email, password);
+      const tenant = getTenantFromSubdomain()?.toLowerCase();
 
-      if (user.role === "Admin") {
-        navigate("/admin/home");
-      } else {
-        navigate("/home");
+      if (!tenant) {
+        setError("Tenant inválido.");
+        return;
       }
+
+      let token;
+
+      const USE_MOCK_TOKEN = false; // muda para true se quiseres usar token manual
+
+      if (USE_MOCK_TOKEN) {
+        token = "eyJhbGciOi..."; // token JWT válido completo
+      } else {
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/login`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-tenant": tenant,
+            },
+            body: JSON.stringify({ email, password, tenant }),
+          }
+        );
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Erro no login: ${errorText}`);
+        }
+
+        const data = await response.json();
+        token = data.token;
+      }
+
+      if (!token) throw new Error("Token inválido");
+
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      payload.role = payload.roles?.[0]?.toLowerCase();
+
+      localStorage.setItem("token", token);
+      setUser(payload);
+      setToken(token);
+
+      navigate(payload.role === "admin" ? "/admin/home" : "/home");
     } catch (err) {
-      setError(err.message);
+      console.error(err);
+      setError("Erro ao fazer login. Verifica as credenciais.");
     }
   };
 
@@ -235,10 +294,6 @@ const LoginPage = ({ login }) => {
       />
     </div>
   );
-};
-
-LoginPage.propTypes = {
-  login: PropTypes.func.isRequired,
 };
 
 export default LoginPage;
