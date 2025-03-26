@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./ConsentModal.css";
+import Proptypes from "prop-types";
 
 const ConsentModal = ({ setUser }) => {
   const [isVisible, setIsVisible] = useState(false);
@@ -68,6 +69,10 @@ const ConsentModal = ({ setUser }) => {
       </div>
     </div>
   );
+};
+
+ConsentModal.propTypes = {
+  setUser: Proptypes.func.isRequired,
 };
 
 export default ConsentModal;
