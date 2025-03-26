@@ -15,9 +15,10 @@ import RegisterPage from "./Auth/RegisterPage";
 import ChangePassword from "./Auth/ChangePassword";
 import ConsentModal from "./Components/ConsentModal/ConsentModal";
 import { useAuth } from "./context/AuthContext";
+import Loader from "./Components/Loader/Loader";
 
 function App() {
-  const { user, setUser, loading } = useAuth();
+  const { user, setUser, loading, cookiesAccepted } = useAuth();
 
   if (loading) {
     return <div className='p-4 text-center'>A carregar dados...</div>;
@@ -45,8 +46,8 @@ function App() {
     const location = useLocation();
     console.log("ProtectedRoute | user:", user);
 
-    if (loading) {
-      return <div className='p-4 text-center'>A carregar dados...</div>;
+    if (loading || !cookiesAccepted) {
+      return <Loader />;
     }
 
     if (!user) {

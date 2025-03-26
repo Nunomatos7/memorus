@@ -8,6 +8,7 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [cookiesAccepted, setCookiesAccepted] = useState(false);
 
   useEffect(() => {
     let storedToken = localStorage.getItem("token");
@@ -29,12 +30,23 @@ export function AuthProvider({ children }) {
         console.error("Erro ao decodificar token:", err);
       }
     }
-
+    const consent = document.cookie.includes("cookiesAccepted=true");
+    setCookiesAccepted(consent);
     setLoading(false);
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, setUser, token, setToken, loading }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        setUser,
+        token,
+        setToken,
+        loading,
+        cookiesAccepted,
+        setCookiesAccepted,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
