@@ -1,5 +1,4 @@
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
-import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import "./App.css";
 import Home from "./pages/Home/Home";
@@ -14,36 +13,20 @@ import CollaboratorLayout from "./Components/CollaboratorLayout/CollaboratorLayo
 import LoginPage from "./Auth/LoginPage";
 import RegisterPage from "./Auth/RegisterPage";
 import ChangePassword from "./Auth/ChangePassword";
-import Loader from "./Components/Loader/Loader";
 import ConsentModal from "./Components/ConsentModal/ConsentModal";
+import { useAuth } from "./context/AuthContext";
 
 function App() {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { user, setUser, loading } = useAuth();
+
+  if (loading) {
+    return <div className='p-4 text-center'>A carregar dados...</div>;
+  }
 
   const demoUsers = [
     { email: "admin@blip.com", password: "admin123", role: "Admin" },
     { email: "user@blip.com", password: "user123", role: "Regular" },
   ];
-
-  useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (storedUser) {
-      setUser(storedUser);
-    }
-    setLoading(false);
-
-    const handleStorageChange = () => {
-      const updatedUser = JSON.parse(localStorage.getItem("user"));
-      setUser(updatedUser);
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-    };
-  }, []);
 
   const login = (email, password) => {
     const authenticatedUser = demoUsers.find(
@@ -54,16 +37,15 @@ function App() {
       throw new Error("Invalid email or password");
     }
 
-    setUser(authenticatedUser);
+    setUser(authenticatedUser); // <-- do contexto
     localStorage.setItem("user", JSON.stringify(authenticatedUser));
     return authenticatedUser;
   };
-
   const ProtectedRoute = ({ children, role }) => {
     const location = useLocation();
 
     if (loading) {
-      return <Loader />;
+      return <div className='p-4 text-center'>A carregar dados...</div>;
     }
 
     if (!user) {
