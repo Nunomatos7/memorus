@@ -1,12 +1,15 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./ConsentModal.css";
+import Proptypes from "prop-types";
+import { useAuth } from "../../context/AuthContext";
 
 const ConsentModal = ({ setUser }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isExit, setIsExit] = useState(false);
   const navigate = useNavigate();
+  const { setCookiesAccepted } = useAuth();
 
   useEffect(() => {
     const cookiesAccepted = document.cookie.includes("cookiesAccepted=true");
@@ -25,6 +28,7 @@ const ConsentModal = ({ setUser }) => {
           new Date().getTime() + 365 * 24 * 60 * 60 * 1000
         ).toUTCString() +
         "; path=/;";
+      setCookiesAccepted(true);
     } else {
       localStorage.removeItem("user");
       setUser(null);
@@ -68,6 +72,10 @@ const ConsentModal = ({ setUser }) => {
       </div>
     </div>
   );
+};
+
+ConsentModal.propTypes = {
+  setUser: Proptypes.func.isRequired,
 };
 
 export default ConsentModal;

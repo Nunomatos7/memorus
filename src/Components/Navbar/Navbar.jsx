@@ -31,6 +31,7 @@ import {
 } from "../../assets/utils/leaderboardUtils";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import { useAuth } from "../../context/AuthContext";
 
 const useStyles = makeStyles({
   customBadge: {
@@ -105,6 +106,7 @@ const Navbar = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const [showLeaderboard, setShowLeaderboard] = useState(
     getLeaderboardVisibility()
@@ -273,13 +275,13 @@ const Navbar = () => {
               <MenuItem>
                 <Box sx={{ cursor: "default" }}>
                   <Typography variant='body1' sx={{ fontWeight: 600 }}>
-                    User
+                    {user?.firstName} {user?.lastName}
                   </Typography>
                   <Typography variant='body2' color='gray'>
-                    user@blip.com
+                    {user?.email}
                   </Typography>
                   <Typography variant='body2' sx={{ color: "#00C896" }}>
-                    The Debuggers
+                    {user?.team}
                   </Typography>
                 </Box>
               </MenuItem>

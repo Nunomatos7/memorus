@@ -3,6 +3,7 @@ import { BrowserRouter } from "react-router-dom";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import App from "./App";
 import "swiper/css";
+import { AuthProvider } from "./context/AuthContext";
 
 const theme = createTheme({
   typography: {
@@ -15,7 +16,9 @@ const root = document.getElementById("root");
 ReactDOM.createRoot(root).render(
   <ThemeProvider theme={theme}>
     <BrowserRouter>
-      <App />
+      <AuthProvider>
+        <App />
+      </AuthProvider>
     </BrowserRouter>
   </ThemeProvider>
 );
