@@ -87,7 +87,24 @@ const LoginPage = () => {
 
       if (!token) throw new Error("Token inválido");
 
-      const payload = JSON.parse(atob(token.split(".")[1]));
+      const parts = token.split(".");
+      if (parts.length !== 3) {
+        throw new Error("Token JWT mal formatado");
+      }
+
+      const base64Url = parts[1];
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+
+      const padded = base64 + "=".repeat((4 - (base64.length % 4)) % 4);
+
+      let payload;
+      try {
+        payload = JSON.parse(atob(padded));
+      } catch (err) {
+        console.error("Erro ao decodificar o token:", err);
+        throw new Error("Token inválido ou mal codificado");
+      }
+
       payload.role = payload.roles?.[0]?.toLowerCase();
 
       localStorage.setItem("token", token);
