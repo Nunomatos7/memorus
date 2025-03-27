@@ -15,44 +15,46 @@ import RegisterPage from "./Auth/RegisterPage";
 import ChangePassword from "./Auth/ChangePassword";
 import ConsentModal from "./Components/ConsentModal/ConsentModal";
 import { useAuth } from "./context/AuthContext";
+import Loader from "./Components/Loader/Loader";
 
 function App() {
-  const { user, setUser, loading } = useAuth();
+  const { user, setUser, loading, cookiesAccepted } = useAuth();
 
   if (loading) {
     return <div className='p-4 text-center'>A carregar dados...</div>;
   }
 
-  const demoUsers = [
-    { email: "admin@blip.com", password: "admin123", role: "Admin" },
-    { email: "user@blip.com", password: "user123", role: "Regular" },
-  ];
+  // const demoUsers = [
+  //   { email: "admin@blip.com", password: "admin123", role: "Admin" },
+  //   { email: "user@blip.com", password: "user123", role: "Regular" },
+  // ];
 
-  const login = (email, password) => {
-    const authenticatedUser = demoUsers.find(
-      (u) => u.email === email && u.password === password
-    );
+  // const login = (email, password) => {
+  //   const authenticatedUser = demoUsers.find(
+  //     (u) => u.email === email && u.password === password
+  //   );
 
-    if (!authenticatedUser) {
-      throw new Error("Invalid email or password");
-    }
+  //   if (!authenticatedUser) {
+  //     throw new Error("Invalid email or password");
+  //   }
 
-    setUser(authenticatedUser); // <-- do contexto
-    localStorage.setItem("user", JSON.stringify(authenticatedUser));
-    return authenticatedUser;
-  };
+  //   setUser(authenticatedUser); // <-- do contexto
+  //   localStorage.setItem("user", JSON.stringify(authenticatedUser));
+  //   return authenticatedUser;
+  // };
   const ProtectedRoute = ({ children, role }) => {
     const location = useLocation();
+    console.log("ProtectedRoute | user:", user);
 
-    if (loading) {
-      return <div className='p-4 text-center'>A carregar dados...</div>;
+    if (loading || !cookiesAccepted) {
+      return <Loader />;
     }
 
     if (!user) {
       return <Navigate to='/login' state={{ from: location }} replace />;
     }
 
-    if (role && user.role !== role) {
+    if (role && !user.roles?.includes(role.toLowerCase())) {
       return <Navigate to='/login' replace />;
     }
 
@@ -74,11 +76,11 @@ function App() {
           element={
             user ? (
               <Navigate
-                to={`/${user.role === "Admin" ? "admin/home" : "home"}`}
+                to={user.roles?.includes("admin") ? "/admin/home" : "/home"}
                 replace
               />
             ) : (
-              <LoginPage login={login} />
+              <LoginPage />
             )
           }
         />
@@ -88,7 +90,7 @@ function App() {
           element={
             user ? (
               <Navigate
-                to={`/${user.role === "Admin" ? "admin/home" : "home"}`}
+                to={user.roles?.includes("admin") ? "/admin/home" : "/home"}
                 replace
               />
             ) : (
@@ -103,7 +105,7 @@ function App() {
         <Route
           path='/*'
           element={
-            <ProtectedRoute role='Regular'>
+            <ProtectedRoute role='member'>
               <CollaboratorLayout />
             </ProtectedRoute>
           }
@@ -120,7 +122,7 @@ function App() {
         <Route
           path='/admin/*'
           element={
-            <ProtectedRoute role='Admin'>
+            <ProtectedRoute role='admin'>
               <AdminLayout />
             </ProtectedRoute>
           }
