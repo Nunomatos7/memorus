@@ -25,37 +25,83 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Mousewheel, FreeMode } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/free-mode";
-import { useLocation, useParams, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import Loader from "../../Components/Loader/Loader";
 import BackupRoundedIcon from "@mui/icons-material/BackupRounded";
-import { memorsData } from "../../Data/Memors.json";
+// import { memorsData } from "../../Data/Memors.json";
+import { useAuth } from "../../context/AuthContext";
 
 const Memors = () => {
+  const { token, user } = useAuth();
+
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const tabParam = searchParams.get("tab") || "all";
 
   const navigate = useNavigate();
-  const { memorId } = useParams();
 
   const [tab, setTab] = useState(tabParam);
   const [expandedIndex, setExpandedIndex] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedMemor, setSelectedMemor] = useState(null);
-  const [ongoingMemors, setOngoingMemors] = useState(
-    memorsData.filter((memor) => memor.team === "The Debuggers")
-  );
+  const [ongoingMemors, setOngoingMemors] = useState([]);
+
+  useEffect(() => {
+    const fetchMemors = async () => {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/memors`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "X-Tenant": user?.tenant_subdomain,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!res.ok) throw new Error("Erro ao buscar memors");
+
+        const data = await res.json();
+
+        const allMemors = data.flatMap((group) =>
+          group.memors.map((memor) => ({
+            ...memor,
+            competitionName: group.competition_name,
+            status: memor.has_my_submission ? "submitted" : "incomplete",
+            submission: memor.has_my_submission
+              ? "Submitted by you"
+              : "No submission yet",
+            dueDate: new Date(memor.due_date).toLocaleDateString("pt-PT"),
+            timeLeft: getTimeLeft(memor.due_date),
+          }))
+        );
+
+        function getTimeLeft(dueDate) {
+          const now = new Date();
+          const end = new Date(dueDate);
+          const diff = end - now;
+
+          if (diff <= 0) return "Expired";
+
+          const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+          return `${days} dia${days > 1 ? "s" : ""} restante${
+            days > 1 ? "s" : ""
+          }`;
+        }
+
+        setOngoingMemors(allMemors);
+      } catch (err) {
+        console.error("Erro ao carregar memors:", err);
+      }
+    };
+
+    if (token && user?.tenant_subdomain) {
+      fetchMemors();
+    }
+  }, [token, user?.tenant_subdomain]);
 
   useEffect(() => {
     document.title = `Memor'us | Memors`;
-  }, []);
-
-  useEffect(() => {
-    setOngoingMemors(
-      memorsData.filter((memor) => memor.team === "The Debuggers")
-    );
   }, []);
 
   const handleTabChange = (_, newValue) => {
@@ -80,16 +126,6 @@ const Memors = () => {
     navigate("/memors");
   };
 
-  useEffect(() => {
-    if (memorId) {
-      const memorData = memorsData.find((m) => m.id.toString() === memorId);
-      if (memorData) {
-        setSelectedMemor(memorData);
-        setIsModalOpen(true);
-      }
-    }
-  }, [memorId]);
-
   const handleSubmitMemor = (id) => {
     setOngoingMemors((prevMemors) =>
       prevMemors.map((memor) =>
@@ -104,18 +140,17 @@ const Memors = () => {
     );
   };
 
-  const filteredMemors = memorsData.filter((memor) => {
+  const filteredMemors = ongoingMemors.filter((memor) => {
     const matchesSearch = memor.title
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
-    const matchesTeam = memor.team === "The Debuggers";
     if (tab === "completed") {
-      return memor.status === "submitted" && matchesSearch && matchesTeam;
+      return memor.status === "submitted" && matchesSearch;
     }
     if (tab === "incomplete") {
-      return memor.status === "incomplete" && matchesSearch && matchesTeam;
+      return memor.status === "incomplete" && matchesSearch;
     }
-    return matchesSearch && matchesTeam;
+    return matchesSearch;
   });
 
   return (

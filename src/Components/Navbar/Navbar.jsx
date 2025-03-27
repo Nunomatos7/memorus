@@ -24,6 +24,7 @@ import notifDelete from "../../assets/images/notifDelete.svg";
 import NotificationsNoneRoundedIcon from "@mui/icons-material/NotificationsNoneRounded";
 import { Badge } from "@mui/material";
 import { makeStyles } from "@mui/styles";
+import toast from "react-hot-toast";
 
 import {
   getLeaderboardVisibility,
@@ -105,8 +106,8 @@ const StyledNavLink = styled(NavLink)(() => ({
 const Navbar = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const { user, setToken, setUser } = useAuth();
   const navigate = useNavigate();
-  const { user } = useAuth();
 
   const [showLeaderboard, setShowLeaderboard] = useState(
     getLeaderboardVisibility()
@@ -120,7 +121,6 @@ const Navbar = () => {
     if (!newValue) {
       navigate("/home");
     }
-    // Dispatch storage event to sync across components
     window.dispatchEvent(new Event("storage"));
   };
 
@@ -153,9 +153,16 @@ const Navbar = () => {
   };
 
   const handleLogOut = () => {
-    localStorage.removeItem("user");
+    console.log("🚪 Logging out...");
+    localStorage.removeItem("token");
+
+    setUser(null);
+    setToken(null);
+
     setAnchorEl(null);
-    window.location.href = "/login";
+
+    toast.success("You’ve been logged out successfully 👋");
+    navigate("/login");
   };
 
   const [notifAnchorEl, setNotifAnchorEl] = useState(null);
