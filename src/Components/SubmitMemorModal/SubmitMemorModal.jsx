@@ -15,8 +15,10 @@ import { Mousewheel, FreeMode } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/free-mode";
 import PropTypes from "prop-types";
+import { useAuth } from "../../context/AuthContext";
 
 const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
+  const { token, user } = useAuth();
   const [uploadedImage, setUploadedImage] = useState(null);
   const [feedback, setFeedback] = useState(null);
   const [isSubmitMemorOpen, setIsSubmitMemorOpen] = useState(true);
@@ -88,9 +90,63 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
     }
   };
 
-  const handleSubmit = () => {
-    if (uploadedImage) {
-      onSubmit();
+  const handleSubmit = async () => {
+    console.log("🔄 handleSubmit iniciado");
+
+    if (!uploadedImage) {
+      console.log("❌ Nenhuma imagem carregada");
+      setFeedback({
+        type: "error",
+        title: "Oops! Something happened...",
+        description:
+          "Please upload an image before submitting! Try again or check the details.",
+      });
+      setIsSubmitMemorOpen(false);
+      return;
+    }
+
+    try {
+      const fileInput = document.getElementById("file-input");
+      const file = fileInput?.files?.[0];
+
+      if (!file) {
+        console.log("❌ Nenhum ficheiro encontrado no input");
+        throw new Error("No file selected");
+      }
+
+      console.log("📦 Ficheiro selecionado:", file);
+
+      const formData = new FormData();
+      formData.append("image", file);
+
+      console.log("📤 A enviar imagem para memor:", memor.id);
+      console.log("🧾 Headers:", {
+        Authorization: `Bearer ${token}`,
+        "X-Tenant": user?.tenant_subdomain,
+      });
+
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/memors/${memor.id}/pictures`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "X-Tenant": user?.tenant_subdomain,
+          },
+          body: formData,
+        }
+      );
+
+      console.log("✅ Resposta recebida:", res);
+
+      if (!res.ok) {
+        const errText = await res.text();
+        console.error("❌ Erro da API:", errText);
+        throw new Error("Erro ao submeter a imagem: " + errText);
+      }
+
+      const responseData = await res.json();
+      console.log("🎉 Submissão bem-sucedida:", responseData);
 
       setFeedback({
         type: "success",
@@ -98,14 +154,15 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
         description:
           "Another one to the team board, keep going! Check your team's Memory Board to see your new Memor.",
       });
-    } else {
+
+      onSubmit();
+    } catch (err) {
+      console.error("💥 Erro no handleSubmit:", err);
       setFeedback({
         type: "error",
-        title: "Oops! Something happened...",
-        description:
-          "Please upload an image before submitting! Try again or check the details.",
+        title: "Failed to submit",
+        description: err.message || "Something went wrong. Please try again.",
       });
-
       setIsSubmitMemorOpen(false);
     }
   };
@@ -311,12 +368,12 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
               {normalizedImages.map((image, index) => (
                 <SwiperSlide
                   key={index}
-                  tabIndex={image ? 0 : -1} // Make slide focusable only if there's an image
+                  tabIndex={image ? 0 : -1}
                   className='photo-slide'
                   onClick={(event) => image && handleImageClick(image, event)}
                   onKeyDown={(event) => {
                     if (image && (event.key === "Enter" || event.key === " ")) {
-                      event.preventDefault(); // Prevent default scrolling behavior for Space key
+                      event.preventDefault();
                       handleImageClick(image, event);
                     }
                   }}
