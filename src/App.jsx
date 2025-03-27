@@ -16,6 +16,7 @@ import ChangePassword from "./Auth/ChangePassword";
 import ConsentModal from "./Components/ConsentModal/ConsentModal";
 import { useAuth } from "./context/AuthContext";
 import Loader from "./Components/Loader/Loader";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   const { user, setUser, loading, cookiesAccepted } = useAuth();
@@ -24,24 +25,6 @@ function App() {
     return <div className='p-4 text-center'>A carregar dados...</div>;
   }
 
-  // const demoUsers = [
-  //   { email: "admin@blip.com", password: "admin123", role: "Admin" },
-  //   { email: "user@blip.com", password: "user123", role: "Regular" },
-  // ];
-
-  // const login = (email, password) => {
-  //   const authenticatedUser = demoUsers.find(
-  //     (u) => u.email === email && u.password === password
-  //   );
-
-  //   if (!authenticatedUser) {
-  //     throw new Error("Invalid email or password");
-  //   }
-
-  //   setUser(authenticatedUser); // <-- do contexto
-  //   localStorage.setItem("user", JSON.stringify(authenticatedUser));
-  //   return authenticatedUser;
-  // };
   const ProtectedRoute = ({ children, role }) => {
     const location = useLocation();
     console.log("ProtectedRoute | user:", user);
@@ -136,6 +119,16 @@ function App() {
         {/* Catch-All Redirect */}
         <Route path='*' element={<Navigate to='/login' replace />} />
       </Routes>
+      <Toaster
+        position='top-right'
+        toastOptions={{
+          style: {
+            background: "#1E1F20",
+            color: "#fff",
+            border: "1px solid #d0bcfe",
+          },
+        }}
+      />
     </>
   );
 }

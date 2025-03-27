@@ -59,10 +59,11 @@ const LoginPage = () => {
 
       let token;
 
-      const USE_MOCK_TOKEN = false; // muda para true se quiseres usar token manual
+      const USE_MOCK_TOKEN = false;
 
       if (USE_MOCK_TOKEN) {
-        token = "eyJhbGciOi..."; // token JWT válido completo
+        token =
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZmlyc3ROYW1lIjoiTWFyaWEiLCJsYXN0TmFtZSI6IlNpbHZhIiwiZW1haWwiOiJtYXJpYUBibGlwLmNvbSIsInRlYW1zSWQiOjEsInRlbmFudF9zdWJkb21haW4iOiJibGlwIiwicm9sZXMiOlsibWVtYmVyIl0sImlzU3VwZXJBZG1pbiI6ZmFsc2UsImlhdCI6MTc0MzA3ODk5OCwiZXhwIjoxNzQzMTY1Mzk4fQ.gwBh6hV17OK1q6ZAdCJJSFXfSv48VYCONILGd1fnmGk"; //token da BLIP - user
       } else {
         const response = await fetch(
           `${import.meta.env.VITE_API_URL}/api/login`,

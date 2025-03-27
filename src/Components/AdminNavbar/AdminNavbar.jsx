@@ -16,6 +16,8 @@ import { styled } from "@mui/system";
 import MenuIcon from "@mui/icons-material/Menu";
 import logo from "../../assets/images/logoAdmin.svg";
 import profileIcon from "../../assets/images/profileAdmin.svg";
+import { useAuth } from "../../context/AuthContext";
+import { toast } from "react-hot-toast";
 
 const StyledNavLink = styled(NavLink)(() => ({
   textDecoration: "none",
@@ -37,6 +39,7 @@ const StyledNavLink = styled(NavLink)(() => ({
 const AdminNavbar = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const { user, setToken, setUser } = useAuth();
   const navigate = useNavigate();
 
   const handleMenuOpen = (event) => {
@@ -52,9 +55,16 @@ const AdminNavbar = () => {
   };
 
   const handleLogOut = () => {
-    localStorage.removeItem("user");
+    console.log("🚪 Logging out...");
+    localStorage.removeItem("token");
+
+    setToken(null);
+    setUser(null);
+
     setAnchorEl(null);
-    window.location.href = "/login";
+
+    toast.success("Logged out successfully 👋");
+    navigate("/admin/login");
   };
 
   return (
@@ -126,10 +136,10 @@ const AdminNavbar = () => {
               <MenuItem>
                 <Box sx={{ cursor: "default" }}>
                   <Typography variant='body1' sx={{ fontWeight: 600 }}>
-                    Blip Admin
+                    {user?.firstName} {user?.lastName}
                   </Typography>
                   <Typography variant='body2' color='gray'>
-                    admin.blip@example.com
+                    {user?.email}
                   </Typography>
                 </Box>
               </MenuItem>
