@@ -77,7 +77,7 @@ const Leaderboard = () => {
 const [leaderboardTeams, setLeaderboardTeams] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [currentCompetitionId, setCurrentCompetitionId] = useState(null);
+  const [currentCompetition, setCurrentCompetition] = useState(null);
 
   useEffect(() => {
     document.title = `Memor'us | Leaderboard`;
@@ -105,7 +105,7 @@ const [leaderboardTeams, setLeaderboardTeams] = useState([]);
         
         const competitions = await compResponse.json();
         if (competitions && competitions.length > 0) {
-          setCurrentCompetitionId(competitions[0].id);
+          setCurrentCompetition(competitions[0]);
         } else {
           throw new Error("No active competitions found");
         }
@@ -121,13 +121,13 @@ const [leaderboardTeams, setLeaderboardTeams] = useState([]);
 
   useEffect(() => {
     const fetchLeaderboardData = async () => {
-      if (!token || !user?.tenant_subdomain || !currentCompetitionId) return;
+      if (!token || !user?.tenant_subdomain || !currentCompetition?.id) return;
       
       try {
         setLoading(true);
         // Now fetch the leaderboard for this competition
         const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/leaderboard/competition/3`,
+          `${import.meta.env.VITE_API_URL}/api/leaderboard/competition/${currentCompetition.id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -168,7 +168,7 @@ const [leaderboardTeams, setLeaderboardTeams] = useState([]);
     };
     
     fetchLeaderboardData();
-  }, [token, user, currentCompetitionId]);
+  }, [token, user, currentCompetition]);
 
   // Simple placeholder avatar in case API doesn't provide one
   const getDefaultAvatar = () => {
@@ -258,6 +258,11 @@ const [leaderboardTeams, setLeaderboardTeams] = useState([]);
               <Typography variant="h6" color="error" gutterBottom>
                 {error}
               </Typography>
+              {!currentCompetition && (
+                <Typography variant="body1" color="#d0bcfe">
+                  No active competition found.
+                </Typography>
+              )}
 
             </Box>
           ) : (
