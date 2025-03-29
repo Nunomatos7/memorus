@@ -90,6 +90,21 @@ const Memors = () => {
         }
 
         setOngoingMemors(allMemors);
+
+        // 👇 AQUI entra a lógica para abrir o memor do URL
+        const pathnameParts = location.pathname.split("/");
+        const memorIdFromUrl = pathnameParts[2]; // ex: /memors/1 → "1"
+
+        if (memorIdFromUrl) {
+          const memorToOpen = allMemors.find(
+            (memor) => String(memor.id) === memorIdFromUrl
+          );
+          if (memorToOpen) {
+            setSelectedMemor(memorToOpen);
+            setIsModalOpen(true);
+            document.body.style.overflow = "hidden";
+          }
+        }
       } catch (err) {
         console.error("Erro ao carregar memors:", err);
       }
@@ -98,7 +113,7 @@ const Memors = () => {
     if (token && user?.tenant_subdomain) {
       fetchMemors();
     }
-  }, [token, user?.tenant_subdomain]);
+  }, [token, user?.tenant_subdomain, location.pathname]);
 
   useEffect(() => {
     document.title = `Memor'us | Memors`;
