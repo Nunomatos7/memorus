@@ -18,42 +18,48 @@ export const leaderboardData = [
     points: 510,
     memors: 51,
     rank: 1,
-    avatar: "https://images.adsttc.com/media/images/5d44/14fa/284d/d1fd/3a00/003d/medium_jpg/eiffel-tower-in-paris-151-medium.jpg?1564742900",
+    avatar:
+      "https://images.adsttc.com/media/images/5d44/14fa/284d/d1fd/3a00/003d/medium_jpg/eiffel-tower-in-paris-151-medium.jpg?1564742900",
   },
   {
     teamName: "The Debuggers",
     points: 360,
     memors: 36,
     rank: 2,
-    avatar: "https://www.girlfromnowhere.pt/wp-content/uploads/2023/02/Passeio-de-moliceiro-nos-canais-de-Aveiro-1024x768.jpg",
+    avatar:
+      "https://www.girlfromnowhere.pt/wp-content/uploads/2023/02/Passeio-de-moliceiro-nos-canais-de-Aveiro-1024x768.jpg",
   },
   {
     teamName: "Capital Crew",
     points: 190,
     memors: 19,
     rank: 3,
-    avatar: "https://cdn-imgix.headout.com/microbrands-content-image/image/848bbbd82180ddf262893075f225b20d-Christmas%20in%20Prague%20-%20Why%20Spend%20Christmas%20in%20Prague%3F.jpg?auto=format&w=1222.3999999999999&h=687.6&q=90&fit=crop&ar=16%3A9&crop=faces",
+    avatar:
+      "https://cdn-imgix.headout.com/microbrands-content-image/image/848bbbd82180ddf262893075f225b20d-Christmas%20in%20Prague%20-%20Why%20Spend%20Christmas%20in%20Prague%3F.jpg?auto=format&w=1222.3999999999999&h=687.6&q=90&fit=crop&ar=16%3A9&crop=faces",
   },
   {
     teamName: "The Hackers",
     points: 150,
     memors: 15,
     rank: 4,
-    avatar: "https://www.vivernocentrodeportugal.com/Assets/Img/Galeria-regioes/f6f230cf.jpg",
+    avatar:
+      "https://www.vivernocentrodeportugal.com/Assets/Img/Galeria-regioes/f6f230cf.jpg",
   },
   {
     teamName: "The Coders",
     points: 120,
     memors: 12,
     rank: 5,
-    avatar: "https://www.rotadaluz.pt/wp-content/uploads/2021/07/praia-furadouro-topo.jpg",
+    avatar:
+      "https://www.rotadaluz.pt/wp-content/uploads/2021/07/praia-furadouro-topo.jpg",
   },
   {
     teamName: "The Programmers",
     points: 100,
     memors: 10,
     rank: 6,
-    avatar: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Cidade_Maravilhosa.jpg/800px-Cidade_Maravilhosa.jpg",
+    avatar:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Cidade_Maravilhosa.jpg/800px-Cidade_Maravilhosa.jpg",
   },
   {
     teamName: "The Developers",
@@ -67,14 +73,14 @@ export const leaderboardData = [
     points: 80,
     memors: 8,
     rank: 8,
-    avatar: "https://static.nationalgeographicbrasil.com/files/styles/image_3200/public/nationalgeographic2710344.jpg?w=1900&h=1272",
+    avatar:
+      "https://static.nationalgeographicbrasil.com/files/styles/image_3200/public/nationalgeographic2710344.jpg?w=1900&h=1272",
   },
 ];
 
 const Leaderboard = () => {
   const { token, user } = useAuth();
-  // Use a different name for the state variable to avoid conflicts with the exported static data
-const [leaderboardTeams, setLeaderboardTeams] = useState([]);
+  const [leaderboardTeams, setLeaderboardTeams] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentCompetition, setCurrentCompetition] = useState(null);
@@ -86,23 +92,23 @@ const [leaderboardTeams, setLeaderboardTeams] = useState([]);
   useEffect(() => {
     const fetchCurrentCompetition = async () => {
       if (!token || !user?.tenant_subdomain) return;
-      
+
       try {
         // First, get active competitions to find the current one
         const compResponse = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/competitions/active`, 
+          `${import.meta.env.VITE_API_URL}/api/competitions/active`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
-              "X-Tenant": user.tenant_subdomain
-            }
+              "X-Tenant": user.tenant_subdomain,
+            },
           }
         );
-        
+
         if (!compResponse.ok) {
           throw new Error("Failed to fetch active competitions");
         }
-        
+
         const competitions = await compResponse.json();
         if (competitions && competitions.length > 0) {
           setCurrentCompetition(competitions[0]);
@@ -115,14 +121,14 @@ const [leaderboardTeams, setLeaderboardTeams] = useState([]);
         setLoading(false);
       }
     };
-    
+
     fetchCurrentCompetition();
   }, [token, user]);
 
   useEffect(() => {
     const fetchLeaderboardData = async () => {
       if (!token || !user?.tenant_subdomain || !currentCompetition?.id) return;
-      
+
       try {
         setLoading(true);
         // Now fetch the leaderboard for this competition
@@ -131,17 +137,17 @@ const [leaderboardTeams, setLeaderboardTeams] = useState([]);
           {
             headers: {
               Authorization: `Bearer ${token}`,
-              "X-Tenant": user.tenant_subdomain
-            }
+              "X-Tenant": user.tenant_subdomain,
+            },
           }
         );
-        
+
         if (!response.ok) {
           throw new Error("Failed to fetch leaderboard data");
         }
-        
+
         const leaderboardResult = await response.json();
-        
+
         if (leaderboardResult && leaderboardResult.teams) {
           // Transform API data to match our expected format
           const formattedData = leaderboardResult.teams.map((team, index) => ({
@@ -150,9 +156,9 @@ const [leaderboardTeams, setLeaderboardTeams] = useState([]);
             memors: Math.ceil(team.points / 10), // Estimating memors count based on points
             rank: team.rank || index + 1,
             avatar: team.avatar || getDefaultAvatar(index),
-            teamId: team.teamId
+            teamId: team.teamId,
           }));
-          
+
           setLeaderboardTeams(formattedData);
           setLoading(false);
         } else {
@@ -166,7 +172,7 @@ const [leaderboardTeams, setLeaderboardTeams] = useState([]);
         setLoading(false);
       }
     };
-    
+
     fetchLeaderboardData();
   }, [token, user, currentCompetition]);
 
@@ -178,10 +184,10 @@ const [leaderboardTeams, setLeaderboardTeams] = useState([]);
   return (
     <>
       <Loader />
-      <div className='container'>
+      <div className="container">
         <img
           src={background1}
-          alt=''
+          alt=""
           style={{
             position: "absolute",
             top: "2",
@@ -192,7 +198,7 @@ const [leaderboardTeams, setLeaderboardTeams] = useState([]);
         />
         <img
           src={background2}
-          alt=''
+          alt=""
           style={{
             position: "absolute",
             top: "25%",
@@ -203,7 +209,7 @@ const [leaderboardTeams, setLeaderboardTeams] = useState([]);
         />
         <img
           src={background3}
-          alt=''
+          alt=""
           style={{
             position: "absolute",
             top: "35%",
@@ -220,39 +226,52 @@ const [leaderboardTeams, setLeaderboardTeams] = useState([]);
             zIndex: "10",
           }}
         >
+          <Box>
           {/* Header */}
           <Typography
-            variant='h4'
-            component='h1'
+            variant="h4"
+            component="h1"
             sx={{
               fontWeight: "bold",
               color: "white",
-              marginBottom: "30px",
+              marginBottom: "10px",
             }}
           >
             Leaderboard
           </Typography>
+          {currentCompetition && (
+              <Typography
+                variant="subtitle1"
+                sx={{
+                  color: "#d8bcfc",
+                  marginBottom: "30px",
+                }}
+              >
+                {currentCompetition.name}
+              </Typography>
+            )}
+            </Box>
 
           {loading ? (
-            <Box 
-              sx={{ 
-                display: 'flex', 
-                justifyContent: 'center', 
-                alignItems: 'center', 
-                minHeight: '300px' 
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                minHeight: "300px",
               }}
             >
-              <CircularProgress sx={{ color: '#d0bcfe' }} />
+              <CircularProgress sx={{ color: "#d0bcfe" }} />
             </Box>
           ) : error ? (
-            <Box 
-              sx={{ 
-                display: 'flex', 
-                justifyContent: 'center', 
-                flexDirection: 'column',
-                alignItems: 'center', 
-                minHeight: '300px',
-                color: 'white'
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                flexDirection: "column",
+                alignItems: "center",
+                minHeight: "300px",
+                color: "white",
               }}
             >
               <Typography variant="h6" color="error" gutterBottom>
@@ -263,7 +282,6 @@ const [leaderboardTeams, setLeaderboardTeams] = useState([]);
                   No active competition found.
                 </Typography>
               )}
-
             </Box>
           ) : (
             <>
@@ -321,7 +339,7 @@ const [leaderboardTeams, setLeaderboardTeams] = useState([]);
                           }}
                         />
                         <Typography
-                          variant='h6'
+                          variant="h6"
                           sx={{
                             color: "#D0BCFE",
                           }}
@@ -338,11 +356,11 @@ const [leaderboardTeams, setLeaderboardTeams] = useState([]);
                           height: "100%",
                         }}
                       >
-                        <Typography variant='h4' sx={{ fontWeight: "bold" }}>
+                        <Typography variant="h4" sx={{ fontWeight: "bold" }}>
                           {leaderboardTeams[1]?.points} Points
                         </Typography>
                         <Typography
-                          variant='body1'
+                          variant="body1"
                           sx={{
                             marginTop: "5px",
                             fontSize: "1.2rem",
@@ -353,7 +371,7 @@ const [leaderboardTeams, setLeaderboardTeams] = useState([]);
                       </Box>
                       <img
                         src={rank2}
-                        alt=''
+                        alt=""
                         style={{
                           position: "absolute",
                           bottom: "0px",
@@ -409,7 +427,7 @@ const [leaderboardTeams, setLeaderboardTeams] = useState([]);
                           }}
                         />
                         <Typography
-                          variant='h6'
+                          variant="h6"
                           sx={{
                             color: "#381e72",
                           }}
@@ -427,7 +445,7 @@ const [leaderboardTeams, setLeaderboardTeams] = useState([]);
                         }}
                       >
                         <Typography
-                          variant='h4'
+                          variant="h4"
                           sx={{
                             color: "#381e72",
                             fontWeight: "bold",
@@ -437,7 +455,7 @@ const [leaderboardTeams, setLeaderboardTeams] = useState([]);
                           {leaderboardTeams[0]?.points} Points
                         </Typography>
                         <Typography
-                          variant='body1'
+                          variant="body1"
                           sx={{
                             marginTop: "5px",
                             color: "#381e72",
@@ -449,7 +467,7 @@ const [leaderboardTeams, setLeaderboardTeams] = useState([]);
                       </Box>
                       <img
                         src={rank1}
-                        alt=''
+                        alt=""
                         style={{
                           position: "absolute",
                           bottom: "0px",
@@ -505,7 +523,7 @@ const [leaderboardTeams, setLeaderboardTeams] = useState([]);
                           }}
                         />
                         <Typography
-                          variant='h6'
+                          variant="h6"
                           sx={{
                             color: "#D0BCFE",
                           }}
@@ -523,7 +541,7 @@ const [leaderboardTeams, setLeaderboardTeams] = useState([]);
                         }}
                       >
                         <Typography
-                          variant='h4'
+                          variant="h4"
                           sx={{
                             fontWeight: "bold",
                             fontSize: "1.8rem",
@@ -531,13 +549,13 @@ const [leaderboardTeams, setLeaderboardTeams] = useState([]);
                         >
                           {leaderboardTeams[2]?.points} Points
                         </Typography>
-                        <Typography variant='body1' sx={{ marginTop: "5px" }}>
+                        <Typography variant="body1" sx={{ marginTop: "5px" }}>
                           {leaderboardTeams[2]?.memors} Memors
                         </Typography>
                       </Box>
                       <img
                         src={rank3}
-                        alt=''
+                        alt=""
                         style={{
                           position: "absolute",
                           bottom: "0px",
@@ -553,8 +571,8 @@ const [leaderboardTeams, setLeaderboardTeams] = useState([]);
 
               {/* Global Ranking */}
               <Typography
-                variant='h5'
-                component='h2'
+                variant="h5"
+                component="h2"
                 sx={{
                   color: "white",
                   marginBottom: "20px",
@@ -578,23 +596,23 @@ const [leaderboardTeams, setLeaderboardTeams] = useState([]);
                     marginBottom: "20px",
                   }}
                 >
-                  <Typography variant='h6' sx={{ color: "white" }}>
+                  <Typography variant="h6" sx={{ color: "white" }}>
                     Rank
                   </Typography>
                   <Typography
-                    variant='h6'
+                    variant="h6"
                     sx={{ color: "white", textAlign: "center" }}
                   >
                     Team
                   </Typography>
-                  <Typography variant='h6' sx={{ color: "white" }}>
+                  <Typography variant="h6" sx={{ color: "white" }}>
                     Memors Completed
                   </Typography>
-                  <Typography variant='h6' sx={{ color: "white" }}>
+                  <Typography variant="h6" sx={{ color: "white" }}>
                     Total Points
                   </Typography>
                 </Box>
-                
+
                 {/* Show teams from rank 4 and lower */}
                 {leaderboardTeams
                   .filter((team) => team.rank >= 4)
@@ -614,7 +632,7 @@ const [leaderboardTeams, setLeaderboardTeams] = useState([]);
                       tabIndex={0}
                     >
                       <Typography
-                        variant='h6'
+                        variant="h6"
                         sx={{ color: "white", textAlign: "center" }}
                       >
                         {team.rank}
@@ -637,29 +655,30 @@ const [leaderboardTeams, setLeaderboardTeams] = useState([]);
                           }}
                         />
                         <Typography
-                          variant='h6'
+                          variant="h6"
                           sx={{ color: "white", textAlign: "center" }}
                         >
                           {team.teamName}
                         </Typography>
                       </Box>
                       <Typography
-                        variant='h6'
+                        variant="h6"
                         sx={{ color: "white", textAlign: "center" }}
                       >
                         {team.memors}
                       </Typography>
                       <Typography
-                        variant='h6'
+                        variant="h6"
                         sx={{ color: "white", textAlign: "center" }}
                       >
                         {team.points}
                       </Typography>
                     </Box>
                   ))}
-                  
+
                 {/* Display a message if there are no teams below rank 3 */}
-                {leaderboardTeams.filter((team) => team.rank >= 4).length === 0 && (
+                {leaderboardTeams.filter((team) => team.rank >= 4).length ===
+                  0 && (
                   <Box
                     sx={{
                       display: "flex",
