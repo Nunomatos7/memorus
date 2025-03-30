@@ -1,3 +1,5 @@
+// Changes for src/Components/Navbar/Navbar.jsx
+
 import { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
@@ -12,19 +14,20 @@ import {
   Drawer,
   List,
   Button,
+  CircularProgress,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import PropTypes from "prop-types";
 import MenuIcon from "@mui/icons-material/Menu";
 import logo from "../../assets/images/logoText.svg";
 import profileIcon from "../../assets/images/profile.svg";
-import notifPurple from "../../assets/images/notifPurple.svg";
-import notifGreen from "../../assets/images/notifGreen.svg";
 import notifDelete from "../../assets/images/notifDelete.svg";
 import NotificationsNoneRoundedIcon from "@mui/icons-material/NotificationsNoneRounded";
 import { Badge } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import toast from "react-hot-toast";
+import notifPurple from "../../assets/images/notifPurple.svg";
+import notifGreen from "../../assets/images/notifGreen.svg";
 
 import {
   getLeaderboardVisibility,
@@ -41,7 +44,7 @@ const useStyles = makeStyles({
   },
 });
 
-const NotificationItem = ({ notification, onDelete }) => {
+const NotificationItem = ({ notification, onDelete, onClick }) => {
   return (
     <Box
       sx={{
@@ -55,9 +58,11 @@ const NotificationItem = ({ notification, onDelete }) => {
           cursor: "pointer",
         },
       }}
+      onClick={notification.memorId ? () => onClick(notification) : null}
     >
-      <img
-        src={notification.image}
+      
+      <IconButton
+        src={notification.read ? notifPurple : notifGreen}
         alt='Notification Icon'
         style={{ width: 28, height: 28 }}
       />
@@ -73,7 +78,10 @@ const NotificationItem = ({ notification, onDelete }) => {
         </Typography>
       </Box>
       <IconButton
-        onClick={() => onDelete(notification.id)}
+        onClick={(e) => {
+          e.stopPropagation();
+          onDelete(notification.id);
+        }}
         sx={{ color: "#ff1744" }}
       >
         <img
@@ -106,12 +114,15 @@ const StyledNavLink = styled(NavLink)(() => ({
 const Navbar = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const { user, setToken, setUser } = useAuth();
+  const { user, setToken, setUser, token } = useAuth();
   const navigate = useNavigate();
 
   const [showLeaderboard, setShowLeaderboard] = useState(
     getLeaderboardVisibility()
   );
+
+  const [notifications, setNotifications] = useState([]);
+  const [loadingNotifications, setLoadingNotifications] = useState(false);
 
   const toggleLeaderboard = () => {
     const newValue = !showLeaderboard;
@@ -123,6 +134,41 @@ const Navbar = () => {
     }
     window.dispatchEvent(new Event("storage"));
   };
+
+  // Fetch notifications when component mounts or user changes
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      if (!token || !user) return;
+      
+      setLoadingNotifications(true);
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/me/notifications`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "X-Tenant": user.tenant_subdomain || user.tenant,
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch notifications');
+        }
+
+        const data = await response.json();
+        setNotifications(data);
+      } catch (error) {
+        console.error("Error fetching notifications:", error);
+      } finally {
+        setLoadingNotifications(false);
+      }
+    };
+
+    fetchNotifications();
+    
+    // Set up a polling interval to check for new notifications
+    const intervalId = setInterval(fetchNotifications, 60000); // Check every minute
+    
+    return () => clearInterval(intervalId);
+  }, [token, user]);
 
   useEffect(() => {
     const handleStorageChange = () => {
@@ -161,53 +207,110 @@ const Navbar = () => {
 
     setAnchorEl(null);
 
-    toast.success("You’ve been logged out successfully 👋");
+    toast.success("You've been logged out successfully 👋");
     navigate("/login");
   };
 
   const [notifAnchorEl, setNotifAnchorEl] = useState(null);
   const handleNotifClick = (event) => {
     setNotifAnchorEl(event.currentTarget);
+    
+    // Mark all notifications as read when opening the menu
+    notifications.forEach(notification => {
+      if (!notification.read) {
+        markNotificationAsRead(notification.id);
+      }
+    });
   };
+  
   const handleNotifClose = () => {
     setNotifAnchorEl(null);
   };
-  const handleDeleteNotification = (id) => {
-    setNotifications(
-      notifications.filter((notification) => notification.id !== id)
-    );
+  
+  const handleDeleteNotification = async (id) => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/me/notifications/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "X-Tenant": user.tenant_subdomain || user.tenant,
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete notification');
+      }
+
+      setNotifications(prevNotifications => 
+        prevNotifications.filter(notification => notification.id !== id)
+      );
+      
+      toast.success("Notification removed");
+    } catch (error) {
+      console.error("Error deleting notification:", error);
+      toast.error("Failed to delete notification");
+    }
   };
 
-  const handleMarkAllRead = () => {
-    setNotifications([]);
+  const markNotificationAsRead = async (id) => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/me/notifications/${id}/read`, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "X-Tenant": user.tenant_subdomain || user.tenant,
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to mark notification as read');
+      }
+
+      // Update the local state to mark as read
+      setNotifications(prev => 
+        prev.map(notification => 
+          notification.id === id 
+            ? { ...notification, read: true } 
+            : notification
+        )
+      );
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
+    }
   };
 
-  const [notifications, setNotifications] = useState([
-    {
-      id: 1,
-      image: notifPurple,
-      title: "Less than a day to submit your memor!",
-      description: "Don't forget to submit your memor 'Virtual Coffee Break'!",
-    },
-    {
-      id: 2,
-      image: notifGreen,
-      title: "You've received a new memor",
-      description: "A new memor was added to your team's memors.",
-    },
-    {
-      id: 3,
-      image: notifGreen,
-      title: "You've received a new memor",
-      description: "A new memor was added to your team's memors.",
-    },
-    {
-      id: 4,
-      image: notifGreen,
-      title: "You've received a new memor",
-      description: "A new memor was added to your team's memors.",
-    },
-  ]);
+  const handleMarkAllRead = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/me/notifications`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "X-Tenant": user.tenant_subdomain || user.tenant,
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to clear notifications');
+      }
+
+      setNotifications([]);
+      toast.success("All notifications removed");
+    } catch (error) {
+      console.error("Error clearing notifications:", error);
+      toast.error("Failed to clear notifications");
+    }
+  };
+  
+  const handleNotificationClick = (notification) => {
+    // Navigate to the memor details page if it's a memor-related notification
+    if (notification.memorId) {
+      navigate(`/memors/${notification.memorId}`);
+      handleNotifClose();
+    }
+  };
+
+  // Get unread notification count
+  const unreadCount = notifications.filter(notif => !notif.read).length;
 
   const classes = useStyles();
 
@@ -284,7 +387,7 @@ const Navbar = () => {
                   <Typography variant='body1' sx={{ fontWeight: 600 }}>
                     {user?.firstName} {user?.lastName}
                   </Typography>
-                  <Typography variant='body2' color='gray'>
+                  <Typography variant='body2' color="gray">
                     {user?.email}
                   </Typography>
                   <Typography variant='body2' sx={{ color: "#00C896" }}>
@@ -344,7 +447,7 @@ const Navbar = () => {
           <Box>
             <IconButton onClick={handleNotifClick}>
               <Badge
-                badgeContent={notifications.length}
+                badgeContent={unreadCount}
                 classes={{ badge: classes.customBadge }}
               >
                 <NotificationsNoneRoundedIcon
@@ -359,7 +462,7 @@ const Navbar = () => {
               onClose={handleNotifClose}
               PaperProps={{
                 style: {
-                  backgroundColor: "#232627",
+                  backgroundColor: "#1e1e1e",
                   color: "white",
                   width: "400px",
                 },
@@ -380,18 +483,30 @@ const Navbar = () => {
                   variant='text'
                   sx={{ color: "#fff" }}
                   onClick={handleMarkAllRead}
+                  disabled={notifications.length === 0}
                 >
                   Remove All
                 </Button>
               </Box>
-              <Box sx={{ maxHeight: "300px", overflowY: "auto" }}>
-                {notifications.map((notification) => (
-                  <NotificationItem
-                    key={notification.id}
-                    notification={notification}
-                    onDelete={handleDeleteNotification}
-                  />
-                ))}
+              <Box sx={{ maxHeight: "300px", overflowY: "auto", padding: "0 10px" }}>
+                {loadingNotifications ? (
+                  <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
+                    <CircularProgress size={24} sx={{ color: '#d0bcfe' }} />
+                  </Box>
+                ) : notifications.length > 0 ? (
+                  notifications.map((notification) => (
+                    <NotificationItem
+                      key={notification.id}
+                      notification={notification}
+                      onDelete={handleDeleteNotification}
+                      onClick={handleNotificationClick}
+                    />
+                  ))
+                ) : (
+                  <Box sx={{ p: 2, textAlign: 'center', color: '#888' }}>
+                    No notifications
+                  </Box>
+                )}
               </Box>
             </Menu>
           </Box>
@@ -434,13 +549,13 @@ const Navbar = () => {
                 }}
               />
               <Typography variant='body1' sx={{ fontWeight: 600 }}>
-                Jane Doe
+                {user?.firstName} {user?.lastName}
               </Typography>
-              <Typography variant='body2' color='gray'>
-                jane.doe@example.com
+              <Typography variant='body2' color="gray">
+                {user?.email}
               </Typography>
               <Typography variant='body2' sx={{ color: "#00C896" }}>
-                The Debuggers
+                {user?.team}
               </Typography>
             </Box>
             <Divider sx={{ backgroundColor: "#444" }} />
@@ -512,26 +627,18 @@ const Navbar = () => {
     </AppBar>
   );
 };
+
 NotificationItem.propTypes = {
   notification: PropTypes.shape({
     id: PropTypes.number.isRequired,
     image: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,
     description: PropTypes.string.isRequired,
+    memorId: PropTypes.number,
+    read: PropTypes.bool
   }).isRequired,
   onDelete: PropTypes.func.isRequired,
-};
-
-Navbar.propTypes = {
-  notifications: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      image: PropTypes.string.isRequired,
-      title: PropTypes.string.isRequired,
-      description: PropTypes.string.isRequired,
-    })
-  ).isRequired,
-  handleDeleteNotification: PropTypes.func.isRequired,
+  onClick: PropTypes.func.isRequired
 };
 
 export default Navbar;
