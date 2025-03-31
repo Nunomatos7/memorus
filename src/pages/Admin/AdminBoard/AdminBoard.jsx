@@ -12,9 +12,9 @@ import background1 from "../../../assets/images/adminBackground1.svg";
 import background2 from "../../../assets/images/adminBackground2.svg";
 import background3 from "../../../assets/images/adminBackground3.svg";
 import Loader from "../../../Components/Loader/Loader";
-import ManageMemors from "./components/ManageMemors";
-import ManageTeams from "./components/ManageTeams";
-import ManageCompetition from "./components/ManageCompetition";
+import ManageMemors from "./Components/ManageMemors";
+import ManageTeams from "./Components/ManageTeams";
+import ManageCompetition from "./Components/ManageCompetition";
 import DynamicModal from "./Components/DynamicModal";
 import FeedbackModal from "../../../Components/FeedbackModal/FeedbackModal";
 import { useLocation } from "react-router-dom";
@@ -24,7 +24,6 @@ const AdminBoard = () => {
   const searchParams = new URLSearchParams(location.search);
   const tabParam = searchParams.get("tab") || "all";
 
-  // State
   const [tab, setTab] = useState("memors");
   const [tab2, setTab2] = useState(tabParam);
   const [searchQuery, setSearchQuery] = useState("");
@@ -37,8 +36,8 @@ const AdminBoard = () => {
   });
   const [modalState, setModalState] = useState({
     open: false,
-    type: null, // "memor", "team", "competition"
-    action: null, // "create", "edit", "delete"
+    type: null,
+    action: null,
     data: null,
   });
 
@@ -249,6 +248,21 @@ const AdminBoard = () => {
               onClose={closeModal}
               showFeedback={showFeedback}
               setLoading={setLoading}
+              refreshData={() => {
+                if (tab === "memors" && window.manageMemorsRef?.fetchMemors) {
+                  window.manageMemorsRef.fetchMemors();
+                } else if (
+                  tab === "teams" &&
+                  window.manageTeamsRef?.fetchTeams
+                ) {
+                  window.manageTeamsRef.fetchTeams();
+                } else if (
+                  tab === "competition" &&
+                  window.manageCompetitionRef?.fetchCompetitions
+                ) {
+                  window.manageCompetitionRef.fetchCompetitions();
+                }
+              }}
             />
           )}
 

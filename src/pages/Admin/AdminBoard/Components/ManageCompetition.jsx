@@ -25,7 +25,6 @@ const ManageCompetition = ({
     try {
       const response = await api.get("/api/competitions");
 
-      // Map the data to match the required format
       const formattedCompetitions = response.data.map((comp) => ({
         id: comp.id,
         title: comp.name,
@@ -35,13 +34,11 @@ const ManageCompetition = ({
         status: comp.is_active ? "Ongoing" : "Closed",
       }));
 
-      // Find ongoing competition
       const ongoing = formattedCompetitions.find(
         (comp) => comp.status === "Ongoing"
       );
       setOngoingCompetition(ongoing || null);
 
-      // Filter out the ongoing competition for the list of finished competitions
       const finished = formattedCompetitions.filter(
         (comp) => comp.status === "Closed"
       );
@@ -54,8 +51,20 @@ const ManageCompetition = ({
     }
   };
 
+  useEffect(() => {
+    if (window.manageCompetitionsRef) {
+      window.manageCompetitionsRef.fetchTeams = fetchCompetitions;
+    } else {
+      window.manageCompetitionsRef = { fetchCompetitions };
+    }
+    return () => {
+      if (window.manageCompetitionsRef) {
+        delete window.manageCompetitionsRef.fetchCompetitions;
+      }
+    };
+  }, []);
+
   const formatDateForDisplay = (dateString) => {
-    // Convert from ISO format to DD/MM/YYYY
     const date = new Date(dateString);
     return `${date.getDate().toString().padStart(2, "0")}/${(
       date.getMonth() + 1
@@ -65,7 +74,6 @@ const ManageCompetition = ({
   };
 
   const formatDateForAPI = (dateString) => {
-    // Convert from DD/MM/YYYY to YYYY-MM-DD
     const parts = dateString.split("/");
     return `${parts[2]}-${parts[1]}-${parts[0]}`;
   };
@@ -75,7 +83,6 @@ const ManageCompetition = ({
   };
 
   const handleEditCompetition = (competition) => {
-    // Transform date format for the modal
     const compForModal = {
       ...competition,
       startDate: formatDateForAPI(competition.startDate),
@@ -86,11 +93,9 @@ const ManageCompetition = ({
 
   const calculateDaysLeft = (endDate) => {
     const parts = endDate.split("/");
-    // Convert from DD/MM/YYYY to MM/DD/YYYY for JS Date
     const date = new Date(`${parts[1]}/${parts[0]}/${parts[2]}`);
     const today = new Date();
 
-    // Reset time to midnight for comparison
     today.setHours(0, 0, 0, 0);
     date.setHours(0, 0, 0, 0);
 
