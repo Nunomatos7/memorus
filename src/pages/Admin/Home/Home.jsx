@@ -1,24 +1,24 @@
 import { useState, useRef, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Mousewheel, FreeMode } from "swiper/modules";
-import { Grid, Card, CardContent, Typography, Box } from "@mui/material";
+import { Grid, Card, CardContent, Typography, Box, CircularProgress, Alert } from "@mui/material";
 import MemorPicture from "./../../../Components/MemorPicture/MemorPicture";
 import "swiper/css";
 import "swiper/css/free-mode";
 import "./Home.css";
-import rank1 from "../../../assets/images/rank1admin.svg";
-import rank2 from "../../../assets/images/rank2admin.svg";
-import rank3 from "../../../assets/images/rank3admin.svg";
+import rank1 from "../../../assets/images/adminRank1.svg";
+import rank2 from "../../../assets/images/adminRank2.svg";
+import rank3 from "../../../assets/images/adminRank3.svg";
 import ongoing from "../../../assets/images/ongoingAdmin.svg";
 import closed from "../../../assets/images/closedAdmin.svg";
 import { leaderboardData } from "../Leaderboard/Leaderboard";
 import CustomButton from "../../../Components/CustomButton/CustomButton";
 import Loader from "../../../Components/Loader/Loader";
-import background1 from "../../../assets/images/background1.svg";
-import background2 from "../../../assets/images/background2.svg";
-import background3 from "../../../assets/images/background3.svg";
+import background1 from "../../../assets/images/adminBackground1.svg";
+import background2 from "../../../assets/images/adminBackground2.svg";
+import background3 from "../../../assets/images/adminBackground3.svg";
 import Countdown from "../../../Components/Countdown/Countdown";
-import { memorsData } from "../../../Data/Memors.json";
+import { useAuth } from "../../../context/AuthContext";
 
 const rankImages = {
   1: rank1,
@@ -26,22 +26,196 @@ const rankImages = {
   3: rank3,
 };
 
-const mockUser = {
-  id: 1,
-  name: "John Doe",
-  email: "john.doe@example.com",
-  pending_memors: 3,
-  complete_memors: 5,
-  admin: false,
-};
-
 const Home = () => {
+  const { token, user } = useAuth();
   const [selectedSlide, setSelectedSlide] = useState(null);
+  const [memors, setMemors] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [leaderboardTeams, setLeaderboardTeams] = useState([]);
+  const [currentCompetition, setCurrentCompetition] = useState(null);
+  const [ongoingMemors, setOngoingMemors] = useState(0);
+  const [closedMemors, setClosedMemors] = useState(0);
+  
   const swiperRef = useRef(null);
 
   useEffect(() => {
-    document.title = `Memor'us | Home`;
+    document.title = `Memor'us | Admin Home`;
   }, []);
+
+  useEffect(() => {
+    // Only fetch if we have a token and user
+    if (!token || !user) return;
+
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      
+      try {
+        // Fetch active competition
+        const competitionResponse = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/competitions/active`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "X-Tenant": user.tenant_subdomain || "",
+            },
+          }
+        );
+        
+        if (!competitionResponse.ok) {
+          throw new Error("Failed to fetch active competition");
+        }
+        
+        const competitionsData = await competitionResponse.json();
+        
+        if (competitionsData && competitionsData.length > 0) {
+          const activeCompetition = competitionsData[0];
+          setCurrentCompetition(activeCompetition);
+          
+          // Fetch leaderboard for the current competition
+          const leaderboardResponse = await fetch(
+            `${import.meta.env.VITE_API_URL}/api/leaderboard/competition/${activeCompetition.id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "X-Tenant": user.tenant_subdomain || "",
+              },
+            }
+          );
+          
+          if (leaderboardResponse.ok) {
+            const leaderboardData = await leaderboardResponse.json();
+            if (leaderboardData && leaderboardData.teams) {
+              // Sort teams by rank and take top 3
+              const teams = leaderboardData.teams
+                .sort((a, b) => a.rank - b.rank)
+                .slice(0, 3)
+                .map((team, index) => ({
+                  rank: index + 1,
+                  teamName: team.name || `Team ${team.teamId}`,
+                  points: team.points || 0,
+                  memors: Math.ceil((team.points || 0) / 10), // Estimate based on points
+                  avatar: team.avatar || "https://via.placeholder.com/150",
+                }));
+              
+              setLeaderboardTeams(teams);
+            }
+          }
+          
+          // Fetch memors for the active competition (all teams)
+          // First get all memors for the active competition
+          const memorResponse = await fetch(
+            `${import.meta.env.VITE_API_URL}/api/competitions/${activeCompetition.id}/memors`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "X-Tenant": user.tenant_subdomain || "",
+              },
+            }
+          );
+          
+          if (!memorResponse.ok) {
+            throw new Error("Failed to fetch memors");
+          }
+          
+          const memorsData = await memorResponse.json();
+          
+          // Process memors
+          let ongoingCount = 0;
+          let closedCount = 0;
+          let allSubmissions = [];
+          
+          if (Array.isArray(memorsData)) {
+            // Count ongoing vs closed
+            memorsData.forEach(memor => {
+              const dueDate = new Date(memor.due_date);
+              const now = new Date();
+              if (dueDate > now) {
+                ongoingCount++;
+              } else {
+                closedCount++;
+              }
+            });
+            
+            // Now fetch all completed memors across all teams
+            const teamsResponse = await fetch(
+              `${import.meta.env.VITE_API_URL}/api/teams`,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  "X-Tenant": user.tenant_subdomain || "",
+                },
+              }
+            );
+            
+            if (teamsResponse.ok) {
+              const teamsData = await teamsResponse.json();
+              
+              // For each team, get their completed memors
+              const teamPromises = teamsData.map(async (team) => {
+                try {
+                  const teamMemorsResponse = await fetch(
+                    `${import.meta.env.VITE_API_URL}/api/memors/team/${team.id}/competition/${activeCompetition.id}/completed`,
+                    {
+                      headers: {
+                        Authorization: `Bearer ${token}`,
+                        "X-Tenant": user.tenant_subdomain || "",
+                      },
+                    }
+                  );
+                  
+                  if (teamMemorsResponse.ok) {
+                    const teamMemorsData = await teamMemorsResponse.json();
+                    
+                    if (Array.isArray(teamMemorsData)) {
+                      // Process each memor and its pictures
+                      teamMemorsData.forEach(memor => {
+                        if (memor.pictures && memor.pictures.length > 0) {
+                          memor.pictures.forEach(pic => {
+                            allSubmissions.push({
+                              id: `${memor.id}-${pic.id}`,
+                              memorId: memor.id,
+                              title: memor.title,
+                              description: memor.description,
+                              submittedDate: new Date(pic.created_at || memor.updated_at || memor.created_at).toLocaleDateString(),
+                              dueDate: new Date(memor.due_date).toLocaleDateString(),
+                              team: team.name,
+                              image: [pic.img_src],
+                              submitter: pic.first_name ? `${pic.first_name} ${pic.last_name || ''}` : "Team member"
+                            });
+                          });
+                        }
+                      });
+                    }
+                  }
+                } catch (error) {
+                  console.error(`Error fetching memors for team ${team.id}:`, error);
+                }
+              });
+              
+              // Wait for all team requests to complete
+              await Promise.all(teamPromises);
+            }
+          }
+          
+          // Sort by most recent first
+          allSubmissions.sort((a, b) => new Date(b.submittedDate) - new Date(a.submittedDate));
+          
+          setMemors(allSubmissions);
+          setOngoingMemors(ongoingCount);
+          setClosedMemors(closedCount);
+        }
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        setError(`Failed to load data: ${err.message}`);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [token, user]);
 
   const handleImageClick = (slide) => {
     setSelectedSlide(slide);
@@ -51,22 +225,6 @@ const Home = () => {
   const closeModal = () => {
     setSelectedSlide(null);
     document.body.style.overflow = "auto";
-  };
-
-  const uniqueMemors = Object.values(
-    memorsData.reduce((acc, memor) => {
-      if (!acc[memor.title] && memor.image?.length > 0) {
-        acc[memor.title] = memor;
-      }
-      return acc;
-    }, {})
-  ).sort((a, b) => a.id - b.id);
-
-  const handleKeyPress = (event, callback) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      callback();
-    }
   };
 
   return (
@@ -121,148 +279,90 @@ const Home = () => {
         {/* Swiper */}
         <div className='overflow-hidden w-full'>
           <div className='container'>
-            <Swiper
-              ref={swiperRef}
-              spaceBetween={20}
-              breakpoints={{
-                640: { slidesPerView: 2.3 },
-                768: { slidesPerView: 4.3 },
-                1024: { slidesPerView: 5.3 },
-              }}
-              className='latest-wrapper'
-              freeMode={true}
-              mousewheel={{ releaseOnEdges: true }}
-              modules={[Mousewheel, FreeMode]}
-              aria-label='Latest Memors'
-              keyboard={{ enabled: true, onlyInViewport: true }}
-            >
-              {uniqueMemors.map((memor, index) => (
-                <SwiperSlide
-                  key={memor.id}
-                  className={
-                    memor.image ? "latest-memors-pic" : "latest-memors"
-                  }
-                  tabIndex='0'
-                  role='button'
-                  aria-label={`Open memor titled ${memor.title}, submitted on ${memor.submittedDate}`}
-                  onClick={() => handleImageClick(memor)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      handleImageClick(memor);
-                    }
-
-                    if (e.key === "Tab") {
-                      if (!e.shiftKey && index === uniqueMemors.length - 1) {
-                        // Estamos no último slide e foi Tab
-                        e.preventDefault();
-                        const nextSection =
-                          document.querySelector("#adminStats"); // <-- ajusta para o teu próximo bloco
-                        if (nextSection) {
-                          const focusable = nextSection.querySelector(
-                            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-                          );
-                          if (focusable) {
-                            focusable.focus();
-                          } else {
-                            nextSection.focus();
-                          }
-                        }
-                        return;
-                      }
-
-                      if (e.shiftKey && index === 0) {
-                        // Estamos no primeiro slide e foi Shift+Tab
-                        e.preventDefault();
-                        const prevElement =
-                          document.querySelector(".home-title");
-                        if (prevElement) prevElement.focus();
-                        return;
-                      }
-
-                      e.preventDefault();
-                      let newIndex = e.shiftKey
-                        ? Math.max(index - 1, 0)
-                        : Math.min(index + 1, uniqueMemors.length - 1);
-
-                      swiperRef.current?.swiper.slideTo(newIndex);
-
-                      const nextSlide =
-                        document.querySelectorAll(".latest-memors-pic")[
-                          newIndex
-                        ];
-                      if (nextSlide) nextSlide.focus();
-                    }
-                  }}
-                >
-                  {memor.image && (
-                    <div onClick={() => handleImageClick(memor)}>
-                      <div className='image-wrapper'>
-                        <img
-                          width={"100%"}
-                          height={"100%"}
-                          style={{ objectFit: "cover" }}
-                          src={memor.image[0]}
-                          alt='Memor Image'
-                        />
-                      </div>
-                      <div className='latest-memors-content'>
-                        <CustomButton
-                          text={memor.team}
-                          onClick={() => handleImageClick(memor)}
-                          sx={{
-                            display: "flex",
-                            padding: "3.147px 15.953px",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            flex: "1 0 0",
-                            alignSelf: "stretch",
-                            fontSize: "0.8rem",
-                            color: "#003731",
-                            fontWeight: "600",
-                          }}
-                        />
-                        <h3>{memor.submittedDate}</h3>
-                        <p style={{ fontSize: "0.9rem" }}>
-                          &quot;{memor.title}&quot;
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </SwiperSlide>
-              ))}
-
-              {Array.from(
-                {
-                  length: Math.max(
-                    0,
-                    5 -
-                      Object.values(
-                        memorsData.reduce((acc, memor) => {
-                          if (!acc[memor.title] && memor.image?.length > 0) {
-                            acc[memor.title] = memor;
-                          }
-                          return acc;
-                        }, {})
-                      ).length
-                  ),
-                },
-                (_, index) => (
+            {loading ? (
+              <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
+                <CircularProgress size={40} sx={{ color: "#82D5C7" }} />
+              </Box>
+            ) : error ? (
+              <Alert severity="error" sx={{ mx: 2 }}>{error}</Alert>
+            ) : memors.length === 0 ? (
+              <Box sx={{ p: 4, textAlign: "center", color: "#aaa" }}>
+                <Typography>No memors available for any teams yet.</Typography>
+              </Box>
+            ) : (
+              <Swiper
+                ref={swiperRef}
+                spaceBetween={20}
+                breakpoints={{
+                  640: { slidesPerView: 2.3 },
+                  768: { slidesPerView: 4.3 },
+                  1024: { slidesPerView: 5.3 },
+                }}
+                className='latest-wrapper'
+                freeMode={true}
+                mousewheel={{ releaseOnEdges: true }}
+                modules={[Mousewheel, FreeMode]}
+                aria-label='Latest Memors'
+                keyboard={{ enabled: true, onlyInViewport: true }}
+              >
+                {memors.map((memor, index) => (
                   <SwiperSlide
-                    key={`placeholder-${index}`}
-                    className='placeholder-slide'
-                    role='group'
-                    aria-label='Placeholder'
+                    key={memor.id}
+                    className={
+                      memor.image && memor.image.length > 0 ? "latest-memors-pic" : "latest-memors"
+                    }
+                    tabIndex='0'
+                    role='button'
+                    aria-label={`Open memor titled ${memor.title}, submitted on ${memor.submittedDate}`}
+                    onClick={() => handleImageClick(memor)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        handleImageClick(memor);
+                      }
+                    }}
                   >
-                    <div className='placeholder-content'>
-                      <p style={{ fontSize: "0.9rem", color: "#aaa" }}>
-                        Placeholder
-                      </p>
-                    </div>
+                    {memor.image && memor.image.length > 0 && (
+                      <div onClick={() => handleImageClick(memor)}>
+                        <div className='image-wrapper'>
+                          <img
+                            width={"100%"}
+                            height={"100%"}
+                            style={{ objectFit: "cover" }}
+                            src={memor.image[0]}
+                            alt='Memor Image'
+                          />
+                        </div>
+                        <div className='latest-memors-content'>
+                          <CustomButton
+                            text={memor.team}
+                            onClick={() => handleImageClick(memor)}
+                            sx={{
+                              display: "flex",
+                              padding: "3.147px 15.953px",
+                              justifyContent: "center",
+                              alignItems: "center",
+                              flex: "1 0 0",
+                              alignSelf: "stretch",
+                              fontSize: "0.8rem",
+                              color: "#003731",
+                              fontWeight: "600",
+                            }}
+                          />
+                          <h3>{memor.submittedDate}</h3>
+                          <p style={{ fontSize: "0.9rem" }}>
+                            &quot;{memor.title}&quot;
+                          </p>
+                          <p style={{ fontSize: "0.8rem", color: "#aaa" }}>
+                            by {memor.submitter}
+                          </p>
+                        </div>
+                      </div>
+                    )}
                   </SwiperSlide>
-                )
-              )}
-            </Swiper>
+                ))}
+              </Swiper>
+            )}
           </div>
         </div>
 
@@ -273,7 +373,7 @@ const Home = () => {
             title={selectedSlide.title}
             submitDate={selectedSlide.submittedDate}
             onClose={closeModal}
-            aria-labelledby='memor-picture-modal'
+            onNavigate={handleImageClick}
           />
         )}
       </section>
@@ -282,6 +382,7 @@ const Home = () => {
         id='adminStats'
         className='container'
         aria-labelledby='memors-dashboard-heading'
+        style={{ marginTop: "2rem" }}
       >
         <Typography
           variant='h6'
@@ -316,7 +417,7 @@ const Home = () => {
                   justifyContent='space-between'
                 >
                   <Typography variant='h4' fontWeight='bold'>
-                    {mockUser.pending_memors}
+                    {loading ? <CircularProgress size={30} /> : ongoingMemors}
                   </Typography>
                   <img src={ongoing} alt='Ongoing Memors' />
                 </Box>
@@ -351,7 +452,7 @@ const Home = () => {
                   justifyContent='space-between'
                 >
                   <Typography variant='h4' fontWeight='bold'>
-                    {mockUser.complete_memors}
+                    {loading ? <CircularProgress size={30} /> : closedMemors}
                   </Typography>
                   <img src={closed} alt='Closed Memors' />
                 </Box>
@@ -365,33 +466,45 @@ const Home = () => {
           <Grid item xs={12} sm={6}>
             <Card className='card' aria-labelledby='competition-heading'>
               <CardContent>
-                <Box
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    flexDirection: "column",
-                  }}
-                >
-                  <Box>
-                    <Typography
-                      variant='h6'
-                      style={{ color: "white" }}
-                      id='competition-heading'
-                    >
-                      The competition{" "}
-                      <span style={{ color: "#409C90", fontWeight: "bold" }}>
-                        New Year New Us
-                      </span>{" "}
-                      ends in
+                {loading ? (
+                  <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
+                    <CircularProgress size={40} sx={{ color: "#82D5C7" }} />
+                  </Box>
+                ) : currentCompetition ? (
+                  <Box
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <Box>
+                      <Typography
+                        variant='h6'
+                        style={{ color: "white" }}
+                        id='competition-heading'
+                      >
+                        The competition{" "}
+                        <span style={{ color: "#409C90", fontWeight: "bold" }}>
+                          {currentCompetition.name}
+                        </span>{" "}
+                        ends in
+                      </Typography>
+                    </Box>
+                    <Countdown
+                      endDate={currentCompetition.end_date}
+                      role='admin'
+                      aria-label='Countdown to competition end'
+                      aria-live='polite'
+                    />
+                  </Box>
+                ) : (
+                  <Box sx={{ p: 2, textAlign: "center" }}>
+                    <Typography variant='body1' sx={{ color: "#82D5C7" }}>
+                      No active competitions at the moment.
                     </Typography>
                   </Box>
-                  <Countdown
-                    endDate='2025-05-31T00:00:00'
-                    role='admin'
-                    aria-label='Countdown to competition end: New Year New Us'
-                    aria-live='polite' // Ensures screen readers announce updates
-                  />
-                </Box>
+                )}
               </CardContent>
             </Card>
           </Grid>
@@ -411,105 +524,127 @@ const Home = () => {
         >
           Current Leaders
         </Typography>
-        <Grid container spacing={2}>
-          {leaderboardData
-            .filter((team) => team.rank <= 3)
-            .map((team) => (
-              <Grid
-                item
-                xs={12}
-                sm={team.rank === 1 ? 5 : team.rank === 2 ? 4 : 3}
-                key={team.rank}
-              >
-                <Card
-                  className='card'
-                  onClick={() => (window.location.href = "/admin/leaderboard")}
-                  onKeyPress={(e) =>
-                    handleKeyPress(
-                      e,
-                      () => (window.location.href = "/admin/leaderboard")
-                    )
-                  }
-                  style={{ cursor: "pointer" }}
-                  tabIndex='0'
-                  role='button'
-                  aria-label={`View details for ${team.teamName}`}
-                >
-                  <Box
-                    display='flex'
-                    alignItems='center'
-                    style={{ width: "100%" }}
+        {loading ? (
+          <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
+            <CircularProgress size={40} sx={{ color: "#82D5C7" }} />
+          </Box>
+        ) : error ? (
+          <Alert severity="warning" sx={{ mx: 2 }}>
+            Unable to load leaderboard data.
+          </Alert>
+        ) : (
+          <Grid container spacing={2}>
+            {leaderboardTeams.length > 0 ? (
+              leaderboardTeams
+                .filter((team) => team.rank <= 3)
+                .map((team) => (
+                  <Grid
+                    item
+                    xs={12}
+                    sm={team.rank === 1 ? 5 : team.rank === 2 ? 4 : 3}
+                    key={team.rank}
                   >
-                    <Box style={{ flex: 1, textAlign: "center" }}>
-                      <img
-                        src={rankImages[team.rank]}
-                        alt={`Rank ${team.rank}`}
-                        style={{
-                          position: "absolute",
-                          bottom: "0px",
-                          left: "10px",
-                          height: `${75 - team.rank * 10}%`,
-                        }}
-                      />
-                    </Box>
-                    <Box
-                      style={{
-                        flex: team.rank === 1 ? 1 : 1.5,
-                        paddingRight: "20px",
-                      }}
+                    <Card
+                      className='card'
+                      onClick={() => (window.location.href = "/admin/leaderboard")}
+                      style={{ cursor: "pointer" }}
+                      tabIndex='0'
+                      role='button'
+                      aria-label={`View details for ${team.teamName}`}
                     >
                       <Box
-                        className='team-header'
                         display='flex'
-                        justifyContent='space-between'
+                        alignItems='center'
+                        style={{ width: "100%" }}
                       >
-                        <Typography variant='h6' className='team-name'>
-                          {team.teamName}
-                        </Typography>
-                        <img
-                          src={team.avatar}
-                          alt={team.teamName}
-                          className='team-avatar-admin'
+                        <Box style={{ flex: 1, textAlign: "center" }}>
+                          <img
+                            src={rankImages[team.rank]}
+                            alt={`Rank ${team.rank}`}
+                            style={{
+                              position: "absolute",
+                              bottom: "0px",
+                              left: "10px",
+                              height: `${75 - team.rank * 10}%`,
+                            }}
+                          />
+                        </Box>
+                        <Box
                           style={{
-                            width: "50px",
-                            height: "50px",
-                            borderRadius: "50%",
-                            objectFit: "cover",
+                            flex: team.rank === 1 ? 1 : 1.5,
+                            paddingRight: "20px",
                           }}
-                        />
+                        >
+                          <Box
+                            className='team-header'
+                            display='flex'
+                            justifyContent='space-between'
+                          >
+                            <Typography variant='h6' className='team-name'>
+                              {team.teamName}
+                            </Typography>
+                            <img
+                              src={team.avatar}
+                              alt={team.teamName}
+                              className='team-avatar-admin'
+                              style={{
+                                width: "50px",
+                                height: "50px",
+                                borderRadius: "50%",
+                                objectFit: "cover",
+                              }}
+                            />
+                          </Box>
+                          <Box
+                            className='stats'
+                            display='flex'
+                            justifyContent='space-between'
+                            marginTop='10px'
+                          >
+                            <div>
+                              <Typography variant='body2' className='label'>
+                                Total Points
+                              </Typography>
+                              <Typography variant='h5' className='value'>
+                                {team.points}
+                              </Typography>
+                            </div>
+                            <div>
+                              <Typography variant='body2' className='label'>
+                                Total Memors
+                              </Typography>
+                              <Typography variant='h5' className='value'>
+                                {team.memors}
+                              </Typography>
+                            </div>
+                          </Box>
+                        </Box>
                       </Box>
-                      <Box
-                        className='stats'
-                        display='flex'
-                        justifyContent='space-between'
-                        marginTop='10px'
-                      >
-                        <div>
-                          <Typography variant='body2' className='label'>
-                            Total Points
-                          </Typography>
-                          <Typography variant='h5' className='value'>
-                            {team.points}
-                          </Typography>
-                        </div>
-                        <div>
-                          <Typography variant='body2' className='label'>
-                            Total Memors
-                          </Typography>
-                          <Typography variant='h5' className='value'>
-                            {team.memors}
-                          </Typography>
-                        </div>
-                      </Box>
-                    </Box>
-                  </Box>
-                </Card>
+                    </Card>
+                  </Grid>
+                ))
+            ) : (
+              <Grid item xs={12}>
+                <Box sx={{ p: 4, textAlign: "center", color: "#aaa" }}>
+                  <Typography>
+                    No leaderboard data available yet.
+                  </Typography>
+                </Box>
               </Grid>
-            ))}
-        </Grid>
+            )}
+          </Grid>
+        )}
       </section>
     </>
   );
+};
+
+// Helper function for keyboard navigation
+const handleKeyPress = (event, callback) => {
+  if (event.key === "Enter" || event.key === " ") {
+    event.preventDefault();
+    callback();
+  }
 };
 
 export default Home;
