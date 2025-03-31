@@ -98,15 +98,86 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
     }
   };
 
+  // In ManageTeams.jsx - Replace the current useEffect with this one
+
   useEffect(() => {
-    if (window.manageTeamsRef) {
-      window.manageTeamsRef.fetchTeams = fetchTeamsAndMembers;
-    } else {
-      window.manageTeamsRef = { fetchTeamsAndMembers };
+    // Set up the global reference immediately
+    if (!window.manageTeamsRef) {
+      window.manageTeamsRef = {};
     }
+
+    // Define the reference to the current fetchTeamsAndMembers function
+    const fetchTeamsAndMembersRef = async () => {
+      setLoading(true);
+      try {
+        // Fetch teams
+        const teamsResponse = await api.get("/api/teams");
+
+        // Save full team data for deletion purposes
+        setTeamsData(teamsResponse.data || []);
+
+        // Transform the array to the required format
+        const teamsObj = {};
+        const teamsArray = teamsResponse.data || [];
+
+        // Fetch all users
+        const usersResponse = await api.get("/api/users");
+        const users = usersResponse.data || [];
+
+        // Create a filtered array of members, excluding those with admin role
+        const membersArray = [];
+
+        for (const user of users) {
+          try {
+            // Get user roles
+            const rolesResponse = await api.get(`/api/users/${user.id}/roles`);
+            const roles = rolesResponse.data || [];
+
+            // Check if user has admin role
+            const isAdmin = roles.some((role) => role.title === "admin");
+
+            // Only add non-admin users
+            if (!isAdmin) {
+              membersArray.push({
+                name: `${user.first_name} ${user.last_name}`,
+                email: user.email,
+                team:
+                  teamsArray.find((t) => t.id === user.teams_id)?.name || "",
+              });
+            }
+          } catch (error) {
+            console.error(`Error checking roles for user ${user.id}:`, error);
+            // Continue with other users even if one fails
+          }
+        }
+
+        // Create a map of team members (also excluding admin users)
+        teamsArray.forEach((team) => {
+          teamsObj[team.name] = membersArray
+            .filter((member) => member.team === team.name)
+            .map((member) => member.email);
+        });
+
+        setTeams(teamsObj);
+        setMembers(membersArray);
+      } catch (error) {
+        console.error("Error fetching teams and members:", error);
+        showFeedback("error", "Error", "Failed to load teams and members");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    // Store the function reference
+    window.manageTeamsRef.fetchTeams = fetchTeamsAndMembersRef;
+
+    // Initial data fetch
+    fetchTeamsAndMembersRef();
+
+    // Cleanup when component unmounts
     return () => {
-      if (window.manageTeamsRef) {
-        delete window.manageTeamsRef.fetchTeamsAndMembers;
+      if (window.manageTeamsRef?.fetchTeams === fetchTeamsAndMembersRef) {
+        delete window.manageTeamsRef.fetchTeams;
       }
     };
   }, []);

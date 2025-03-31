@@ -13,6 +13,7 @@ import CustomButton from "../../../../Components/CustomButton/CustomButton";
 import ConfirmationModal from "../../../../Components/ConfirmationModal/ConfirmationModal";
 import background3 from "../../../../assets/images/adminBackground3.svg";
 import api from "../../../../api/axiosInstance";
+import { forceRefreshAdminBoard } from "../../../../assets/utils/adminRefresh";
 import PropTypes from "prop-types";
 
 const DynamicModal = ({
@@ -172,25 +173,37 @@ const DynamicModal = ({
 
   const executeSubmit = async () => {
     setLoading(true);
+    let success = false;
+
     try {
       switch (modalType) {
         case "memor":
           await handleMemorSubmit();
+          success = true;
           break;
         case "team":
           await handleTeamSubmit();
+          success = true;
           break;
         case "competition":
           await handleCompetitionSubmit();
+          success = true;
           break;
       }
 
-      if (typeof refreshData === "function") {
-        refreshData();
-      }
+      // If operation was successful
+      if (success) {
+        // Call both the specific refresh data function and the global refresh
+        if (typeof refreshData === "function") {
+          console.log(`Refreshing after ${action} ${modalType}`);
+          refreshData();
+        }
 
-      setConfirmationModalOpen(false);
-      onClose();
+        // Also use the global force refresh function after a short delay
+        setTimeout(() => {
+          forceRefreshAdminBoard();
+        }, 300);
+      }
     } catch (error) {
       console.error(
         `Error ${
@@ -210,7 +223,11 @@ const DynamicModal = ({
     } finally {
       setLoading(false);
       setConfirmationModalOpen(false);
-      onClose();
+
+      // Close modal only if operation was successful
+      if (success) {
+        onClose();
+      }
     }
   };
 
