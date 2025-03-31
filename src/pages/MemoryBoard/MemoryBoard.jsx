@@ -1,70 +1,236 @@
 import { useRef, useState, useEffect } from "react";
 import { ReactInfiniteCanvas } from "react-infinite-canvas";
-import seedrandom from "seedrandom";
 import { COMPONENT_POSITIONS } from "../../assets/Helpers/constants";
-import { memorsData } from "../../Data/Memors.json";
+import seedrandom from "seedrandom";
 import MemorPicture from "../../Components/MemorPicture/MemorPicture";
 import "./MemoryBoard.css";
 import Loader from "../../Components/Loader/Loader";
+import { useAuth } from "../../context/AuthContext";
+import { CircularProgress } from "@mui/material";
+import { memorsData as staticMemorsData } from "../../Data/Memors.json";
 
+// Canvas dimensions
 const canvasWidth = 2000;
 const canvasHeight = 2000;
 const cardWidth = 350;
 const cardHeight = 400;
 const spacing = 200;
 
+// Create a fixed seed for consistent randomness
 const rng = seedrandom("fixed-seed");
 
-const generateNonOverlappingPosition = (positions) => {
-  let position;
-  let overlaps;
-
-  do {
-    position = {
-      x: rng() * canvasWidth - canvasWidth / 2,
-      y: rng() * canvasHeight - canvasHeight / 2,
-    };
-
-    overlaps = positions.some(
-      (pos) =>
-        Math.abs(pos.x - position.x) < cardWidth + spacing &&
-        Math.abs(pos.y - position.y) < cardHeight + spacing
-    );
-  } while (overlaps);
-
-  return position;
-};
-
 const MemoryBoard = () => {
-  const canvasRef = useRef();
-  const [posts, setPosts] = useState([]);
+  // References
+  const canvasRef = useRef(null);
+  const { token, user } = useAuth();
+
+  // Basic state
   const [selectedMemor, setSelectedMemor] = useState(null);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [loadedImages, setLoadedImages] = useState(new Set());
-  const [filteredTeam, setFilteredTeam] = useState("The Debuggers");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [posts, setPosts] = useState([]);
 
-  const teams = [...new Set(memorsData.map((memor) => memor.team))];
+  // Filter state
+  const [competitions, setCompetitions] = useState([]);
+  const [teams, setTeams] = useState([]);
+  const [selectedCompetition, setSelectedCompetition] = useState("");
+  const [selectedTeam, setSelectedTeam] = useState("");
 
+  // Helper function to generate non-overlapping positions
+  const generateNonOverlappingPosition = (positions) => {
+    let position;
+    let overlaps;
+
+    do {
+      position = {
+        x: rng() * canvasWidth - canvasWidth / 2,
+        y: rng() * canvasHeight - canvasHeight / 2,
+      };
+
+      overlaps = positions.some(
+        (pos) =>
+          Math.abs(pos.x - position.x) < cardWidth + spacing &&
+          Math.abs(pos.y - position.y) < cardHeight + spacing
+      );
+    } while (overlaps);
+
+    return position;
+  };
+
+  // Initialize page title
   useEffect(() => {
     document.title = `Memor'us | Memory Board`;
   }, []);
 
+  // Load initial data: competitions and teams
   useEffect(() => {
-    const positions = [];
-    const memorsWithImages = memorsData.filter(
-      (memor) =>
-        memor.image && memor.image.length > 0 && memor.team === filteredTeam
-    );
+    if (!token || !user) return;
+  
+    const fetchInitialData = async () => {
+      setLoading(true);
+  
+      try {
+        // Fetch ALL competitions instead of just active ones
+        const competitionsResponse = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/competitions`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "X-Tenant": user?.tenant_subdomain || "",
+            },
+          }
+        );
+  
+        if (competitionsResponse.ok) {
+          const competitionsData = await competitionsResponse.json();
+          setCompetitions(competitionsData);
+          
+          // Find currently active competition
+          const today = new Date().toISOString().split('T')[0];
+          const activeCompetition = competitionsData.find(
+            comp => comp.is_active && comp.start_date <= today && comp.end_date >= today
+          );
+          
+          // Set default to active competition, or first in list if none are active
+          if (activeCompetition) {
+            setSelectedCompetition(activeCompetition.id);
+          } else if (competitionsData.length > 0) {
+            setSelectedCompetition(competitionsData[0].id);
+          }
+        }
+  
+        // Fetch teams
+        const teamsResponse = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/teams`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "X-Tenant": user?.tenant_subdomain || "",
+            },
+          }
+        );
+  
+        if (teamsResponse.ok) {
+          const teamsData = await teamsResponse.json();
+          setTeams(teamsData);
+          
+          // Set default team (user's team or first team)
+          if (user?.teamsId) {
+            setSelectedTeam(user.teamsId);
+          } else if (teamsData.length > 0) {
+            setSelectedTeam(teamsData[0].id);
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching initial data:", err);
+        setError("Failed to load initial data");
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    fetchInitialData();
+  }, [token, user]);
 
-    const newPosts = memorsWithImages.map((post) => {
-      const position = generateNonOverlappingPosition(positions);
-      positions.push(position);
-      return { ...post, ...position };
-    });
+  // Fetch memory board data when competition or team selection changes
+  useEffect(() => {
+    if (!selectedCompetition || !selectedTeam || !token || !user?.tenant_subdomain) {
+      return;
+    }
+    
+    console.log(`Fetching data for competition: ${selectedCompetition}, team: ${selectedTeam}`);
+    setLoading(true);
 
-    setPosts(newPosts);
-  }, [filteredTeam]);
+    // Get team name for static data filtering
+    const teamName = teams.find(t => t.id === parseInt(selectedTeam))?.name || "Your Team";
+    console.log(`Selected team name: ${teamName}`);
+    
+    // Reset posts first to avoid showing old data
+    setPosts([]);
+    
+    // First load static data immediately as fallback
+    try {
+      // Filter static data to match selected team
+      const filteredStaticData = staticMemorsData.filter(
+        memor => memor.team === teamName && memor.image && memor.image.length > 0
+      );
+      
+      console.log(`Found ${filteredStaticData.length} static memors for team "${teamName}"`);
+      
+      if (filteredStaticData.length > 0) {
+        const positions = [];
+        const staticPosts = filteredStaticData.map(memor => {
+          const position = generateNonOverlappingPosition(positions);
+          positions.push(position);
+          return { ...memor, ...position };
+        });
+        
+        setPosts(staticPosts);
+      }
+    } catch (err) {
+      console.error("Error loading static data:", err);
+    }
 
+    // Then try to fetch from API
+    const fetchMemorData = async () => {
+      try {
+        // Attempt to fetch from the completed memors endpoint
+        const memorUrl = `${import.meta.env.VITE_API_URL}/api/memors/team/${selectedTeam}/competition/${selectedCompetition}/completed`;
+        console.log(`Fetching from API: ${memorUrl}`);
+        
+        const response = await fetch(memorUrl, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "X-Tenant": user.tenant_subdomain,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch memor data: ${response.status} ${response.statusText}`);
+        }
+
+        const memorData = await response.json();
+        console.log(`API response:`, memorData);
+        
+        if (memorData && memorData.length > 0) {
+          // Process memor data
+          const positions = [];
+          const apiPosts = memorData
+            .filter(memor => memor.pictures && memor.pictures.length > 0)
+            .map(memor => {
+              const position = generateNonOverlappingPosition(positions);
+              positions.push(position);
+              
+              return {
+                ...position,
+                title: memor.title,
+                description: memor.description || "",
+                team: teamName,
+                submittedDate: new Date(memor.due_date).toLocaleDateString(),
+                image: memor.pictures.map(pic => pic.img_src)
+              };
+            });
+
+          console.log(`Processed ${apiPosts.length} API posts`);
+          
+          if (apiPosts.length > 0) {
+            setPosts(apiPosts);
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching from API:", err);
+        // We already loaded static data, so no need to update error state
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMemorData();
+  }, [selectedCompetition, selectedTeam, token, user, teams]);
+
+  // Handle lazy loading of images
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -85,6 +251,7 @@ const MemoryBoard = () => {
     return () => observer.disconnect();
   }, [posts]);
 
+  // Handle zoom controls
   useEffect(() => {
     const handleWheel = (e) => {
       if (e.ctrlKey) {
@@ -115,7 +282,7 @@ const MemoryBoard = () => {
     };
 
     window.addEventListener("wheel", handleWheel, { passive: false });
-    const interval = setInterval(syncZoomLevel, 200); // Sync every 200ms
+    const interval = setInterval(syncZoomLevel, 200);
 
     return () => {
       window.removeEventListener("wheel", handleWheel);
@@ -123,29 +290,7 @@ const MemoryBoard = () => {
     };
   }, []);
 
-  const openModal = (imageIndex, postIndex) => {
-    const post = posts[postIndex];
-    setSelectedMemor({
-      images: post.image,
-      currentIndex: imageIndex,
-      title: post.title,
-      submittedDate: post.submittedDate,
-      team: post.team,
-      postIndex,
-    });
-  };
-
-  const closeModal = () => {
-    setSelectedMemor(null);
-  };
-
-  const handleImageNavigation = (newIndex) => {
-    setSelectedMemor((prev) => ({
-      ...prev,
-      currentIndex: newIndex,
-    }));
-  };
-
+  // Event handlers
   const handleZoom = (action = "out") => {
     const canvasState = canvasRef.current?.getCanvasState?.();
     if (!canvasState) return;
@@ -161,6 +306,41 @@ const MemoryBoard = () => {
     }
   };
 
+  const openModal = (imageIndex, postIndex) => {
+    setSelectedMemor({
+      images: posts[postIndex].image,
+      currentIndex: imageIndex,
+      title: posts[postIndex].title,
+      submittedDate: posts[postIndex].submittedDate,
+      team: posts[postIndex].team,
+      postIndex,
+    });
+  };
+
+  const closeModal = () => {
+    setSelectedMemor(null);
+  };
+
+  const handleImageNavigation = (newIndex) => {
+    setSelectedMemor((prev) => ({
+      ...prev,
+      currentIndex: newIndex,
+    }));
+  };
+
+  const handleCompetitionChange = (event) => {
+    // Clear posts when changing competition to avoid showing old data
+    setPosts([]);
+    setSelectedCompetition(event.target.value);
+  };
+
+  const handleTeamChange = (event) => {
+    // Clear posts when changing team to avoid showing old data
+    setPosts([]);
+    setSelectedTeam(event.target.value);
+  };
+
+  // Render
   return (
     <>
       <Loader />
@@ -172,7 +352,30 @@ const MemoryBoard = () => {
           backgroundColor: "#9990d8",
         }}
       >
+        {/* Filter Controls */}
         <div className='filter-controls'>
+          {/* Competition Filter */}
+          <label
+            htmlFor='competition-filter'
+            className='sr-only'
+            style={{ color: "#341881", fontWeight: "600" }}
+          >
+            Filter by competition:
+          </label>
+          <select
+            id='competition-filter'
+            value={selectedCompetition}
+            onChange={handleCompetitionChange}
+            className='filter-dropdown'
+          >
+            {competitions.map((competition) => (
+              <option key={competition.id} value={competition.id}>
+                {competition.name}
+              </option>
+            ))}
+          </select>
+          
+          {/* Team Filter */}
           <label
             htmlFor='team-filter'
             className='sr-only'
@@ -182,111 +385,123 @@ const MemoryBoard = () => {
           </label>
           <select
             id='team-filter'
-            value={filteredTeam}
-            onChange={(e) => setFilteredTeam(e.target.value)}
+            value={selectedTeam}
+            onChange={handleTeamChange}
             className='filter-dropdown'
           >
-            {teams.map((team, index) => (
-              <option key={index} value={team} alt={`Filter by ${team}`}>
-                {team}
+            {teams.map((team) => (
+              <option key={team.id} value={team.id}>
+                {team.name}
               </option>
             ))}
           </select>
         </div>
 
-        <ReactInfiniteCanvas
-          ref={canvasRef}
-          onCanvasMount={(mountFunc) => {
-            mountFunc.fitContentToView({ scale: 0.5 });
-          }}
-          customComponents={[
-            {
-              component: (
-                <button
-                  className='start-btn'
-                  onClick={() => {
-                    canvasRef.current?.fitContentToView({ scale: 1 });
-                  }}
-                >
-                  Start
-                </button>
-              ),
-              position: COMPONENT_POSITIONS.BOTTOM_LEFT,
-              offset: { x: 20, y: 70 },
-            },
-          ]}
-        >
-          {posts.map((post, postIndex) => (
-            <div
-              key={postIndex}
-              className='polaroid-container'
-              style={{
-                position: "absolute",
-                top: post.y + canvasHeight / 2,
-                left: post.x + canvasWidth / 2,
-                width: `${cardWidth}px`,
-                height: `${cardHeight}px`,
-              }}
-            >
+        {loading && posts.length === 0 ? (
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+            <CircularProgress size={60} sx={{ color: "#d0bcfe" }} />
+          </div>
+        ) : posts.length === 0 ? (
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+            <p style={{ color: '#341881', fontWeight: 'bold', fontSize: '1.5rem' }}>
+              No memories found for this team in the selected competition
+            </p>
+          </div>
+        ) : (
+          <ReactInfiniteCanvas
+            ref={canvasRef}
+            onCanvasMount={(mountFunc) => {
+              mountFunc.fitContentToView({ scale: 0.5 });
+            }}
+            customComponents={[
+              {
+                component: (
+                  <button
+                    className='start-btn'
+                    onClick={() => {
+                      canvasRef.current?.fitContentToView({ scale: 1 });
+                    }}
+                  >
+                    Start
+                  </button>
+                ),
+                position: COMPONENT_POSITIONS.BOTTOM_LEFT,
+                offset: { x: 20, y: 70 },
+              },
+            ]}
+          >
+            {posts.map((post, postIndex) => (
               <div
-                style={{ position: "relative", width: "100%", height: "100%" }}
+                key={postIndex}
+                className='polaroid-container'
+                style={{
+                  position: "absolute",
+                  top: post.y + canvasHeight / 2,
+                  left: post.x + canvasWidth / 2,
+                  width: `${cardWidth}px`,
+                  height: `${cardHeight}px`,
+                }}
               >
-                {post.image
-                  .slice()
-                  .reverse()
-                  .map((imgSrc, cardIndex, reversedArray) => (
-                    <div
-                      key={cardIndex}
-                      className='polaroid-card'
-                      onClick={() =>
-                        openModal(
-                          reversedArray.length - 1 - cardIndex,
-                          postIndex
-                        )
-                      }
-                      style={{
-                        position: "absolute",
-                        top: `${cardIndex * 5}px`,
-                        left: `${cardIndex * 40}px`,
-                        width: "100%",
-                        height: "100%",
-                        backgroundColor: "white",
-                        border: "2px solid white",
-                        boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)",
-                        borderRadius: "8px",
-                        transform: `rotate(${cardIndex % 2 === 0 ? -1 : 1}deg)`,
-                        zIndex: cardIndex,
-                        cursor: "pointer",
-                      }}
-                    >
-                      {/* Submitted Date */}
-                      <p className='card-date'>{post.submittedDate}</p>
-
-                      {/* Image */}
-                      <img
-                        data-src={imgSrc}
-                        src={loadedImages.has(imgSrc) ? imgSrc : ""}
-                        alt={`Post image ${cardIndex}`}
+                <div
+                  style={{ position: "relative", width: "100%", height: "100%" }}
+                >
+                  {post.image
+                    .slice()
+                    .reverse()
+                    .map((imgSrc, cardIndex, reversedArray) => (
+                      <div
+                        key={cardIndex}
+                        className='polaroid-card'
+                        onClick={() =>
+                          openModal(
+                            reversedArray.length - 1 - cardIndex,
+                            postIndex
+                          )
+                        }
                         style={{
-                          width: "90%",
-                          height: "60%",
-                          objectFit: "cover",
+                          position: "absolute",
+                          top: `${cardIndex * 5}px`,
+                          left: `${cardIndex * 40}px`,
+                          width: "100%",
+                          height: "100%",
+                          backgroundColor: "white",
+                          border: "2px solid white",
+                          boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)",
                           borderRadius: "8px",
-                          margin: "10px auto",
-                          display: "block",
+                          transform: `rotate(${cardIndex % 2 === 0 ? -1 : 1}deg)`,
+                          zIndex: cardIndex,
+                          cursor: "pointer",
                         }}
-                      />
+                      >
+                        {/* Submitted Date */}
+                        <p className='card-date'>{post.submittedDate}</p>
 
-                      {/* Title - Only for the first image */}
-                      {cardIndex === reversedArray.length - 1 && (
-                        <p className='card-title'>{post.title}</p>
-                      )}
-                    </div>
-                  ))}
+                        {/* Image */}
+                        <img
+                          data-src={imgSrc}
+                          src={loadedImages.has(imgSrc) ? imgSrc : ""}
+                          alt={`Post image ${cardIndex}`}
+                          style={{
+                            width: "90%",
+                            height: "60%",
+                            objectFit: "cover",
+                            borderRadius: "8px",
+                            margin: "10px auto",
+                            display: "block",
+                          }}
+                        />
+
+                        {/* Title - Only for the first image */}
+                        {cardIndex === reversedArray.length - 1 && (
+                          <p className='card-title'>{post.title}</p>
+                        )}
+                      </div>
+                    ))}
+                </div>
               </div>
-            </div>
-          ))}
-        </ReactInfiniteCanvas>
+            ))}
+          </ReactInfiniteCanvas>
+        )}
 
         {selectedMemor && (
           <MemorPicture
