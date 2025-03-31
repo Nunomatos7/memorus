@@ -94,8 +94,8 @@ const DynamicModal = ({
         try {
           const rolesResponse = await api.get(`/api/users/${user.id}/roles`);
           const roles = rolesResponse.data || [];
-
           const isAdmin = roles.some((role) => role.title === "admin");
+
           if (!isAdmin) {
             unassignedMembers.push({
               id: user.id,
@@ -188,6 +188,9 @@ const DynamicModal = ({
       if (typeof refreshData === "function") {
         refreshData();
       }
+
+      setConfirmationModalOpen(false);
+      onClose();
     } catch (error) {
       console.error(
         `Error ${

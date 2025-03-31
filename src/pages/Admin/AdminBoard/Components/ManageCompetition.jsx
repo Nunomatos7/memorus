@@ -23,6 +23,10 @@ const ManageCompetition = ({
   const fetchCompetitions = async () => {
     setLoading(true);
     try {
+      // First, trigger an update of competition statuses
+      await api.get("/api/competitions/update-statuses");
+
+      // Then fetch the competitions
       const response = await api.get("/api/competitions");
 
       const formattedCompetitions = response.data.map((comp) => ({
@@ -100,7 +104,8 @@ const ManageCompetition = ({
     date.setHours(0, 0, 0, 0);
 
     const timeDiff = date - today;
-    return Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+    const daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+    return Math.max(0, daysLeft);
   };
 
   const filteredCompetitions = competitions.filter((comp) =>
