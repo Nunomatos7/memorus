@@ -344,12 +344,13 @@ const MemoryBoard = () => {
   return (
     <>
       <Loader />
-      <div
+      <div 
+        className="memory-board-container"
         style={{
           width: "100%",
           height: "93vh",
           position: "relative",
-          backgroundColor: "#9990d8",
+          backgroundColor: "#9990d8"
         }}
       >
         {/* Filter Controls */}
@@ -396,14 +397,14 @@ const MemoryBoard = () => {
             ))}
           </select>
         </div>
-
+  
         {loading && posts.length === 0 ? (
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+          <div className="loading-container">
             <CircularProgress size={60} sx={{ color: "#d0bcfe" }} />
           </div>
         ) : posts.length === 0 ? (
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-            <p style={{ color: '#341881', fontWeight: 'bold', fontSize: '1.5rem' }}>
+          <div className="empty-container">
+            <p className="empty-message">
               No memories found for this team in the selected competition
             </p>
           </div>
@@ -413,6 +414,7 @@ const MemoryBoard = () => {
             onCanvasMount={(mountFunc) => {
               mountFunc.fitContentToView({ scale: 0.5 });
             }}
+            backgroundType="none" // This disables the dotted background
             customComponents={[
               {
                 component: (
@@ -430,6 +432,7 @@ const MemoryBoard = () => {
               },
             ]}
           >
+            {/* Rest of your canvas content */}
             {posts.map((post, postIndex) => (
               <div
                 key={postIndex}
@@ -498,35 +501,35 @@ const MemoryBoard = () => {
                       </div>
                     ))}
                 </div>
-              </div>
-            ))}
-          </ReactInfiniteCanvas>
-        )}
+                </div>
+          ))}
+        </ReactInfiniteCanvas>
+      )}
 
-        {selectedMemor && (
-          <MemorPicture
-            images={selectedMemor.images}
-            currentIndex={selectedMemor.currentIndex}
-            title={selectedMemor.title}
-            submitDate={selectedMemor.submittedDate}
-            teamName={selectedMemor.team}
-            onClose={closeModal}
-            onNavigate={handleImageNavigation}
-          />
-        )}
+      {selectedMemor && (
+        <MemorPicture
+          images={selectedMemor.images}
+          currentIndex={selectedMemor.currentIndex}
+          title={selectedMemor.title}
+          submitDate={selectedMemor.submittedDate}
+          teamName={selectedMemor.team}
+          onClose={closeModal}
+          onNavigate={handleImageNavigation}
+        />
+      )}
 
-        <div className='zoom-controls'>
-          <button className='zoom-btn' onClick={() => handleZoom("out")}>
-            -
-          </button>
-          <span className='zoom-display'>{Math.round(zoomLevel * 100)}%</span>
-          <button className='zoom-btn' onClick={() => handleZoom("in")}>
-            +
-          </button>
-        </div>
+      <div className='zoom-controls'>
+        <button className='zoom-btn' onClick={() => handleZoom("out")}>
+          -
+        </button>
+        <span className='zoom-display'>{Math.round(zoomLevel * 100)}%</span>
+        <button className='zoom-btn' onClick={() => handleZoom("in")}>
+          +
+        </button>
       </div>
-    </>
-  );
+    </div>
+  </>
+);
 };
 
 export default MemoryBoard;
