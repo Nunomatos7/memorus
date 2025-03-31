@@ -23,6 +23,10 @@ const ManageCompetition = ({
   const fetchCompetitions = async () => {
     setLoading(true);
     try {
+      // First, trigger an update of competition statuses
+      await api.get("/api/competitions/update-statuses");
+
+      // Then fetch the competitions
       const response = await api.get("/api/competitions");
 
       const formattedCompetitions = response.data.map((comp) => ({
