@@ -22,24 +22,19 @@ const DynamicModal = ({
   onClose,
   showFeedback,
   setLoading,
+  refreshData,
 }) => {
-  // Common state
   const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
 
-  // Memor state
   const [newMemorTitle, setNewMemorTitle] = useState("");
   const [newMemorDate, setNewMemorDate] = useState(null);
   const [newMemorDescription, setNewMemorDescription] = useState("");
   const [newMemorPoints, setNewMemorPoints] = useState(null);
-
-  // Team state
   const [newTeamName, setNewTeamName] = useState("");
   const [newTeamThumbnail, setNewTeamThumbnail] = useState(null);
   const [newTeamMembers, setNewTeamMembers] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
   const [unassignedMembers, setUnassignedMembers] = useState([]);
-
-  // Competition state
   const [newCompetitionTitle, setNewCompetitionTitle] = useState("");
   const [newCompetitionDescription, setNewCompetitionDescription] =
     useState("");
@@ -81,7 +76,6 @@ const DynamicModal = ({
       }
     }
 
-    // Fetch unassigned members for team creation/editing
     if (modalType === "team" && action !== "delete") {
       fetchUnassignedMembers();
     }
@@ -90,19 +84,31 @@ const DynamicModal = ({
   const fetchUnassignedMembers = async () => {
     setLoading(true);
     try {
-      const response = await api.get("/api/users");
-      const users = response.data || [];
+      const usersResponse = await api.get("/api/users");
+      const users = usersResponse.data || [];
+      const unassignedMembers = [];
 
-      // Get unassigned users
-      const unassigned = users
-        .filter((user) => !user.teams_id)
-        .map((user) => ({
-          id: user.id,
-          name: `${user.first_name} ${user.last_name}`,
-          email: user.email,
-        }));
+      for (const user of users) {
+        if (user.teams_id) continue;
 
-      setUnassignedMembers(unassigned);
+        try {
+          const rolesResponse = await api.get(`/api/users/${user.id}/roles`);
+          const roles = rolesResponse.data || [];
+
+          const isAdmin = roles.some((role) => role.title === "admin");
+          if (!isAdmin) {
+            unassignedMembers.push({
+              id: user.id,
+              name: `${user.first_name} ${user.last_name}`,
+              email: user.email,
+            });
+          }
+        } catch (error) {
+          console.error(`Error checking roles for user ${user.id}:`, error);
+        }
+      }
+
+      setUnassignedMembers(unassignedMembers);
     } catch (error) {
       console.error("Error fetching unassigned members:", error);
       showFeedback("error", "Error", "Failed to load unassigned members");
@@ -132,7 +138,6 @@ const DynamicModal = ({
   );
 
   const validateFormBeforeSubmit = () => {
-    // Skip validation for delete actions
     if (action === "delete") return true;
 
     switch (modalType) {
@@ -162,7 +167,6 @@ const DynamicModal = ({
       return;
     }
 
-    // Open confirmation modal
     setConfirmationModalOpen(true);
   };
 
@@ -179,6 +183,10 @@ const DynamicModal = ({
         case "competition":
           await handleCompetitionSubmit();
           break;
+      }
+
+      if (typeof refreshData === "function") {
+        refreshData();
       }
     } catch (error) {
       console.error(
@@ -222,7 +230,6 @@ const DynamicModal = ({
       return;
     }
 
-    // Format data for API
     const memorData = {
       title: newMemorTitle,
       description: newMemorDescription,
@@ -230,7 +237,6 @@ const DynamicModal = ({
       points: newMemorPoints,
     };
 
-    // Get active competition
     const competitionsResponse = await api.get("/api/competitions");
     const activeCompetition = competitionsResponse.data.find(
       (comp) => comp.is_active
@@ -274,33 +280,51 @@ const DynamicModal = ({
 
     // Create team
     if (action === "create") {
-      // Create the team
-      const teamResponse = await api.post("/api/teams", {
-        name: newTeamName,
-        avatar: newTeamThumbnail || "default_avatar.png",
-      });
+      try {
+        // Create the team
+        const teamResponse = await api.post("/api/teams", {
+          name: newTeamName,
+          avatar: newTeamThumbnail || "default_avatar.png",
+        });
 
-      const teamId = teamResponse.data.id;
+        const teamId = teamResponse.data.id;
 
-      // Assign selected members to team
-      const selectedMemberIds = Object.entries(newTeamMembers)
-        .filter(([_, isSelected]) => isSelected)
-        .map(([email]) => {
-          const member = unassignedMembers.find((m) => m.email === email);
-          return member ? member.id : null;
-        })
-        .filter((id) => id !== null);
+        // Assign selected members to team
+        const selectedMemberIds = Object.entries(newTeamMembers)
+          .filter(([_, isSelected]) => isSelected)
+          .map(([email]) => {
+            const member = unassignedMembers.find((m) => m.email === email);
+            return member ? member.id : null;
+          })
+          .filter((id) => id !== null);
 
-      // Update each user
-      for (const userId of selectedMemberIds) {
-        await api.patch(`/api/users/${userId}/team`, { teamsId: teamId });
+        // Update each user using the correct endpoint
+        for (const userId of selectedMemberIds) {
+          try {
+            // Use PATCH instead of PUT and the correct endpoint format
+            await api.patch(`/api/users/${userId}/team`, { teamsId: teamId });
+          } catch (error) {
+            console.error(`Error assigning user ${userId} to team:`, error);
+            // Continue with other users even if one fails
+          }
+        }
+
+        showFeedback(
+          "success",
+          "Team Created",
+          `The team "${newTeamName}" has been successfully created with ${selectedMemberIds.length} members.`
+        );
+
+        return true; // Signal success to the caller
+      } catch (error) {
+        console.error("Error creating team:", error);
+        showFeedback(
+          "error",
+          "Team Creation Failed",
+          error.response?.data?.error || error.message || "Unknown error"
+        );
+        throw error; // Propagate the error
       }
-
-      showFeedback(
-        "success",
-        "Team Created",
-        `The team "${newTeamName}" has been successfully created.`
-      );
     }
     // Edit team functionality would be handled in the Teams component
   };
@@ -890,6 +914,7 @@ DynamicModal.propTypes = {
   onClose: PropTypes.func.isRequired,
   showFeedback: PropTypes.func.isRequired,
   setLoading: PropTypes.func.isRequired,
+  refreshData: PropTypes.func,
 };
 
 export default DynamicModal;

@@ -28,7 +28,6 @@ const ManageMemors = ({
   const fetchMemors = async () => {
     setLoading(true);
     try {
-      // Get all active competitions to find the current one
       const competitionsResponse = await api.get("/api/competitions");
       const activeCompetition = competitionsResponse.data.find(
         (comp) => comp.is_active
@@ -63,6 +62,19 @@ const ManageMemors = ({
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (window.manageMemorsRef) {
+      window.manageMemorsRef.fetchMemors = fetchMemors;
+    } else {
+      window.manageMemorsRef = { fetchMemors };
+    }
+    return () => {
+      if (window.manageMemorsRef) {
+        delete window.manageMemorsRef.fetchMemors;
+      }
+    };
+  }, []);
 
   const deleteMemor = async (memor) => {
     setLoading(true);
