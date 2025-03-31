@@ -1,3 +1,35 @@
+/* Background with texture overlay */
+.memory-board-container {
+  width: 100%;
+  height: 93vh;
+  position: relative;
+  background-color: #9990d8;
+  background-image: url('../../assets/images/texture.png');
+  background-repeat: repeat;
+  background-blend-mode: overlay;
+  background-size: 200px; /* Control texture size */
+  background-opacity: 0.15; /* Subtle texture */
+  overflow: hidden;
+}
+
+/* Remove dotted background from ReactInfiniteCanvas */
+.memory-board-container svg pattern,
+.memory-board-container svg .pattern-rect,
+.memory-board-container .infinite-canvas-container svg pattern,
+.memory-board-container .infinite-canvas-container svg [fill="url(#dots)"],
+.memory-board-container .infinite-canvas-container svg rect[fill="url(#dots)"] {
+  display: none !important;
+}
+
+/* Alternative approach - override the pattern fill */
+.memory-board-container svg defs pattern#dots circle {
+  fill: transparent !important;
+}
+
+/* If needed, directly target the background rect */
+.memory-board-container .infinite-canvas-container svg rect:first-child {
+  fill: transparent !important;
+}
 
 .zoom-controls {
   position: absolute;
@@ -83,6 +115,8 @@
   cursor: pointer;
   user-select: none;
   transition: background-color 0.3s ease;
+  position: relative;
+  z-index: 10; /* Ensure button is above texture */
 }
 
 .start-btn:hover {
@@ -162,4 +196,21 @@
 
 .filter-dropdown::-webkit-scrollbar-thumb:hover {
   background: #5c3a91;
+}
+
+/* Loading and Empty State */
+.loading-container, .empty-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+.empty-message {
+  color: #341881;
+  font-weight: bold;
+  font-size: 1.5rem;
+  text-shadow: 1px 1px 3px rgba(255, 255, 255, 0.5);
 }
