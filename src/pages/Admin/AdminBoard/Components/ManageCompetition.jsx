@@ -104,7 +104,8 @@ const ManageCompetition = ({
     date.setHours(0, 0, 0, 0);
 
     const timeDiff = date - today;
-    return Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+    const daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+    return Math.max(0, daysLeft);
   };
 
   const filteredCompetitions = competitions.filter((comp) =>

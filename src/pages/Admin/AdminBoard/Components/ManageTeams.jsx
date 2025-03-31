@@ -55,22 +55,40 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
       const usersResponse = await api.get("/api/users");
       const users = usersResponse.data || [];
 
-      // Create a map of team members
+      // Create a filtered array of members, excluding those with admin role
+      const membersArray = [];
+
+      for (const user of users) {
+        try {
+          // Get user roles
+          const rolesResponse = await api.get(`/api/users/${user.id}/roles`);
+          const roles = rolesResponse.data || [];
+
+          // Check if user has admin role
+          const isAdmin = roles.some((role) => role.title === "admin");
+
+          // Only add non-admin users
+          if (!isAdmin) {
+            membersArray.push({
+              name: `${user.first_name} ${user.last_name}`,
+              email: user.email,
+              team: teamsArray.find((t) => t.id === user.teams_id)?.name || "",
+            });
+          }
+        } catch (error) {
+          console.error(`Error checking roles for user ${user.id}:`, error);
+          // Continue with other users even if one fails
+        }
+      }
+
+      // Create a map of team members (also excluding admin users)
       teamsArray.forEach((team) => {
-        teamsObj[team.name] = users
-          .filter((user) => user.teams_id === team.id)
-          .map((user) => user.email);
+        teamsObj[team.name] = membersArray
+          .filter((member) => member.team === team.name)
+          .map((member) => member.email);
       });
 
       setTeams(teamsObj);
-
-      // Format members
-      const membersArray = users.map((user) => ({
-        name: `${user.first_name} ${user.last_name}`,
-        email: user.email,
-        team: teamsArray.find((t) => t.id === user.teams_id)?.name || "",
-      }));
-
       setMembers(membersArray);
     } catch (error) {
       console.error("Error fetching teams and members:", error);
