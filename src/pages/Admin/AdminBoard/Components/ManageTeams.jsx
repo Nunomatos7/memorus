@@ -80,10 +80,22 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
     }
   };
 
+  useEffect(() => {
+    if (window.manageTeamsRef) {
+      window.manageTeamsRef.fetchTeams = fetchTeamsAndMembers;
+    } else {
+      window.manageTeamsRef = { fetchTeamsAndMembers };
+    }
+    return () => {
+      if (window.manageTeamsRef) {
+        delete window.manageTeamsRef.fetchTeamsAndMembers;
+      }
+    };
+  }, []);
+
   const deleteTeam = async (teamName) => {
     setLoading(true);
     try {
-      // Find team ID from team name
       const teamToDelete = teamsData.find((team) => team.name === teamName);
 
       if (!teamToDelete) {
