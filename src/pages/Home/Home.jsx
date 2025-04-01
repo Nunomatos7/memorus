@@ -542,7 +542,7 @@ const Home = () => {
           <Grid
             container
             spacing={3}
-            style={{ filter: showLeaderboard ? "none" : "blur(15px)" }}
+            style={{ filter: showLeaderboard ? "none" : "blur(15px)", pointerEvents: "none" }}
           >
             {leaderboardData.length > 0 ? (
               leaderboardData.map((team) => (
