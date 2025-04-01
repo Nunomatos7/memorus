@@ -17,8 +17,9 @@ import Loader from "../../Components/Loader/Loader";
 import background1 from "../../assets/images/background1.svg";
 import background2 from "../../assets/images/background2.svg";
 import background3 from "../../assets/images/background3.svg";
-import { getLeaderboardVisibility } from "../../assets/utils/leaderboardUtils";
 import { useAuth } from "../../context/AuthContext";
+import { getLeaderboardVisibility, LEADERBOARD_VISIBILITY_CHANGE } from "../../assets/utils/leaderboardUtils";
+
 
 const rankImages = {
   1: rank1,
@@ -29,7 +30,6 @@ const rankImages = {
 const Home = () => {
   const { token, user } = useAuth();
   const [selectedSlide, setSelectedSlide] = useState(null);
-  const [showLeaderboard] = useState(getLeaderboardVisibility());
   const [memors, setMemors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -40,8 +40,28 @@ const Home = () => {
   
   const swiperRef = useRef(null);
 
+  const [showLeaderboard, setShowLeaderboard] = useState(getLeaderboardVisibility());
+
+
   useEffect(() => {
     document.title = `Memor'us | Home`;
+  }, []);
+
+  useEffect(() => {
+    const handleLeaderboardVisibilityChange = () => {
+      setShowLeaderboard(getLeaderboardVisibility());
+    };
+  
+    // Listen for our custom event
+    window.addEventListener(LEADERBOARD_VISIBILITY_CHANGE, handleLeaderboardVisibilityChange);
+    
+    // Also listen for standard storage events (for cross-tab sync)
+    window.addEventListener("storage", handleLeaderboardVisibilityChange);
+  
+    return () => {
+      window.removeEventListener(LEADERBOARD_VISIBILITY_CHANGE, handleLeaderboardVisibilityChange);
+      window.removeEventListener("storage", handleLeaderboardVisibilityChange);
+    };
   }, []);
 
   useEffect(() => {
@@ -522,7 +542,7 @@ const Home = () => {
           <Grid
             container
             spacing={3}
-            style={{ filter: showLeaderboard ? "none" : "blur(15px)" }}
+            style={{ filter: showLeaderboard ? "none" : "blur(15px)", pointerEvents: "none" }}
           >
             {leaderboardData.length > 0 ? (
               leaderboardData.map((team) => (

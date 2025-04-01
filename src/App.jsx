@@ -17,6 +17,7 @@ import ConsentModal from "./Components/ConsentModal/ConsentModal";
 import { useAuth } from "./context/AuthContext";
 import Loader from "./Components/Loader/Loader";
 import { Toaster } from "react-hot-toast";
+import TeamGuard from "./Components/TeamGuard/TeamGuard";
 
 function App() {
   const { user, setUser, loading, cookiesAccepted } = useAuth();
@@ -89,7 +90,9 @@ function App() {
           path='/*'
           element={
             <ProtectedRoute role='member'>
-              <CollaboratorLayout />
+              <TeamGuard>
+                <CollaboratorLayout />
+              </TeamGuard>
             </ProtectedRoute>
           }
         >
@@ -101,7 +104,7 @@ function App() {
           <Route path='memoryboard' element={<MemoryBoard />} />
         </Route>
 
-        {/* Admin Routes */}
+        {/* Admin Routes - No TeamGuard for admins */}
         <Route
           path='/admin/*'
           element={

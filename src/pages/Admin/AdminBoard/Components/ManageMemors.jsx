@@ -62,19 +62,66 @@ const ManageMemors = ({
       setLoading(false);
     }
   };
+  // In ManageMemors.jsx - Replace the current useEffect with this one
 
   useEffect(() => {
-    if (window.manageMemorsRef) {
-      window.manageMemorsRef.fetchMemors = fetchMemors;
-    } else {
-      window.manageMemorsRef = { fetchMemors };
+    // Set up the global reference immediately
+    if (!window.manageMemorsRef) {
+      window.manageMemorsRef = {};
     }
+
+    // Define the reference to the current fetchMemors function
+    const fetchMemorsRef = async () => {
+      setLoading(true);
+      try {
+        const competitionsResponse = await api.get("/api/competitions");
+        const activeCompetition = competitionsResponse.data.find(
+          (comp) => comp.is_active
+        );
+
+        if (!activeCompetition) {
+          setMemors([]);
+          setLoading(false);
+          return;
+        }
+
+        // Get memors for the active competition
+        const memorsResponse = await api.get(
+          `/api/competitions/${activeCompetition.id}/memors`
+        );
+
+        const formattedMemors = memorsResponse.data.map((memor) => ({
+          id: memor.id,
+          title: memor.title,
+          description: memor.description,
+          date: new Date(memor.due_date).toLocaleDateString("en-GB"), // Format as DD/MM/YYYY
+          points: `+ ${memor.points} pts`,
+          teamsLeft: memor.team_submissions ? memor.team_submissions.length : 0,
+          is_done: memor.is_done,
+        }));
+
+        setMemors(formattedMemors);
+      } catch (error) {
+        console.error("Error fetching memors:", error);
+        showFeedback("error", "Error", "Failed to load memors");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    // Store the function reference
+    window.manageMemorsRef.fetchMemors = fetchMemorsRef;
+
+    // Initial data fetch
+    fetchMemorsRef();
+
+    // Cleanup when component unmounts
     return () => {
-      if (window.manageMemorsRef) {
+      if (window.manageMemorsRef?.fetchMemors === fetchMemorsRef) {
         delete window.manageMemorsRef.fetchMemors;
       }
     };
-  }, []);
+  }, [tab2]); // Only depend on tab2 to avoid infinite loops
 
   const deleteMemor = async (memor) => {
     setLoading(true);

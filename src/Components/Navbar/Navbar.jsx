@@ -29,13 +29,12 @@ import toast from "react-hot-toast";
 import notifPurple from "../../assets/images/notifPurple.svg";
 import notifGreen from "../../assets/images/notifGreen.svg";
 
-import {
-  getLeaderboardVisibility,
-  setLeaderboardVisibility,
-} from "../../assets/utils/leaderboardUtils";
+
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { useAuth } from "../../context/AuthContext";
+import { getLeaderboardVisibility, setLeaderboardVisibility, LEADERBOARD_VISIBILITY_CHANGE } from "../../assets/utils/leaderboardUtils";
+
 
 const useStyles = makeStyles({
   customBadge: {
@@ -128,11 +127,8 @@ const Navbar = () => {
     const newValue = !showLeaderboard;
     setShowLeaderboard(newValue);
     setLeaderboardVisibility(newValue);
-
-    if (!newValue) {
-      navigate("/home");
-    }
-    window.dispatchEvent(new Event("storage"));
+    
+    // No need to navigate away if hiding - we'll handle this in the Home component
   };
 
   // Fetch notifications when component mounts or user changes
@@ -174,15 +170,17 @@ const Navbar = () => {
     const handleStorageChange = () => {
       setShowLeaderboard(getLeaderboardVisibility());
     };
-
+  
     // Set initial value
     setShowLeaderboard(getLeaderboardVisibility());
-
-    // Listen for changes in localStorage
+  
+    // Listen for both localStorage events and our custom event
     window.addEventListener("storage", handleStorageChange);
-
+    window.addEventListener(LEADERBOARD_VISIBILITY_CHANGE, handleStorageChange);
+  
     return () => {
       window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener(LEADERBOARD_VISIBILITY_CHANGE, handleStorageChange);
     };
   }, []);
 
