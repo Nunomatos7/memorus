@@ -12,7 +12,7 @@ import background1 from "../../../assets/images/adminBackground1.svg";
 import background2 from "../../../assets/images/adminBackground2.svg";
 import background3 from "../../../assets/images/adminBackground3.svg";
 import Loader from "../../../Components/Loader/Loader";
-import ManageMemors from "./Components/ManageMemors";
+import ManageMemors from "./components/ManageMemors";
 import ManageTeams from "./Components/ManageTeams";
 import ManageCompetition from "./Components/ManageCompetition";
 import DynamicModal from "./Components/DynamicModal";
@@ -27,6 +27,8 @@ const AdminBoard = () => {
   const [tab, setTab] = useState("memors");
   const [tab2, setTab2] = useState(tabParam);
   const [searchQuery, setSearchQuery] = useState("");
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [activeTab, setActiveTab] = useState(tab);
   const [loading, setLoading] = useState(false);
   const [feedbackModal, setFeedbackModal] = useState({
     open: false,
@@ -42,11 +44,27 @@ const AdminBoard = () => {
   });
 
   useEffect(() => {
+    console.log(`Refreshing ${activeTab} data (trigger: ${refreshTrigger})`);
+
+    if (activeTab === "memors" && window.manageMemorsRef?.fetchMemors) {
+      window.manageMemorsRef.fetchMemors();
+    } else if (activeTab === "teams" && window.manageTeamsRef?.fetchTeams) {
+      window.manageTeamsRef.fetchTeams();
+    } else if (
+      activeTab === "competition" &&
+      window.manageCompetitionRef?.fetchCompetitions
+    ) {
+      window.manageCompetitionRef.fetchCompetitions();
+    }
+  }, [activeTab, refreshTrigger]);
+
+  useEffect(() => {
     document.title = `Memor'us | Admin board`;
   }, []);
 
   const handleTabChange = (_, newValue) => {
     setTab(newValue);
+    setActiveTab(newValue);
     setSearchQuery("");
   };
 
@@ -74,8 +92,11 @@ const AdminBoard = () => {
       action: null,
       data: null,
     });
-  };
 
+    setTimeout(() => {
+      setRefreshTrigger((prev) => prev + 1);
+    }, 300);
+  };
   const showFeedback = (type, title, description) => {
     setFeedbackModal({
       open: true,
@@ -248,21 +269,7 @@ const AdminBoard = () => {
               onClose={closeModal}
               showFeedback={showFeedback}
               setLoading={setLoading}
-              refreshData={() => {
-                if (tab === "memors" && window.manageMemorsRef?.fetchMemors) {
-                  window.manageMemorsRef.fetchMemors();
-                } else if (
-                  tab === "teams" &&
-                  window.manageTeamsRef?.fetchTeams
-                ) {
-                  window.manageTeamsRef.fetchTeams();
-                } else if (
-                  tab === "competition" &&
-                  window.manageCompetitionRef?.fetchCompetitions
-                ) {
-                  window.manageCompetitionRef.fetchCompetitions();
-                }
-              }}
+              refreshData={() => setRefreshTrigger((prev) => prev + 1)}
             />
           )}
 

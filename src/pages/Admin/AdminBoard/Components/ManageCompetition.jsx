@@ -23,6 +23,10 @@ const ManageCompetition = ({
   const fetchCompetitions = async () => {
     setLoading(true);
     try {
+      // First, trigger an update of competition statuses
+      await api.get("/api/competitions/update-statuses");
+
+      // Then fetch the competitions
       const response = await api.get("/api/competitions");
 
       const formattedCompetitions = response.data.map((comp) => ({
@@ -52,14 +56,58 @@ const ManageCompetition = ({
   };
 
   useEffect(() => {
-    if (window.manageCompetitionsRef) {
-      window.manageCompetitionsRef.fetchTeams = fetchCompetitions;
-    } else {
-      window.manageCompetitionsRef = { fetchCompetitions };
+    if (!window.manageCompetitionRef) {
+      window.manageCompetitionRef = {};
     }
+
+    // Define the reference to the current fetchCompetitions function
+    const fetchCompetitionsRef = async () => {
+      setLoading(true);
+      try {
+        // First, trigger an update of competition statuses
+        await api.get("/api/competitions/update-statuses");
+
+        // Then fetch the competitions
+        const response = await api.get("/api/competitions");
+
+        const formattedCompetitions = response.data.map((comp) => ({
+          id: comp.id,
+          title: comp.name,
+          description: comp.description,
+          startDate: formatDateForDisplay(comp.start_date),
+          endDate: formatDateForDisplay(comp.end_date),
+          status: comp.is_active ? "Ongoing" : "Closed",
+        }));
+
+        const ongoing = formattedCompetitions.find(
+          (comp) => comp.status === "Ongoing"
+        );
+        setOngoingCompetition(ongoing || null);
+
+        const finished = formattedCompetitions.filter(
+          (comp) => comp.status === "Closed"
+        );
+        setCompetitions(finished);
+      } catch (error) {
+        console.error("Error fetching competitions:", error);
+        showFeedback("error", "Error", "Failed to load competitions");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    // Store the function reference
+    window.manageCompetitionRef.fetchCompetitions = fetchCompetitionsRef;
+
+    // Initial data fetch
+    fetchCompetitionsRef();
+
+    // Cleanup when component unmounts
     return () => {
-      if (window.manageCompetitionsRef) {
-        delete window.manageCompetitionsRef.fetchCompetitions;
+      if (
+        window.manageCompetitionRef?.fetchCompetitions === fetchCompetitionsRef
+      ) {
+        delete window.manageCompetitionRef.fetchCompetitions;
       }
     };
   }, []);
@@ -100,7 +148,8 @@ const ManageCompetition = ({
     date.setHours(0, 0, 0, 0);
 
     const timeDiff = date - today;
-    return Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+    const daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+    return Math.max(0, daysLeft);
   };
 
   const filteredCompetitions = competitions.filter((comp) =>
