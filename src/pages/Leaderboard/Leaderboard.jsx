@@ -9,74 +9,10 @@ import background2 from "../../assets/images/background2.svg";
 import background3 from "../../assets/images/background3.svg";
 import Loader from "../../Components/Loader/Loader";
 import { useAuth } from "../../context/AuthContext";
+import { getLeaderboardVisibility, LEADERBOARD_VISIBILITY_CHANGE } from "../../assets/utils/leaderboardUtils";
+import { useNavigate } from "react-router-dom";
 
-// Keeping the static data as fallback
-// Export for use in other components like Home
-export const leaderboardData = [
-  {
-    teamName: "Visual Voyagers",
-    points: 510,
-    memors: 51,
-    rank: 1,
-    avatar:
-      "https://images.adsttc.com/media/images/5d44/14fa/284d/d1fd/3a00/003d/medium_jpg/eiffel-tower-in-paris-151-medium.jpg?1564742900",
-  },
-  {
-    teamName: "The Debuggers",
-    points: 360,
-    memors: 36,
-    rank: 2,
-    avatar:
-      "https://www.girlfromnowhere.pt/wp-content/uploads/2023/02/Passeio-de-moliceiro-nos-canais-de-Aveiro-1024x768.jpg",
-  },
-  {
-    teamName: "Capital Crew",
-    points: 190,
-    memors: 19,
-    rank: 3,
-    avatar:
-      "https://cdn-imgix.headout.com/microbrands-content-image/image/848bbbd82180ddf262893075f225b20d-Christmas%20in%20Prague%20-%20Why%20Spend%20Christmas%20in%20Prague%3F.jpg?auto=format&w=1222.3999999999999&h=687.6&q=90&fit=crop&ar=16%3A9&crop=faces",
-  },
-  {
-    teamName: "The Hackers",
-    points: 150,
-    memors: 15,
-    rank: 4,
-    avatar:
-      "https://www.vivernocentrodeportugal.com/Assets/Img/Galeria-regioes/f6f230cf.jpg",
-  },
-  {
-    teamName: "The Coders",
-    points: 120,
-    memors: 12,
-    rank: 5,
-    avatar:
-      "https://www.rotadaluz.pt/wp-content/uploads/2021/07/praia-furadouro-topo.jpg",
-  },
-  {
-    teamName: "The Programmers",
-    points: 100,
-    memors: 10,
-    rank: 6,
-    avatar:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Cidade_Maravilhosa.jpg/800px-Cidade_Maravilhosa.jpg",
-  },
-  {
-    teamName: "The Developers",
-    points: 90,
-    memors: 9,
-    rank: 7,
-    avatar: "https://www.pelago.com/img/destinations/bali/0619-0941_bali.jpg",
-  },
-  {
-    teamName: "The Designers",
-    points: 80,
-    memors: 8,
-    rank: 8,
-    avatar:
-      "https://static.nationalgeographicbrasil.com/files/styles/image_3200/public/nationalgeographic2710344.jpg?w=1900&h=1272",
-  },
-];
+
 
 const Leaderboard = () => {
   const { token, user } = useAuth();
@@ -84,6 +20,11 @@ const Leaderboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentCompetition, setCurrentCompetition] = useState(null);
+
+  const [showLeaderboard, setShowLeaderboard] = useState(getLeaderboardVisibility());
+
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     document.title = `Memor'us | Leaderboard`;
@@ -124,6 +65,28 @@ const Leaderboard = () => {
 
     fetchCurrentCompetition();
   }, [token, user]);
+
+  useEffect(() => {
+    const handleLeaderboardVisibilityChange = () => {
+      setShowLeaderboard(getLeaderboardVisibility());
+      
+      // Optionally redirect if leaderboard is hidden
+      if (!getLeaderboardVisibility()) {
+        navigate('/home');
+      }
+    };
+  
+    // Listen for our custom event
+    window.addEventListener(LEADERBOARD_VISIBILITY_CHANGE, handleLeaderboardVisibilityChange);
+    
+    // Also listen for standard storage events (for cross-tab sync)
+    window.addEventListener("storage", handleLeaderboardVisibilityChange);
+  
+    return () => {
+      window.removeEventListener(LEADERBOARD_VISIBILITY_CHANGE, handleLeaderboardVisibilityChange);
+      window.removeEventListener("storage", handleLeaderboardVisibilityChange);
+    };
+  }, [navigate]);
 
   useEffect(() => {
     const fetchLeaderboardData = async () => {
