@@ -1,6 +1,5 @@
-import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import PropTypes from "prop-types";
 import "./App.css";
 import Home from "./pages/Home/Home";
 import Memors from "./pages/Memors/Memors";
@@ -14,11 +13,9 @@ import CollaboratorLayout from "./Components/CollaboratorLayout/CollaboratorLayo
 import LoginPage from "./Auth/LoginPage";
 import RegisterPage from "./Auth/RegisterPage";
 import ChangePassword from "./Auth/ChangePassword";
-import Loader from "./Components/Loader/Loader";
 
 function App() {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
 
   const demoUsers = [
     { email: "admin@blip.com", password: "admin123", role: "Admin" },
@@ -30,7 +27,6 @@ function App() {
     if (storedUser) {
       setUser(storedUser);
     }
-    setLoading(false);
 
     const handleStorageChange = () => {
       const updatedUser = JSON.parse(localStorage.getItem("user"));
@@ -58,28 +54,23 @@ function App() {
     return authenticatedUser;
   };
 
-  const ProtectedRoute = ({ children, role }) => {
-    const location = useLocation();
+  // const ProtectedRoute = ({ children, role }) => {
+  //   const location = useLocation();
 
-    if (loading) {
-      return <Loader />;
-    }
+  //   if (loading) {
+  //     return <Loader />;
+  //   }
 
-    if (!user) {
-      return <Navigate to='/login' state={{ from: location }} replace />;
-    }
+  //   if (!user) {
+  //     return <Navigate to='/login' state={{ from: location }} replace />;
+  //   }
 
-    if (role && user.role !== role) {
-      return <Navigate to='/login' replace />;
-    }
+  //   if (role && user.role !== role) {
+  //     return <Navigate to='/login' replace />;
+  //   }
 
-    return children;
-  };
-
-  ProtectedRoute.propTypes = {
-    children: PropTypes.node.isRequired,
-    role: PropTypes.string,
-  };
+  //   return children;
+  // };
 
   return (
     <>
@@ -116,14 +107,7 @@ function App() {
         <Route path='/change-password' element={<ChangePassword />} />
 
         {/* Regular User Routes */}
-        <Route
-          path='/*'
-          element={
-            <ProtectedRoute role='Regular'>
-              <CollaboratorLayout />
-            </ProtectedRoute>
-          }
-        >
+        <Route path='/*' element={<CollaboratorLayout />}>
           <Route path='' element={<Navigate to='home' replace />} />
           <Route path='home' index element={<Home />} />
           <Route path='memors' element={<Memors />} />
@@ -133,14 +117,7 @@ function App() {
         </Route>
 
         {/* Admin Routes */}
-        <Route
-          path='/admin/*'
-          element={
-            <ProtectedRoute role='Admin'>
-              <AdminLayout />
-            </ProtectedRoute>
-          }
-        >
+        <Route path='/admin/*' element={<AdminLayout />}>
           <Route path='home' element={<AdminHome />} />
           <Route path='leaderboard' element={<AdminLeaderboard />} />
           <Route path='memoryboard' element={<MemoryBoard />} />
