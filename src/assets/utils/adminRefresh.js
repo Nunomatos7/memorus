@@ -8,24 +8,20 @@
  * current references available in the window object
  */
 export const forceRefreshAdminBoard = () => {
-  // Small delay to ensure backend operations have completed
   setTimeout(() => {
     console.log("Force refreshing Admin Board data");
 
     try {
-      // Check if memors reference exists and refresh
       if (window.manageMemorsRef?.fetchMemors) {
         console.log("Refreshing Memors data");
         window.manageMemorsRef.fetchMemors();
       }
 
-      // Check if teams reference exists and refresh
       if (window.manageTeamsRef?.fetchTeams) {
         console.log("Refreshing Teams data");
         window.manageTeamsRef.fetchTeams();
       }
 
-      // Check if competition reference exists and refresh
       if (window.manageCompetitionRef?.fetchCompetitions) {
         console.log("Refreshing Competitions data");
         window.manageCompetitionRef.fetchCompetitions();
@@ -33,7 +29,7 @@ export const forceRefreshAdminBoard = () => {
     } catch (error) {
       console.error("Error during admin board refresh:", error);
     }
-  }, 500); // Half-second delay
+  }, 500);
 };
 
 /**
@@ -41,6 +37,7 @@ export const forceRefreshAdminBoard = () => {
  * @param {string} componentType - Type of component ("memors", "teams", or "competition")
  * @param {Function} refreshFunction - Function to call to refresh the component
  */
+
 export const registerRefreshFunction = (componentType, refreshFunction) => {
   if (!refreshFunction || typeof refreshFunction !== "function") {
     console.error("Invalid refresh function provided");
@@ -70,6 +67,7 @@ export const registerRefreshFunction = (componentType, refreshFunction) => {
  * @param {string} componentType - Type of component ("memors", "teams", or "competition")
  * @param {Function} refreshFunction - Function that was registered
  */
+
 export const unregisterRefreshFunction = (componentType, refreshFunction) => {
   switch (componentType) {
     case "memors":
