@@ -269,7 +269,7 @@ const LoginPage = () => {
               }
             />
             <a
-              href='/forgot-password'
+              href='/change-password'
               className='forgot-password'
               aria-label='Forgot Password'
             >
