@@ -49,7 +49,7 @@ const MemorPicture = ({
       <button className='modal-close' onClick={onClose}>
         &times;
       </button>
-      <div className='modal-content' onClick={(e) => e.stopPropagation()}>
+      <div className='memor-modal-content' onClick={(e) => e.stopPropagation()}>
         <img src={images[activeIndex]} alt='Selected Memor' />
 
         <div className='modal-navigation'>
