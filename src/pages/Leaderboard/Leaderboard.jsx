@@ -198,6 +198,7 @@ const Leaderboard = () => {
               fontWeight: "bold",
               color: "white",
               marginBottom: "10px",
+              marginTop: "32px",
             }}
           >
             Leaderboard

@@ -25,14 +25,13 @@
   padding: 10px;
   border-radius: 10px;
   margin-bottom: 3vh;
+  margin-top: 32px;
   gap: 5px;
 }
 
 .memors-ongoing {
-  font-size: 1rem;
-  padding: 0;
+  font-size: 2rem;
   height: 100%;
-  margin-top: 3px;
 }
 
 .memor .title_date {
