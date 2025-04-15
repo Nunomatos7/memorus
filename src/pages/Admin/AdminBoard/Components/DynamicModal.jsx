@@ -443,6 +443,7 @@ const DynamicModal = ({
             </Typography>
             <TextField
               label='Title'
+              required
               variant='outlined'
               value={newMemorTitle}
               onChange={(e) => setNewMemorTitle(e.target.value)}
@@ -461,6 +462,7 @@ const DynamicModal = ({
             <TextField
               type='date'
               label='Due Date'
+              required
               value={newMemorDate || ""}
               onChange={(e) => setNewMemorDate(e.target.value)}
               fullWidth
@@ -490,6 +492,7 @@ const DynamicModal = ({
             <TextField
               label='Description'
               variant='outlined'
+              required
               multiline
               rows={4}
               value={newMemorDescription}
@@ -510,7 +513,7 @@ const DynamicModal = ({
               }}
             />
             <Typography variant='body1' sx={{ color: "#CAC4D0" }}>
-              Points
+              Points *
             </Typography>
             <Box
               sx={{
@@ -523,6 +526,7 @@ const DynamicModal = ({
               {[5, 10, 20, 30, 50, 100].map((point) => (
                 <Button
                   key={point}
+                  required
                   onClick={() => setNewMemorPoints(point)}
                   sx={{
                     backgroundColor:
@@ -560,6 +564,7 @@ const DynamicModal = ({
             </Typography>
             <TextField
               label="Team's Name"
+              required
               variant='outlined'
               value={newTeamName}
               onChange={(e) => setNewTeamName(e.target.value)}
@@ -644,11 +649,12 @@ const DynamicModal = ({
               variant='body1'
               sx={{ color: "#CAC4D0", marginBottom: "10px" }}
             >
-              Members
+              Members *
             </Typography>
             <TextField
               placeholder='Search Name'
               value={searchQuery}
+              required
               onChange={(e) => setSearchQuery(e.target.value)}
               variant='outlined'
               size='small'
@@ -747,6 +753,7 @@ const DynamicModal = ({
             </Typography>
             <TextField
               label='Title'
+              required
               variant='outlined'
               value={newCompetitionTitle}
               onChange={(e) => setNewCompetitionTitle(e.target.value)}
@@ -766,6 +773,7 @@ const DynamicModal = ({
               label='Description'
               variant='outlined'
               multiline
+              required
               rows={4}
               value={newCompetitionDescription}
               onChange={(e) => setNewCompetitionDescription(e.target.value)}
@@ -785,10 +793,11 @@ const DynamicModal = ({
               variant='body1'
               sx={{ color: "#CAC4D0", marginBottom: "5px" }}
             >
-              Start Date
+              Start Date *
             </Typography>
             <TextField
               type='date'
+              required
               value={newCompetitionStartDate || ""}
               onChange={(e) => setNewCompetitionStartDate(e.target.value)}
               fullWidth
@@ -812,10 +821,11 @@ const DynamicModal = ({
               variant='body1'
               sx={{ color: "#CAC4D0", marginBottom: "5px" }}
             >
-              End Date
+              End Date *
             </Typography>
             <TextField
               type='date'
+              required
               value={newCompetitionEndDate || ""}
               onChange={(e) => setNewCompetitionEndDate(e.target.value)}
               fullWidth
