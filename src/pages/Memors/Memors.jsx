@@ -581,10 +581,12 @@ const Memors = () => {
                             </Typography>
                           )}
                         </div>
-                        <div className='description'>
+                        <div className="description">
                           {expandedIndex === index
                             ? memor.description
-                            : `${memor.description.substring(0, 50)}...`}
+                            : `${memor.description.substring(0, 50)}${
+                                memor.description.length > 50 ? "..." : ""
+                              }`}
                         </div>
 
                         <div className='status'>
