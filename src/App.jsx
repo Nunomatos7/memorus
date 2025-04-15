@@ -21,6 +21,7 @@ import Loader from "./Components/Loader/Loader";
 import { Toaster } from "react-hot-toast";
 import TeamGuard from "./Components/TeamGuard/TeamGuard";
 import { Box } from "@mui/material";
+import Profile from "./pages/Profile/Profile";
 
 function App() {
   const { user, setUser, loading, cookiesAccepted } = useAuth();
@@ -117,6 +118,7 @@ function App() {
           <Route path='memors/:memorId' element={<Memors />} />
           <Route path='leaderboard' element={<Leaderboard />} />
           <Route path='memoryboard' element={<MemoryBoard />} />
+          <Route path='profile' element={<Profile/>} />
         </Route>
 
         {/* Admin Routes */}

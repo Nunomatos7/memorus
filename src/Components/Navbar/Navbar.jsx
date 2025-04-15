@@ -35,6 +35,9 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { useAuth } from "../../context/AuthContext";
 import { getLeaderboardVisibility, setLeaderboardVisibility, LEADERBOARD_VISIBILITY_CHANGE } from "../../assets/utils/leaderboardUtils";
 
+import PersonIcon from "@mui/icons-material/Person";
+import LockIcon from "@mui/icons-material/Lock";
+import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 
 const useStyles = makeStyles({
   customBadge: {
@@ -370,77 +373,100 @@ const Navbar = () => {
               />
             </IconButton>
             <Menu
-              anchorEl={anchorEl}
-              open={Boolean(anchorEl)}
-              onClose={handleMenuClose}
-              sx={{
-                "& .MuiMenu-paper": {
-                  backgroundColor: "#1e1e1e",
-                  color: "#fff",
-                },
-              }}
-            >
-              <MenuItem>
-                <Box sx={{ cursor: "default" }}>
-                  <Typography variant='body1' sx={{ fontWeight: 600 }}>
-                    {user?.firstName} {user?.lastName}
-                  </Typography>
-                  <Typography variant='body2' color="gray">
-                    {user?.email}
-                  </Typography>
-                  <Typography variant='body2' sx={{ color: "#00C896" }}>
-                    {user?.team}
-                  </Typography>
-                </Box>
-              </MenuItem>
-              <Divider sx={{ backgroundColor: "gray" }} />
-              <MenuItem
-                onClick={() => {
-                  toggleLeaderboard();
-                  handleMenuClose();
-                }}
-                sx={{
-                  "&:hover": {
-                    backgroundColor: "#181818",
-                    color: "#FFFFFF",
-                  },
-                  display: "flex",
-                  justifyContent: "space-between",
-                }}
-              >
-                <Typography>
-                  {showLeaderboard ? "Hide" : "Show"} Leaderboard
-                </Typography>
-                <IconButton sx={{ color: "white" }}>
-                  {showLeaderboard ? <VisibilityIcon /> : <VisibilityOffIcon />}
-                </IconButton>
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  navigate("/change-password");
-                  handleMenuClose();
-                }}
-                sx={{
-                  "&:hover": {
-                    backgroundColor: "#181818",
-                    color: "#FFFFFF",
-                  },
-                }}
-              >
-                Change Password
-              </MenuItem>
-              <MenuItem
-                onClick={handleLogOut}
-                sx={{
-                  color: "#FF5C5C",
-                  "&:hover": {
-                    backgroundColor: "#181818 ",
-                  },
-                }}
-              >
-                Log Out
-              </MenuItem>
-            </Menu>
+  anchorEl={anchorEl}
+  open={Boolean(anchorEl)}
+  onClose={handleMenuClose}
+  sx={{
+    "& .MuiMenu-paper": {
+      backgroundColor: "#1e1e1e",
+      color: "#fff",
+    },
+  }}
+>
+  <MenuItem>
+    <Box sx={{ cursor: "default" }}>
+      <Typography variant='body1' sx={{ fontWeight: 600 }}>
+        {user?.firstName} {user?.lastName}
+      </Typography>
+      <Typography variant='body2' color="gray">
+        {user?.email}
+      </Typography>
+      <Typography variant='body2' sx={{ color: "#00C896" }}>
+        {user?.team}
+      </Typography>
+    </Box>
+  </MenuItem>
+  <Divider sx={{ backgroundColor: "gray" }} />
+  <MenuItem
+    onClick={() => {
+      navigate("/profile");
+      handleMenuClose();
+    }}
+    sx={{
+      "&:hover": {
+        backgroundColor: "#181818",
+        color: "#FFFFFF",
+      },
+    }}
+  >
+    <Typography sx={{ display: 'flex', alignItems: 'center' }}>
+      <PersonIcon sx={{ mr: 1, fontSize: "1rem" }} />
+      My Profile
+    </Typography>
+  </MenuItem>
+  <MenuItem
+    onClick={() => {
+      toggleLeaderboard();
+      handleMenuClose();
+    }}
+    sx={{
+      "&:hover": {
+        backgroundColor: "#181818",
+        color: "#FFFFFF",
+      },
+      display: "flex",
+      justifyContent: "space-between",
+    }}
+  >
+    <IconButton sx={{ color: "white", paddingLeft: 0, ml: -0.5 }}>
+      {showLeaderboard ? <VisibilityIcon /> : <VisibilityOffIcon />}
+    </IconButton>
+    <Typography>
+      {showLeaderboard ? "Hide" : "Show"} Leaderboard
+    </Typography>
+  </MenuItem>
+  <MenuItem
+    onClick={() => {
+      navigate("/change-password");
+      handleMenuClose();
+    }}
+    sx={{
+      "&:hover": {
+        backgroundColor: "#181818",
+        color: "#FFFFFF",
+      },
+    }}
+  >
+    <Typography sx={{ display: 'flex', alignItems: 'center' }}>
+      <LockIcon sx={{ mr: 1, fontSize: "1rem" }} />
+      Change Password
+    </Typography>
+  </MenuItem>
+  <MenuItem
+    onClick={handleLogOut}
+    sx={{
+      color: "#FF5C5C",
+      "&:hover": {
+        backgroundColor: "#181818 ",
+      },
+    }}
+  >
+    <Typography sx={{ display: 'flex', alignItems: 'center' }}>
+      <ExitToAppIcon sx={{ mr: 1, fontSize: "1rem" }} />
+      Log Out
+    </Typography>
+  </MenuItem>
+</Menu>
           </Box>
           <Box>
             <IconButton onClick={handleNotifClick}>

@@ -1,0 +1,66 @@
+.profile-stats-card {
+    background-color: #272728;
+    border-radius: 12px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .profile-stats-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  }
+  
+  .profile-avatar {
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  .profile-avatar:hover {
+    transform: scale(1.05);
+  }
+  
+  .avatar-upload-button {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .avatar-upload-button input {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 100px;
+    text-align: right;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    outline: none;
+    cursor: pointer;
+    display: block;
+  }
+  
+  /* Animation for stats cards */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .animated-card {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+  
+  .animated-card:nth-child(1) {
+    animation-delay: 0.1s;
+  }
+  
+  .animated-card:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  
+  .animated-card:nth-child(3) {
+    animation-delay: 0.3s;
+  }
