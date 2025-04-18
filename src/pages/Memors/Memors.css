@@ -71,6 +71,10 @@
   font-size: 0.8rem;
 }
 
+.memor .submissions svg {
+  margin-left: -30px;
+}
+
 .memor .actions {
   color: rgba(255, 255, 255, 0.6);
 }
@@ -136,7 +140,7 @@
   .memor .description {
     width: 200px;
   }
-  
+
   .memor .status .MuiChip-root {
     width: auto !important;
     min-width: 80px;
@@ -149,21 +153,21 @@
     align-items: flex-start;
     gap: 10px;
   }
-  
+
   .memor .title_date {
     width: 100%;
   }
-  
+
   .memor .description {
     width: 100%;
   }
-  
+
   .memor .status {
     width: 100%;
     display: flex;
     justify-content: flex-start;
   }
-  
+
   .memor .submissions {
     width: 100%;
     display: flex;
