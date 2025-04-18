@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -16,7 +16,6 @@ import {
   ListItem,
   CircularProgress,
   Alert,
-  
 } from "@mui/material";
 import { Groups, Search } from "@mui/icons-material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
@@ -24,8 +23,6 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import TodayIcon from "@mui/icons-material/Today";
 import "./Memors.css";
 import SubmitMemorModal from "../../Components/SubmitMemorModal/SubmitMemorModal";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Mousewheel, FreeMode } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/free-mode";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -72,25 +69,27 @@ const Memors = () => {
             },
           }
         );
-        
+
         if (!competitionResponse.ok) {
           throw new Error("Failed to fetch active competition");
         }
-        
+
         const competitionsData = await competitionResponse.json();
-        
+
         if (!competitionsData || competitionsData.length === 0) {
           setLoading(false);
           setError("No active competition found");
           return;
         }
-        
+
         const activeCompetition = competitionsData[0];
         setCurrentCompetition(activeCompetition);
-        
+
         // Then fetch memors for this competition
         const memorResponse = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/competitions/${activeCompetition.id}/memors`,
+          `${import.meta.env.VITE_API_URL}/api/competitions/${
+            activeCompetition.id
+          }/memors`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -98,55 +97,63 @@ const Memors = () => {
             },
           }
         );
-        
+
         if (!memorResponse.ok) {
           throw new Error("Failed to fetch memors for this competition");
         }
-        
+
         const memorsData = await memorResponse.json();
-        
+
         // Process all memors
-        const allProcessedMemors = memorsData.map(memor => {
+        const allProcessedMemors = memorsData.map((memor) => {
           const timeLeftInfo = getTimeLeft(memor.due_date);
-          
+
           // For checking if expired, we need to compare to the end of the due date
           const dueDate = new Date(memor.due_date);
           dueDate.setHours(23, 59, 59, 999); // Set to end of day
-          
+
           const now = new Date();
           const isExpired = dueDate < now;
-          
+
           return {
             ...memor,
             competitionName: activeCompetition.name,
-            status: memor.has_my_submission ? "submitted" : (isExpired ? "expired" : "incomplete"),
+            status: memor.has_my_submission
+              ? "submitted"
+              : isExpired
+              ? "expired"
+              : "incomplete",
             submission: memor.has_my_submission
               ? "Submitted by you"
-              : (isExpired ? "Expired" : "No submission yet"),
+              : isExpired
+              ? "Expired"
+              : "No submission yet",
             dueDate: new Date(memor.due_date).toLocaleDateString("pt-PT"),
             dueDateRaw: new Date(memor.due_date), // Keep raw date for sorting
             timeLeft: isExpired ? { text: "Expired", days: 0 } : timeLeftInfo,
-            isExpired
+            isExpired,
           };
         });
-        
+
         // Filter for ongoing section - only active memors
         const ongoingMemors = allProcessedMemors
-          .filter(memor => !memor.isExpired)
+          .filter((memor) => !memor.isExpired)
           .sort((a, b) => a.dueDateRaw - b.dueDateRaw); // Sort by due date (closest first)
-          
+
         setOngoingMemors(ongoingMemors);
-        
+
         // All memors for the list below - sorted by due date (distant dates on top)
-        const sortedAllMemors = [...allProcessedMemors].sort((a, b) => b.dueDateRaw - a.dueDateRaw);
+        const sortedAllMemors = [...allProcessedMemors].sort(
+          (a, b) => b.dueDateRaw - a.dueDateRaw
+        );
         setMemors(sortedAllMemors);
-        
+
         // Check for memor ID in URL
         const pathnameParts = location.pathname.split("/");
         const memorIdFromUrl = pathnameParts[2]; // ex: /memors/1 → "1"
 
-        if (memorIdFromUrl) {
-          const memorToOpen = processedMemors.find(
+        if (memorIdFromUrl && !isModalOpen) {
+          const memorToOpen = allProcessedMemors.find(
             (memor) => String(memor.id) === memorIdFromUrl
           );
           if (memorToOpen) {
@@ -166,23 +173,23 @@ const Memors = () => {
     if (token && user?.tenant_subdomain) {
       fetchData();
     }
-  }, [token, user?.tenant_subdomain, location.pathname]);
+  }, [token, user?.tenant_subdomain, location.pathname, isModalOpen]);
 
   const getTimeLeft = (dueDate) => {
     const now = new Date();
     const end = new Date(dueDate);
     end.setHours(23, 59, 59, 999); // Set to end of the due date
-    
+
     const diff = end - now;
 
     if (diff <= 0) return "Expired";
 
     // Calculate days remaining (same day = 1 day left)
     const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
-    
+
     return {
       text: `< ${days} day${days > 1 ? "s" : ""} left${days > 1 ? "s" : ""}`,
-      days: days
+      days: days,
     };
   };
 
@@ -198,14 +205,16 @@ const Memors = () => {
     setSelectedMemor(memor);
     setIsModalOpen(true);
     document.body.style.overflow = "hidden";
-    navigate(`/memors/${memor.id}`);
+    // Use replace:true to update URL without causing refresh
+    navigate(`/memors/${memor.id}`, { replace: true });
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedMemor(null);
     document.body.style.overflow = "auto";
-    navigate("/memors");
+    // Use replace:true to update URL without causing refresh
+    navigate("/memors", { replace: true });
   };
 
   const handleSubmitMemor = (id) => {
@@ -216,33 +225,11 @@ const Memors = () => {
               ...memor,
               submission: "Submitted by you",
               status: "submitted",
-              has_my_submission: true
+              has_my_submission: true,
             }
           : memor
       )
     );
-  };
-
-  const handleSlideChange = (swiper) => {
-    if (ongoingMemors.length <= 1) {
-      setScrollProgress(100);
-      return;
-    }
-    
-    // Calculate progress as a percentage
-    const totalSlides = ongoingMemors.length;
-    const slidesPerView = swiper.params.slidesPerView;
-    const maxProgress = totalSlides - slidesPerView;
-    
-    let progress;
-    if (maxProgress <= 0) {
-      progress = 100;
-    } else {
-      progress = (swiper.activeIndex / maxProgress) * 100;
-    }
-    
-    // Ensure progress stays between 0 and 100
-    setScrollProgress(Math.min(Math.max(progress, 0), 100));
   };
 
   const filteredMemors = memors.filter((memor) => {
@@ -253,7 +240,10 @@ const Memors = () => {
       return memor.status === "submitted" && matchesSearch;
     }
     if (tab === "incomplete") {
-      return (memor.status === "incomplete" || memor.status === "expired") && matchesSearch;
+      return (
+        (memor.status === "incomplete" || memor.status === "expired") &&
+        matchesSearch
+      );
     }
     return matchesSearch;
   });
@@ -272,10 +262,15 @@ const Memors = () => {
               {currentCompetition ? (
                 <>
                   Ongoing Memors
-                  <span className='memors-ongoing'> ({ongoingMemors.length})</span>
+                  <span className='memors-ongoing'>
+                    {" "}
+                    ({ongoingMemors.length})
+                  </span>
                 </>
+              ) : loading ? (
+                "Loading Memors..."
               ) : (
-                loading ? 'Loading Memors...' : 'No Active Competition'
+                "No Active Competition"
               )}
             </Typography>
           </div>
@@ -285,14 +280,16 @@ const Memors = () => {
               <CircularProgress size={40} sx={{ color: "#d0bcfe" }} />
             </Box>
           ) : error ? (
-            <Alert severity="warning" sx={{ my: 2 }}>{error}</Alert>
+            <Alert severity='warning' sx={{ my: 2 }}>
+              {error}
+            </Alert>
           ) : (
             <>
               {/* Native scrollable container with real scrollbar */}
-              <Box className="memors-swiper-container">
-                <div className="horizontal-scroll-container">
+              <Box className='memors-swiper-container'>
+                <div className='horizontal-scroll-container'>
                   {ongoingMemors.map((memor, index) => (
-                    <div key={index} className="memor-card-container">
+                    <div key={index} className='memor-card-container'>
                       <Card
                         sx={{
                           width: "300px",
@@ -326,7 +323,10 @@ const Memors = () => {
                               sx={{ mr: 1, color: "#CBCBCB" }}
                               aria-hidden='true'
                             />
-                            <Typography color='#CBCBCB' sx={{ fontSize: "0.8rem" }}>
+                            <Typography
+                              color='#CBCBCB'
+                              sx={{ fontSize: "0.8rem" }}
+                            >
                               {memor.submission}
                             </Typography>
                           </Box>
@@ -347,7 +347,8 @@ const Memors = () => {
                               color='#CBCBCB'
                               sx={{ fontSize: "0.8rem" }}
                             >
-                              Due on {memor.dueDate} {memor.timeLeft && memor.timeLeft.days === 1}
+                              Due on {memor.dueDate}{" "}
+                              {memor.timeLeft && memor.timeLeft.days === 1}
                             </Typography>
                           </Box>
                           <Box sx={{ display: "flex", gap: "10px" }}>
@@ -380,55 +381,56 @@ const Memors = () => {
                           </Box>
                         </CardContent>
 
-                        {memor.status !== "expired" && memor.status !== "submitted" &&(
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "8px",
-                              padding: "8px 16px",
-                              cursor: "pointer",
-                              width: "fit-content",
-                            }}
-                            onClick={() => handleOpenModal(memor)}
-                            role='button'
-                            tabIndex={0}
-                            aria-label={`View details for ${memor.title}`}
-                          >
-                            <Button
-                              variant='contained'
-                              aria-label='Add picture'
+                        {memor.status !== "expired" &&
+                          memor.status !== "submitted" && (
+                            <Box
                               sx={{
-                                backgroundColor: "#7E57C2",
-                                color: "white",
-                                borderRadius: "8px",
-                                width: "30px",
-                                height: "30px",
-                                minWidth: "0px",
-                                padding: "0px",
                                 display: "flex",
                                 alignItems: "center",
-                                justifyContent: "center",
-                                boxShadow: "0px 4px 10px rgba(0,0,0,0.4)",
-                                "&:hover": {
-                                  backgroundColor: "#6A48B3",
-                                },
+                                gap: "8px",
+                                padding: "8px 16px",
+                                cursor: "pointer",
+                                width: "fit-content",
                               }}
+                              onClick={() => handleOpenModal(memor)}
+                              role='button'
+                              tabIndex={0}
+                              aria-label={`View details for ${memor.title}`}
                             >
-                              <AddRoundedIcon fontSize='small' />
-                            </Button>
+                              <Button
+                                variant='contained'
+                                aria-label='Add picture'
+                                sx={{
+                                  backgroundColor: "#7E57C2",
+                                  color: "white",
+                                  borderRadius: "8px",
+                                  width: "30px",
+                                  height: "30px",
+                                  minWidth: "0px",
+                                  padding: "0px",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  boxShadow: "0px 4px 10px rgba(0,0,0,0.4)",
+                                  "&:hover": {
+                                    backgroundColor: "#6A48B3",
+                                  },
+                                }}
+                              >
+                                <AddRoundedIcon fontSize='small' />
+                              </Button>
 
-                            <Typography
-                              variant='body2'
-                              sx={{
-                                fontSize: "0.8rem",
-                                color: "white",
-                              }}
-                            >
-                              View details
-                            </Typography>
-                          </Box>
-                        )}
+                              <Typography
+                                variant='body2'
+                                sx={{
+                                  fontSize: "0.8rem",
+                                  color: "white",
+                                }}
+                              >
+                                View details
+                              </Typography>
+                            </Box>
+                          )}
                       </Card>
                     </div>
                   ))}
@@ -437,7 +439,7 @@ const Memors = () => {
             </>
           )}
         </Box>
-        
+
         {isModalOpen && selectedMemor && (
           <SubmitMemorModal
             memor={selectedMemor}
@@ -521,13 +523,15 @@ const Memors = () => {
             }}
           />
         </Box>
-        
+
         {loading ? (
           <Box sx={{ display: "flex", justifyContent: "center", my: 4 }}>
             <CircularProgress size={40} sx={{ color: "#d0bcfe" }} />
           </Box>
         ) : error ? (
-          <Alert severity="warning" sx={{ my: 2 }}>{error}</Alert>
+          <Alert severity='warning' sx={{ my: 2 }}>
+            {error}
+          </Alert>
         ) : (
           <Paper sx={{ backgroundColor: "transparent", paddingBottom: "40px" }}>
             <List
@@ -563,7 +567,8 @@ const Memors = () => {
                             sx={{
                               fontWeight: "bold",
                               color: "white",
-                              fontSize: expandedIndex === index ? "1.25rem" : "1rem",
+                              fontSize:
+                                expandedIndex === index ? "1.25rem" : "1rem",
                             }}
                           >
                             {memor.title}
@@ -581,7 +586,7 @@ const Memors = () => {
                             </Typography>
                           )}
                         </div>
-                        <div className="description">
+                        <div className='description'>
                           {expandedIndex === index
                             ? memor.description
                             : `${memor.description.substring(0, 50)}${
@@ -594,7 +599,7 @@ const Memors = () => {
                             label={
                               memor.status === "submitted"
                                 ? "Submitted"
-                                : memor.status === "expired" 
+                                : memor.status === "expired"
                                 ? "Expired"
                                 : "Incomplete"
                             }
@@ -617,29 +622,33 @@ const Memors = () => {
                           />
                         </div>
                         <div className='submissions'>
-                          {memor.status !== "expired" && memor.status !== "submitted" && (
-                            <BackupRoundedIcon
-                              sx={{
-                                color: "#CBCBCB",
-                                fontSize: "35px",
-                                cursor: "pointer",
-                                "&:hover": { color: "white" },
-                              }}
-                              tabIndex={0}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleOpenModal(memor);
-                              }}
-                              onKeyDown={(event) => {
-                                if (event.key === "Enter" || event.key === " ") {
-                                  event.preventDefault();
-                                  event.stopPropagation();
+                          {memor.status !== "expired" &&
+                            memor.status !== "submitted" && (
+                              <BackupRoundedIcon
+                                sx={{
+                                  color: "#CBCBCB",
+                                  fontSize: "35px",
+                                  cursor: "pointer",
+                                  "&:hover": { color: "white" },
+                                }}
+                                tabIndex={0}
+                                onClick={(e) => {
+                                  e.stopPropagation();
                                   handleOpenModal(memor);
-                                }
-                              }}
-                              aria-label={`Submit ${memor.title}`}
-                            />
-                          )}
+                                }}
+                                onKeyDown={(event) => {
+                                  if (
+                                    event.key === "Enter" ||
+                                    event.key === " "
+                                  ) {
+                                    event.preventDefault();
+                                    event.stopPropagation();
+                                    handleOpenModal(memor);
+                                  }
+                                }}
+                                aria-label={`Submit ${memor.title}`}
+                              />
+                            )}
                         </div>
 
                         <div className='arrowIcon'>
@@ -680,7 +689,8 @@ const Memors = () => {
               ) : (
                 <Box sx={{ p: 4, textAlign: "center", color: "#aaa" }}>
                   <Typography>
-                    No {tab === "all" ? "" : tab} memors found{searchQuery ? " matching your search" : ""}
+                    No {tab === "all" ? "" : tab} memors found
+                    {searchQuery ? " matching your search" : ""}
                   </Typography>
                 </Box>
               )}

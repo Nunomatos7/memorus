@@ -294,6 +294,7 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
                 <p className='points'>+{memor.points} points</p>
               </div>
             </div>
+
             <div className='modal-upload'>
               <div className='upload-box'>
                 {uploadedImage ? (
