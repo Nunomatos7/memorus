@@ -67,7 +67,8 @@ const Home = () => {
   useEffect(() => {
     // Only fetch if we have a token and user
     if (!token || !user || !user.teamsId) return;
-
+    console.log("Fetching data with token:", token ? "Valid token" : "No token");
+    console.log("User data:", user ? `ID: ${user.id}, Team: ${user.teamsId}` : "No user data");
     const fetchData = async () => {
       setLoading(true);
       setError(null);
@@ -148,9 +149,9 @@ const Home = () => {
             }
           }
           
-          // Fetch completed memors for the user's team in this competition
-          const completedMemorsResponse = await fetch(
-            `${import.meta.env.VITE_API_URL}/api/memors/team/${user.teamsId}/competition/${activeCompetition.id}/completed`,
+          // Get latest memors for the user's team - new endpoint
+          const latestMemorsResponse = await fetch(
+            `${import.meta.env.VITE_API_URL}/api/memors/team/${user.teamsId}/latest`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -159,38 +160,63 @@ const Home = () => {
             }
           );
           
-          if (completedMemorsResponse.ok) {
-            const completedMemorsData = await completedMemorsResponse.json();
+          if (latestMemorsResponse.ok) {
+            const latestMemorsData = await latestMemorsResponse.json();
             
-            // These are the completed memors with pictures
-            if (Array.isArray(completedMemorsData)) {
-              // Create a flattened list of all unique memor submissions
-              const allSubmissions = [];
-              
-              completedMemorsData.forEach(memor => {
-                if (memor.pictures && memor.pictures.length > 0) {
-                  // For each memor, extract each picture submission as its own entry
-                  memor.pictures.forEach(pic => {
-                    allSubmissions.push({
-                      id: `${memor.id}-${pic.id}`,
-                      memorId: memor.id,
-                      title: memor.title,
-                      description: memor.description,
-                      submittedDate: new Date(pic.created_at || memor.updated_at || memor.created_at).toLocaleDateString(),
-                      dueDate: memor.due_date,
-                      team: user.teamName || "Your Team",
-                      image: [pic.img_src], // Each submission has a single image
-                      submitter: pic.user_id === user.id ? "You" : pic.first_name ? `${pic.first_name} ${pic.last_name || ''}` : "Team member"
-                    });
-                  });
+            if (Array.isArray(latestMemorsData)) {
+              // These are already formatted for display
+              setMemors(latestMemorsData);
+            }
+          } else {
+            console.error("Error fetching latest memors:", await latestMemorsResponse.text());
+            
+            // Fallback to completed memors endpoint if new endpoint isn't available yet
+            try {
+              const completedMemorsResponse = await fetch(
+                `${import.meta.env.VITE_API_URL}/api/memors/team/${user.teamsId}/competition/${activeCompetition.id}/completed`,
+                {
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                    "X-Tenant": user.tenant_subdomain || "",
+                  },
                 }
-              });
+              );
               
-              // Sort by most recent first
-              allSubmissions.sort((a, b) => new Date(b.submittedDate) - new Date(a.submittedDate));
-              
-              setMemors(allSubmissions);
-              setCompletedMemors(completedMemorsData.length); // Count of completed memors
+              if (completedMemorsResponse.ok) {
+                const completedMemorsData = await completedMemorsResponse.json();
+                console.log("Completed memors data:", completedMemorsData);
+                
+                if (Array.isArray(completedMemorsData)) {
+                  // Convert to format needed for display
+                  const allSubmissions = [];
+                  
+                  completedMemorsData.forEach(memor => {
+                    if (memor.pictures && memor.pictures.length > 0) {
+                      memor.pictures.forEach(pic => {
+                        allSubmissions.push({
+                          id: `${memor.id}-${pic.id}`,
+                          memorId: memor.id,
+                          title: memor.title,
+                          description: memor.description,
+                          submittedDate: new Date(pic.created_at || memor.updated_at || memor.created_at).toLocaleDateString(),
+                          dueDate: memor.due_date,
+                          team: user.teamName || "Your Team",
+                          image: [pic.img_src],
+                          submitter: pic.user_id === user.id ? "You" : pic.first_name ? `${pic.first_name} ${pic.last_name || ''}` : "Team member"
+                        });
+                      });
+                    }
+                  });
+                  
+                  // Sort by most recent first
+                  allSubmissions.sort((a, b) => new Date(b.submittedDate) - new Date(a.submittedDate));
+                  
+                  setMemors(allSubmissions);
+                  setCompletedMemors(completedMemorsData.length);
+                }
+              }
+            } catch (fallbackErr) {
+              console.error("Error in fallback fetch:", fallbackErr);
             }
           }
           
@@ -211,6 +237,7 @@ const Home = () => {
             if (progressData) {
               const pending = (progressData.totalMemors || 0) - (progressData.completedMemors || 0);
               setPendingMemors(Math.max(0, pending)); // Ensure it's not negative
+              setCompletedMemors(progressData.completedMemors || 0);
             }
           }
         }
