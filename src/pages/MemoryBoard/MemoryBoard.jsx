@@ -210,7 +210,9 @@ const MemoryBoard = () => {
         }
 
         const memorData = await response.json();
-        console.log(`API response:`, memorData);
+        console.log(`API response from ${memorUrl}:`, memorData);
+
+        
 
         if (memorData && memorData.length > 0) {
           // Process memor data
@@ -221,17 +223,21 @@ const MemoryBoard = () => {
               const position = generateNonOverlappingPosition(positions);
               positions.push(position);
 
+              // Extract images from pictures array
+              const images = memor.pictures.map(pic => pic.img_src);
+
               return {
                 ...position,
                 title: memor.title,
                 description: memor.description || "",
-                team: teamName,
-                submittedDate: new Date(memor.due_date).toLocaleDateString(),
-                image: memor.pictures.map((pic) => pic.img_src),
+                team: memor.team || teamName,
+                submittedDate: new Date(memor.created_at || memor.due_date).toLocaleDateString(),
+                image: images.length > 0 ? images : null
               };
-            });
+            })
+            .filter(post => post.image && post.image.length > 0);
 
-          console.log(`Processed ${apiPosts.length} API posts`);
+          
 
           if (apiPosts.length > 0) {
             setPosts(apiPosts);
@@ -248,6 +254,8 @@ const MemoryBoard = () => {
     fetchMemorData();
   }, [selectedCompetition, selectedTeam, token, user, teams]);
 
+  // The rest of the component remains unchanged
+  
   // Handle lazy loading of images
   useEffect(() => {
     const observer = new IntersectionObserver(
