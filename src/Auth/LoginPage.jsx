@@ -20,9 +20,11 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
+  const [tenant, setTenant] = useState("");
 
   const getTenantFromSubdomain = () => {
     const host = window.location.hostname;
+    console.log("Current hostname:", host);
 
     // Em dev: "loba.localhost" → ["loba", "localhost"]
     // Em prod: "loba.memor-us.com" → ["loba", "memor-us", "com"]
@@ -41,8 +43,16 @@ const LoginPage = () => {
   };
 
   const navigate = useNavigate();
+
   useEffect(() => {
     document.title = `Memor'us | Login`;
+
+    // Set tenant on component mount
+    const detectedTenant = getTenantFromSubdomain();
+    console.log("Detected tenant:", detectedTenant);
+    if (detectedTenant) {
+      setTenant(detectedTenant.toLowerCase());
+    }
   }, []);
 
   const handleLogin = async (e) => {
@@ -50,44 +60,47 @@ const LoginPage = () => {
     setError("");
 
     try {
-      const tenant = getTenantFromSubdomain()?.toLowerCase();
-
       if (!tenant) {
-        setError("Tenant inválido.");
+        setError("Tenant inválido ou não detectado.");
         return;
       }
 
-      let token;
+      console.log(`Attempting login for email: ${email} on tenant: ${tenant}`);
 
-      const USE_MOCK_TOKEN = false;
-
-      if (USE_MOCK_TOKEN) {
-        token =
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZmlyc3ROYW1lIjoiTWFyaWEiLCJsYXN0TmFtZSI6IlNpbHZhIiwiZW1haWwiOiJtYXJpYUBibGlwLmNvbSIsInRlYW1zSWQiOjEsInRlbmFudF9zdWJkb21haW4iOiJibGlwIiwicm9sZXMiOlsibWVtYmVyIl0sImlzU3VwZXJBZG1pbiI6ZmFsc2UsImlhdCI6MTc0MzA3ODk5OCwiZXhwIjoxNzQzMTY1Mzk4fQ.gwBh6hV17OK1q6ZAdCJJSFXfSv48VYCONILGd1fnmGk"; //token da BLIP - user
-      } else {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/login`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "x-tenant": tenant,
-            },
-            body: JSON.stringify({ email, password, tenant }),
-          }
-        );
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`Erro no login: ${errorText}`);
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Tenant": tenant,
+          },
+          body: JSON.stringify({ email, password, tenant }),
+          credentials: "include",
         }
+      );
 
-        const data = await response.json();
-        token = data.token;
+      console.log("Login response status:", response.status);
+
+      if (!response.ok) {
+        let errorMessage;
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || "Erro desconhecido no login";
+        } catch (e) {
+          errorMessage = (await response.text(e)) || "Erro no login";
+        }
+        throw new Error(errorMessage);
       }
 
-      if (!token) throw new Error("Token inválido");
+      const data = await response.json();
+      console.log("Login successful, received data");
 
+      if (!data.token) {
+        throw new Error("Token não recebido do servidor");
+      }
+
+      const token = data.token;
       const parts = token.split(".");
       if (parts.length !== 3) {
         throw new Error("Token JWT mal formatado");
@@ -107,6 +120,7 @@ const LoginPage = () => {
       }
 
       payload.role = payload.roles?.[0]?.toLowerCase();
+      console.log("User role from token:", payload.role);
 
       localStorage.setItem("token", token);
       setUser(payload);
@@ -114,8 +128,8 @@ const LoginPage = () => {
 
       navigate(payload.role === "admin" ? "/admin/home" : "/home");
     } catch (err) {
-      console.error(err);
-      setError("Erro ao fazer login. Verifica as credenciais.");
+      console.error("Login error:", err);
+      setError(err.message || "Erro ao fazer login. Verifica as credenciais.");
     }
   };
 
@@ -148,7 +162,7 @@ const LoginPage = () => {
           <img src={logo} alt='Memor-us Logo' className='logo' />
         </div>
         <Typography variant='h5' className='login-title' id='login-title'>
-          Login
+          Login {tenant && `(${tenant})`}
         </Typography>
         <Typography variant='body2' className='login-subtitle' sx={{ mb: 2 }}>
           This device is currently not logged in. Please enter the credentials
