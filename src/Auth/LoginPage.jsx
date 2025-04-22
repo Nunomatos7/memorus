@@ -60,12 +60,14 @@ const LoginPage = () => {
     setError("");
 
     try {
+      const tenant = getTenantFromSubdomain()?.toLowerCase();
+
       if (!tenant) {
-        setError("Tenant inválido ou não detectado.");
+        setError("Invalid tenant.");
         return;
       }
 
-      console.log(`Attempting login for email: ${email} on tenant: ${tenant}`);
+      console.log(`Attempting login for ${email} on tenant ${tenant}`);
 
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/login`,
@@ -73,63 +75,47 @@ const LoginPage = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "X-Tenant": tenant,
+            "x-tenant": tenant,
           },
-          body: JSON.stringify({ email, password, tenant }),
           credentials: "include",
+          body: JSON.stringify({ email, password, tenant }),
         }
       );
 
-      console.log("Login response status:", response.status);
-
+      // Check if response is OK
       if (!response.ok) {
-        let errorMessage;
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.error || "Erro desconhecido no login";
-        } catch (e) {
-          errorMessage = (await response.text(e)) || "Erro no login";
-        }
-        throw new Error(errorMessage);
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Login failed");
       }
 
       const data = await response.json();
-      console.log("Login successful, received data");
 
       if (!data.token) {
-        throw new Error("Token não recebido do servidor");
+        throw new Error("Invalid response from server - no token");
       }
 
-      const token = data.token;
-      const parts = token.split(".");
-      if (parts.length !== 3) {
-        throw new Error("Token JWT mal formatado");
-      }
+      // Store token and user info
+      localStorage.setItem("token", data.token);
 
+      // Parse the token
+      const parts = data.token.split(".");
       const base64Url = parts[1];
       const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-
       const padded = base64 + "=".repeat((4 - (base64.length % 4)) % 4);
 
-      let payload;
-      try {
-        payload = JSON.parse(atob(padded));
-      } catch (err) {
-        console.error("Erro ao decodificar o token:", err);
-        throw new Error("Token inválido ou mal codificado");
-      }
-
+      const payload = JSON.parse(atob(padded));
       payload.role = payload.roles?.[0]?.toLowerCase();
-      console.log("User role from token:", payload.role);
 
-      localStorage.setItem("token", token);
       setUser(payload);
-      setToken(token);
+      setToken(data.token);
 
+      // Navigate to appropriate page
       navigate(payload.role === "admin" ? "/admin/home" : "/home");
     } catch (err) {
       console.error("Login error:", err);
-      setError(err.message || "Erro ao fazer login. Verifica as credenciais.");
+      setError(
+        err.message || "Error logging in. Please check your credentials."
+      );
     }
   };
 
