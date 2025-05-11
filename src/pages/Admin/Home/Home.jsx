@@ -95,7 +95,7 @@ const Home = () => {
                   rank: index + 1,
                   teamName: team.name || `Team ${team.teamId}`,
                   points: team.points || 0,
-                  memors: Math.ceil((team.points || 0) / 10), // Estimate based on points
+                  memors: team.memors || 0,
                   avatar: team.avatar || "https://via.placeholder.com/150",
                 }));
               
