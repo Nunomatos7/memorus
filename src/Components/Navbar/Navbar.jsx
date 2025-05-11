@@ -1,4 +1,4 @@
-// Changes for src/Components/Navbar/Navbar.jsx
+// Updated Navbar.jsx with fixed team rendering
 
 import { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
@@ -314,6 +314,14 @@ const Navbar = () => {
   const unreadCount = notifications.filter(notif => !notif.read).length;
 
   const classes = useStyles();
+  
+  // Safely extract team name
+  const getTeamName = () => {
+    if (!user) return "";
+    if (typeof user.team === 'string') return user.team;
+    if (user.team && typeof user.team === 'object' && user.team.name) return user.team.name;
+    return "";
+  };
 
   return (
     <AppBar
@@ -373,100 +381,100 @@ const Navbar = () => {
               />
             </IconButton>
             <Menu
-  anchorEl={anchorEl}
-  open={Boolean(anchorEl)}
-  onClose={handleMenuClose}
-  sx={{
-    "& .MuiMenu-paper": {
-      backgroundColor: "#1e1e1e",
-      color: "#fff",
-    },
-  }}
->
-  <MenuItem>
-    <Box sx={{ cursor: "default" }}>
-      <Typography variant='body1' sx={{ fontWeight: 600 }}>
-        {user?.firstName} {user?.lastName}
-      </Typography>
-      <Typography variant='body2' color="gray">
-        {user?.email}
-      </Typography>
-      <Typography variant='body2' sx={{ color: "#00C896" }}>
-        {user?.team}
-      </Typography>
-    </Box>
-  </MenuItem>
-  <Divider sx={{ backgroundColor: "gray" }} />
-  <MenuItem
-    onClick={() => {
-      navigate("/profile");
-      handleMenuClose();
-    }}
-    sx={{
-      "&:hover": {
-        backgroundColor: "#181818",
-        color: "#FFFFFF",
-      },
-    }}
-  >
-    <Typography sx={{ display: 'flex', alignItems: 'center' }}>
-      <PersonIcon sx={{ mr: 1, fontSize: "1rem" }} />
-      My Profile
-    </Typography>
-  </MenuItem>
-  <MenuItem
-    onClick={() => {
-      toggleLeaderboard();
-      handleMenuClose();
-    }}
-    sx={{
-      "&:hover": {
-        backgroundColor: "#181818",
-        color: "#FFFFFF",
-      },
-      display: "flex",
-      justifyContent: "space-between",
-    }}
-  >
-    <IconButton sx={{ color: "white", paddingLeft: 0, ml: -0.5 }}>
-      {showLeaderboard ? <VisibilityIcon /> : <VisibilityOffIcon />}
-    </IconButton>
-    <Typography>
-      {showLeaderboard ? "Hide" : "Show"} Leaderboard
-    </Typography>
-  </MenuItem>
-  <MenuItem
-    onClick={() => {
-      navigate("/change-password");
-      handleMenuClose();
-    }}
-    sx={{
-      "&:hover": {
-        backgroundColor: "#181818",
-        color: "#FFFFFF",
-      },
-    }}
-  >
-    <Typography sx={{ display: 'flex', alignItems: 'center' }}>
-      <LockIcon sx={{ mr: 1, fontSize: "1rem" }} />
-      Change Password
-    </Typography>
-  </MenuItem>
-  <MenuItem
-    onClick={handleLogOut}
-    sx={{
-      color: "#FF5C5C",
-      "&:hover": {
-        backgroundColor: "#181818 ",
-      },
-    }}
-  >
-    <Typography sx={{ display: 'flex', alignItems: 'center' }}>
-      <ExitToAppIcon sx={{ mr: 1, fontSize: "1rem" }} />
-      Log Out
-    </Typography>
-  </MenuItem>
-</Menu>
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleMenuClose}
+              sx={{
+                "& .MuiMenu-paper": {
+                  backgroundColor: "#1e1e1e",
+                  color: "#fff",
+                },
+              }}
+            >
+              <MenuItem>
+                <Box sx={{ cursor: "default" }}>
+                  <Typography variant='body1' sx={{ fontWeight: 600 }}>
+                    {user?.firstName} {user?.lastName}
+                  </Typography>
+                  <Typography variant='body2' color="gray">
+                    {user?.email}
+                  </Typography>
+                  <Typography variant='body2' sx={{ color: "#00C896" }}>
+                    {getTeamName()}
+                  </Typography>
+                </Box>
+              </MenuItem>
+              <Divider sx={{ backgroundColor: "gray" }} />
+              <MenuItem
+                onClick={() => {
+                  navigate("/profile");
+                  handleMenuClose();
+                }}
+                sx={{
+                  "&:hover": {
+                    backgroundColor: "#181818",
+                    color: "#FFFFFF",
+                  },
+                }}
+              >
+                <Typography sx={{ display: 'flex', alignItems: 'center' }}>
+                  <PersonIcon sx={{ mr: 1, fontSize: "1rem" }} />
+                  My Profile
+                </Typography>
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  toggleLeaderboard();
+                  handleMenuClose();
+                }}
+                sx={{
+                  "&:hover": {
+                    backgroundColor: "#181818",
+                    color: "#FFFFFF",
+                  },
+                  display: "flex",
+                  justifyContent: "space-between",
+                }}
+              >
+                <IconButton sx={{ color: "white", paddingLeft: 0, ml: -0.5 }}>
+                  {showLeaderboard ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                </IconButton>
+                <Typography>
+                  {showLeaderboard ? "Hide" : "Show"} Leaderboard
+                </Typography>
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  navigate("/change-password");
+                  handleMenuClose();
+                }}
+                sx={{
+                  "&:hover": {
+                    backgroundColor: "#181818",
+                    color: "#FFFFFF",
+                  },
+                }}
+              >
+                <Typography sx={{ display: 'flex', alignItems: 'center' }}>
+                  <LockIcon sx={{ mr: 1, fontSize: "1rem" }} />
+                  Change Password
+                </Typography>
+              </MenuItem>
+              <MenuItem
+                onClick={handleLogOut}
+                sx={{
+                  color: "#FF5C5C",
+                  "&:hover": {
+                    backgroundColor: "#181818 ",
+                  },
+                }}
+              >
+                <Typography sx={{ display: 'flex', alignItems: 'center' }}>
+                  <ExitToAppIcon sx={{ mr: 1, fontSize: "1rem" }} />
+                  Log Out
+                </Typography>
+              </MenuItem>
+            </Menu>
           </Box>
           <Box>
             <IconButton onClick={handleNotifClick}>
@@ -579,7 +587,7 @@ const Navbar = () => {
                 {user?.email}
               </Typography>
               <Typography variant='body2' sx={{ color: "#00C896" }}>
-                {user?.team}
+                {getTeamName()}
               </Typography>
             </Box>
             <Divider sx={{ backgroundColor: "#444" }} />
@@ -606,6 +614,9 @@ const Navbar = () => {
               )}
               <StyledNavLink to='/memoryBoard' onClick={toggleDrawer(false)}>
                 Memory Board
+              </StyledNavLink>
+              <StyledNavLink to='/profile' onClick={toggleDrawer(false)}>
+                My Profile
               </StyledNavLink>
             </List>
             <Divider sx={{ backgroundColor: "#444", marginTop: "20px" }} />

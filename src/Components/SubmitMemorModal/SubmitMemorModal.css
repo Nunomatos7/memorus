@@ -252,16 +252,62 @@
 }
 
 .uploaded-image {
-  width: 50%;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  overflow: hidden;
+  width: 50%;
+  padding: 10px;
   border-radius: 10px;
+  transition: all 0.3s ease;
 }
 
 .uploaded-image img {
-  max-width: 70%;
+  max-width: 80%;
+  max-height: 250px;
   object-fit: contain;
-  border-radius: 10px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.upload-status-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+  color: #d0bcfe;
+}
+
+.image-upload-area {
+  border: 2px dashed #d0bcfe;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.image-upload-area:hover {
+  border-color: #a37cf3;
+  background-color: rgba(208, 188, 254, 0.05);
+}
+
+.upload-area-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+/* Add a simple fade animation for the upload button */
+.upload-button {
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.upload-button:hover {
+  transform: scale(1.05);
+  opacity: 0.9;
 }
