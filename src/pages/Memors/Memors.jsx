@@ -200,14 +200,26 @@ const Memors = () => {
     setSelectedMemor(memor);
     setIsModalOpen(true);
     document.body.style.overflow = "hidden";
-    navigate(`/memors/${memor.id}`);
+    
+    // Update URL without causing a page refresh using replaceState
+    window.history.replaceState(
+      null, 
+      '', 
+      `/memors/${memor.id}`
+    );
   };
-
+  
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedMemor(null);
     document.body.style.overflow = "auto";
-    navigate("/memors");
+    
+    // Update URL without causing a page refresh using replaceState
+    window.history.replaceState(
+      null, 
+      '', 
+      '/memors'
+    );
   };
 
   const handleSubmitMemor = (id) => {

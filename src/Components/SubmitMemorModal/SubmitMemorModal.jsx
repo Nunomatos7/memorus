@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import "./SubmitMemorModal.css";
 import "../FeedbackModal/FeedbackModal.css";
-import { Typography, Button, CircularProgress, Alert } from "@mui/material";
+import { Typography, Button, CircularProgress, Alert, Box } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { Groups, Stars } from "@mui/icons-material";
 import TodayIcon from "@mui/icons-material/Today";
@@ -27,9 +27,65 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadError, setUploadError] = useState(null);
+  const [loadingTeamPhotos, setLoadingTeamPhotos] = useState(false);
+  const [normalizedImages, setNormalizedImages] = useState([]);
 
   const modalRef = useRef(null);
   const fileInputRef = useRef(null);
+
+  // Restore body overflow when component unmounts
+  useEffect(() => {
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, []);
+
+  // Fetch team photos when component mounts or memor changes
+  useEffect(() => {
+    const fetchTeamPhotos = async () => {
+      if (!memor || !memor.id || !token || !user?.tenant_subdomain) return;
+      
+      setLoadingTeamPhotos(true);
+      
+      try {
+        // Fetch photos for this memor
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/memors/${memor.id}/pictures`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "X-Tenant": user.tenant_subdomain,
+            },
+          }
+        );
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch memor pictures: ${response.status}`);
+        }
+        
+        const pictures = await response.json();
+        
+        // Extract image URLs from the response
+        const imageUrls = pictures.map(pic => pic.img_src).filter(Boolean);
+        
+        // Update normalized images state
+        setNormalizedImages(imageUrls);
+        
+        // Also update memor.image if it's empty
+        if (!memor.image || memor.image.length === 0) {
+          memor.image = imageUrls;
+        }
+      } catch (error) {
+        console.error("Error fetching team photos:", error);
+        // Use existing memor.image if available
+        setNormalizedImages(memor.image || []);
+      } finally {
+        setLoadingTeamPhotos(false);
+      }
+    };
+    
+    fetchTeamPhotos();
+  }, [memor?.id, token, user?.tenant_subdomain]);
 
   useEffect(() => {
     if (isSubmitMemorOpen && modalRef.current && !selectedImage) {
@@ -45,6 +101,7 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
         if (event.key === "Escape") {
           if (selectedImage) {
             setSelectedImage(null);
+            document.body.style.overflow = "auto";
           } else {
             onClose();
           }
@@ -74,14 +131,19 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
     }
   }, [isSubmitMemorOpen, selectedImage, onClose]);
 
-  const normalizedImages = (() => {
-    const images = memor.image || [];
+  const fullNormalizedImages = (() => {
+    const images = normalizedImages || [];
     const placeholderCount = Math.max(6 - images.length, 0);
     return [...images, ...Array(placeholderCount).fill(null)];
   })();
 
-  const handleImageClick = (image) => {
+  const handleImageClick = (image, event) => {
+    if (event) {
+      event.stopPropagation();
+    }
     setSelectedImage(image);
+    // Prevent scrolling when showing the image modal
+    document.body.style.overflow = "hidden";
   };
 
   const handleFileChange = (event) => {
@@ -124,10 +186,7 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
   };
 
   const handleSubmit = async () => {
-    console.log("🔄 handleSubmit iniciado");
-
     if (!uploadedFile || !uploadedImage) {
-      console.log("❌ Nenhuma imagem carregada");
       setFeedback({
         type: "error",
         title: "Oops! Something happened...",
@@ -142,12 +201,6 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
       // Create FormData object and append the file
       const formData = new FormData();
       formData.append("image", uploadedFile);
-
-      console.log("📤 A enviar imagem para memor:", memor.id);
-      console.log("🧾 Headers:", {
-        Authorization: `Bearer ${token}`,
-        "X-Tenant": user?.tenant_subdomain,
-      });
 
       // Set up loading state
       setIsSubmitting(true);
@@ -168,16 +221,19 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
       // Reset loading state
       setIsSubmitting(false);
 
-      console.log("✅ Resposta recebida:", res);
-
       if (!res.ok) {
         const errText = await res.text();
-        console.error("❌ Erro da API:", errText);
-        throw new Error("Erro ao submeter a imagem: " + errText);
+        throw new Error("Failed to submit image: " + errText);
       }
 
       const responseData = await res.json();
-      console.log("🎉 Submissão bem-sucedida:", responseData);
+
+      // If we have the new image URL in the response, add it to our images
+      if (responseData.img_src) {
+        const newImages = [...normalizedImages, responseData.img_src];
+        setNormalizedImages(newImages);
+        memor.image = newImages;
+      }
 
       // Show success feedback
       setFeedback({
@@ -191,7 +247,7 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
 
       onSubmit();
     } catch (err) {
-      console.error("💥 Erro no handleSubmit:", err);
+      console.error("Error in handleSubmit:", err);
       setFeedback({
         type: "error",
         title: "Failed to submit",
@@ -461,56 +517,73 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
               Your team&apos;s photos for this Memor
             </Typography>
 
-            <Swiper
-              spaceBetween={15}
-              slidesPerView={5.3}
-              freeMode={true}
-              modules={[FreeMode, Mousewheel]}
-              mousewheel={true}
-              className='uploaded-photos-slider'
-            >
-              {normalizedImages.map((image, index) => (
-                <SwiperSlide
-                  key={index}
-                  tabIndex={image ? 0 : -1}
-                  className='photo-slide'
-                  onClick={(event) => image && handleImageClick(image, event)}
-                  onKeyDown={(event) => {
-                    if (image && (event.key === "Enter" || event.key === " ")) {
-                      event.preventDefault();
-                      handleImageClick(image, event);
-                    }
-                  }}
-                >
-                  {image ? (
-                    <img
-                      style={{ cursor: "pointer" }}
-                      src={image}
-                      alt={`Team photo ${index + 1}`}
-                      className='photo'
-                    />
-                  ) : (
-                    <div className='photo-placeholder'></div>
-                  )}
-                </SwiperSlide>
-              ))}
-            </Swiper>
+            {/* Display loading indicator while fetching images */}
+            {loadingTeamPhotos ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
+                <CircularProgress size={30} sx={{ color: '#d0bcfe' }} />
+              </Box>
+            ) : (
+              <>
+                {normalizedImages.length > 0 ? (
+                  <Swiper
+                    spaceBetween={15}
+                    slidesPerView={5.3}
+                    freeMode={true}
+                    modules={[FreeMode, Mousewheel]}
+                    mousewheel={true}
+                    className='uploaded-photos-slider'
+                  >
+                    {fullNormalizedImages.map((image, index) => (
+                      <SwiperSlide
+                        key={index}
+                        tabIndex={image ? 0 : -1}
+                        className='photo-slide'
+                        onClick={(event) => image && handleImageClick(image, event)}
+                        onKeyDown={(event) => {
+                          if (image && (event.key === "Enter" || event.key === " ")) {
+                            event.preventDefault();
+                            handleImageClick(image, event);
+                          }
+                        }}
+                      >
+                        {image ? (
+                          <img
+                            style={{ cursor: "pointer" }}
+                            src={image}
+                            alt={`Team photo ${index + 1}`}
+                            className='photo'
+                            onError={(e) => {
+                              console.error(`Error loading image at index ${index}:`, image);
+                              e.target.src = '/assets/images/image-placeholder.svg'; // Fallback image
+                              e.target.alt = 'Image failed to load';
+                            }}
+                          />
+                        ) : (
+                          <div className='photo-placeholder'></div>
+                        )}
+                      </SwiperSlide>
+                    ))}
+                  </Swiper>
+                ) : (
+                  <Typography variant='body2' className='no-photos-text'>
+                    No team memors uploaded yet.
+                  </Typography>
+                )}
+              </>
+            )}
 
             {selectedImage && (
               <MemorPicture
-                images={memor.image}
-                currentIndex={memor.image.indexOf(selectedImage)}
+                images={normalizedImages || memor.image || []}
+                currentIndex={normalizedImages.indexOf(selectedImage)}
                 title={memor.title}
                 submitDate={memor.dueDate}
                 teamName={memor.team}
-                onClose={() => setSelectedImage(null)}
+                onClose={() => {
+                  setSelectedImage(null);
+                  document.body.style.overflow = "auto"; // Restore scrolling
+                }}
               />
-            )}
-
-            {(memor.image?.length ?? 0) === 0 && (
-              <Typography variant='body2' className='no-photos-text'>
-                No team memors uploaded yet.
-              </Typography>
             )}
 
             <div className='modal-actions'>
@@ -567,10 +640,10 @@ SubmitMemorModal.propTypes = {
     points: PropTypes.number.isRequired,
     team: PropTypes.string.isRequired,
     id: PropTypes.number.isRequired,
+    team_submissions: PropTypes.arrayOf(PropTypes.object),
   }).isRequired,
 
   onClose: PropTypes.func.isRequired,
-
   onSubmit: PropTypes.func.isRequired,
 };
 
