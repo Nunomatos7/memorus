@@ -1,7 +1,13 @@
 import { useState, useRef, useEffect } from "react";
 import "./SubmitMemorModal.css";
 import "../FeedbackModal/FeedbackModal.css";
-import { Typography, Button, CircularProgress, Alert, Box } from "@mui/material";
+import {
+  Typography,
+  Button,
+  CircularProgress,
+  Alert,
+  Box,
+} from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { Groups, Stars } from "@mui/icons-material";
 import TodayIcon from "@mui/icons-material/Today";
@@ -44,9 +50,9 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
   useEffect(() => {
     const fetchTeamPhotos = async () => {
       if (!memor || !memor.id || !token || !user?.tenant_subdomain) return;
-      
+
       setLoadingTeamPhotos(true);
-      
+
       try {
         // Fetch photos for this memor
         const response = await fetch(
@@ -58,32 +64,38 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
             },
           }
         );
-        
+
         if (!response.ok) {
           throw new Error(`Failed to fetch memor pictures: ${response.status}`);
         }
-        
+
         const pictures = await response.json();
-        
-        // Extract image URLs from the response
-        const imageUrls = pictures.map(pic => pic.img_src).filter(Boolean);
-        
-        // Update normalized images state
-        setNormalizedImages(imageUrls);
-        
-        // Also update memor.image if it's empty
+
+        // Store the complete picture objects
+        setNormalizedImages(pictures);
+
+        // For backward compatibility
         if (!memor.image || memor.image.length === 0) {
-          memor.image = imageUrls;
+          memor.image = pictures.map((pic) => pic.img_src).filter(Boolean);
         }
       } catch (error) {
         console.error("Error fetching team photos:", error);
         // Use existing memor.image if available
-        setNormalizedImages(memor.image || []);
+        if (memor.image && memor.image.length > 0) {
+          // Convert URL strings to objects if needed
+          const objectImages = memor.image.map((url) => ({
+            img_src: url,
+            alt_text: "Memor image", // Fallback alt text
+          }));
+          setNormalizedImages(objectImages);
+        } else {
+          setNormalizedImages([]);
+        }
       } finally {
         setLoadingTeamPhotos(false);
       }
     };
-    
+
     fetchTeamPhotos();
   }, [memor?.id, token, user?.tenant_subdomain]);
 
@@ -141,42 +153,57 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
     if (event) {
       event.stopPropagation();
     }
-    setSelectedImage(image);
-    // Prevent scrolling when showing the image modal
+
+    // Store the index of the clicked image
+    const imageIndex = normalizedImages.findIndex(
+      (img) =>
+        (typeof img === "string" ? img : img.img_src) ===
+        (typeof image === "string" ? image : image.img_src)
+    );
+
+    setSelectedImage(imageIndex >= 0 ? imageIndex : 0);
     document.body.style.overflow = "hidden";
   };
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     setUploadError(null);
-    
+
     if (!file) {
       setUploadedImage(null);
       setUploadedFile(null);
       return;
     }
-    
+
     // Validate file type
-    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+    const validTypes = [
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
+      "image/webp",
+      "image/gif",
+    ];
     if (!validTypes.includes(file.type)) {
-      setUploadError('Invalid file type. Please select a JPEG, PNG, WebP, or GIF image.');
+      setUploadError(
+        "Invalid file type. Please select a JPEG, PNG, WebP, or GIF image."
+      );
       setUploadedImage(null);
       setUploadedFile(null);
       return;
     }
-    
+
     // Validate file size (max 10MB)
     const maxSize = 10 * 1024 * 1024; // 10MB in bytes
     if (file.size > maxSize) {
-      setUploadError('File is too large. Maximum size is 10MB.');
+      setUploadError("File is too large. Maximum size is 10MB.");
       setUploadedImage(null);
       setUploadedFile(null);
       return;
     }
-    
+
     // Set the uploaded file for submission
     setUploadedFile(file);
-    
+
     // Create preview
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -218,6 +245,19 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
         }
       );
 
+      {
+        memor?.id && (
+          <div
+            style={{
+              marginTop: "20px",
+              padding: "10px",
+              background: "#f5f5f5",
+            }}
+          >
+            <TestAltText memorId={memor.id} />
+          </div>
+        );
+      }
       // Reset loading state
       setIsSubmitting(false);
 
@@ -340,17 +380,17 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
       )}
 
       {isSubmitMemorOpen && !feedback && (
-        <div className='modal-overlay-submit-memor'>
+        <div className="modal-overlay-submit-memor">
           <div
             ref={modalRef}
-            className='modal-container'
-            role='dialog'
-            aria-modal='true'
+            className="modal-container"
+            role="dialog"
+            aria-modal="true"
             tabIndex={-1}
-            aria-labelledby='modal-title'
-            aria-describedby='modal-description'
+            aria-labelledby="modal-title"
+            aria-describedby="modal-description"
           >
-            <div className='modal-top'>
+            <div className="modal-top">
               <Button
                 onClick={onClose}
                 sx={{ minWidth: 0, p: 0, color: "#CAC4D0" }}
@@ -359,68 +399,68 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
               </Button>
               <h4>Details</h4>
             </div>
-            <div className='modal-header'>
+            <div className="modal-header">
               <Typography
-                variant='h5'
-                id='modal-title'
-                className='modal-title'
-                aria-live='polite'
+                variant="h5"
+                id="modal-title"
+                className="modal-title"
+                aria-live="polite"
               >
                 {memor.title}
               </Typography>
               <Typography
-                variant='body2'
-                id='modal-description'
-                className='modal-description'
-                aria-live='polite'
+                variant="body2"
+                id="modal-description"
+                className="modal-description"
+                aria-live="polite"
               >
                 {memor.description}
               </Typography>
             </div>
-            <div className='modal-details'>
-              <div className='modal-details-header'>
+            <div className="modal-details">
+              <div className="modal-details-header">
                 <Groups />
-                <p className='submission-status'>{memor.submission}</p>
+                <p className="submission-status">{memor.submission}</p>
               </div>
-              <div className='modal-details-header'>
+              <div className="modal-details-header">
                 <TodayIcon />
-                <p className='due-date'>Due on {memor.dueDate}</p>
+                <p className="due-date">Due on {memor.dueDate}</p>
               </div>
-              <div className='modal-details-header'>
+              <div className="modal-details-header">
                 <Stars />
-                <p className='points'>+{memor.points} points</p>
+                <p className="points">+{memor.points} points</p>
               </div>
             </div>
 
             {/* Display upload error if any */}
             {uploadError && (
-              <Alert 
-                severity="error" 
-                sx={{ 
-                  mt: 2, 
+              <Alert
+                severity="error"
+                sx={{
+                  mt: 2,
                   mb: 2,
-                  backgroundColor: 'rgba(211, 47, 47, 0.1)',
-                  color: '#ff5252'
+                  backgroundColor: "rgba(211, 47, 47, 0.1)",
+                  color: "#ff5252",
                 }}
               >
                 {uploadError}
               </Alert>
             )}
 
-            <div className='modal-upload'>
-              <div className='upload-box'>
+            <div className="modal-upload">
+              <div className="upload-box">
                 {uploadedImage ? (
-                  <div className='uploaded-image'>
-                    <img src={uploadedImage} alt='Uploaded' />
-                    <Typography 
-                      variant='body2' 
-                      sx={{ 
-                        color: "#DDDAF2", 
+                  <div className="uploaded-image">
+                    <img src={uploadedImage} alt="Uploaded" />
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: "#DDDAF2",
                         mt: 2,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: 1
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: 1,
                       }}
                     >
                       <CloudUploadIcon fontSize="small" />
@@ -429,13 +469,13 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
                     <Button
                       variant="text"
                       size="small"
-                      sx={{ 
-                        color: "#d0bcfe", 
+                      sx={{
+                        color: "#d0bcfe",
                         mt: 1,
                         fontSize: "0.8rem",
                         "&:hover": {
-                          backgroundColor: "rgba(208, 188, 254, 0.08)"
-                        }
+                          backgroundColor: "rgba(208, 188, 254, 0.08)",
+                        },
                       }}
                       onClick={() => {
                         setUploadedImage(null);
@@ -450,26 +490,26 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
                   </div>
                 ) : (
                   <>
-                    <div className='qr-code-placeholder'>
+                    <div className="qr-code-placeholder">
                       <QRCode
                         value={`https://memor-us.com/memors/${memor.id}`}
                         size={128}
-                        bgColor='transparent'
-                        fgColor='#d0bcfe'
+                        bgColor="transparent"
+                        fgColor="#d0bcfe"
                         style={{ padding: "8px", borderRadius: "8px" }}
                       />
-                      <Typography variant='body2' style={{ color: "#DDDAF2" }}>
+                      <Typography variant="body2" style={{ color: "#DDDAF2" }}>
                         Scan it with your phone
                       </Typography>
                     </div>
-                    <Typography variant='body2' className='or-text'>
+                    <Typography variant="body2" className="or-text">
                       or
                     </Typography>
-                    <div className='qr-code-placeholder'>
+                    <div className="qr-code-placeholder">
                       <label
-                        htmlFor='file-input'
+                        htmlFor="file-input"
                         tabIndex={0}
-                        role='button'
+                        role="button"
                         onKeyDown={(e) => {
                           if (e.key === "Enter" || e.key === " ") {
                             e.preventDefault();
@@ -479,31 +519,31 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
                       >
                         <img
                           src={UploadButton}
-                          alt='Upload Button'
-                          className='upload-button'
+                          alt="Upload Button"
+                          className="upload-button"
                         />
                       </label>
 
                       <input
-                        id='file-input'
+                        id="file-input"
                         ref={fileInputRef}
-                        type='file'
-                        accept='image/jpeg,image/png,image/webp,image/gif'
-                        aria-label='Upload photo button'
-                        className='file-input'
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp,image/gif"
+                        aria-label="Upload photo button"
+                        className="file-input"
                         onChange={handleFileChange}
                         style={{ display: "none" }}
                       />
-                      <Typography variant='body2' sx={{ color: "#DDDAF2" }}>
+                      <Typography variant="body2" sx={{ color: "#DDDAF2" }}>
                         Upload Computer File
                       </Typography>
-                      <Typography 
-                        variant='caption' 
-                        sx={{ 
+                      <Typography
+                        variant="caption"
+                        sx={{
                           color: "#9282F9",
                           display: "block",
                           mt: 1,
-                          fontSize: "0.7rem"
+                          fontSize: "0.7rem",
                         }}
                       >
                         Supported: JPEG, PNG, WebP, GIF (max 10MB)
@@ -513,14 +553,14 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
                 )}
               </div>
             </div>
-            <Typography variant='body2' className='uploaded-photos-title'>
+            <Typography variant="body2" className="uploaded-photos-title">
               Your team&apos;s photos for this Memor
             </Typography>
 
             {/* Display loading indicator while fetching images */}
             {loadingTeamPhotos ? (
-              <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
-                <CircularProgress size={30} sx={{ color: '#d0bcfe' }} />
+              <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
+                <CircularProgress size={30} sx={{ color: "#d0bcfe" }} />
               </Box>
             ) : (
               <>
@@ -531,16 +571,21 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
                     freeMode={true}
                     modules={[FreeMode, Mousewheel]}
                     mousewheel={true}
-                    className='uploaded-photos-slider'
+                    className="uploaded-photos-slider"
                   >
                     {fullNormalizedImages.map((image, index) => (
                       <SwiperSlide
                         key={index}
                         tabIndex={image ? 0 : -1}
-                        className='photo-slide'
-                        onClick={(event) => image && handleImageClick(image, event)}
+                        className="photo-slide"
+                        onClick={(event) =>
+                          image && handleImageClick(image, event)
+                        }
                         onKeyDown={(event) => {
-                          if (image && (event.key === "Enter" || event.key === " ")) {
+                          if (
+                            image &&
+                            (event.key === "Enter" || event.key === " ")
+                          ) {
                             event.preventDefault();
                             handleImageClick(image, event);
                           }
@@ -549,46 +594,54 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
                         {image ? (
                           <img
                             style={{ cursor: "pointer" }}
-                            src={image}
-                            alt={`Team photo ${index + 1}`}
-                            className='photo'
+                            src={
+                              typeof image === "string" ? image : image.img_src
+                            }
+                            alt={
+                              typeof image === "object" && image.alt_text
+                                ? image.alt_text
+                                : `Team photo ${index + 1}`
+                            }
+                            className="photo"
                             onError={(e) => {
-                              console.error(`Error loading image at index ${index}:`, image);
-                              e.target.src = '/assets/images/image-placeholder.svg'; // Fallback image
-                              e.target.alt = 'Image failed to load';
+                              e.target.src =
+                                "/assets/images/image-placeholder.svg";
+                              e.target.alt = "Image failed to load";
                             }}
                           />
                         ) : (
-                          <div className='photo-placeholder'></div>
+                          <div className="photo-placeholder"></div>
                         )}
                       </SwiperSlide>
                     ))}
                   </Swiper>
                 ) : (
-                  <Typography variant='body2' className='no-photos-text'>
+                  <Typography variant="body2" className="no-photos-text">
                     No team memors uploaded yet.
                   </Typography>
                 )}
               </>
             )}
 
-            {selectedImage && (
+            {selectedImage !== null && (
               <MemorPicture
-                images={normalizedImages || memor.image || []}
-                currentIndex={normalizedImages.indexOf(selectedImage)}
+                images={normalizedImages}
+                currentIndex={
+                  typeof selectedImage === "number" ? selectedImage : 0
+                }
                 title={memor.title}
                 submitDate={memor.dueDate}
                 teamName={memor.team}
                 onClose={() => {
                   setSelectedImage(null);
-                  document.body.style.overflow = "auto"; // Restore scrolling
+                  document.body.style.overflow = "auto";
                 }}
               />
             )}
 
-            <div className='modal-actions'>
+            <div className="modal-actions">
               <CustomButton
-                text='Cancel'
+                text="Cancel"
                 onClick={onClose}
                 disabled={isSubmitting}
                 sx={{
@@ -600,15 +653,23 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
                   },
                   "&:disabled": {
                     color: "#645c6b",
-                    borderColor: "#645c6b"
-                  }
+                    borderColor: "#645c6b",
+                  },
                 }}
               />
               <CustomButton
-                text={isSubmitting ? 'Submitting...' : 'Submit'}
+                text={isSubmitting ? "Submitting..." : "Submit"}
                 onClick={handleSubmit}
                 disabled={isSubmitting || !uploadedImage}
-                icon={isSubmitting ? <CircularProgress size={16} color="inherit" sx={{ mr: 1 }} /> : null}
+                icon={
+                  isSubmitting ? (
+                    <CircularProgress
+                      size={16}
+                      color="inherit"
+                      sx={{ mr: 1 }}
+                    />
+                  ) : null
+                }
                 sx={{
                   backgroundColor: "#d0bcfe",
                   color: "#381e72",
@@ -617,9 +678,9 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
                   },
                   "&:disabled": {
                     backgroundColor: "#a395c5",
-                    color: "#2d1a54"
+                    color: "#2d1a54",
                   },
-                  minWidth: "120px"
+                  minWidth: "120px",
                 }}
               />
             </div>
