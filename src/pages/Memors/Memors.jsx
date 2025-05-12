@@ -226,11 +226,74 @@ const Memors = () => {
     setExpandedIndex(expandedIndex === index ? null : index);
   };
 
-  const handleOpenModal = (memor) => {
-    setSelectedMemor(memor);
+  const handleOpenModal = async (memor) => {
+    console.log("Memors: Opening modal for memor:", memor);
+    
+    // Prepare memor for display
+    const preparedMemor = { ...memor };
+    
+    // Fetch the pictures with alt_text from the API
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/memors/${memor.id}/pictures`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "X-Tenant": user.tenant_subdomain,
+          },
+        }
+      );
+      
+      if (response.ok) {
+        const pictures = await response.json();
+        console.log("Memors: Fetched pictures with alt_text from API:", pictures);
+        
+        if (pictures && pictures.length > 0) {
+          // Use the pictures from the API which include the correct alt_text
+          preparedMemor.image = pictures;
+          console.log("Memors: Using pictures from API with alt_text");
+        } else {
+          // Fall back to the existing images if API returns no pictures
+          preparedMemor.image = Array.isArray(memor.image) ? memor.image.map(img => {
+            if (typeof img === 'string') {
+              return {
+                img_src: img,
+                alt_text: `Image for ${memor.title}`
+              };
+            }
+            return img;
+          }) : [];
+        }
+      } else {
+        // Fall back to existing images if API call fails
+        preparedMemor.image = Array.isArray(memor.image) ? memor.image.map(img => {
+          if (typeof img === 'string') {
+            return {
+              img_src: img,
+              alt_text: `Image for ${memor.title}`
+            };
+          }
+          return img;
+        }) : [];
+      }
+    } catch (error) {
+      console.error("Error fetching pictures:", error);
+      // Fall back to existing images on error
+      preparedMemor.image = Array.isArray(memor.image) ? memor.image.map(img => {
+        if (typeof img === 'string') {
+          return {
+            img_src: img,
+            alt_text: `Image for ${memor.title}`
+          };
+        }
+        return img;
+      }) : [];
+    }
+    
+    setSelectedMemor(preparedMemor);
     setIsModalOpen(true);
     document.body.style.overflow = "hidden";
-
+  
     // Update URL without causing a page refresh using replaceState
     window.history.replaceState(null, "", `/memors/${memor.id}`);
   };

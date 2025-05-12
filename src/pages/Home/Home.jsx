@@ -20,7 +20,6 @@ import background3 from "../../assets/images/background3.svg";
 import { useAuth } from "../../context/AuthContext";
 import { getLeaderboardVisibility, LEADERBOARD_VISIBILITY_CHANGE } from "../../assets/utils/leaderboardUtils";
 
-
 const rankImages = {
   1: rank1,
   2: rank2,
@@ -42,7 +41,6 @@ const Home = () => {
 
   const [showLeaderboard, setShowLeaderboard] = useState(getLeaderboardVisibility());
 
-
   useEffect(() => {
     document.title = `Memor'us | Home`;
   }, []);
@@ -52,10 +50,7 @@ const Home = () => {
       setShowLeaderboard(getLeaderboardVisibility());
     };
   
-    // Listen for our custom event
     window.addEventListener(LEADERBOARD_VISIBILITY_CHANGE, handleLeaderboardVisibilityChange);
-    
-    // Also listen for standard storage events (for cross-tab sync)
     window.addEventListener("storage", handleLeaderboardVisibilityChange);
   
     return () => {
@@ -65,16 +60,13 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    // Only fetch if we have a token and user
     if (!token || !user || !user.teamsId) return;
-    console.log("Fetching data with token:", token ? "Valid token" : "No token");
-    console.log("User data:", user ? `ID: ${user.id}, Team: ${user.teamsId}` : "No user data");
+    
     const fetchData = async () => {
       setLoading(true);
       setError(null);
       
       try {
-        // First get the user's team name if not already available
         if (user.teamsId && (!user.team || !user.team.name)) {
           try {
             const teamResponse = await fetch(
@@ -90,7 +82,6 @@ const Home = () => {
             if (teamResponse.ok) {
               const teamData = await teamResponse.json();
               if (teamData && teamData.name) {
-                // Set team name in local state so we can use it
                 user.teamName = teamData.name;
               }
             }
@@ -98,7 +89,7 @@ const Home = () => {
             console.error("Error fetching team details:", teamErr);
           }
         }
-        // Fetch active competition
+        
         const competitionResponse = await fetch(
           `${import.meta.env.VITE_API_URL}/api/competitions/active`,
           {
@@ -119,7 +110,6 @@ const Home = () => {
           const activeCompetition = competitionsData[0];
           setCurrentCompetition(activeCompetition);
           
-          // Fetch leaderboard for the current competition
           const leaderboardResponse = await fetch(
             `${import.meta.env.VITE_API_URL}/api/leaderboard/competition/${activeCompetition.id}`,
             {
@@ -133,7 +123,6 @@ const Home = () => {
           if (leaderboardResponse.ok) {
             const leaderboardData = await leaderboardResponse.json();
             if (leaderboardData && leaderboardData.teams) {
-              // Sort teams by rank and take top 3
               const teams = leaderboardData.teams
                 .sort((a, b) => a.rank - b.rank)
                 .slice(0, 3)
@@ -149,7 +138,6 @@ const Home = () => {
             }
           }
           
-          // Get latest memors for the user's team - new endpoint
           const latestMemorsResponse = await fetch(
             `${import.meta.env.VITE_API_URL}/api/memors/team/${user.teamsId}/latest`,
             {
@@ -164,13 +152,27 @@ const Home = () => {
             const latestMemorsData = await latestMemorsResponse.json();
             
             if (Array.isArray(latestMemorsData)) {
-              // These are already formatted for display
-              setMemors(latestMemorsData);
+              const formattedMemors = latestMemorsData.map(memor => {
+                let formattedImages = [];
+                
+                if (memor.image && Array.isArray(memor.image)) {
+                  formattedImages = memor.image.map(img => ({
+                    img_src: typeof img === 'object' ? (img.img_src || img) : img,
+                    alt_text: typeof img === 'object' ? (img.alt_text || `Image for ${memor.title}`) : `Image for ${memor.title}`
+                  }));
+                }
+                
+                return {
+                  ...memor,
+                  image: formattedImages
+                };
+              });
+              
+              setMemors(formattedMemors);
             }
           } else {
             console.error("Error fetching latest memors:", await latestMemorsResponse.text());
             
-            // Fallback to completed memors endpoint if new endpoint isn't available yet
             try {
               const completedMemorsResponse = await fetch(
                 `${import.meta.env.VITE_API_URL}/api/memors/team/${user.teamsId}/competition/${activeCompetition.id}/completed`,
@@ -184,10 +186,8 @@ const Home = () => {
               
               if (completedMemorsResponse.ok) {
                 const completedMemorsData = await completedMemorsResponse.json();
-                console.log("Completed memors data:", completedMemorsData);
                 
                 if (Array.isArray(completedMemorsData)) {
-                  // Convert to format needed for display
                   const allSubmissions = [];
                   
                   completedMemorsData.forEach(memor => {
@@ -201,14 +201,16 @@ const Home = () => {
                           submittedDate: new Date(pic.created_at || memor.updated_at || memor.created_at).toLocaleDateString(),
                           dueDate: memor.due_date,
                           team: user.teamName || "Your Team",
-                          image: [pic.img_src],
+                          image: [{
+                            img_src: pic.img_src,
+                            alt_text: pic.alt_text || `Image for ${memor.title}`
+                          }],
                           submitter: pic.user_id === user.id ? "You" : pic.first_name ? `${pic.first_name} ${pic.last_name || ''}` : "Team member"
                         });
                       });
                     }
                   });
                   
-                  // Sort by most recent first
                   allSubmissions.sort((a, b) => new Date(b.submittedDate) - new Date(a.submittedDate));
                   
                   setMemors(allSubmissions);
@@ -220,7 +222,6 @@ const Home = () => {
             }
           }
           
-          // Get team progress to know pending memors
           const progressResponse = await fetch(
             `${import.meta.env.VITE_API_URL}/api/memors/team/${user.teamsId}/competition/${activeCompetition.id}/progress`,
             {
@@ -233,10 +234,9 @@ const Home = () => {
           
           if (progressResponse.ok) {
             const progressData = await progressResponse.json();
-            // Calculate pending by subtracting completed from total
             if (progressData) {
               const pending = (progressData.totalMemors || 0) - (progressData.completedMemors || 0);
-              setPendingMemors(Math.max(0, pending)); // Ensure it's not negative
+              setPendingMemors(Math.max(0, pending));
               setCompletedMemors(progressData.completedMemors || 0);
             }
           }
@@ -252,8 +252,59 @@ const Home = () => {
     fetchData();
   }, [token, user]);
 
-  const handleImageClick = (slide) => {
-    setSelectedSlide(slide);
+  const handleImageClick = async (slide) => {
+    console.log("Home: handleImageClick called with slide:", slide);
+    
+    const preparedSlide = { ...slide };
+    
+    if (preparedSlide.image && Array.isArray(preparedSlide.image)) {
+      preparedSlide.image = preparedSlide.image.map(img => {
+        if (typeof img === 'string') {
+          return {
+            img_src: img,
+            alt_text: `Image for ${slide.title}`
+          };
+        } else {
+          return {
+            img_src: img.img_src || img,
+            alt_text: img.alt_text || `Image for ${slide.title}`
+          };
+        }
+      });
+    }
+
+    if (slide.memorId) {
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/memors/${slide.memorId}/pictures`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "X-Tenant": user.tenant_subdomain,
+            },
+          }
+        );
+        
+        if (response.ok) {
+          const pictures = await response.json();
+          console.log("Home: Fetched pictures with alt_text from API:", pictures);
+          
+          if (pictures && pictures.length > 0) {
+            preparedSlide.image = pictures.map((pic, index) => ({
+              img_src: pic.img_src,
+              alt_text: pic.alt_text || 
+                       (preparedSlide.image[index]?.alt_text) || 
+                       `Image for ${slide.title}`
+            }));
+          }
+        }
+      } catch (error) {
+        console.error("Home: Error fetching pictures:", error);
+      }
+    }
+    
+    console.log("Home: Final prepared slide image:", preparedSlide.image);
+    setSelectedSlide(preparedSlide);
     document.body.style.overflow = "hidden";
   };
 
@@ -262,7 +313,6 @@ const Home = () => {
     document.body.style.overflow = "auto";
   };
 
-  // No need to filter memors further as they are already filtered by API calls
   const teamMemors = memors;
 
   return (
@@ -278,10 +328,9 @@ const Home = () => {
             position: "relative",
           }}
         >
-          {/* Background Images */}
           <img
             src={background1}
-            alt=''
+            alt='Decorative background element'
             style={{
               position: "absolute",
               top: "2",
@@ -293,7 +342,7 @@ const Home = () => {
           />
           <img
             src={background2}
-            alt=''
+            alt='Decorative background element'
             style={{
               position: "absolute",
               top: "25%",
@@ -305,7 +354,7 @@ const Home = () => {
           />
           <img
             src={background3}
-            alt=''
+            alt='Decorative background element'
             style={{
               position: "absolute",
               top: "35%",
@@ -316,7 +365,6 @@ const Home = () => {
             aria-hidden='true'
           />
 
-          {/* Page Title */}
           <h1
             className='home-title'
             style={{ display: "flex", alignItems: "center", gap: "1rem" }}
@@ -329,7 +377,6 @@ const Home = () => {
           </h1>
         </div>
 
-        {/* Swiper Section */}
         <div className='overflow-hidden w-full'>
           <div className='container'>
             {loading ? (
@@ -372,7 +419,6 @@ const Home = () => {
                         handleImageClick(slide);
                       }
 
-                      // Navigation logic with tab keys
                       if (e.key === "Tab") {
                         if (!e.shiftKey && index === teamMemors.length - 1) {
                           e.preventDefault();
@@ -414,8 +460,20 @@ const Home = () => {
                         width={"100%"}
                         height={"100%"}
                         style={{ objectFit: "cover" }}
-                        src={slide.image && slide.image.length > 0 ? slide.image[0] : "https://via.placeholder.com/400x300?text=No+Image"}
-                        alt={`Memor image: ${slide.title}`}
+                        src={
+                          slide.image && slide.image.length > 0 && slide.image[0]
+                            ? (typeof slide.image[0] === 'object'
+                                ? slide.image[0].img_src
+                                : slide.image[0])
+                            : "https://via.placeholder.com/400x300?text=No+Image"
+                        }
+                        alt={
+                          slide.image && 
+                          slide.image.length > 0 && 
+                          typeof slide.image[0] === 'object'
+                            ? slide.image[0].alt_text
+                            : `Image for ${slide.title}`
+                        }
                       />
                     </div>
                     <div className='latest-memors-content'>
@@ -434,7 +492,6 @@ const Home = () => {
           </div>
         </div>
 
-        {/* Memor Picture Modal */}
         {selectedSlide && (
           <MemorPicture
             images={selectedSlide.image}
@@ -446,13 +503,11 @@ const Home = () => {
         )}
       </section>
 
-      {/* My Memors Section */}
       <section id='myMemors' className='container' tabIndex='0'>
         <Typography variant='h6' gutterBottom style={{ color: "white" }}>
           My Memors
         </Typography>
         <Grid container spacing={3}>
-          {/* Pending Memors Card */}
           <Grid item xs={12} sm={3}>
             <Card
               className='card'
@@ -480,7 +535,6 @@ const Home = () => {
             </Card>
           </Grid>
 
-          {/* Completed Memors Card */}
           <Grid item xs={12} sm={3}>
             <Card
               className='card'
@@ -508,7 +562,6 @@ const Home = () => {
             </Card>
           </Grid>
 
-          {/* Countdown Card */}
           <Grid item xs={12} sm={6}>
             <Card
               className='card'
@@ -552,7 +605,6 @@ const Home = () => {
         </Grid>
       </section>
 
-      {/* Current Leaders Section */}
       <section id='currentLeaders' className='pb-10 container' tabIndex='0'>
         <Typography variant='h6' gutterBottom style={{ color: "white" }}>
           Current Leaders
@@ -569,7 +621,7 @@ const Home = () => {
           <Grid
             container
             spacing={3}
-            style={{ filter: showLeaderboard ? "none" : "blur(15px)", pointerEvents: "none" }}
+            style={{ filter: showLeaderboard ? "none" : "blur(15px)", pointerEvents: showLeaderboard ? "auto" : "none" }}
           >
             {leaderboardData.length > 0 ? (
               leaderboardData.map((team) => (
@@ -594,7 +646,6 @@ const Home = () => {
                       alignItems='center'
                       style={{ width: "100%" }}
                     >
-                      {/* Rank Image */}
                       <Box style={{ flex: 1, textAlign: "center" }}>
                         <img
                           src={rankImages[team.rank]}
@@ -608,7 +659,6 @@ const Home = () => {
                         />
                       </Box>
 
-                      {/* Team Details */}
                       <Box
                         style={{
                           flex: team.rank === 1 ? 1 : 1.5,
