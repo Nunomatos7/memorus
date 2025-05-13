@@ -39,6 +39,11 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
   const modalRef = useRef(null);
   const fileInputRef = useRef(null);
 
+  useEffect(() => {
+    console.log("SubmitMemorModal: Initial memor=", memor);
+    console.log("SubmitMemorModal: memor.image=", memor.image);
+  }, [memor]);
+
   // Restore body overflow when component unmounts
   useEffect(() => {
     return () => {
@@ -48,12 +53,13 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
 
   // Fetch team photos when component mounts or memor changes
   useEffect(() => {
+    if (!memor || !memor.id || !token || !user?.tenant_subdomain) return;
+
+    setLoadingTeamPhotos(true);
+
     const fetchTeamPhotos = async () => {
-      if (!memor || !memor.id || !token || !user?.tenant_subdomain) return;
-
-      setLoadingTeamPhotos(true);
-
       try {
+        console.log(`Fetching pictures for memor ID: ${memor.id}`);
         // Fetch photos for this memor
         const response = await fetch(
           `${import.meta.env.VITE_API_URL}/api/memors/${memor.id}/pictures`,
@@ -70,24 +76,43 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
         }
 
         const pictures = await response.json();
+        console.log("API returned pictures:", pictures);
+
+        // Log first picture for debugging
+        if (pictures.length > 0) {
+          console.log("First picture details:", pictures[0]);
+          console.log("First picture alt_text:", pictures[0].alt_text);
+        }
 
         // Store the complete picture objects
         setNormalizedImages(pictures);
+        console.log("Set normalizedImages to:", pictures);
 
         // For backward compatibility
         if (!memor.image || memor.image.length === 0) {
-          memor.image = pictures.map((pic) => pic.img_src).filter(Boolean);
+          // IMPORTANT: Preserve alt_text from the API response
+          memor.image = pictures.map((pic) => ({
+            img_src: pic.img_src,
+            alt_text: pic.alt_text  // This preserves the alt_text from the database
+          }));
+          console.log("Updated memor.image with alt_text:", memor.image);
         }
       } catch (error) {
         console.error("Error fetching team photos:", error);
         // Use existing memor.image if available
         if (memor.image && memor.image.length > 0) {
           // Convert URL strings to objects if needed
-          const objectImages = memor.image.map((url) => ({
-            img_src: url,
-            alt_text: "Memor image", // Fallback alt text
-          }));
+          const objectImages = memor.image.map((url) => {
+            if (typeof url === 'string') {
+              return {
+                img_src: url,
+                alt_text: "Memor image", // Fallback alt text
+              };
+            }
+            return url; // Already an object
+          });
           setNormalizedImages(objectImages);
+          console.log("Using existing memor.image as normalized images:", objectImages);
         } else {
           setNormalizedImages([]);
         }
@@ -153,15 +178,39 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
     if (event) {
       event.stopPropagation();
     }
-
-    // Store the index of the clicked image
-    const imageIndex = normalizedImages.findIndex(
-      (img) =>
-        (typeof img === "string" ? img : img.img_src) ===
-        (typeof image === "string" ? image : image.img_src)
-    );
-
-    setSelectedImage(imageIndex >= 0 ? imageIndex : 0);
+  
+    console.log("SubmitMemorModal: handleImageClick called with image:", image);
+    
+    // Find the image index in the normalized images array
+    let imageIndex = -1;
+    
+    // If the image is an object with img_src, find by img_src
+    if (typeof image === 'object' && image.img_src) {
+      imageIndex = normalizedImages.findIndex(img => 
+        (typeof img === 'object' && img.img_src === image.img_src) || 
+        (typeof img === 'string' && img === image.img_src)
+      );
+    } 
+    // If the image is a string URL, find by string matching
+    else if (typeof image === 'string') {
+      imageIndex = normalizedImages.findIndex(img => 
+        (typeof img === 'string' && img === image) ||
+        (typeof img === 'object' && img.img_src === image)
+      );
+    }
+    
+    // Set the selected image index
+    console.log("SubmitMemorModal: Found image at index:", imageIndex);
+    
+    // If found, use that index, otherwise use 0
+    const selectedIndex = imageIndex >= 0 ? imageIndex : 0;
+    
+    // Log what we're selecting
+    if (selectedIndex < normalizedImages.length) {
+      console.log("SubmitMemorModal: Selected image:", normalizedImages[selectedIndex]);
+    }
+    
+    setSelectedImage(selectedIndex);
     document.body.style.overflow = "hidden";
   };
 
@@ -623,21 +672,19 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
               </>
             )}
 
-            {selectedImage !== null && (
-              <MemorPicture
-                images={normalizedImages}
-                currentIndex={
-                  typeof selectedImage === "number" ? selectedImage : 0
-                }
-                title={memor.title}
-                submitDate={memor.dueDate}
-                teamName={memor.team}
-                onClose={() => {
-                  setSelectedImage(null);
-                  document.body.style.overflow = "auto";
-                }}
-              />
-            )}
+{selectedImage !== null && (
+        <MemorPicture
+          images={normalizedImages}
+          currentIndex={typeof selectedImage === "number" ? selectedImage : 0}
+          title={memor.title}
+          submitDate={memor.dueDate}
+          teamName={memor.team}
+          onClose={() => {
+            setSelectedImage(null);
+            document.body.style.overflow = "auto";
+          }}
+        />
+      )}
 
             <div className="modal-actions">
               <CustomButton

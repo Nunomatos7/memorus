@@ -13,6 +13,18 @@ const MemorPicture = ({
 }) => {
   const [activeIndex, setActiveIndex] = useState(currentIndex || 0);
   
+  // Debug - log what images we received
+  useEffect(() => {
+    console.log("MemorPicture received images:", images);
+    if (images && images.length > 0) {
+      console.log("First image format:", images[0]);
+      // If it's an object with img_src and alt_text
+      if (typeof images[0] === 'object' && images[0] !== null) {
+        console.log("First image alt_text:", images[0].alt_text);
+      }
+    }
+  }, [images]);
+  
   const handlePrevious = useCallback(() => {
     setActiveIndex(prev => {
       const newIndex = prev <= 0 ? images.length - 1 : prev - 1;
@@ -50,6 +62,7 @@ const MemorPicture = ({
   
   // Get current image
   const currentImage = images[activeIndex];
+  console.log("Current image at index", activeIndex, ":", currentImage);
   
   // Get image URL and alt text
   let imageUrl = '';
@@ -58,8 +71,20 @@ const MemorPicture = ({
   if (typeof currentImage === 'string') {
     imageUrl = currentImage;
   } else if (currentImage && typeof currentImage === 'object') {
-    imageUrl = currentImage.img_src || '';
-    altText = currentImage.alt_text || 'Memor image';
+    // Handle all possible object structures we've seen in the codebase
+    if (currentImage.img_src) {
+      imageUrl = currentImage.img_src;
+      if (currentImage.alt_text) {
+        altText = currentImage.alt_text;
+        console.log("Using alt_text from object:", altText);
+      }
+    } else if (currentImage.image) {
+      imageUrl = currentImage.image;
+      if (currentImage.alt_text) {
+        altText = currentImage.alt_text;
+        console.log("Using alt_text from image property:", altText);
+      }
+    }
   }
 
   return (
@@ -96,7 +121,6 @@ const MemorPicture = ({
           <p>
             {teamName} • {submitDate}
           </p>
-          <p className="image-description">{altText}</p>
         </div>
       </div>
     </div>
