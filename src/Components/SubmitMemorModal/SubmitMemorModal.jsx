@@ -303,7 +303,7 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
               background: "#f5f5f5",
             }}
           >
-            <TestAltText memorId={memor.id} />
+            {/* <TestAltText memorId={memor.id} /> */}
           </div>
         );
       }
