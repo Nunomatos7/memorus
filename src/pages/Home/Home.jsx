@@ -300,6 +300,7 @@ const Home = () => {
 
     const preparedSlide = { ...slide };
 
+    // We'll still prepare the image data, but only as a fallback
     if (preparedSlide.image && Array.isArray(preparedSlide.image)) {
       preparedSlide.image = preparedSlide.image.map((img) => {
         if (typeof img === "string") {
@@ -314,40 +315,6 @@ const Home = () => {
           };
         }
       });
-    }
-
-    if (slide.memorId) {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/memors/${slide.memorId}/pictures`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "X-Tenant": user.tenant_subdomain,
-            },
-          }
-        );
-
-        if (response.ok) {
-          const pictures = await response.json();
-          console.log(
-            "Home: Fetched pictures with alt_text from API:",
-            pictures
-          );
-
-          if (pictures && pictures.length > 0) {
-            preparedSlide.image = pictures.map((pic, index) => ({
-              img_src: pic.img_src,
-              alt_text:
-                pic.alt_text ||
-                preparedSlide.image[index]?.alt_text ||
-                `Image for ${slide.title}`,
-            }));
-          }
-        }
-      } catch (error) {
-        console.error("Home: Error fetching pictures:", error);
-      }
     }
 
     console.log("Home: Final prepared slide image:", preparedSlide.image);
@@ -563,6 +530,7 @@ const Home = () => {
             title={selectedSlide.title}
             submitDate={selectedSlide.submittedDate}
             onClose={closeModal}
+            memorId={selectedSlide.memorId} // Add this prop to pass the memor ID
           />
         )}
       </section>
