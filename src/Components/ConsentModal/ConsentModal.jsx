@@ -3,11 +3,15 @@ import { useNavigate } from "react-router-dom";
 import "./ConsentModal.css";
 import Proptypes from "prop-types";
 import { useAuth } from "../../context/AuthContext";
+import TermsModal from "../TermsModal/TermsModal";
+import { Link } from "@mui/material";
 
 const ConsentModal = ({ setUser }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isExit, setIsExit] = useState(false);
+  const [termsModalOpen, setTermsModalOpen] = useState(false);
+  const [initialTab, setInitialTab] = useState("terms");
   const navigate = useNavigate();
   const { setCookiesAccepted } = useAuth();
 
@@ -43,34 +47,80 @@ const ConsentModal = ({ setUser }) => {
     }, 500);
   };
 
+  const openTermsModal = (tab) => {
+    setInitialTab(tab);
+    setTermsModalOpen(true);
+  };
+
   if (!isVisible) return null;
 
   return (
-    <div className={`cookie-consent-overlay ${isOpen ? "open" : ""}`}>
-      <div
-        className={`modal-content ${isOpen ? "open" : ""} ${
-          isExit ? "exit" : ""
-        }`}
-      >
-        <h2>We use cookies</h2>
-        <p>
-          Our website uses cookies to enhance your experience to manage
-          information stored in your browser. We don&apos;t share any
-          information with third-parties. All data is of responsible use of
-          Memor&apos;us, LTD and your tenant.
-          <br />
-          By continuing to use our site, you accept our use of cookies.
-        </p>
-        <div>
-          <button className='decline' onClick={() => handleCookieAction(false)}>
-            Decline
-          </button>
-          <button className='accept' onClick={() => handleCookieAction(true)}>
-            Accept
-          </button>
+    <>
+      <div className={`cookie-consent-overlay ${isOpen ? "open" : ""}`}>
+        <div
+          className={`modal-content ${isOpen ? "open" : ""} ${
+            isExit ? "exit" : ""
+          }`}
+        >
+          <h2>We use cookies</h2>
+          <p>
+            Our website uses cookies to enhance your experience to manage
+            information stored in your browser. We don&apos;t share any
+            information with third-parties. All data is of responsible use of
+            Memor&apos;us, LTD and your tenant.
+            <br />
+            By continuing to use our site, you accept our use of cookies.
+          </p>
+          <p style={{ fontSize: "12px", margin: "0 0 20px 0" }}>
+            Read our{" "}
+            <Link
+              component='button'
+              onClick={() => openTermsModal("terms")}
+              sx={{
+                color: "#d0bcfe",
+                cursor: "pointer",
+                fontSize: "12px",
+                textDecoration: "none",
+              }}
+            >
+              Terms of Service
+            </Link>{" "}
+            and{" "}
+            <Link
+              component='button'
+              onClick={() => openTermsModal("cookies")}
+              sx={{
+                color: "#d0bcfe",
+                cursor: "pointer",
+                fontSize: "12px",
+                textDecoration: "none",
+              }}
+            >
+              Cookie Policy
+            </Link>{" "}
+            for more details.
+          </p>
+          <div>
+            <button
+              className='decline'
+              onClick={() => handleCookieAction(false)}
+            >
+              Decline
+            </button>
+            <button className='accept' onClick={() => handleCookieAction(true)}>
+              Accept
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+
+      {/* Terms Modal */}
+      <TermsModal
+        open={termsModalOpen}
+        onClose={() => setTermsModalOpen(false)}
+        initialTab={initialTab}
+      />
+    </>
   );
 };
 
