@@ -297,18 +297,21 @@ const DynamicModal = ({
       );
       return;
     }
-
+  
     // Create team
     if (action === "create") {
       try {
+        setLoading(true);
+        
         // Create the team
         const teamResponse = await api.post("/api/teams", {
           name: newTeamName,
           avatar: newTeamThumbnail || "default_avatar.png",
         });
-
+  
         const teamId = teamResponse.data.id;
-
+        console.log(`Created team with ID: ${teamId}`);
+  
         // Assign selected members to team
         const selectedMemberIds = Object.entries(newTeamMembers)
           .filter(([_, isSelected]) => isSelected)
@@ -317,7 +320,7 @@ const DynamicModal = ({
             return member ? member.id : null;
           })
           .filter((id) => id !== null);
-
+  
         // Update each user using the correct endpoint
         for (const userId of selectedMemberIds) {
           try {
@@ -328,15 +331,43 @@ const DynamicModal = ({
             // Continue with other users even if one fails
           }
         }
-
+  
+        // ADDED: Get active competition and add team to it
+        try {
+          const competitionsResponse = await api.get("/api/competitions/active");
+          if (competitionsResponse.data && competitionsResponse.data.length > 0) {
+            const activeCompetition = competitionsResponse.data[0];
+            console.log(`Found active competition: ${activeCompetition.id}`);
+            
+            // Add team to the active competition
+            const addTeamResponse = await api.post(
+              `/api/competitions/${activeCompetition.id}/teams/${teamId}`,
+              {}
+            );
+            
+            if (addTeamResponse.status === 201) {
+              console.log(`Team ${teamId} added to competition ${activeCompetition.id} successfully`);
+            } else {
+              console.warn(`Unexpected response when adding team to competition:`, addTeamResponse);
+            }
+          } else {
+            console.log("No active competition found to add the team to");
+          }
+        } catch (compError) {
+          console.error("Error adding team to competition:", compError);
+          // Don't fail if this step fails - the team is still created
+        }
+  
+        setLoading(false);
         showFeedback(
           "success",
           "Team Created",
           `The team "${newTeamName}" has been successfully created with ${selectedMemberIds.length} members.`
         );
-
+        
         return true; // Signal success to the caller
       } catch (error) {
+        setLoading(false);
         console.error("Error creating team:", error);
         showFeedback(
           "error",
