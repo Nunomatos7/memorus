@@ -128,8 +128,7 @@ const Footer = () => {
           >
             Cookie Policy
           </StyledLink>
-          <StyledLink href='#'>Contact Us</StyledLink>
-          <StyledLink href='#'>Support</StyledLink>
+          <StyledLink href='mailto:geral@memor-us.com'>Contact Us</StyledLink>
         </FooterLinks>
       </FooterContent>
 
@@ -137,7 +136,13 @@ const Footer = () => {
       {termsModalOpen && (
         <TermsModal
           open={termsModalOpen}
-          onClose={() => setTermsModalOpen(false)}
+          onClose={() => {
+            setTermsModalOpen(false);
+            // Ensure body overflow is restored
+            setTimeout(() => {
+              document.body.style.overflow = "auto";
+            }, 0);
+          }}
           initialTab={initialTab}
         />
       )}

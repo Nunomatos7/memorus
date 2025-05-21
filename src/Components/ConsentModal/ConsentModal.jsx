@@ -13,7 +13,7 @@ const ConsentModal = ({ setUser }) => {
   const [termsModalOpen, setTermsModalOpen] = useState(false);
   const [initialTab, setInitialTab] = useState("terms");
   const navigate = useNavigate();
-  const { setCookiesAccepted } = useAuth();
+  const { setCookiesAccepted, token, user } = useAuth();
 
   useEffect(() => {
     const cookiesAccepted = document.cookie.includes("cookiesAccepted=true");
@@ -24,8 +24,9 @@ const ConsentModal = ({ setUser }) => {
     }
   }, []);
 
-  const handleCookieAction = (accept) => {
+  const handleCookieAction = async (accept) => {
     if (accept) {
+      // Set cookie for immediate UI update
       document.cookie =
         "cookiesAccepted=true; expires=" +
         new Date(
@@ -33,6 +34,16 @@ const ConsentModal = ({ setUser }) => {
         ).toUTCString() +
         "; path=/;";
       setCookiesAccepted(true);
+
+      // If user is logged in, save to database too
+      if (user && token) {
+        try {
+          await saveTermsAcceptance(token, user.tenant_subdomain, "cookies");
+        } catch (error) {
+          console.error("Error saving cookie acceptance to database:", error);
+          // Continue anyway as we've set the cookie locally
+        }
+      }
     } else {
       localStorage.removeItem("user");
       setUser(null);
@@ -115,11 +126,19 @@ const ConsentModal = ({ setUser }) => {
       </div>
 
       {/* Terms Modal */}
-      <TermsModal
-        open={termsModalOpen}
-        onClose={() => setTermsModalOpen(false)}
-        initialTab={initialTab}
-      />
+      {termsModalOpen && (
+        <TermsModal
+          open={termsModalOpen}
+          onClose={() => {
+            setTermsModalOpen(false);
+            // Ensure body overflow is restored
+            setTimeout(() => {
+              document.body.style.overflow = isVisible ? "hidden" : "auto";
+            }, 0);
+          }}
+          initialTab={initialTab}
+        />
+      )}
     </>
   );
 };

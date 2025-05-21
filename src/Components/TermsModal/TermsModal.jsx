@@ -10,9 +10,11 @@ import {
   Tab,
   Divider,
   Link,
+  CircularProgress,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { useAuth } from "../../context/AuthContext";
 
 /**
  * Modal component for displaying Terms of Service and Cookie Policy
@@ -23,26 +25,74 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
  * @param {string} props.initialTab Which tab should be active on open ('terms' or 'cookies')
  */
 const TermsModal = ({ open, onClose, initialTab = "terms" }) => {
+  const { token, user } = useAuth();
   const [activeTab, setActiveTab] = useState(initialTab);
   const [scrollPosition, setScrollPosition] = useState(0);
   const [canAccept, setCanAccept] = useState(false);
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hasAccepted, setHasAccepted] = useState({
+    terms: false,
+    cookies: false,
+  });
+  // Additional useEffect to ensure body overflow is restored when component unmounts
   useEffect(() => {
-    if (open) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
-    }
     return () => {
+      // Final cleanup - ensure overflow is restored when component unmounts
       document.body.style.overflow = "auto";
     };
+  }, []);
+
+  // Check if user has already accepted terms
+  useEffect(() => {
+    if (open && token && user) {
+      const checkAcceptance = async () => {
+        try {
+          // Try to fetch from database first
+          const acceptanceStatus = await checkTermsAcceptance(
+            token,
+            user.tenant_subdomain
+          );
+          setHasAccepted({
+            terms: acceptanceStatus.termsAccepted,
+            cookies: acceptanceStatus.cookiesAccepted,
+          });
+        } catch (error) {
+          // Fallback to localStorage if API fails
+          setHasAccepted({
+            terms: localStorage.getItem("termsAccepted") === "true",
+            cookies: localStorage.getItem("cookiesAccepted") === "true",
+          });
+        }
+      };
+
+      checkAcceptance();
+    }
+  }, [open, token, user]);
+
+  useEffect(() => {
+    // Handle body overflow when modal opens/closes
+    if (open) {
+      // Store the current overflow style
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+
+      // Return cleanup function that will run when component unmounts or 'open' changes
+      return () => {
+        document.body.style.overflow = originalOverflow || "auto";
+      };
+    }
+
+    // If modal is closed, ensure overflow is restored
+    document.body.style.overflow = "auto";
+
+    return () => {};
   }, [open]);
 
   useEffect(() => {
     // Reset scroll position and acceptance status when tab changes
     setScrollPosition(0);
-    setCanAccept(false);
-  }, [activeTab]);
+    setCanAccept(hasAccepted[activeTab] || false);
+  }, [activeTab, hasAccepted]);
 
   const handleScroll = (e) => {
     const { scrollTop, scrollHeight, clientHeight } = e.target;
@@ -60,11 +110,52 @@ const TermsModal = ({ open, onClose, initialTab = "terms" }) => {
     setActiveTab(newValue);
   };
 
-  const handleAccept = () => {
-    // Set a cookie or localStorage item to remember user accepted
-    localStorage.setItem("termsAccepted", "true");
-    localStorage.setItem("cookiesAccepted", "true");
-    onClose();
+  const handleAccept = async () => {
+    if (!token || !user) {
+      // Fallback to localStorage if not logged in
+      localStorage.setItem("termsAccepted", "true");
+      localStorage.setItem("cookiesAccepted", "true");
+      localStorage.setItem("termsAcceptedDate", new Date().toISOString());
+      onClose();
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Save to both database and localStorage
+      await saveTermsAcceptance(
+        token,
+        user.tenant_subdomain,
+        activeTab === "terms" ? "terms" : "cookies"
+      );
+
+      // Update local state
+      setHasAccepted((prev) => ({
+        ...prev,
+        [activeTab]: true,
+      }));
+
+      // Also save to localStorage as backup
+      localStorage.setItem(`${activeTab}Accepted`, "true");
+      localStorage.setItem(
+        `${activeTab}AcceptedDate`,
+        new Date().toISOString()
+      );
+
+      onClose();
+    } catch (error) {
+      console.error("Failed to save acceptance:", error);
+      // Fallback to localStorage
+      localStorage.setItem(`${activeTab}Accepted`, "true");
+      localStorage.setItem(
+        `${activeTab}AcceptedDate`,
+        new Date().toISOString()
+      );
+      onClose();
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -235,7 +326,7 @@ const TermsModal = ({ open, onClose, initialTab = "terms" }) => {
             </Button>
             <Button
               onClick={handleAccept}
-              disabled={!canAccept}
+              disabled={!canAccept || isSubmitting}
               sx={{
                 backgroundColor: "#d0bcfe",
                 color: "#381e72",
@@ -246,10 +337,15 @@ const TermsModal = ({ open, onClose, initialTab = "terms" }) => {
                   backgroundColor: "#4a4a4a",
                   color: "#999",
                 },
+                minWidth: "100px",
               }}
               variant='contained'
             >
-              Accept
+              {isSubmitting ? (
+                <CircularProgress size={24} sx={{ color: "#381e72" }} />
+              ) : (
+                "Accept"
+              )}
             </Button>
           </Box>
         </Box>
@@ -408,7 +504,7 @@ const TermsOfServiceContent = () => (
     <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 4 }}>
       If you have any questions about these Terms, please contact us at{" "}
       <Link href='mailto:legal@memor-us.com' sx={{ color: "#d0bcfe" }}>
-        legal@memor-us.com
+        geral@memor-us.com
       </Link>
     </Typography>
   </Box>
