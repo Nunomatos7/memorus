@@ -42,10 +42,10 @@ const RegisterPage = () => {
   const handleRegister = async (e) => {
     e.preventDefault();
     setError("");
-    
+
     // Get tenant from subdomain
     const tenant = getTenantFromSubdomain()?.toLowerCase();
-    
+
     if (!tenant) {
       setError("Invalid tenant.");
       return;
@@ -64,21 +64,24 @@ const RegisterPage = () => {
 
     try {
       setIsSubmitting(true);
-      
+
       // Make API call to register endpoint
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-tenant": tenant,
-        },
-        body: JSON.stringify({
-          firstName,
-          lastName,
-          email,
-          password,
-        }),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/register`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-tenant": tenant,
+          },
+          body: JSON.stringify({
+            firstName,
+            lastName,
+            email,
+            password,
+          }),
+        }
+      );
 
       // Handle response
       if (!response.ok) {
@@ -88,14 +91,14 @@ const RegisterPage = () => {
 
       // Registration successful
       toast.success("Registration successful! You can now log in.");
-      
+
       // Clear form
       setFirstName("");
       setLastName("");
       setEmail("");
       setPassword("");
       setConfirmPassword("");
-      
+
       // Redirect to login page
       setTimeout(() => {
         navigate("/login");
@@ -109,30 +112,30 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="login-container">
-      <div className="login-card">
-        <div className="logo-container">
-          <img src={logo} alt="Memor'us Logo" className="logo" />
+    <div className='login-container'>
+      <div className='login-card'>
+        <div className='logo-container'>
+          <img src={logo} alt="Memor'us Logo" className='logo' />
         </div>
-        <Typography variant="h5" className="login-title">
+        <Typography variant='h5' className='login-title'>
           Register
         </Typography>
-        <Typography variant="body2" className="login-subtitle">
+        <Typography variant='body2' className='login-subtitle'>
           Create your account to get started. Enter your details below.
           <span style={{ color: "rgb(146,130,249)" }}> * = required </span>
         </Typography>
-        <form onSubmit={handleRegister} className="login-form">
-          {error && <p className="error-message">{error}</p>}
+        <form onSubmit={handleRegister} className='login-form'>
+          {error && <p className='error-message'>{error}</p>}
 
           {/* Name Fields */}
           <div style={{ display: "flex", gap: "16px", marginBottom: "16px" }}>
             <TextField
-              label="First Name"
+              label='First Name'
               value={firstName}
               required
               onChange={(e) => setFirstName(e.target.value)}
               fullWidth
-              variant="outlined"
+              variant='outlined'
               sx={{
                 "& .MuiInputBase-root": {
                   backgroundColor: "#2c2c2c",
@@ -156,12 +159,12 @@ const RegisterPage = () => {
               }}
             />
             <TextField
-              label="Last Name"
+              label='Last Name'
               value={lastName}
               required
               onChange={(e) => setLastName(e.target.value)}
               fullWidth
-              variant="outlined"
+              variant='outlined'
               sx={{
                 "& .MuiInputBase-root": {
                   backgroundColor: "#2c2c2c",
@@ -187,13 +190,13 @@ const RegisterPage = () => {
           </div>
 
           <TextField
-            label="Email"
-            type="email"
+            label='Email'
+            type='email'
             value={email}
             required
             onChange={(e) => setEmail(e.target.value)}
             fullWidth
-            variant="outlined"
+            variant='outlined'
             sx={{
               mb: 2,
               "& .MuiInputBase-root": {
@@ -219,13 +222,13 @@ const RegisterPage = () => {
           />
 
           <TextField
-            label="Password"
-            type="password"
+            label='Password'
+            type='password'
             value={password}
             required
             onChange={(e) => setPassword(e.target.value)}
             fullWidth
-            variant="outlined"
+            variant='outlined'
             sx={{
               mb: 2,
               "& .MuiInputBase-root": {
@@ -251,13 +254,13 @@ const RegisterPage = () => {
           />
 
           <TextField
-            label="Confirm Password"
-            type="password"
+            label='Confirm Password'
+            type='password'
             value={confirmPassword}
             required
             onChange={(e) => setConfirmPassword(e.target.value)}
             fullWidth
-            variant="outlined"
+            variant='outlined'
             sx={{
               mb: 2,
               "& .MuiInputBase-root": {
@@ -281,10 +284,21 @@ const RegisterPage = () => {
               },
             }}
           />
+          <Typography variant='body2' className='login-subtitle'>
+            By creating an account you agree to our
+            <a href='/terms' className='consent-link'>
+              Terms of Service
+            </a>
+            and
+            <a href='/privacy' className='consent-link'>
+              Privacy Policy
+            </a>
+            .
+          </Typography>
 
           <Button
-            type="submit"
-            variant="contained"
+            type='submit'
+            variant='contained'
             fullWidth
             disabled={isSubmitting}
             sx={{
@@ -298,18 +312,28 @@ const RegisterPage = () => {
             }}
           >
             {isSubmitting ? (
-              <CircularProgress size={24} color="inherit" />
+              <CircularProgress size={24} color='inherit' />
             ) : (
               "Register"
             )}
           </Button>
         </form>
-        <a href="/login" className="admin-link">
+        <a href='/login' className='admin-link'>
           Already have an account? Login here
         </a>
       </div>
-      <img className="left-background" src={leftBackground} alt="" aria-hidden="true" />
-      <img className="right-background" src={rightBackground} alt="" aria-hidden="true" />
+      <img
+        className='left-background'
+        src={leftBackground}
+        alt=''
+        aria-hidden='true'
+      />
+      <img
+        className='right-background'
+        src={rightBackground}
+        alt=''
+        aria-hidden='true'
+      />
     </div>
   );
 };
