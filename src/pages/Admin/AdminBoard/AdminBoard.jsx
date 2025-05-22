@@ -12,7 +12,7 @@ import background1 from "../../../assets/images/adminBackground1.svg";
 import background2 from "../../../assets/images/adminBackground2.svg";
 import background3 from "../../../assets/images/adminBackground3.svg";
 import Loader from "../../../Components/Loader/Loader";
-import ManageMemors from "./components/ManageMemors";
+import ManageMemors from "./Components/ManageMemors";
 import ManageTeams from "./Components/ManageTeams";
 import ManageCompetition from "./Components/ManageCompetition";
 import DynamicModal from "./Components/DynamicModal";
