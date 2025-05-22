@@ -13,6 +13,8 @@ jobs:
         fetch-depth: 0
         
     - name: Remove workflow files and push to personal repo
+      env:
+        PERSONAL_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
       run: |
         # Remove the .github directory
         rm -rf .github
@@ -21,10 +23,8 @@ jobs:
         git config user.name "GitHub Actions Bot"
         git config user.email "actions@github.com"
         
-        # Stage the removal of .github directory
+        # Add remote and push (force push to overwrite)
+        git remote add personal https://${PERSONAL_TOKEN}@github.com/Nunomatos7/memorus.git
         git add -A
-        git commit -m "Sync from organization repo (excluding workflows)" || echo "No changes to commit"
-        
-        # Push to personal repo
-        git remote add personal https://${{ secrets.PERSONAL_TOKEN }}@github.com/Nunomatos7/memorus.git
+        git commit -m "Sync from organization repo" || echo "No changes to commit"
         git push personal HEAD:main --force
