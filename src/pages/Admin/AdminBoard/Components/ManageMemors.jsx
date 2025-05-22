@@ -39,7 +39,6 @@ const ManageMemors = ({
         return;
       }
 
-      // Get memors for the active competition
       const memorsResponse = await api.get(
         `/api/competitions/${activeCompetition.id}/memors`
       );
@@ -48,7 +47,7 @@ const ManageMemors = ({
         id: memor.id,
         title: memor.title,
         description: memor.description,
-        date: new Date(memor.due_date).toLocaleDateString("en-GB"), // Format as DD/MM/YYYY
+        date: new Date(memor.due_date).toLocaleDateString("en-GB"),
         points: `+ ${memor.points} pts`,
         teamsLeft: memor.team_submissions ? memor.team_submissions.length : 0,
         is_done: memor.is_done,
@@ -62,15 +61,12 @@ const ManageMemors = ({
       setLoading(false);
     }
   };
-  // In ManageMemors.jsx - Replace the current useEffect with this one
 
   useEffect(() => {
-    // Set up the global reference immediately
     if (!window.manageMemorsRef) {
       window.manageMemorsRef = {};
     }
 
-    // Define the reference to the current fetchMemors function
     const fetchMemorsRef = async () => {
       setLoading(true);
       try {
@@ -85,7 +81,6 @@ const ManageMemors = ({
           return;
         }
 
-        // Get memors for the active competition
         const memorsResponse = await api.get(
           `/api/competitions/${activeCompetition.id}/memors`
         );
@@ -94,7 +89,7 @@ const ManageMemors = ({
           id: memor.id,
           title: memor.title,
           description: memor.description,
-          date: new Date(memor.due_date).toLocaleDateString("en-GB"), // Format as DD/MM/YYYY
+          date: new Date(memor.due_date).toLocaleDateString("en-GB"),
           points: `+ ${memor.points} pts`,
           teamsLeft: memor.team_submissions ? memor.team_submissions.length : 0,
           is_done: memor.is_done,
@@ -109,19 +104,16 @@ const ManageMemors = ({
       }
     };
 
-    // Store the function reference
     window.manageMemorsRef.fetchMemors = fetchMemorsRef;
 
-    // Initial data fetch
     fetchMemorsRef();
 
-    // Cleanup when component unmounts
     return () => {
       if (window.manageMemorsRef?.fetchMemors === fetchMemorsRef) {
         delete window.manageMemorsRef.fetchMemors;
       }
     };
-  }, [tab2]); // Only depend on tab2 to avoid infinite loops
+  }, [tab2]);
 
   const deleteMemor = async (memor) => {
     setLoading(true);
@@ -132,7 +124,7 @@ const ManageMemors = ({
         "Memor Deleted",
         `The memor "${memor.title}" has been successfully deleted.`
       );
-      fetchMemors(); // Refresh the list
+      fetchMemors();
     } catch (error) {
       console.error("Error deleting memor:", error);
       showFeedback(
@@ -173,11 +165,9 @@ const ManageMemors = ({
 
   const calculateDaysLeft = (dateString) => {
     const parts = dateString.split("/");
-    // Convert from DD/MM/YYYY to MM/DD/YYYY for JS Date
     const dueDate = new Date(`${parts[1]}/${parts[0]}/${parts[2]}`);
     const today = new Date();
 
-    // Reset time to midnight for comparison
     today.setHours(0, 0, 0, 0);
     dueDate.setHours(0, 0, 0, 0);
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Box,
   Typography,
@@ -15,9 +15,9 @@ import {
   List,
   ListItem,
   CircularProgress,
-  Alert
+  Alert,
 } from "@mui/material";
-import { Groups, Search } from "@mui/icons-material";
+import { Groups, Search, Stars } from "@mui/icons-material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import TodayIcon from "@mui/icons-material/Today";
@@ -35,11 +35,9 @@ import { useAuth } from "../../context/AuthContext";
 
 const Memors = () => {
   const { token, user } = useAuth();
-
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const tabParam = searchParams.get("tab") || "all";
-
   const navigate = useNavigate();
 
   const [tab, setTab] = useState(tabParam);
@@ -48,6 +46,7 @@ const Memors = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedMemor, setSelectedMemor] = useState(null);
   const [ongoingMemors, setOngoingMemors] = useState([]);
+  const [memors, setMemors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentCompetition, setCurrentCompetition] = useState(null);
@@ -72,22 +71,25 @@ const Memors = () => {
             },
           }
         );
-        
+
         if (!competitionResponse.ok) {
-          throw new Error("Failed to fetch active competition");
+          throw new Error(
+            `Failed to fetch active competition: ${competitionResponse.status} ${competitionResponse.statusText}`
+          );
         }
-        
+
         const competitionsData = await competitionResponse.json();
-        
+        console.log("Active competitions:", competitionsData);
+
         if (!competitionsData || competitionsData.length === 0) {
           setLoading(false);
           setError("No active competition found");
           return;
         }
-        
+
         const activeCompetition = competitionsData[0];
         setCurrentCompetition(activeCompetition);
-        
+
         // Then fetch memors for this competition
         const memorResponse = await fetch(
           `${import.meta.env.VITE_API_URL}/api/competitions/${activeCompetition.id}/memors`,
@@ -98,33 +100,85 @@ const Memors = () => {
             },
           }
         );
-        
-        if (!memorResponse.ok) {
-          throw new Error("Failed to fetch memors for this competition");
-        }
-        
-        const memorsData = await memorResponse.json();
-        
-        // Process memors
-        const processedMemors = memorsData.map(memor => ({
-          ...memor,
-          competitionName: activeCompetition.name,
-          status: memor.has_my_submission ? "submitted" : "incomplete",
-          submission: memor.has_my_submission
-            ? "Submitted by you"
-            : "No submission yet",
-          dueDate: new Date(memor.due_date).toLocaleDateString("pt-PT"),
-          timeLeft: getTimeLeft(memor.due_date),
-        }));
 
-        setOngoingMemors(processedMemors);
-        
+        if (!memorResponse.ok) {
+          throw new Error(
+            `Failed to fetch memors for this competition: ${memorResponse.status} ${memorResponse.statusText}`
+          );
+        }
+
+        const memorsData = await memorResponse.json();
+        console.log("Memors data:", memorsData);
+
+        // Process all memors
+        const allProcessedMemors = memorsData.map((memor) => {
+          const timeLeftInfo = getTimeLeft(memor.due_date);
+
+          // For checking if expired, we need to compare to the end of the due date
+          const dueDate = new Date(memor.due_date);
+          dueDate.setHours(23, 59, 59, 999); // Set to end of day
+
+          const now = new Date();
+          const isExpired = dueDate < now;
+
+          // Check if there are team submissions (but not by the current user)
+          const hasTeamSubmission =
+            memor.team_submissions &&
+            memor.team_submissions.length > 0 &&
+            !memor.has_my_submission;
+
+          // Determine the status
+          let status = "incomplete";
+          if (memor.has_my_submission) {
+            status = "submitted";
+          } else if (hasTeamSubmission) {
+            status = "team-submitted";
+          } else if (isExpired) {
+            status = "expired";
+          }
+
+          // Determine the submission text
+          let submissionText = "No submission yet";
+          if (memor.has_my_submission) {
+            submissionText = "Submitted by you";
+          } else if (hasTeamSubmission) {
+            submissionText = "Submitted by team member";
+          } else if (isExpired) {
+            submissionText = "Expired";
+          }
+
+          return {
+            ...memor,
+            competitionName: activeCompetition.name,
+            status: status,
+            submission: submissionText,
+            dueDate: new Date(memor.due_date).toLocaleDateString("pt-PT"),
+            dueDateRaw: new Date(memor.due_date), // Keep raw date for sorting
+            timeLeft: isExpired ? { text: "Expired", days: 0 } : timeLeftInfo,
+            isExpired,
+            hasTeamSubmission: hasTeamSubmission,
+          };
+        });
+
+        // Filter for ongoing section - only active memors
+        const ongoingMemors = allProcessedMemors
+          .filter((memor) => !memor.isExpired)
+          .sort((a, b) => a.dueDateRaw - b.dueDateRaw); // Sort by due date (closest first)
+
+        setOngoingMemors(ongoingMemors);
+
+        // All memors for the list below - sorted by due date (distant dates on top)
+        const sortedAllMemors = [...allProcessedMemors].sort(
+          (a, b) => b.dueDateRaw - a.dueDateRaw
+        );
+        setMemors(sortedAllMemors);
+
         // Check for memor ID in URL
         const pathnameParts = location.pathname.split("/");
         const memorIdFromUrl = pathnameParts[2]; // ex: /memors/1 → "1"
 
         if (memorIdFromUrl) {
-          const memorToOpen = processedMemors.find(
+          const memorToOpen = allProcessedMemors.find(
             (memor) => String(memor.id) === memorIdFromUrl
           );
           if (memorToOpen) {
@@ -149,14 +203,19 @@ const Memors = () => {
   const getTimeLeft = (dueDate) => {
     const now = new Date();
     const end = new Date(dueDate);
+    end.setHours(23, 59, 59, 999); // Set to end of the due date
+
     const diff = end - now;
 
     if (diff <= 0) return "Expired";
 
+    // Calculate days remaining (same day = 1 day left)
     const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
-    return `${days} dia${days > 1 ? "s" : ""} restante${
-      days > 1 ? "s" : ""
-    }`;
+
+    return {
+      text: `< ${days} day${days > 1 ? "s" : ""} left${days > 1 ? "s" : ""}`,
+      days: days,
+    };
   };
 
   const handleTabChange = (_, newValue) => {
@@ -167,18 +226,85 @@ const Memors = () => {
     setExpandedIndex(expandedIndex === index ? null : index);
   };
 
-  const handleOpenModal = (memor) => {
-    setSelectedMemor(memor);
+  const handleOpenModal = async (memor) => {
+    console.log("Memors: Opening modal for memor:", memor);
+    
+    // Prepare memor for display
+    const preparedMemor = { ...memor };
+    
+    // Fetch the pictures with alt_text from the API
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/memors/${memor.id}/pictures`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "X-Tenant": user.tenant_subdomain,
+          },
+        }
+      );
+      
+      if (response.ok) {
+        const pictures = await response.json();
+        console.log("Memors: Fetched pictures with alt_text from API:", pictures);
+        
+        if (pictures && pictures.length > 0) {
+          // Use the pictures from the API which include the correct alt_text
+          preparedMemor.image = pictures;
+          console.log("Memors: Using pictures from API with alt_text");
+        } else {
+          // Fall back to the existing images if API returns no pictures
+          preparedMemor.image = Array.isArray(memor.image) ? memor.image.map(img => {
+            if (typeof img === 'string') {
+              return {
+                img_src: img,
+                alt_text: `Image for ${memor.title}`
+              };
+            }
+            return img;
+          }) : [];
+        }
+      } else {
+        // Fall back to existing images if API call fails
+        preparedMemor.image = Array.isArray(memor.image) ? memor.image.map(img => {
+          if (typeof img === 'string') {
+            return {
+              img_src: img,
+              alt_text: `Image for ${memor.title}`
+            };
+          }
+          return img;
+        }) : [];
+      }
+    } catch (error) {
+      console.error("Error fetching pictures:", error);
+      // Fall back to existing images on error
+      preparedMemor.image = Array.isArray(memor.image) ? memor.image.map(img => {
+        if (typeof img === 'string') {
+          return {
+            img_src: img,
+            alt_text: `Image for ${memor.title}`
+          };
+        }
+        return img;
+      }) : [];
+    }
+    
+    setSelectedMemor(preparedMemor);
     setIsModalOpen(true);
     document.body.style.overflow = "hidden";
-    navigate(`/memors/${memor.id}`);
+  
+    // Update URL without causing a page refresh using replaceState
+    window.history.replaceState(null, "", `/memors/${memor.id}`);
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedMemor(null);
     document.body.style.overflow = "auto";
-    navigate("/memors");
+
+    // Update URL without causing a page refresh using replaceState
+    window.history.replaceState(null, "", "/memors");
   };
 
   const handleSubmitMemor = (id) => {
@@ -189,14 +315,27 @@ const Memors = () => {
               ...memor,
               submission: "Submitted by you",
               status: "submitted",
-              has_my_submission: true
+              has_my_submission: true,
+            }
+          : memor
+      )
+    );
+
+    setMemors((prevMemors) =>
+      prevMemors.map((memor) =>
+        memor.id === id
+          ? {
+              ...memor,
+              submission: "Submitted by you",
+              status: "submitted",
+              has_my_submission: true,
             }
           : memor
       )
     );
   };
 
-  const filteredMemors = ongoingMemors.filter((memor) => {
+  const filteredMemors = memors.filter((memor) => {
     const matchesSearch = memor.title
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
@@ -204,7 +343,10 @@ const Memors = () => {
       return memor.status === "submitted" && matchesSearch;
     }
     if (tab === "incomplete") {
-      return memor.status === "incomplete" && matchesSearch;
+      return (
+        (memor.status === "incomplete" || memor.status === "expired") &&
+        matchesSearch
+      );
     }
     return matchesSearch;
   });
@@ -212,21 +354,26 @@ const Memors = () => {
   return (
     <>
       <Loader />
-      <div className='container'>
+      <div className="container">
         <Box>
-          <div className='memors-header'>
+          <div className="memors-header">
             <Typography
-              variant='h4'
-              component='h1'
+              variant="h4"
+              component="h1"
               sx={{ fontWeight: "bold", color: "white" }}
             >
               {currentCompetition ? (
                 <>
                   Ongoing Memors
-                  <span className='memors-ongoing'> ({ongoingMemors.length})</span>
+                  <span className="memors-ongoing">
+                    {" "}
+                    ({ongoingMemors.length})
+                  </span>
                 </>
+              ) : loading ? (
+                "Loading Memors..."
               ) : (
-                loading ? 'Loading Memors...' : 'No Active Competition'
+                "No Active Competition"
               )}
             </Typography>
           </div>
@@ -236,175 +383,181 @@ const Memors = () => {
               <CircularProgress size={40} sx={{ color: "#d0bcfe" }} />
             </Box>
           ) : error ? (
-            <Alert severity="warning" sx={{ my: 2 }}>{error}</Alert>
+            <Alert severity="warning" sx={{ my: 2 }}>
+              {error}
+            </Alert>
           ) : (
             <>
-              {/* Swiper Section */}
-              <Swiper
-                spaceBetween={80}
-                breakpoints={{
-                  640: {
-                    slidesPerView: 2.3,
-                  },
-                  768: {
-                    slidesPerView: 3.3,
-                  },
-                  1024: {
-                    slidesPerView: 4.3,
-                  },
-                }}
-                freeMode={true}
-                mousewheel={{
-                  releaseOnEdges: true,
-                }}
-                modules={[Mousewheel, FreeMode]}
-              >
-                {ongoingMemors.map((memor, index) => (
-                  <SwiperSlide key={index}>
-                    <Card
-                      key={index}
+              {/* Native scrollable container with real scrollbar */}
+              <Box className="memors-swiper-container">
+                <div className="horizontal-scroll-container">
+                  {ongoingMemors.length > 0 ? (
+                    ongoingMemors.map((memor, index) => (
+                      <div key={index} className="memor-card-container">
+                        <Card
+                          sx={{
+                            width: "300px",
+                            height: "220px",
+                            backgroundColor: "#1E1F20",
+                            color: "white",
+                            borderRadius: "12px",
+                            boxShadow: "0px 4px 10px rgba(0,0,0,0.2)",
+                            display: "flex",
+                            flexDirection: "column",
+                            justifyContent: "space-between",
+                            paddingBottom: "8px",
+                          }}
+                          tabIndex={0}
+                          aria-label={`Memor: ${memor.title}`}
+                        >
+                          <CardContent>
+                            <Typography sx={{ mb: 1, fontWeight: "bold" }}>
+                              {memor.title}
+                            </Typography>
+
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                mb: 1,
+                              }}
+                            >
+                              <Groups
+                                fontSize="small"
+                                sx={{ mr: 1, color: "#CBCBCB" }}
+                                aria-hidden="true"
+                              />
+                              <Typography
+                                color="#CBCBCB"
+                                sx={{ fontSize: "0.8rem" }}
+                              >
+                                {memor.submission}
+                              </Typography>
+                            </Box>
+
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                              }}
+                            >
+                              <TodayIcon
+                                fontSize="small"
+                                sx={{ mr: 1, color: "#CBCBCB" }}
+                                aria-hidden="true"
+                              />
+                              <Typography
+                                variant="body2"
+                                color="#CBCBCB"
+                                sx={{ fontSize: "0.8rem" }}
+                              >
+                                Due on {memor.dueDate}{" "}
+                                {memor.timeLeft && memor.timeLeft.days === 1}
+                              </Typography>
+                            </Box>
+                            <Box sx={{ display: "flex", gap: "10px" }}>
+                              {memor.timeLeft && memor.timeLeft.days === 1 && (
+                                <Chip
+                                  label={memor.timeLeft.text}
+                                  size="small"
+                                  sx={{
+                                    backgroundColor: "rgba(255, 0, 136, 0.2)",
+                                    color: "#D582B0",
+                                    borderRadius: "40px",
+                                    marginTop: "10px",
+                                    boxShadow: "0px 4px 10px rgba(0,0,0,0.4)",
+                                  }}
+                                />
+                              )}
+                              {memor.status === "submitted" && (
+                                <Chip
+                                  label="Submitted"
+                                  size="small"
+                                  sx={{
+                                    backgroundColor: "rgba(0, 255, 163, 0.2)",
+                                    color: "#82D5C7",
+                                    borderRadius: "40px",
+                                    marginTop: "10px",
+                                    boxShadow: "0px 4px 10px rgba(0,0,0,0.4)",
+                                  }}
+                                />
+                              )}
+                            </Box>
+                          </CardContent>
+
+                          {memor.status !== "expired" &&
+                            memor.status !== "submitted" && (
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: "8px",
+                                  padding: "8px 16px",
+                                  cursor: "pointer",
+                                  width: "fit-content",
+                                }}
+                                onClick={() => handleOpenModal(memor)}
+                                role="button"
+                                tabIndex={0}
+                                aria-label={`View details for ${memor.title}`}
+                              >
+                                <Button
+                                  variant="contained"
+                                  aria-label="Add picture"
+                                  sx={{
+                                    backgroundColor: "#7E57C2",
+                                    color: "white",
+                                    borderRadius: "8px",
+                                    width: "30px",
+                                    height: "30px",
+                                    minWidth: "0px",
+                                    padding: "0px",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    boxShadow: "0px 4px 10px rgba(0,0,0,0.4)",
+                                    "&:hover": {
+                                      backgroundColor: "#6A48B3",
+                                    },
+                                  }}
+                                >
+                                  <AddRoundedIcon fontSize="small" />
+                                </Button>
+
+                                <Typography
+                                  variant="body2"
+                                  sx={{
+                                    fontSize: "0.8rem",
+                                    color: "white",
+                                  }}
+                                >
+                                  View details
+                                </Typography>
+                              </Box>
+                            )}
+                        </Card>
+                      </div>
+                    ))
+                  ) : (
+                    <Box
                       sx={{
-                        width: "300px",
-                        height: "220px",
-                        backgroundColor: "#1E1F20",
-                        color: "white",
-                        borderRadius: "12px",
-                        boxShadow: "0px 4px 10px rgba(0,0,0,0.2)",
-                        display: "flex",
-                        flexDirection: "column",
-                        justifyContent: "space-between",
-                        paddingBottom: "8px",
-                        flexShrink: 0,
+                        p: 4,
+                        textAlign: "center",
+                        color: "#aaa",
+                        width: "100%",
                       }}
-                      tabIndex={0}
-                      aria-label={`Memor: ${memor.title}`}
                     >
-                      <CardContent>
-                        <Typography sx={{ mb: 1, fontWeight: "bold" }}>
-                          {memor.title}
-                        </Typography>
-
-                        <Box
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            mb: 1,
-                          }}
-                        >
-                          <Groups
-                            fontSize='small'
-                            sx={{ mr: 1, color: "#CBCBCB" }}
-                            aria-hidden='true'
-                          />
-                          <Typography color='#CBCBCB' sx={{ fontSize: "0.8rem" }}>
-                            {memor.submission}
-                          </Typography>
-                        </Box>
-
-                        <Box
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                          }}
-                        >
-                          <TodayIcon
-                            fontSize='small'
-                            sx={{ mr: 1, color: "#CBCBCB" }}
-                            aria-hidden='true'
-                          />
-                          <Typography
-                            variant='body2'
-                            color='#CBCBCB'
-                            sx={{ fontSize: "0.8rem" }}
-                          >
-                            Due on {memor.dueDate}
-                          </Typography>
-                        </Box>
-                        <Box sx={{ display: "flex", gap: "10px" }}>
-                          {memor.timeLeft && (
-                            <Chip
-                              label={memor.timeLeft}
-                              size='small'
-                              sx={{
-                                backgroundColor: "rgba(255, 0, 136, 0.2)",
-                                color: "#D582B0",
-                                borderRadius: "40px",
-                                marginTop: "10px",
-                                boxShadow: "0px 4px 10px rgba(0,0,0,0.4)",
-                              }}
-                            />
-                          )}
-                          {memor.status === "submitted" && (
-                            <Chip
-                              label='Submitted'
-                              size='small'
-                              sx={{
-                                backgroundColor: "rgba(0, 255, 163, 0.2)",
-                                color: "#82D5C7",
-                                borderRadius: "40px",
-                                marginTop: "10px",
-                                boxShadow: "0px 4px 10px rgba(0,0,0,0.4)",
-                              }}
-                            />
-                          )}
-                        </Box>
-                      </CardContent>
-
-                      <Box
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "8px",
-                          padding: "8px 16px",
-                          cursor: "pointer",
-                          width: "fit-content",
-                        }}
-                        onClick={() => handleOpenModal(memor)}
-                        role='button'
-                        tabIndex={0}
-                        aria-label={`View details for ${memor.title}`}
-                      >
-                        <Button
-                          variant='contained'
-                          aria-label='Add picture'
-                          sx={{
-                            backgroundColor: "#7E57C2",
-                            color: "white",
-                            borderRadius: "8px",
-                            width: "30px",
-                            height: "30px",
-                            minWidth: "0px",
-                            padding: "0px",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            boxShadow: "0px 4px 10px rgba(0,0,0,0.4)",
-                            "&:hover": {
-                              backgroundColor: "#6A48B3",
-                            },
-                          }}
-                        >
-                          <AddRoundedIcon fontSize='small' />
-                        </Button>
-
-                        <Typography
-                          variant='body2'
-                          sx={{
-                            fontSize: "0.8rem",
-                            color: "white",
-                          }}
-                        >
-                          View details
-                        </Typography>
-                      </Box>
-                    </Card>
-                  </SwiperSlide>
-                ))}
-              </Swiper>
+                      <Typography>
+                        No ongoing memors available at this time
+                      </Typography>
+                    </Box>
+                  )}
+                </div>
+              </Box>
             </>
           )}
         </Box>
-        
+
         {isModalOpen && selectedMemor && (
           <SubmitMemorModal
             memor={selectedMemor}
@@ -417,7 +570,7 @@ const Memors = () => {
         <Divider
           sx={{
             backgroundColor: "gray",
-            marginTop: "40px",
+            marginTop: "20px",
             marginBottom: "40px",
           }}
         />
@@ -454,23 +607,23 @@ const Memors = () => {
                 },
               },
             }}
-            aria-label='Memor Tabs'
+            aria-label="Memor Tabs"
           >
-            <Tab value='all' label='All Memors' />
-            <Tab value='completed' label='Completed' />
-            <Tab value='incomplete' label='Incomplete' />
+            <Tab value="all" label="All Memors" />
+            <Tab value="completed" label="Completed" />
+            <Tab value="incomplete" label="Incomplete" />
           </Tabs>
 
           <TextField
-            placeholder='Search Memors'
+            placeholder="Search Memors"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            variant='outlined'
-            size='small'
+            variant="outlined"
+            size="small"
             InputProps={{
               startAdornment: (
-                <InputAdornment position='start'>
-                  <Search fontSize='small' sx={{ color: "#CBCBCB" }} />
+                <InputAdornment position="start">
+                  <Search fontSize="small" sx={{ color: "#CBCBCB" }} />
                 </InputAdornment>
               ),
             }}
@@ -488,13 +641,15 @@ const Memors = () => {
             }}
           />
         </Box>
-        
+
         {loading ? (
           <Box sx={{ display: "flex", justifyContent: "center", my: 4 }}>
             <CircularProgress size={40} sx={{ color: "#d0bcfe" }} />
           </Box>
         ) : error ? (
-          <Alert severity="warning" sx={{ my: 2 }}>{error}</Alert>
+          <Alert severity="warning" sx={{ my: 2 }}>
+            {error}
+          </Alert>
         ) : (
           <Paper sx={{ backgroundColor: "transparent", paddingBottom: "40px" }}>
             <List
@@ -502,7 +657,7 @@ const Memors = () => {
                 display: "flex",
                 flexDirection: "column",
               }}
-              aria-label='Memors List'
+              aria-label="Memors List"
             >
               {filteredMemors.length > 0 ? (
                 filteredMemors.map((memor, index) => (
@@ -519,86 +674,118 @@ const Memors = () => {
                         "&:hover": { backgroundColor: "#2E2F30" },
                       }}
                       onClick={() => toggleExpand(index)}
-                      role='button'
+                      role="button"
                       tabIndex={0}
                       aria-label={`Expand ${memor.title}`}
                     >
-                      <div className='memor'>
-                        <div className='title_date'>
+                      <div className="memor">
+                        <div className="title_date">
                           <Typography
-                            variant='h6'
+                            variant="h6"
                             sx={{
-                              mb: 1,
                               fontWeight: "bold",
                               color: "white",
+                              fontSize:
+                                expandedIndex === index ? "1.25rem" : "1rem",
                             }}
                           >
                             {memor.title}
                           </Typography>{" "}
-                          <Typography
-                            variant='body2'
-                            sx={{
-                              color: "#CBCBCB",
-                              fontSize: "0.8rem",
-                            }}
-                          >
-                            {memor.dueDate}
-                          </Typography>
+                          {expandedIndex === index && (
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                color: "#CBCBCB",
+                                fontSize: "0.8rem",
+                                mt: 1,
+                              }}
+                            >
+                              Due on {memor.dueDate}
+                            </Typography>
+                          )}
                         </div>
-                        <div className='description'>
+                        <div className="description">
                           {expandedIndex === index
                             ? memor.description
-                            : `${memor.description.substring(0, 50)}...`}
+                            : `${memor.description.substring(0, 50)}${
+                                memor.description.length > 50 ? "..." : ""
+                              }`}
                         </div>
 
-                        <div className='status'>
+                        <div className="points">
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              color: "#CBCBCB",
+                              fontSize: "1rem",
+                              display: "flex",
+                              alignItems: "center",
+                            }}
+                          >
+                            <Stars />{memor.points} points
+                          </Typography>
+                        </div>
+
+                        <div className="status">
                           <Chip
                             label={
                               memor.status === "submitted"
                                 ? "Submitted"
-                                : "Incomplete"
+                                : memor.status === "expired"
+                                  ? "Expired"
+                                  : "Incomplete"
                             }
                             sx={{
                               bgcolor:
                                 memor.status === "submitted"
                                   ? "rgba(0, 255, 163, 0.2)"
-                                  : "rgba(255, 0, 136, 0.2)",
+                                  : memor.status === "expired"
+                                    ? "rgba(105, 105, 105, 0.2)"
+                                    : "rgba(255, 0, 136, 0.2)",
                               color:
                                 memor.status === "submitted"
                                   ? "#82D5C7"
-                                  : "#D582B0",
+                                  : memor.status === "expired"
+                                    ? "#aaaaaa"
+                                    : "#D582B0",
                               borderRadius: "40px",
                               width: "7vw",
                             }}
                           />
                         </div>
-                        <div className='submissions'>
-                          <BackupRoundedIcon
-                            sx={{
-                              color: "#CBCBCB",
-                              fontSize: "35px",
-                              cursor: "pointer",
-                              "&:hover": { color: "white" },
-                            }}
-                            tabIndex={0}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleOpenModal(memor);
-                            }}
-                            onKeyDown={(event) => {
-                              if (event.key === "Enter" || event.key === " ") {
-                                event.preventDefault();
-                                event.stopPropagation();
-                                handleOpenModal(memor);
-                              }
-                            }}
-                            aria-label={`Submit ${memor.title}`}
-                          />
+                        <div className="submissions">
+                          {memor.status !== "expired" &&
+                            memor.status !== "submitted" && (
+                              <BackupRoundedIcon
+                                sx={{
+                                  color: "#CBCBCB",
+                                  fontSize: "35px",
+                                  cursor: "pointer",
+                                  "&:hover": { color: "white" },
+                                }}
+                                tabIndex={0}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleOpenModal(memor);
+                                }}
+                                onKeyDown={(event) => {
+                                  if (
+                                    event.key === "Enter" ||
+                                    event.key === " "
+                                  ) {
+                                    event.preventDefault();
+                                    event.stopPropagation();
+                                    handleOpenModal(memor);
+                                  }
+                                }}
+                                aria-label={`Submit ${memor.title}`}
+                              />
+                            )}
                         </div>
 
-                        <div className='arrowIcon'>
+                        <div className="arrowIcon">
                           <Button
-                            aria-label='expand'
+                            aria-label="expand"
                             sx={{
                               width: "30px",
                               height: "30px",
@@ -612,8 +799,8 @@ const Memors = () => {
                             }}
                           >
                             <Typography
-                              variant='body'
-                              alt='expand'
+                              variant="body"
+                              alt="expand"
                               sx={{
                                 fontSize: "14px",
                                 color: "#CBCBCB",
@@ -634,7 +821,8 @@ const Memors = () => {
               ) : (
                 <Box sx={{ p: 4, textAlign: "center", color: "#aaa" }}>
                   <Typography>
-                    No {tab === "all" ? "" : tab} memors found{searchQuery ? " matching your search" : ""}
+                    No {tab === "all" ? "" : tab} memors found
+                    {searchQuery ? " matching your search" : ""}
                   </Typography>
                 </Box>
               )}

@@ -1,4 +1,4 @@
-// Changes for src/Components/Navbar/Navbar.jsx
+// Updated Navbar.jsx with fixed team rendering
 
 import { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
@@ -35,6 +35,9 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { useAuth } from "../../context/AuthContext";
 import { getLeaderboardVisibility, setLeaderboardVisibility, LEADERBOARD_VISIBILITY_CHANGE } from "../../assets/utils/leaderboardUtils";
 
+import PersonIcon from "@mui/icons-material/Person";
+import LockIcon from "@mui/icons-material/Lock";
+import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 
 const useStyles = makeStyles({
   customBadge: {
@@ -311,6 +314,14 @@ const Navbar = () => {
   const unreadCount = notifications.filter(notif => !notif.read).length;
 
   const classes = useStyles();
+  
+  // Safely extract team name
+  const getTeamName = () => {
+    if (!user) return "";
+    if (typeof user.team === 'string') return user.team;
+    if (user.team && typeof user.team === 'object' && user.team.name) return user.team.name;
+    return "";
+  };
 
   return (
     <AppBar
@@ -389,11 +400,28 @@ const Navbar = () => {
                     {user?.email}
                   </Typography>
                   <Typography variant='body2' sx={{ color: "#00C896" }}>
-                    {user?.team}
+                    {getTeamName()}
                   </Typography>
                 </Box>
               </MenuItem>
               <Divider sx={{ backgroundColor: "gray" }} />
+              <MenuItem
+                onClick={() => {
+                  navigate("/profile");
+                  handleMenuClose();
+                }}
+                sx={{
+                  "&:hover": {
+                    backgroundColor: "#181818",
+                    color: "#FFFFFF",
+                  },
+                }}
+              >
+                <Typography sx={{ display: 'flex', alignItems: 'center' }}>
+                  <PersonIcon sx={{ mr: 1, fontSize: "1rem" }} />
+                  My Profile
+                </Typography>
+              </MenuItem>
               <MenuItem
                 onClick={() => {
                   toggleLeaderboard();
@@ -408,12 +436,12 @@ const Navbar = () => {
                   justifyContent: "space-between",
                 }}
               >
+                <IconButton sx={{ color: "white", paddingLeft: 0, ml: -0.5 }}>
+                  {showLeaderboard ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                </IconButton>
                 <Typography>
                   {showLeaderboard ? "Hide" : "Show"} Leaderboard
                 </Typography>
-                <IconButton sx={{ color: "white" }}>
-                  {showLeaderboard ? <VisibilityIcon /> : <VisibilityOffIcon />}
-                </IconButton>
               </MenuItem>
               <MenuItem
                 onClick={() => {
@@ -427,7 +455,10 @@ const Navbar = () => {
                   },
                 }}
               >
-                Change Password
+                <Typography sx={{ display: 'flex', alignItems: 'center' }}>
+                  <LockIcon sx={{ mr: 1, fontSize: "1rem" }} />
+                  Change Password
+                </Typography>
               </MenuItem>
               <MenuItem
                 onClick={handleLogOut}
@@ -438,7 +469,10 @@ const Navbar = () => {
                   },
                 }}
               >
-                Log Out
+                <Typography sx={{ display: 'flex', alignItems: 'center' }}>
+                  <ExitToAppIcon sx={{ mr: 1, fontSize: "1rem" }} />
+                  Log Out
+                </Typography>
               </MenuItem>
             </Menu>
           </Box>
@@ -553,7 +587,7 @@ const Navbar = () => {
                 {user?.email}
               </Typography>
               <Typography variant='body2' sx={{ color: "#00C896" }}>
-                {user?.team}
+                {getTeamName()}
               </Typography>
             </Box>
             <Divider sx={{ backgroundColor: "#444" }} />
@@ -580,6 +614,9 @@ const Navbar = () => {
               )}
               <StyledNavLink to='/memoryBoard' onClick={toggleDrawer(false)}>
                 Memory Board
+              </StyledNavLink>
+              <StyledNavLink to='/profile' onClick={toggleDrawer(false)}>
+                My Profile
               </StyledNavLink>
             </List>
             <Divider sx={{ backgroundColor: "#444", marginTop: "20px" }} />

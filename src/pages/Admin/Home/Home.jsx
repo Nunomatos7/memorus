@@ -95,7 +95,7 @@ const Home = () => {
                   rank: index + 1,
                   teamName: team.name || `Team ${team.teamId}`,
                   points: team.points || 0,
-                  memors: Math.ceil((team.points || 0) / 10), // Estimate based on points
+                  memors: team.memors || 0,
                   avatar: team.avatar || "https://via.placeholder.com/150",
                 }));
               
@@ -103,9 +103,134 @@ const Home = () => {
             }
           }
           
-          // Fetch memors for the active competition (all teams)
-          // First get all memors for the active competition
-          const memorResponse = await fetch(
+          // Fetch latest memors for all teams - using new endpoint
+          const latestMemorsResponse = await fetch(
+            `${import.meta.env.VITE_API_URL}/api/memors/latest/all`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "X-Tenant": user.tenant_subdomain || "",
+              },
+            }
+          );
+          
+          if (latestMemorsResponse.ok) {
+            const latestMemorsData = await latestMemorsResponse.json();
+            
+            if (Array.isArray(latestMemorsData)) {
+              // Already formatted for display
+              setMemors(latestMemorsData);
+            }
+          } else {
+            console.error("Error fetching latest memors:", await latestMemorsResponse.text());
+            
+            // Fallback to old approach if new endpoint isn't available
+            try {
+              // Fetch memors for the active competition (all teams)
+              const memorResponse = await fetch(
+                `${import.meta.env.VITE_API_URL}/api/competitions/${activeCompetition.id}/memors`,
+                {
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                    "X-Tenant": user.tenant_subdomain || "",
+                  },
+                }
+              );
+              
+              if (!memorResponse.ok) {
+                throw new Error("Failed to fetch memors");
+              }
+              
+              const memorsData = await memorResponse.json();
+              
+              // Process memors
+              let ongoingCount = 0;
+              let closedCount = 0;
+              let allSubmissions = [];
+              
+              if (Array.isArray(memorsData)) {
+                // Count ongoing vs closed
+                memorsData.forEach(memor => {
+                  const dueDate = new Date(memor.due_date);
+                  const now = new Date();
+                  if (dueDate > now) {
+                    ongoingCount++;
+                  } else {
+                    closedCount++;
+                  }
+                });
+                
+                // Now fetch all teams
+                const teamsResponse = await fetch(
+                  `${import.meta.env.VITE_API_URL}/api/teams`,
+                  {
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                      "X-Tenant": user.tenant_subdomain || "",
+                    },
+                  }
+                );
+                
+                if (teamsResponse.ok) {
+                  const teamsData = await teamsResponse.json();
+                  
+                  // For each team, get their completed memors
+                  for (const team of teamsData) {
+                    try {
+                      const teamMemorsResponse = await fetch(
+                        `${import.meta.env.VITE_API_URL}/api/memors/team/${team.id}/competition/${activeCompetition.id}/completed`,
+                        {
+                          headers: {
+                            Authorization: `Bearer ${token}`,
+                            "X-Tenant": user.tenant_subdomain || "",
+                          },
+                        }
+                      );
+                      
+                      if (teamMemorsResponse.ok) {
+                        const teamMemorsData = await teamMemorsResponse.json();
+                        
+                        if (Array.isArray(teamMemorsData)) {
+                          // Process each memor and its pictures
+                          teamMemorsData.forEach(memor => {
+                            if (memor.pictures && memor.pictures.length > 0) {
+                              memor.pictures.forEach(pic => {
+                                allSubmissions.push({
+                                  id: `${memor.id}-${pic.id}`,
+                                  memorId: memor.id,
+                                  title: memor.title,
+                                  description: memor.description,
+                                  submittedDate: new Date(pic.created_at || memor.updated_at || memor.created_at).toLocaleDateString(),
+                                  team: team.name,
+                                  image: [pic.img_src],
+                                  submitter: pic.first_name ? `${pic.first_name} ${pic.last_name || ''}` : "Team member"
+                                });
+                              });
+                            }
+                          });
+                        }
+                      }
+                    } catch (teamError) {
+                      console.error(`Error fetching memors for team ${team.id}:`, teamError);
+                    }
+                  }
+                }
+              }
+              
+              // Sort by most recent first
+              allSubmissions.sort((a, b) => new Date(b.submittedDate) - new Date(a.submittedDate));
+              
+              setMemors(allSubmissions);
+              setOngoingMemors(ongoingCount);
+              setClosedMemors(closedCount);
+            } catch (fallbackError) {
+              console.error("Error in fallback approach:", fallbackError);
+              setError(`Failed to load memors: ${fallbackError.message}`);
+            }
+          }
+          
+          // Get memor counts for admin dashboard
+          const memorsResponse = await fetch(
             `${import.meta.env.VITE_API_URL}/api/competitions/${activeCompetition.id}/memors`,
             {
               headers: {
@@ -115,96 +240,28 @@ const Home = () => {
             }
           );
           
-          if (!memorResponse.ok) {
-            throw new Error("Failed to fetch memors");
-          }
-          
-          const memorsData = await memorResponse.json();
-          
-          // Process memors
-          let ongoingCount = 0;
-          let closedCount = 0;
-          let allSubmissions = [];
-          
-          if (Array.isArray(memorsData)) {
-            // Count ongoing vs closed
-            memorsData.forEach(memor => {
-              const dueDate = new Date(memor.due_date);
-              const now = new Date();
-              if (dueDate > now) {
-                ongoingCount++;
-              } else {
-                closedCount++;
-              }
-            });
+          if (memorsResponse.ok) {
+            const memorsData = await memorsResponse.json();
             
-            // Now fetch all completed memors across all teams
-            const teamsResponse = await fetch(
-              `${import.meta.env.VITE_API_URL}/api/teams`,
-              {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                  "X-Tenant": user.tenant_subdomain || "",
-                },
-              }
-            );
-            
-            if (teamsResponse.ok) {
-              const teamsData = await teamsResponse.json();
+            if (Array.isArray(memorsData)) {
+              // Count ongoing vs closed
+              let ongoing = 0;
+              let closed = 0;
               
-              // For each team, get their completed memors
-              const teamPromises = teamsData.map(async (team) => {
-                try {
-                  const teamMemorsResponse = await fetch(
-                    `${import.meta.env.VITE_API_URL}/api/memors/team/${team.id}/competition/${activeCompetition.id}/completed`,
-                    {
-                      headers: {
-                        Authorization: `Bearer ${token}`,
-                        "X-Tenant": user.tenant_subdomain || "",
-                      },
-                    }
-                  );
-                  
-                  if (teamMemorsResponse.ok) {
-                    const teamMemorsData = await teamMemorsResponse.json();
-                    
-                    if (Array.isArray(teamMemorsData)) {
-                      // Process each memor and its pictures
-                      teamMemorsData.forEach(memor => {
-                        if (memor.pictures && memor.pictures.length > 0) {
-                          memor.pictures.forEach(pic => {
-                            allSubmissions.push({
-                              id: `${memor.id}-${pic.id}`,
-                              memorId: memor.id,
-                              title: memor.title,
-                              description: memor.description,
-                              submittedDate: new Date(pic.created_at || memor.updated_at || memor.created_at).toLocaleDateString(),
-                              dueDate: new Date(memor.due_date).toLocaleDateString(),
-                              team: team.name,
-                              image: [pic.img_src],
-                              submitter: pic.first_name ? `${pic.first_name} ${pic.last_name || ''}` : "Team member"
-                            });
-                          });
-                        }
-                      });
-                    }
-                  }
-                } catch (error) {
-                  console.error(`Error fetching memors for team ${team.id}:`, error);
+              memorsData.forEach(memor => {
+                const dueDate = new Date(memor.due_date);
+                const now = new Date();
+                if (dueDate > now) {
+                  ongoing++;
+                } else {
+                  closed++;
                 }
               });
               
-              // Wait for all team requests to complete
-              await Promise.all(teamPromises);
+              setOngoingMemors(ongoing);
+              setClosedMemors(closed);
             }
           }
-          
-          // Sort by most recent first
-          allSubmissions.sort((a, b) => new Date(b.submittedDate) - new Date(a.submittedDate));
-          
-          setMemors(allSubmissions);
-          setOngoingMemors(ongoingCount);
-          setClosedMemors(closedCount);
         }
       } catch (err) {
         console.error("Error fetching data:", err);
@@ -357,26 +414,28 @@ const Home = () => {
                             by {memor.submitter}
                           </p>
                         </div>
-                      </div>
-                    )}
-                  </SwiperSlide>
-                ))}
-              </Swiper>
-            )}
-          </div>
-        </div>
+                        </div>
+                        )}
+                        </SwiperSlide>
+                        ))}
+                        </Swiper>
+                        )}
+                        </div>
+                        </div>
 
-        {selectedSlide && (
-          <MemorPicture
-            images={selectedSlide.image}
-            teamName={selectedSlide.team}
-            title={selectedSlide.title}
-            submitDate={selectedSlide.submittedDate}
-            onClose={closeModal}
-            onNavigate={handleImageClick}
-          />
-        )}
-      </section>
+                        {selectedSlide && (
+                        <MemorPicture
+                          images={selectedSlide.image}
+                          teamName={selectedSlide.team}
+                          title={selectedSlide.title}
+                          submitDate={selectedSlide.submittedDate}
+                          onClose={closeModal}
+                          onNavigate={handleImageClick}
+                        />
+                        )}
+                        </section>
+
+{/* The rest of the Admin Home component remains unchanged */}
 
       <section
         id='adminStats'

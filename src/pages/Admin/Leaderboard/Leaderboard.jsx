@@ -88,7 +88,7 @@ const Leaderboard = () => {
           const formattedData = leaderboardResult.teams.map((team, index) => ({
             teamName: team.name || `Team ${team.teamId}`,
             points: team.points,
-            memors: Math.ceil(team.points / 10), // Estimating memors count based on points
+            memors: team.memors || 0, // Use actual memors count from API
             rank: team.rank || index + 1,
             avatar: team.avatar || getDefaultAvatar(),
             teamId: team.teamId,

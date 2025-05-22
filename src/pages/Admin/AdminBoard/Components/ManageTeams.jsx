@@ -15,7 +15,7 @@ import PropTypes from "prop-types";
 
 const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
   const [teams, setTeams] = useState({});
-  const [teamsData, setTeamsData] = useState([]); // Store full team data with IDs
+  const [teamsData, setTeamsData] = useState([]);
   const [members, setMembers] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [editingTeam, setEditingTeam] = useState(null);
@@ -29,7 +29,6 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
   });
   const [searchQuery2, setSearchQuery2] = useState("");
 
-  // For direct team deletion
   const [confirmationDeleteModalOpen, setConfirmationDeleteModalOpen] =
     useState(false);
   const [teamToDelete, setTeamToDelete] = useState(null);
@@ -41,33 +40,25 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
   const fetchTeamsAndMembers = async () => {
     setLoading(true);
     try {
-      // Fetch teams
       const teamsResponse = await api.get("/api/teams");
 
-      // Save full team data for deletion purposes
       setTeamsData(teamsResponse.data || []);
 
-      // Transform the array to the required format
       const teamsObj = {};
       const teamsArray = teamsResponse.data || [];
 
-      // Fetch all users
       const usersResponse = await api.get("/api/users");
       const users = usersResponse.data || [];
 
-      // Create a filtered array of members, excluding those with admin role
       const membersArray = [];
 
       for (const user of users) {
         try {
-          // Get user roles
           const rolesResponse = await api.get(`/api/users/${user.id}/roles`);
           const roles = rolesResponse.data || [];
 
-          // Check if user has admin role
           const isAdmin = roles.some((role) => role.title === "admin");
 
-          // Only add non-admin users
           if (!isAdmin) {
             membersArray.push({
               name: `${user.first_name} ${user.last_name}`,
@@ -77,11 +68,9 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
           }
         } catch (error) {
           console.error(`Error checking roles for user ${user.id}:`, error);
-          // Continue with other users even if one fails
         }
       }
 
-      // Create a map of team members (also excluding admin users)
       teamsArray.forEach((team) => {
         teamsObj[team.name] = membersArray
           .filter((member) => member.team === team.name)
@@ -98,45 +87,33 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
     }
   };
 
-  // In ManageTeams.jsx - Replace the current useEffect with this one
-
   useEffect(() => {
-    // Set up the global reference immediately
     if (!window.manageTeamsRef) {
       window.manageTeamsRef = {};
     }
 
-    // Define the reference to the current fetchTeamsAndMembers function
     const fetchTeamsAndMembersRef = async () => {
       setLoading(true);
       try {
-        // Fetch teams
         const teamsResponse = await api.get("/api/teams");
 
-        // Save full team data for deletion purposes
         setTeamsData(teamsResponse.data || []);
 
-        // Transform the array to the required format
         const teamsObj = {};
         const teamsArray = teamsResponse.data || [];
 
-        // Fetch all users
         const usersResponse = await api.get("/api/users");
         const users = usersResponse.data || [];
 
-        // Create a filtered array of members, excluding those with admin role
         const membersArray = [];
 
         for (const user of users) {
           try {
-            // Get user roles
             const rolesResponse = await api.get(`/api/users/${user.id}/roles`);
             const roles = rolesResponse.data || [];
 
-            // Check if user has admin role
             const isAdmin = roles.some((role) => role.title === "admin");
 
-            // Only add non-admin users
             if (!isAdmin) {
               membersArray.push({
                 name: `${user.first_name} ${user.last_name}`,
@@ -147,11 +124,9 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
             }
           } catch (error) {
             console.error(`Error checking roles for user ${user.id}:`, error);
-            // Continue with other users even if one fails
           }
         }
 
-        // Create a map of team members (also excluding admin users)
         teamsArray.forEach((team) => {
           teamsObj[team.name] = membersArray
             .filter((member) => member.team === team.name)
@@ -168,13 +143,10 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
       }
     };
 
-    // Store the function reference
     window.manageTeamsRef.fetchTeams = fetchTeamsAndMembersRef;
 
-    // Initial data fetch
     fetchTeamsAndMembersRef();
 
-    // Cleanup when component unmounts
     return () => {
       if (window.manageTeamsRef?.fetchTeams === fetchTeamsAndMembersRef) {
         delete window.manageTeamsRef.fetchTeams;
@@ -191,31 +163,25 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
         throw new Error(`Team "${teamName}" not found`);
       }
 
-      // Call API to delete the team
-      // Make sure teamToDelete.id is a number, not a string with a colon
       const teamId = parseInt(teamToDelete.id, 10);
       await api.delete(`/api/teams/${teamId}`);
 
-      // Update local state
       setTeams((prevTeams) => {
         const updatedTeams = { ...prevTeams };
         delete updatedTeams[teamName];
         return updatedTeams;
       });
 
-      // Update teamsData state
       setTeamsData((prevTeamsData) =>
         prevTeamsData.filter((team) => team.id !== teamToDelete.id)
       );
 
-      // Show success feedback
       showFeedback(
         "success",
         "Team Deleted",
         `The team "${teamName}" has been successfully deleted.`
       );
 
-      // Refresh the data
       fetchTeamsAndMembers();
     } catch (error) {
       console.error("Error deleting team:", error);
@@ -290,30 +256,24 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
 
       const teamId = teamObj.id;
 
-      // Get selected member emails
       const selectedEmails = Object.entries(editedMembers)
         .filter(([_, isSelected]) => isSelected)
         .map(([email]) => email);
 
-      // Get user IDs for selected emails
       const usersResponse = await api.get("/api/users");
       const users = usersResponse.data;
 
-      // Current team members
       const currentTeamMembers = users.filter((u) => u.teams_id === teamId);
       const currentTeamEmails = currentTeamMembers.map((u) => u.email);
 
-      // Users to add to team
       const emailsToAdd = selectedEmails.filter(
         (email) => !currentTeamEmails.includes(email)
       );
 
-      // Users to remove from team
       const emailsToRemove = currentTeamEmails.filter(
         (email) => !selectedEmails.includes(email)
       );
 
-      // Perform updates
       for (const email of emailsToAdd) {
         const user = users.find((u) => u.email === email);
         if (user) {
@@ -328,7 +288,6 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
         }
       }
 
-      // Update local state
       setTeams((prevTeams) => {
         const updatedTeams = { ...prevTeams };
         updatedTeams[editingTeam] = selectedEmails;
@@ -341,7 +300,6 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
         `The team "${editingTeam}" has been successfully updated.`
       );
 
-      // Refresh data
       fetchTeamsAndMembers();
     } catch (error) {
       console.error("Error updating team:", error);

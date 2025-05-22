@@ -297,18 +297,21 @@ const DynamicModal = ({
       );
       return;
     }
-
+  
     // Create team
     if (action === "create") {
       try {
+        setLoading(true);
+        
         // Create the team
         const teamResponse = await api.post("/api/teams", {
           name: newTeamName,
           avatar: newTeamThumbnail || "default_avatar.png",
         });
-
+  
         const teamId = teamResponse.data.id;
-
+        console.log(`Created team with ID: ${teamId}`);
+  
         // Assign selected members to team
         const selectedMemberIds = Object.entries(newTeamMembers)
           .filter(([_, isSelected]) => isSelected)
@@ -317,7 +320,7 @@ const DynamicModal = ({
             return member ? member.id : null;
           })
           .filter((id) => id !== null);
-
+  
         // Update each user using the correct endpoint
         for (const userId of selectedMemberIds) {
           try {
@@ -328,15 +331,43 @@ const DynamicModal = ({
             // Continue with other users even if one fails
           }
         }
-
+  
+        // ADDED: Get active competition and add team to it
+        try {
+          const competitionsResponse = await api.get("/api/competitions/active");
+          if (competitionsResponse.data && competitionsResponse.data.length > 0) {
+            const activeCompetition = competitionsResponse.data[0];
+            console.log(`Found active competition: ${activeCompetition.id}`);
+            
+            // Add team to the active competition
+            const addTeamResponse = await api.post(
+              `/api/competitions/${activeCompetition.id}/teams/${teamId}`,
+              {}
+            );
+            
+            if (addTeamResponse.status === 201) {
+              console.log(`Team ${teamId} added to competition ${activeCompetition.id} successfully`);
+            } else {
+              console.warn(`Unexpected response when adding team to competition:`, addTeamResponse);
+            }
+          } else {
+            console.log("No active competition found to add the team to");
+          }
+        } catch (compError) {
+          console.error("Error adding team to competition:", compError);
+          // Don't fail if this step fails - the team is still created
+        }
+  
+        setLoading(false);
         showFeedback(
           "success",
           "Team Created",
           `The team "${newTeamName}" has been successfully created with ${selectedMemberIds.length} members.`
         );
-
+        
         return true; // Signal success to the caller
       } catch (error) {
+        setLoading(false);
         console.error("Error creating team:", error);
         showFeedback(
           "error",
@@ -443,6 +474,7 @@ const DynamicModal = ({
             </Typography>
             <TextField
               label='Title'
+              required
               variant='outlined'
               value={newMemorTitle}
               onChange={(e) => setNewMemorTitle(e.target.value)}
@@ -461,6 +493,7 @@ const DynamicModal = ({
             <TextField
               type='date'
               label='Due Date'
+              required
               value={newMemorDate || ""}
               onChange={(e) => setNewMemorDate(e.target.value)}
               fullWidth
@@ -490,6 +523,7 @@ const DynamicModal = ({
             <TextField
               label='Description'
               variant='outlined'
+              required
               multiline
               rows={4}
               value={newMemorDescription}
@@ -510,7 +544,7 @@ const DynamicModal = ({
               }}
             />
             <Typography variant='body1' sx={{ color: "#CAC4D0" }}>
-              Points
+              Points *
             </Typography>
             <Box
               sx={{
@@ -523,6 +557,7 @@ const DynamicModal = ({
               {[5, 10, 20, 30, 50, 100].map((point) => (
                 <Button
                   key={point}
+                  required
                   onClick={() => setNewMemorPoints(point)}
                   sx={{
                     backgroundColor:
@@ -560,6 +595,7 @@ const DynamicModal = ({
             </Typography>
             <TextField
               label="Team's Name"
+              required
               variant='outlined'
               value={newTeamName}
               onChange={(e) => setNewTeamName(e.target.value)}
@@ -644,11 +680,12 @@ const DynamicModal = ({
               variant='body1'
               sx={{ color: "#CAC4D0", marginBottom: "10px" }}
             >
-              Members
+              Members *
             </Typography>
             <TextField
               placeholder='Search Name'
               value={searchQuery}
+              required
               onChange={(e) => setSearchQuery(e.target.value)}
               variant='outlined'
               size='small'
@@ -747,6 +784,7 @@ const DynamicModal = ({
             </Typography>
             <TextField
               label='Title'
+              required
               variant='outlined'
               value={newCompetitionTitle}
               onChange={(e) => setNewCompetitionTitle(e.target.value)}
@@ -766,6 +804,7 @@ const DynamicModal = ({
               label='Description'
               variant='outlined'
               multiline
+              required
               rows={4}
               value={newCompetitionDescription}
               onChange={(e) => setNewCompetitionDescription(e.target.value)}
@@ -785,10 +824,11 @@ const DynamicModal = ({
               variant='body1'
               sx={{ color: "#CAC4D0", marginBottom: "5px" }}
             >
-              Start Date
+              Start Date *
             </Typography>
             <TextField
               type='date'
+              required
               value={newCompetitionStartDate || ""}
               onChange={(e) => setNewCompetitionStartDate(e.target.value)}
               fullWidth
@@ -812,10 +852,11 @@ const DynamicModal = ({
               variant='body1'
               sx={{ color: "#CAC4D0", marginBottom: "5px" }}
             >
-              End Date
+              End Date *
             </Typography>
             <TextField
               type='date'
+              required
               value={newCompetitionEndDate || ""}
               onChange={(e) => setNewCompetitionEndDate(e.target.value)}
               fullWidth

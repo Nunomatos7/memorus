@@ -67,10 +67,10 @@ const MemoryBoard = () => {
   // Load initial data: competitions and teams
   useEffect(() => {
     if (!token || !user) return;
-  
+
     const fetchInitialData = async () => {
       setLoading(true);
-  
+
       try {
         // Fetch ALL competitions instead of just active ones
         const competitionsResponse = await fetch(
@@ -82,17 +82,20 @@ const MemoryBoard = () => {
             },
           }
         );
-  
+
         if (competitionsResponse.ok) {
           const competitionsData = await competitionsResponse.json();
           setCompetitions(competitionsData);
-          
+
           // Find currently active competition
-          const today = new Date().toISOString().split('T')[0];
+          const today = new Date().toISOString().split("T")[0];
           const activeCompetition = competitionsData.find(
-            comp => comp.is_active && comp.start_date <= today && comp.end_date >= today
+            (comp) =>
+              comp.is_active &&
+              comp.start_date <= today &&
+              comp.end_date >= today
           );
-          
+
           // Set default to active competition, or first in list if none are active
           if (activeCompetition) {
             setSelectedCompetition(activeCompetition.id);
@@ -100,7 +103,7 @@ const MemoryBoard = () => {
             setSelectedCompetition(competitionsData[0].id);
           }
         }
-  
+
         // Fetch teams
         const teamsResponse = await fetch(
           `${import.meta.env.VITE_API_URL}/api/teams`,
@@ -111,11 +114,11 @@ const MemoryBoard = () => {
             },
           }
         );
-  
+
         if (teamsResponse.ok) {
           const teamsData = await teamsResponse.json();
           setTeams(teamsData);
-          
+
           // Set default team (user's team or first team)
           if (user?.teamsId) {
             setSelectedTeam(user.teamsId);
@@ -130,43 +133,54 @@ const MemoryBoard = () => {
         setLoading(false);
       }
     };
-  
+
     fetchInitialData();
   }, [token, user]);
 
   // Fetch memory board data when competition or team selection changes
   useEffect(() => {
-    if (!selectedCompetition || !selectedTeam || !token || !user?.tenant_subdomain) {
+    if (
+      !selectedCompetition ||
+      !selectedTeam ||
+      !token ||
+      !user?.tenant_subdomain
+    ) {
       return;
     }
-    
-    console.log(`Fetching data for competition: ${selectedCompetition}, team: ${selectedTeam}`);
+
+    console.log(
+      `Fetching data for competition: ${selectedCompetition}, team: ${selectedTeam}`
+    );
     setLoading(true);
 
     // Get team name for static data filtering
-    const teamName = teams.find(t => t.id === parseInt(selectedTeam))?.name || "Your Team";
+    const teamName =
+      teams.find((t) => t.id === parseInt(selectedTeam))?.name || "Your Team";
     console.log(`Selected team name: ${teamName}`);
-    
+
     // Reset posts first to avoid showing old data
     setPosts([]);
-    
+
     // First load static data immediately as fallback
     try {
       // Filter static data to match selected team
       const filteredStaticData = staticMemorsData.filter(
-        memor => memor.team === teamName && memor.image && memor.image.length > 0
+        (memor) =>
+          memor.team === teamName && memor.image && memor.image.length > 0
       );
-      
-      console.log(`Found ${filteredStaticData.length} static memors for team "${teamName}"`);
-      
+
+      console.log(
+        `Found ${filteredStaticData.length} static memors for team "${teamName}"`
+      );
+
       if (filteredStaticData.length > 0) {
         const positions = [];
-        const staticPosts = filteredStaticData.map(memor => {
+        const staticPosts = filteredStaticData.map((memor) => {
           const position = generateNonOverlappingPosition(positions);
           positions.push(position);
           return { ...memor, ...position };
         });
-        
+
         setPosts(staticPosts);
       }
     } catch (err) {
@@ -177,9 +191,11 @@ const MemoryBoard = () => {
     const fetchMemorData = async () => {
       try {
         // Attempt to fetch from the completed memors endpoint
-        const memorUrl = `${import.meta.env.VITE_API_URL}/api/memors/team/${selectedTeam}/competition/${selectedCompetition}/completed`;
+        const memorUrl = `${
+          import.meta.env.VITE_API_URL
+        }/api/memors/team/${selectedTeam}/competition/${selectedCompetition}/completed`;
         console.log(`Fetching from API: ${memorUrl}`);
-        
+
         const response = await fetch(memorUrl, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -188,33 +204,48 @@ const MemoryBoard = () => {
         });
 
         if (!response.ok) {
-          throw new Error(`Failed to fetch memor data: ${response.status} ${response.statusText}`);
+          throw new Error(
+            `Failed to fetch memor data: ${response.status} ${response.statusText}`
+          );
         }
 
         const memorData = await response.json();
-        console.log(`API response:`, memorData);
-        
+        console.log(`API response from ${memorUrl}:`, memorData);
+
         if (memorData && memorData.length > 0) {
           // Process memor data
           const positions = [];
           const apiPosts = memorData
-            .filter(memor => memor.pictures && memor.pictures.length > 0)
-            .map(memor => {
+            .filter((memor) => memor.pictures && memor.pictures.length > 0)
+            .map((memor) => {
               const position = generateNonOverlappingPosition(positions);
               positions.push(position);
-              
+
+              // Extract images
+              const images = memor.pictures.map((pic) => ({
+                img_src: pic.img_src,
+                alt_text: pic.alt_text || `Image for ${memor.title}`,
+              }));
+
               return {
                 ...position,
                 title: memor.title,
                 description: memor.description || "",
-                team: teamName,
-                submittedDate: new Date(memor.due_date).toLocaleDateString(),
-                image: memor.pictures.map(pic => pic.img_src)
+                team: memor.team || teamName,
+                submittedDate: memor.created_at
+                  ? new Date(
+                      memor.created_at.replace(" ", "T")
+                    ).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })
+                  : "Unknown date",
+                image: images.length > 0 ? images : null,
               };
-            });
+            })
+            .filter((post) => post.image && post.image.length > 0);
 
-          console.log(`Processed ${apiPosts.length} API posts`);
-          
           if (apiPosts.length > 0) {
             setPosts(apiPosts);
           }
@@ -307,12 +338,30 @@ const MemoryBoard = () => {
   };
 
   const openModal = (imageIndex, postIndex) => {
+    console.log(
+      `MemoryBoard: openModal called with imageIndex: ${imageIndex}, postIndex: ${postIndex}`
+    );
+
+    // Get the post from the posts array
+    const post = posts[postIndex];
+    console.log("MemoryBoard: post data:", post);
+
+    // Just use the post images directly, don't modify the format
+    let images = [];
+
+    if (post.image && Array.isArray(post.image)) {
+      // Just use the post images directly, don't modify the format
+      images = post.image;
+      console.log("MemoryBoard: Using post images directly:", images);
+    }
+
+    // Create the selectedMemor object
     setSelectedMemor({
-      images: posts[postIndex].image,
+      images: images,
       currentIndex: imageIndex,
-      title: posts[postIndex].title,
-      submittedDate: posts[postIndex].submittedDate,
-      team: posts[postIndex].team,
+      title: post.title,
+      submittedDate: post.submittedDate || post.created_at,
+      team: post.team?.name || post.team,
       postIndex,
     });
   };
@@ -344,30 +393,30 @@ const MemoryBoard = () => {
   return (
     <>
       <Loader />
-      <div 
+      <div
         className="memory-board-container"
         style={{
           width: "100%",
           height: "93vh",
           position: "relative",
-          backgroundColor: "#9990d8"
+          backgroundColor: "#9990d8",
         }}
       >
         {/* Filter Controls */}
-        <div className='filter-controls'>
+        <div className="filter-controls">
           {/* Competition Filter */}
           <label
-            htmlFor='competition-filter'
-            className='sr-only'
+            htmlFor="competition-filter"
+            className="sr-only"
             style={{ color: "#341881", fontWeight: "600" }}
           >
             Filter by competition:
           </label>
           <select
-            id='competition-filter'
+            id="competition-filter"
             value={selectedCompetition}
             onChange={handleCompetitionChange}
-            className='filter-dropdown'
+            className="filter-dropdown"
           >
             {competitions.map((competition) => (
               <option key={competition.id} value={competition.id}>
@@ -375,20 +424,20 @@ const MemoryBoard = () => {
               </option>
             ))}
           </select>
-          
+
           {/* Team Filter */}
           <label
-            htmlFor='team-filter'
-            className='sr-only'
+            htmlFor="team-filter"
+            className="sr-only"
             style={{ color: "#341881", fontWeight: "600" }}
           >
             Filter by team:
           </label>
           <select
-            id='team-filter'
+            id="team-filter"
             value={selectedTeam}
             onChange={handleTeamChange}
-            className='filter-dropdown'
+            className="filter-dropdown"
           >
             {teams.map((team) => (
               <option key={team.id} value={team.id}>
@@ -397,7 +446,7 @@ const MemoryBoard = () => {
             ))}
           </select>
         </div>
-  
+
         {loading && posts.length === 0 ? (
           <div className="loading-container">
             <CircularProgress size={60} sx={{ color: "#d0bcfe" }} />
@@ -405,7 +454,7 @@ const MemoryBoard = () => {
         ) : posts.length === 0 ? (
           <div className="empty-container">
             <p className="empty-message">
-              No memories found for this team in the selected competition
+              No memors found for this team in the selected competition
             </p>
           </div>
         ) : (
@@ -419,7 +468,7 @@ const MemoryBoard = () => {
               {
                 component: (
                   <button
-                    className='start-btn'
+                    className="start-btn"
                     onClick={() => {
                       canvasRef.current?.fitContentToView({ scale: 1 });
                     }}
@@ -436,7 +485,7 @@ const MemoryBoard = () => {
             {posts.map((post, postIndex) => (
               <div
                 key={postIndex}
-                className='polaroid-container'
+                className="polaroid-container"
                 style={{
                   position: "absolute",
                   top: post.y + canvasHeight / 2,
@@ -446,90 +495,111 @@ const MemoryBoard = () => {
                 }}
               >
                 <div
-                  style={{ position: "relative", width: "100%", height: "100%" }}
+                  style={{
+                    position: "relative",
+                    width: "100%",
+                    height: "100%",
+                  }}
                 >
                   {post.image
                     .slice()
                     .reverse()
-                    .map((imgSrc, cardIndex, reversedArray) => (
-                      <div
-                        key={cardIndex}
-                        className='polaroid-card'
-                        onClick={() =>
-                          openModal(
-                            reversedArray.length - 1 - cardIndex,
-                            postIndex
-                          )
-                        }
-                        style={{
-                          position: "absolute",
-                          top: `${cardIndex * 5}px`,
-                          left: `${cardIndex * 40}px`,
-                          width: "100%",
-                          height: "100%",
-                          backgroundColor: "white",
-                          border: "2px solid white",
-                          boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)",
-                          borderRadius: "8px",
-                          transform: `rotate(${cardIndex % 2 === 0 ? -1 : 1}deg)`,
-                          zIndex: cardIndex,
-                          cursor: "pointer",
-                        }}
-                      >
-                        {/* Submitted Date */}
-                        <p className='card-date'>{post.submittedDate}</p>
+                    .map((image, cardIndex, reversedArray) => {
+                      // Extract img_src and alt_text based on the image format
+                      const imgSrc =
+                        typeof image === "string"
+                          ? image
+                          : image && image.img_src
+                            ? image.img_src
+                            : "";
 
-                        {/* Image */}
-                        <img
-                          data-src={imgSrc}
-                          src={loadedImages.has(imgSrc) ? imgSrc : ""}
-                          alt={`Post image ${cardIndex}`}
+                      const altText =
+                        image && image.alt_text
+                          ? image.alt_text
+                          : `Image for ${post.title}`;
+
+                      return (
+                        <div
+                          key={cardIndex}
+                          className="polaroid-card"
+                          onClick={() =>
+                            openModal(
+                              reversedArray.length - 1 - cardIndex,
+                              postIndex
+                            )
+                          }
                           style={{
-                            width: "90%",
-                            height: "60%",
-                            objectFit: "cover",
+                            position: "absolute",
+                            top: `${cardIndex * 5}px`,
+                            left: `${cardIndex * 40}px`,
+                            width: "100%",
+                            height: "100%",
+                            backgroundColor: "white",
+                            border: "2px solid white",
+                            boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)",
                             borderRadius: "8px",
-                            margin: "10px auto",
-                            display: "block",
+                            transform: `rotate(${
+                              cardIndex % 2 === 0 ? -1 : 1
+                            }deg)`,
+                            zIndex: cardIndex,
+                            cursor: "pointer",
                           }}
-                        />
+                        >
+                          {/* Submitted Date */}
+                          <p className="card-date">{post.submittedDate}</p>
 
-                        {/* Title - Only for the first image */}
-                        {cardIndex === reversedArray.length - 1 && (
-                          <p className='card-title'>{post.title}</p>
-                        )}
-                      </div>
-                    ))}
+                          {/* Image */}
+                          <img
+                            data-src={imgSrc}
+                            src={loadedImages.has(imgSrc) ? imgSrc : ""}
+                            alt={altText}
+                            style={{
+                              width: "90%",
+                              height: "60%",
+                              objectFit: "cover",
+                              borderRadius: "8px",
+                              margin: "10px auto",
+                              display: "block",
+                            }}
+                          />
+
+                          {/* Title - Only for the first image */}
+                          {cardIndex === reversedArray.length - 1 && (
+                            <p className="card-title">{post.title}</p>
+                          )}
+                        </div>
+                      );
+                    })}
                 </div>
-                </div>
-          ))}
-        </ReactInfiniteCanvas>
-      )}
+              </div>
+            ))}
+          </ReactInfiniteCanvas>
+        )}
 
-      {selectedMemor && (
-        <MemorPicture
-          images={selectedMemor.images}
-          currentIndex={selectedMemor.currentIndex}
-          title={selectedMemor.title}
-          submitDate={selectedMemor.submittedDate}
-          teamName={selectedMemor.team}
-          onClose={closeModal}
-          onNavigate={handleImageNavigation}
-        />
-      )}
+        {selectedMemor && (
+          <MemorPicture
+            images={selectedMemor.images}
+            currentIndex={selectedMemor.currentIndex}
+            title={selectedMemor.title}
+            submitDate={selectedMemor.submittedDate}
+            teamName={selectedMemor.team}
+            onClose={closeModal}
+            onNavigate={handleImageNavigation}
+          />
+        )}
 
-      <div className='zoom-controls'>
-        <button className='zoom-btn' onClick={() => handleZoom("out")}>
-          -
-        </button>
-        <span className='zoom-display'>{Math.round(zoomLevel * 100)}%</span>
-        <button className='zoom-btn' onClick={() => handleZoom("in")}>
-          +
-        </button>
+        <div className="zoom-controls">
+          <button className="zoom-btn" onClick={() => handleZoom("out")}>
+            -
+          </button>
+          <span className="zoom-display">{Math.round(zoomLevel * 100)}%</span>
+          <button className="zoom-btn" onClick={() => handleZoom("in")}>
+            +
+          </button>
+        </div>
       </div>
-    </div>
-  </>
-);
+    </>
+  );
 };
 
 export default MemoryBoard;

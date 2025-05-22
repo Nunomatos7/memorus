@@ -60,14 +60,11 @@ const ManageCompetition = ({
       window.manageCompetitionRef = {};
     }
 
-    // Define the reference to the current fetchCompetitions function
     const fetchCompetitionsRef = async () => {
       setLoading(true);
       try {
-        // First, trigger an update of competition statuses
         await api.get("/api/competitions/update-statuses");
 
-        // Then fetch the competitions
         const response = await api.get("/api/competitions");
 
         const formattedCompetitions = response.data.map((comp) => ({
@@ -96,13 +93,10 @@ const ManageCompetition = ({
       }
     };
 
-    // Store the function reference
     window.manageCompetitionRef.fetchCompetitions = fetchCompetitionsRef;
 
-    // Initial data fetch
     fetchCompetitionsRef();
 
-    // Cleanup when component unmounts
     return () => {
       if (
         window.manageCompetitionRef?.fetchCompetitions === fetchCompetitionsRef

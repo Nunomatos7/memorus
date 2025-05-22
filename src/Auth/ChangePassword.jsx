@@ -21,7 +21,7 @@ const ChangePasswordPage = () => {
 
   useEffect(() => {
     document.title = `Memor'us | Change password`;
-    
+
     // If user is logged in, pre-fill the email field
     if (user && user.email) {
       setUsername(user.email);
@@ -44,9 +44,9 @@ const ChangePasswordPage = () => {
     // Create request payload
     const payload = {
       email: username,
-      newPassword: newPassword
+      newPassword: newPassword,
     };
-    
+
     // Only include current password if user is logged in
     if (user && user.email) {
       if (!currentPassword) {
@@ -62,26 +62,26 @@ const ChangePasswordPage = () => {
       const getTenantFromSubdomain = () => {
         const host = window.location.hostname;
         const parts = host.split(".");
-        
+
         if (host.includes("localhost")) {
           return parts.length > 1 ? parts[0] : null;
         }
-        
+
         if (parts.length >= 3) {
           return parts[0];
         }
-        
+
         return null;
       };
 
       const tenant = getTenantFromSubdomain();
-      
+
       // Prepare headers
       const headers = {
         "Content-Type": "application/json",
-        "x-tenant": tenant
+        "x-tenant": tenant,
       };
-      
+
       // Add token to headers if available
       if (token) {
         headers["Authorization"] = `Bearer ${token}`;
@@ -105,18 +105,17 @@ const ChangePasswordPage = () => {
 
       // Show success message
       setSuccess("Password changed successfully! Redirecting to login...");
-      
+
       // Clear form
       setUsername("");
       setCurrentPassword("");
       setNewPassword("");
       setConfirmNewPassword("");
-      
+
       // Redirect to login after a delay
       setTimeout(() => {
         navigate("/login");
       }, 2000);
-      
     } catch (error) {
       console.error("Error changing password:", error);
       setError(error.message || "An unexpected error occurred");
@@ -152,8 +151,8 @@ const ChangePasswordPage = () => {
           Change Password
         </Typography>
         <Typography variant='body2' className='login-subtitle' sx={{ mb: 2 }}>
-          {user 
-            ? "Enter your current password and a new password to update your credentials." 
+          {user
+            ? "Enter your current password and a new password to update your credentials."
             : "Enter your username (email) and a new password to update your credentials."}
         </Typography>
         <form onSubmit={handleChangePassword} className='login-form'>
@@ -163,37 +162,39 @@ const ChangePasswordPage = () => {
           )}
 
           {/* Username Field - Only show if not logged in */}
-          <TextField
-            label='Username (Email)'
-            type='email'
-            variant='outlined'
-            fullWidth
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            disabled={!!user}
-            sx={{
-              mb: 2,
-              "& .MuiInputBase-root": {
-                backgroundColor: "#2c2c2c",
-                borderRadius: "8px",
-                color: "#ffffff",
-              },
-              "& .MuiInputLabel-root": {
-                color: "#ffffff",
-              },
-              "& .MuiOutlinedInput-root": {
-                "& fieldset": {
-                  borderColor: "#6200ea",
+          {!user && (
+            <TextField
+              label='Username (Email)'
+              type='email'
+              variant='outlined'
+              fullWidth
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              disabled={!!user}
+              sx={{
+                mb: 2,
+                "& .MuiInputBase-root": {
+                  backgroundColor: "#2c2c2c",
+                  borderRadius: "8px",
+                  color: "#ffffff",
                 },
-                "&:hover fieldset": {
-                  borderColor: "#4e00d1",
+                "& .MuiInputLabel-root": {
+                  color: "#ffffff",
                 },
-                "&.Mui-focused fieldset": {
-                  borderColor: "#6200ea",
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": {
+                    borderColor: "#6200ea",
+                  },
+                  "&:hover fieldset": {
+                    borderColor: "#4e00d1",
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#6200ea",
+                  },
                 },
-              },
-            }}
-          />
+              }}
+            />
+          )}
 
           {/* Current Password Field - Only show if logged in */}
           {user && (
