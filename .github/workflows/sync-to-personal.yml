@@ -19,12 +19,17 @@ jobs:
         # Remove the .github directory
         rm -rf .github
         
-        # Configure git
-        git config user.name "GitHub Actions Bot"
-        git config user.email "actions@github.com"
+        # Configure git with your username and token
+        git config user.name "Nunomatos7"
+        git config user.email "your-email@example.com"
         
-        # Add remote and push (force push to overwrite)
-        git remote add personal https://${PERSONAL_TOKEN}@github.com/Nunomatos7/memorus.git
+        # Configure git to use the token for authentication
+        git config url."https://${PERSONAL_TOKEN}@github.com/".insteadOf "https://github.com/"
+        
+        # Stage changes
         git add -A
         git commit -m "Sync from organization repo" || echo "No changes to commit"
+        
+        # Add remote and push
+        git remote add personal https://github.com/Nunomatos7/memorus.git
         git push personal HEAD:main --force
