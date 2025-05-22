@@ -1,0 +1,19 @@
+name: Sync to Personal Repo
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+        token: ${{ secrets.PERSONAL_TOKEN }}
+        
+    - name: Push to personal repo
+      run: |
+        git remote add personal https://${{ secrets.PERSONAL_TOKEN }}@github.com/Nunomatos7/memorus.git
+        git push personal main --force
