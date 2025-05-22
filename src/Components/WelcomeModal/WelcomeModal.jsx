@@ -2,9 +2,11 @@ import { useState, useEffect } from "react";
 import "./WelcomeModal.css";
 import { styled } from "@mui/material/styles";
 import Button from "@mui/material/Button";
+import { useAuth } from "../../context/AuthContext";
 
 const WelcomeModal = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const { user } = useAuth(); // Add this to get user context
 
   useEffect(() => {
     const hasClickedBegin = localStorage.getItem("hasClickedBegin");
@@ -16,6 +18,14 @@ const WelcomeModal = () => {
   const handleBeginClick = () => {
     localStorage.setItem("hasClickedBegin", "true");
     setIsVisible(false);
+  };
+
+  const getTeamName = () => {
+    if (!user) return "Your Team";
+    if (typeof user.team === "string") return user.team;
+    if (user.team && typeof user.team === "object" && user.team.name)
+      return user.team.name;
+    return "Your Team"; // Fallback
   };
 
   const BeginButton = styled(Button)({
@@ -66,7 +76,7 @@ const WelcomeModal = () => {
             src='https://media.istockphoto.com/id/2177790198/pt/foto/group-of-young-multi-ethnic-startup-business-team-collaborating-on-project-in-modern-office.jpg?s=2048x2048&w=is&k=20&c=d2l8WTbB8dPYIaybpizLbH-ZFj5moLpM9DHV9vFNG6Q='
             alt='team'
           />
-          <span>The Debuggers</span>
+          <span>{getTeamName()}</span>
         </div>
         <div className='text-right'>
           <BeginButton variant='contained' onClick={handleBeginClick}>
