@@ -17,7 +17,7 @@ import {
   CircularProgress,
   Alert,
 } from "@mui/material";
-import { Groups, Search } from "@mui/icons-material";
+import { Groups, Search, Stars } from "@mui/icons-material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import TodayIcon from "@mui/icons-material/Today";
@@ -710,6 +710,20 @@ const Memors = () => {
                             : `${memor.description.substring(0, 50)}${
                                 memor.description.length > 50 ? "..." : ""
                               }`}
+                        </div>
+
+                        <div className="points">
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              color: "#CBCBCB",
+                              fontSize: "1rem",
+                              display: "flex",
+                              alignItems: "center",
+                            }}
+                          >
+                            <Stars />{memor.points} points
+                          </Typography>
                         </div>
 
                         <div className="status">

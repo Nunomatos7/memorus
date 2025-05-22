@@ -54,13 +54,14 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
   // Fetch team photos when component mounts or memor changes
   useEffect(() => {
     if (!memor || !memor.id || !token || !user?.tenant_subdomain) return;
-
+  
     setLoadingTeamPhotos(true);
-
+  
     const fetchTeamPhotos = async () => {
       try {
-        console.log(`Fetching pictures for memor ID: ${memor.id}`);
-        // Fetch photos for this memor
+        console.log(`Fetching pictures for memor ID: ${memor.id} (Team: ${user?.teamsId})`);
+        
+        // Fetch photos for this memor - API already updated to filter by team
         const response = await fetch(
           `${import.meta.env.VITE_API_URL}/api/memors/${memor.id}/pictures`,
           {
@@ -70,30 +71,25 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
             },
           }
         );
-
+  
         if (!response.ok) {
           throw new Error(`Failed to fetch memor pictures: ${response.status}`);
         }
-
+  
         const pictures = await response.json();
         console.log("API returned pictures:", pictures);
-
-        // Log first picture for debugging
-        if (pictures.length > 0) {
-          console.log("First picture details:", pictures[0]);
-          console.log("First picture alt_text:", pictures[0].alt_text);
-        }
-
+        console.log(`Received ${pictures.length} team pictures for memor ${memor.id}`);
+  
         // Store the complete picture objects
         setNormalizedImages(pictures);
         console.log("Set normalizedImages to:", pictures);
-
+  
         // For backward compatibility
         if (!memor.image || memor.image.length === 0) {
-          // IMPORTANT: Preserve alt_text from the API response
+          // Preserve alt_text from the API response
           memor.image = pictures.map((pic) => ({
             img_src: pic.img_src,
-            alt_text: pic.alt_text  // This preserves the alt_text from the database
+            alt_text: pic.alt_text
           }));
           console.log("Updated memor.image with alt_text:", memor.image);
         }
@@ -120,9 +116,9 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
         setLoadingTeamPhotos(false);
       }
     };
-
+  
     fetchTeamPhotos();
-  }, [memor?.id, token, user?.tenant_subdomain]);
+  }, [memor?.id, token, user?.tenant_subdomain, user?.teamsId]);
 
   useEffect(() => {
     if (isSubmitMemorOpen && modalRef.current && !selectedImage) {
@@ -303,7 +299,7 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
               background: "#f5f5f5",
             }}
           >
-            <TestAltText memorId={memor.id} />
+            {/* <TestAltText memorId={memor.id} /> */}
           </div>
         );
       }

@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { Box, Typography, Link, Container } from "@mui/material";
 import { styled } from "@mui/system";
 import logo from "../../assets/images/logo.svg";
+import TermsModal from "../TermsModal/TermsModal";
 
 const FooterContainer = styled(Box)(({ theme }) => ({
   backgroundColor: "#111315",
@@ -58,15 +60,22 @@ const StyledLink = styled(Link)(({ theme }) => ({
 }));
 
 const Footer = () => {
+  const [termsModalOpen, setTermsModalOpen] = useState(false);
+  const [initialTab, setInitialTab] = useState("terms");
   const currentYear = new Date().getFullYear();
 
+  const openTermsModal = (tab) => {
+    setInitialTab(tab);
+    setTermsModalOpen(true);
+  };
+
   return (
-    <FooterContainer component="footer">
-      <FooterContent maxWidth="lg">
+    <FooterContainer component='footer'>
+      <FooterContent maxWidth='lg'>
         <FooterSection>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <Box
-              component="img"
+              component='img'
               src={logo}
               alt="Memor'us Logo"
               sx={{
@@ -75,7 +84,7 @@ const Footer = () => {
               }}
             />
             <Typography
-              variant="body1"
+              variant='body1'
               sx={{
                 fontWeight: "bold",
                 display: "flex",
@@ -89,7 +98,7 @@ const Footer = () => {
           </Box>
 
           <Typography
-            variant="body2"
+            variant='body2'
             sx={{
               fontSize: "12px",
               color: "white",
@@ -105,12 +114,38 @@ const Footer = () => {
         </FooterSection>
 
         <FooterLinks>
-          <StyledLink href="#">Privacy Policy</StyledLink>
-          <StyledLink href="#">Terms of Service</StyledLink>
-          <StyledLink href="#">Contact Us</StyledLink>
-          <StyledLink href="#">Support</StyledLink>
+          <StyledLink
+            component='button'
+            onClick={() => openTermsModal("terms")}
+            sx={{ cursor: "pointer" }}
+          >
+            Terms of Service
+          </StyledLink>
+          <StyledLink
+            component='button'
+            onClick={() => openTermsModal("cookies")}
+            sx={{ cursor: "pointer" }}
+          >
+            Cookie Policy
+          </StyledLink>
+          <StyledLink href='mailto:geral@memor-us.com'>Contact Us</StyledLink>
         </FooterLinks>
       </FooterContent>
+
+      {/* Terms Modal */}
+      {termsModalOpen && (
+        <TermsModal
+          open={termsModalOpen}
+          onClose={() => {
+            setTermsModalOpen(false);
+            // Ensure body overflow is restored
+            setTimeout(() => {
+              document.body.style.overflow = "auto";
+            }, 0);
+          }}
+          initialTab={initialTab}
+        />
+      )}
     </FooterContainer>
   );
 };

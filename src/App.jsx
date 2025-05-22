@@ -14,7 +14,7 @@ import LoginPage from "./Auth/LoginPage";
 import RegisterPage from "./Auth/RegisterPage";
 import ChangePassword from "./Auth/ChangePassword";
 import ConsentModal from "./Components/ConsentModal/ConsentModal";
-import CollaboratorFooter from "./Components/ColaboratorFooter/ColaboratorFooter";
+import CollaboratorFooter from "./Components/CollaboratorFooter/CollaboratorFooter";
 import AdminFooter from "./Components/AdminFooter/AdminFooter";
 import { useAuth } from "./context/AuthContext";
 import Loader from "./Components/Loader/Loader";
@@ -56,7 +56,8 @@ function App() {
   const isAuthPage = ["/login", "/register", "/change-password"].includes(
     location.pathname
   );
-  const hideFooter = isAuthPage || location.pathname.toLowerCase().includes("/memoryboard");
+  const hideFooter =
+    isAuthPage || location.pathname.toLowerCase().includes("/memoryboard");
 
   const isAdmin = user?.roles?.some((role) => role.toLowerCase() === "admin");
 
@@ -118,7 +119,7 @@ function App() {
           <Route path='memors/:memorId' element={<Memors />} />
           <Route path='leaderboard' element={<Leaderboard />} />
           <Route path='memoryboard' element={<MemoryBoard />} />
-          <Route path='profile' element={<Profile/>} />
+          <Route path='profile' element={<Profile />} />
         </Route>
 
         {/* Admin Routes */}
