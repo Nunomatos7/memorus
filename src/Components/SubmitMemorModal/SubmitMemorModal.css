@@ -99,20 +99,6 @@
   flex-shrink: 0;
 }
 
-@media (max-width: 1024px) {
-  .modal-container {
-    width: 40%;
-  }
-
-  .modal-upload {
-    margin: 20px 0 20px 0;
-  }
-
-  .upload-box {
-    width: 100%;
-  }
-}
-
 .qr-code-placeholder {
   height: 20vh;
   width: 20vw;
@@ -310,4 +296,306 @@
 .upload-button:hover {
   transform: scale(1.05);
   opacity: 0.9;
+}
+
+/* Mobile Responsiveness */
+
+/* Large tablets and small desktops */
+@media (max-width: 1024px) {
+  .modal-container {
+    width: 40%;
+  }
+
+  .modal-upload {
+    margin: 20px 0 20px 0;
+  }
+
+  .upload-box {
+    width: 100%;
+  }
+}
+
+/* Tablets */
+@media (max-width: 768px) {
+  .modal-overlay-submit-memor {
+    justify-content: center;
+    align-items: flex-start;
+    padding: 0;
+  }
+
+  .modal-container {
+    width: 100%;
+    max-width: 100%;
+    height: calc(100vh - 60px);
+    max-height: calc(100vh - 60px);
+    margin-top: 60px;
+    margin-bottom: 0;
+    padding: 20px;
+    border-radius: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .modal-top {
+    margin-bottom: 30px;
+  }
+
+  .modal-title {
+    font-size: 20px;
+  }
+
+  .modal-details {
+    flex-direction: column;
+    gap: 15px;
+    margin: 15px 0;
+  }
+
+  .modal-details-header {
+    justify-content: flex-start;
+    gap: 8px;
+  }
+
+  .upload-box {
+    flex-direction: column;
+    padding: 20px;
+    gap: 15px;
+  }
+
+  .qr-code-placeholder {
+    height: auto;
+    width: 100%;
+    min-height: 160px;
+    padding: 20px;
+  }
+
+  .uploaded-image {
+    width: 100%;
+  }
+
+  .uploaded-image img {
+    max-width: 100%;
+    max-height: 200px;
+  }
+
+  .modal-actions {
+    flex-direction: column-reverse;
+    gap: 12px;
+    margin-top: 30px;
+  }
+
+  .modal-actions button {
+    width: 100%;
+    padding: 14px;
+  }
+}
+
+/* Mobile phones */
+@media (max-width: 480px) {
+  .modal-overlay-submit-memor {
+    padding: 0;
+  }
+
+  .modal-container {
+    margin-top: 60px;
+    margin-bottom: 0;
+    padding: 16px;
+    height: calc(100vh - 60px);
+    max-height: calc(100vh - 60px);
+    border-radius: 0;
+  }
+
+  .modal-top {
+    margin-bottom: 20px;
+  }
+
+  .modal-top h4 {
+    font-size: 16px;
+  }
+
+  .modal-title {
+    font-size: 18px;
+  }
+
+  .modal-description {
+    font-size: 13px;
+  }
+
+  .modal-details {
+    margin: 15px 0;
+    gap: 12px;
+  }
+
+  .modal-details-header {
+    gap: 6px;
+  }
+
+  .modal-details-header p {
+    font-size: 12px;
+  }
+
+  .modal-upload {
+    margin: 15px 0 25px 0;
+  }
+
+  .upload-box {
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .qr-code-placeholder {
+    min-height: 140px;
+    padding: 16px;
+    font-size: 13px;
+  }
+
+  .or-text {
+    margin: 8px 0;
+    font-size: 13px;
+  }
+
+  .uploaded-photos-title {
+    font-size: 13px;
+    margin-top: 16px;
+  }
+
+  .uploaded-photos-slider {
+    gap: 8px;
+    padding: 8px 0;
+  }
+
+  .photo-slide {
+    max-width: 70px !important;
+  }
+
+  .photo,
+  .photo-placeholder {
+    width: 70px;
+    height: 70px;
+  }
+
+  .no-photos-text {
+    font-size: 13px;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .modal-actions {
+    margin-top: 20px;
+    gap: 10px;
+  }
+
+  .modal-actions button {
+    padding: 12px;
+    font-size: 14px;
+  }
+}
+
+/* Small mobile phones */
+@media (max-width: 360px) {
+  .modal-container {
+    padding: 12px;
+    height: calc(100vh - 60px);
+    max-height: calc(100vh - 60px);
+  }
+
+  .modal-title {
+    font-size: 16px;
+  }
+
+  .modal-description {
+    font-size: 12px;
+  }
+
+  .upload-box {
+    padding: 12px;
+  }
+
+  .qr-code-placeholder {
+    min-height: 120px;
+    padding: 12px;
+    font-size: 12px;
+  }
+
+  .photo-slide {
+    max-width: 60px !important;
+  }
+
+  .photo,
+  .photo-placeholder {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+/* Landscape mobile phones */
+@media (max-height: 500px) and (orientation: landscape) {
+  .modal-overlay-submit-memor {
+    align-items: flex-start;
+    padding: 0;
+  }
+
+  .modal-container {
+    height: calc(100vh - 60px);
+    max-height: calc(100vh - 60px);
+    margin-top: 60px;
+    margin-bottom: 0;
+    border-radius: 0;
+  }
+
+  .modal-top {
+    margin-bottom: 15px;
+  }
+
+  .modal-header {
+    margin-bottom: 15px;
+  }
+
+  .modal-upload {
+    margin: 15px 0 20px 0;
+  }
+
+  .qr-code-placeholder {
+    min-height: 100px;
+  }
+
+  .uploaded-image img {
+    max-height: 120px;
+  }
+
+  .modal-actions {
+    margin-top: 15px;
+  }
+}
+
+/* Ensure touch targets are large enough for mobile */
+@media (max-width: 768px) {
+  .upload-button,
+  .photo-slide,
+  .modal-top button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .photo-slide {
+    cursor: pointer;
+    -webkit-tap-highlight-color: rgba(208, 188, 254, 0.2);
+  }
+
+  /* Improve scrolling on mobile */
+  .modal-container {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .uploaded-photos-slider {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .photo,
+  .uploaded-image img {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
 }
