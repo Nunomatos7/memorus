@@ -12,23 +12,7 @@ jobs:
       with:
         fetch-depth: 0
         
-    - name: Remove workflow files and push to personal repo
-      env:
-        PERSONAL_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
+    - name: Push to personal repo
       run: |
-        # Remove the .github directory
-        rm -rf .github
-        
-        # Configure git
-        git config user.name "Nunomatos7"
-        git config user.email "nuno@example.com"
-        
-        # Unset any existing credential helpers
-        git config --unset-all credential.helper || true
-        
-        # Stage changes
-        git add -A
-        git commit -m "Sync from organization repo" || echo "No changes to commit"
-        
-        # Push directly with token in URL
-        git push https://Nunomatos7:${PERSONAL_TOKEN}@github.com/Nunomatos7/memorus.git HEAD:main --force
+        git remote add personal https://${{ secrets.PERSONAL_TOKEN }}@github.com/yourusername/your-personal-repo.git
+        git push personal main --force
