@@ -11,8 +11,21 @@ jobs:
     - uses: actions/checkout@v3
       with:
         fetch-depth: 0
+        token: ${{ secrets.PERSONAL_TOKEN }}  # Use your token from the start!
         
-    - name: Push to personal repo
+    - name: Remove workflow files and push to personal repo
       run: |
-        git remote add personal https://${{ secrets.PERSONAL_TOKEN }}@github.com/Nunomatos7/memorus.git
-        git push personal main --force
+        # Remove the .github directory
+        rm -rf .github
+        
+        # Configure git
+        git config user.name "Nunomatos7"
+        git config user.email "nuno@example.com"
+        
+        # Stage changes
+        git add -A
+        git commit -m "Sync from organization repo" || echo "No changes to commit"
+        
+        # Add remote and push (now using your token's credentials)
+        git remote add personal https://github.com/Nunomatos7/memorus.git
+        git push personal HEAD:main --force
