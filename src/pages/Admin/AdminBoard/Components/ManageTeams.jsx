@@ -34,6 +34,8 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
   const [teamToDelete, setTeamToDelete] = useState(null);
   const [editingTeamAvatar, setEditingTeamAvatar] = useState(null); // For storing new avatar file
   const [editingTeamAvatarPreview, setEditingTeamAvatarPreview] = useState(null); // For preview URL
+  const [pendingAvatarFile, setPendingAvatarFile] = useState(null); // For pending avatar file
+  const [pendingAvatarPreview, setPendingAvatarPreview] = useState(null); // For pending preview
 
   useEffect(() => {
     fetchTeamsAndMembers();
@@ -224,21 +226,45 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
     // Reset avatar editing states
     setEditingTeamAvatar(null);
     setEditingTeamAvatarPreview(null);
+    setPendingAvatarFile(null);
+    setPendingAvatarPreview(null);
     setIsEditing(true);
   };
 
   const handleAvatarChange = (event, teamName) => {
     const file = event.target.files[0];
     if (file) {
-      // Store the file for upload
-      setEditingTeamAvatar(file);
+      // Store the file as pending
+      setPendingAvatarFile(file);
       
-      // Create preview URL
+      // Create preview URL for pending state
       const reader = new FileReader();
       reader.onload = (e) => {
-        setEditingTeamAvatarPreview(e.target.result);
+        setPendingAvatarPreview(e.target.result);
       };
       reader.readAsDataURL(file);
+    }
+  };
+
+  const confirmAvatarChange = () => {
+    // Move pending avatar to confirmed state
+    setEditingTeamAvatar(pendingAvatarFile);
+    setEditingTeamAvatarPreview(pendingAvatarPreview);
+    
+    // Clear pending state
+    setPendingAvatarFile(null);
+    setPendingAvatarPreview(null);
+  };
+
+  const cancelAvatarChange = () => {
+    // Clear pending state without applying changes
+    setPendingAvatarFile(null);
+    setPendingAvatarPreview(null);
+    
+    // Reset file input
+    const fileInput = document.getElementById(`avatar-input-${editingTeam}`);
+    if (fileInput) {
+      fileInput.value = '';
     }
   };
 
@@ -363,6 +389,8 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
     setEditedMembers({});
     setEditingTeamAvatar(null);
     setEditingTeamAvatarPreview(null);
+    setPendingAvatarFile(null);
+    setPendingAvatarPreview(null);
     setSearchQuery2("");
   };
 
@@ -559,26 +587,39 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
                           position: "relative",
                           background: "#1E1E1E",
                           display: "flex",
+                          flexDirection: "column",
                           justifyContent: "center",
                           alignItems: "center",
-                          minHeight: "120px",
-                          width: "120px"
+                          minHeight: "180px",
+                          width: "150px"
                         }}
                       >
+                        {/* Avatar Image */}
                         <img
-                          src={editingTeamAvatarPreview || teamsData.find(t => t.name === teamName)?.avatar || "default_avatar.png"}
-                          alt={`${teamName} current avatar`}
+                          src={
+                            pendingAvatarPreview || 
+                            editingTeamAvatarPreview || 
+                            teamsData.find(t => t.name === teamName)?.avatar || 
+                            "default_avatar.png"
+                          }
+                          alt={`${teamName} avatar`}
                           style={{
                             width: "80px",
                             height: "80px",
                             borderRadius: "50%",
                             objectFit: "cover",
-                            border: editingTeamAvatarPreview ? "2px solid #B5EDE4" : "2px solid #82D5C7",
-                            cursor: "pointer"
+                            border: pendingAvatarPreview 
+                              ? "2px solid #FFA726" 
+                              : editingTeamAvatarPreview 
+                              ? "2px solid #B5EDE4" 
+                              : "2px solid #82D5C7",
+                            cursor: pendingAvatarPreview ? "default" : "pointer",
+                            opacity: pendingAvatarPreview ? 0.8 : 1
                           }}
                           onClick={() => {
-                            // Trigger file input when clicking on avatar
-                            document.getElementById(`avatar-input-${teamName}`).click();
+                            if (!pendingAvatarPreview) {
+                              document.getElementById(`avatar-input-${teamName}`).click();
+                            }
                           }}
                           onError={(e) => {
                             e.target.src = "default_avatar.png";
@@ -594,23 +635,85 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
                           onChange={(e) => handleAvatarChange(e, teamName)}
                         />
                         
-                        {/* Overlay text */}
-                        <Box
-                          sx={{
-                            position: "absolute",
-                            bottom: "5px",
-                            left: "50%",
-                            transform: "translateX(-50%)",
-                            backgroundColor: "rgba(0,0,0,0.7)",
-                            color: "white",
-                            fontSize: "10px",
-                            padding: "2px 6px",
-                            borderRadius: "4px",
-                            whiteSpace: "nowrap"
-                          }}
-                        >
-                          Click to change
-                        </Box>
+                        {/* Status text */}
+                        {pendingAvatarPreview ? (
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              color: "#FFA726",
+                              marginTop: "8px",
+                              fontWeight: "bold"
+                            }}
+                          >
+                            Pending Changes
+                          </Typography>
+                        ) : editingTeamAvatarPreview ? (
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              color: "#B5EDE4",
+                              marginTop: "8px"
+                            }}
+                          >
+                            Updated (Click to change)
+                          </Typography>
+                        ) : (
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              color: "#888",
+                              marginTop: "8px"
+                            }}
+                          >
+                            Click to change
+                          </Typography>
+                        )}
+                        
+                        {/* Confirmation buttons - only show when there's a pending change */}
+                        {pendingAvatarPreview && (
+                          <Box
+                            sx={{
+                              display: "flex",
+                              gap: 1,
+                              marginTop: "10px"
+                            }}
+                          >
+                            <CustomButton
+                              text="✓"
+                              onClick={confirmAvatarChange}
+                              sx={{
+                                minWidth: "30px",
+                                width: "30px",
+                                height: "30px",
+                                borderRadius: "50%",
+                                backgroundColor: "#4CAF50",
+                                color: "white",
+                                fontSize: "14px",
+                                padding: 0,
+                                "&:hover": {
+                                  backgroundColor: "#45a049"
+                                }
+                              }}
+                            />
+                            <CustomButton
+                              text="✕"
+                              onClick={cancelAvatarChange}
+                              sx={{
+                                minWidth: "30px",
+                                width: "30px",
+                                height: "30px",
+                                borderRadius: "50%",
+                                backgroundColor: "#f44336",
+                                color: "white",
+                                fontSize: "14px",
+                                padding: 0,
+                                "&:hover": {
+                                  backgroundColor: "#da190b"
+                                }
+                              }}
+                            />
+                          </Box>
+                        )}
                       </div>
                     </Box>
                   </Box>
