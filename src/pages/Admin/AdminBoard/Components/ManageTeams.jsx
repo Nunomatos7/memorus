@@ -41,7 +41,8 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
     setLoading(true);
     try {
       const teamsResponse = await api.get("/api/teams");
-
+      
+      // Teams now come with pre-signed avatar URLs from the backend
       setTeamsData(teamsResponse.data || []);
 
       const teamsObj = {};
@@ -405,9 +406,30 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
               <Box
                 sx={{
                   display: "grid",
-                  gridTemplateColumns: "1fr 4fr 1fr",
+                  gridTemplateColumns: "auto 1fr 4fr 1fr",
+                  alignItems: "center",
+                  gap: 2
                 }}
               >
+                {/* Team Avatar */}
+                <Box>
+                  <img
+                    src={teamsData.find(t => t.name === teamName)?.avatar || "default_avatar.png"}
+                    alt={`${teamName} avatar`}
+                    style={{
+                      width: "40px",
+                      height: "40px",
+                      borderRadius: "50%",
+                      objectFit: "cover",
+                      border: "2px solid #82D5C7"
+                    }}
+                    onError={(e) => {
+                      e.target.src = "default_avatar.png";
+                    }}
+                  />
+                </Box>
+                
+                {/* Team Name */}
                 <Box
                   sx={{
                     display: "flex",
@@ -421,6 +443,8 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
                     {teamName}
                   </Typography>
                 </Box>
+                
+                {/* Team Members */}
                 <Box
                   sx={{
                     display: "flex",
@@ -439,6 +463,8 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
                     {teamMembers.length > 3 && "..."}
                   </Typography>
                 </Box>
+                
+                {/* Action Buttons */}
                 <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
                   <IconButton onClick={() => startEditing(teamName)}>
                     <img

@@ -33,6 +33,7 @@ const DynamicModal = ({
   const [newMemorPoints, setNewMemorPoints] = useState(null);
   const [newTeamName, setNewTeamName] = useState("");
   const [newTeamThumbnail, setNewTeamThumbnail] = useState(null);
+  const [newTeamThumbnailFile, setNewTeamThumbnailFile] = useState(null); // Add this for file handling
   const [newTeamMembers, setNewTeamMembers] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
   const [unassignedMembers, setUnassignedMembers] = useState([]);
@@ -126,6 +127,10 @@ const DynamicModal = ({
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (file) {
+      // Store the actual file for upload
+      setNewTeamThumbnailFile(file);
+      
+      // Create preview URL for display
       const reader = new FileReader();
       reader.onload = (e) => {
         setNewTeamThumbnail(e.target.result);
@@ -303,15 +308,25 @@ const DynamicModal = ({
       try {
         setLoading(true);
         
-        // Create the team
-        const teamResponse = await api.post("/api/teams", {
-          name: newTeamName,
-          avatar: newTeamThumbnail || "default_avatar.png",
+        // Create FormData for file upload
+        const formData = new FormData();
+        formData.append('name', newTeamName);
+        
+        // Add avatar file if selected
+        if (newTeamThumbnailFile) {
+          formData.append('image', newTeamThumbnailFile);
+        }
+        
+        // Create the team with avatar
+        const teamResponse = await api.post("/api/teams", formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
         });
-  
+
         const teamId = teamResponse.data.id;
         console.log(`Created team with ID: ${teamId}`);
-  
+
         // Assign selected members to team
         const selectedMemberIds = Object.entries(newTeamMembers)
           .filter(([_, isSelected]) => isSelected)
@@ -320,7 +335,7 @@ const DynamicModal = ({
             return member ? member.id : null;
           })
           .filter((id) => id !== null);
-  
+
         // Update each user using the correct endpoint
         for (const userId of selectedMemberIds) {
           try {
@@ -331,7 +346,7 @@ const DynamicModal = ({
             // Continue with other users even if one fails
           }
         }
-  
+
         // ADDED: Get active competition and add team to it
         try {
           const competitionsResponse = await api.get("/api/competitions/active");
@@ -357,7 +372,7 @@ const DynamicModal = ({
           console.error("Error adding team to competition:", compError);
           // Don't fail if this step fails - the team is still created
         }
-  
+
         setLoading(false);
         showFeedback(
           "success",
@@ -377,7 +392,49 @@ const DynamicModal = ({
         throw error; // Propagate the error
       }
     }
-    // Edit team functionality would be handled in the Teams component
+    
+    // Edit team functionality
+    if (action === "edit" && data?.id) {
+      try {
+        setLoading(true);
+        
+        // Create FormData for file upload
+        const formData = new FormData();
+        formData.append('name', newTeamName);
+        
+        // Add avatar file if selected
+        if (newTeamThumbnailFile) {
+          formData.append('image', newTeamThumbnailFile);
+        }
+        
+        // Update the team with avatar
+        const teamResponse = await api.put(`/api/teams/${data.id}`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+
+        console.log(`Updated team with ID: ${data.id}`);
+
+        setLoading(false);
+        showFeedback(
+          "success",
+          "Team Updated",
+          `The team "${newTeamName}" has been successfully updated.`
+        );
+        
+        return true;
+      } catch (error) {
+        setLoading(false);
+        console.error("Error updating team:", error);
+        showFeedback(
+          "error",
+          "Team Update Failed",
+          error.response?.data?.error || error.message || "Unknown error"
+        );
+        throw error;
+      }
+    }
   };
 
   const handleCompetitionSubmit = async () => {
@@ -618,7 +675,7 @@ const DynamicModal = ({
               variant='body1'
               sx={{ color: "#CAC4D0", marginBottom: "10px" }}
             >
-              Thumbnail
+              Team Avatar (Optional)
             </Typography>
             <div
               style={{
@@ -635,12 +692,40 @@ const DynamicModal = ({
               }}
             >
               {newTeamThumbnail ? (
-                <img
-                  src={newTeamThumbnail}
-                  alt='Uploaded Thumbnail'
-                  style={{ borderRadius: "10px", height: "120px" }}
-                  aria-label='Uploaded Thumbnail'
-                />
+                <div style={{ position: "relative" }}>
+                  <img
+                    src={newTeamThumbnail}
+                    alt='Team Avatar Preview'
+                    style={{ 
+                      borderRadius: "10px", 
+                      height: "120px",
+                      maxWidth: "120px",
+                      objectFit: "cover"
+                    }}
+                    aria-label='Team Avatar Preview'
+                  />
+                  <Button
+                    onClick={() => {
+                      setNewTeamThumbnail(null);
+                      setNewTeamThumbnailFile(null);
+                    }}
+                    sx={{
+                      position: "absolute",
+                      top: "-10px",
+                      right: "-10px",
+                      minWidth: "20px",
+                      width: "20px",
+                      height: "20px",
+                      borderRadius: "50%",
+                      backgroundColor: "#D64545",
+                      color: "white",
+                      fontSize: "12px",
+                      "&:hover": { backgroundColor: "#B03C3C" }
+                    }}
+                  >
+                    ×
+                  </Button>
+                </div>
               ) : (
                 <>
                   <label htmlFor='file-input' style={{ cursor: "pointer" }}>
@@ -653,7 +738,7 @@ const DynamicModal = ({
                     >
                       <img
                         src={background3}
-                        alt='Upload Thumbnail'
+                        alt='Upload Avatar'
                         style={{
                           width: "50px",
                           height: "50px",
@@ -661,7 +746,10 @@ const DynamicModal = ({
                         }}
                       />
                       <Typography variant='body2' sx={{ color: "#888" }}>
-                        Upload file from computer
+                        Upload team avatar from computer
+                      </Typography>
+                      <Typography variant='caption' sx={{ color: "#666", mt: 1 }}>
+                        Recommended: Square image, max 5MB
                       </Typography>
                     </div>
                   </label>
