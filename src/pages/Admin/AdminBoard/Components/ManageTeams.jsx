@@ -246,14 +246,66 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
     }
   };
 
-  const confirmAvatarChange = () => {
-    // Move pending avatar to confirmed state
-    setEditingTeamAvatar(pendingAvatarFile);
-    setEditingTeamAvatarPreview(pendingAvatarPreview);
+  const confirmAvatarChange = async () => {
+    if (!pendingAvatarFile || !editingTeam) return;
     
-    // Clear pending state
-    setPendingAvatarFile(null);
-    setPendingAvatarPreview(null);
+    setLoading(true);
+    
+    try {
+      // Get team ID
+      const teamObj = teamsData.find((t) => t.name === editingTeam);
+      if (!teamObj) {
+        throw new Error(`Team ${editingTeam} not found`);
+      }
+
+      const teamId = teamObj.id;
+
+      // Upload the avatar immediately
+      const formData = new FormData();
+      formData.append('name', editingTeam); // Keep the same name
+      formData.append('image', pendingAvatarFile);
+      
+      const response = await api.put(`/api/teams/${teamId}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      
+      // Update the local teamsData state with the new avatar URL
+      setTeamsData(prevTeamsData => 
+        prevTeamsData.map(team => 
+          team.id === teamId 
+            ? { ...team, avatar: response.data.avatar }
+            : team
+        )
+      );
+      
+      // Move to confirmed state
+      setEditingTeamAvatar(pendingAvatarFile);
+      setEditingTeamAvatarPreview(pendingAvatarPreview);
+      
+      // Clear pending state
+      setPendingAvatarFile(null);
+      setPendingAvatarPreview(null);
+      
+      showFeedback("success", "Avatar Updated", "Team avatar has been updated successfully!");
+      
+    } catch (error) {
+      console.error("Error updating team avatar:", error);
+      showFeedback("error", "Avatar Update Failed", error.response?.data?.error || error.message || "Failed to update avatar");
+      
+      // Clear pending state on error
+      setPendingAvatarFile(null);
+      setPendingAvatarPreview(null);
+      
+      // Reset file input
+      const fileInput = document.getElementById(`avatar-input-${editingTeam}`);
+      if (fileInput) {
+        fileInput.value = '';
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const cancelAvatarChange = () => {
@@ -303,27 +355,7 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
 
       const teamId = teamObj.id;
 
-      // Handle avatar update if a new one was selected
-      if (editingTeamAvatar) {
-        try {
-          const formData = new FormData();
-          formData.append('name', editingTeam); // Keep the same name
-          formData.append('image', editingTeamAvatar);
-          
-          await api.put(`/api/teams/${teamId}`, formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          });
-          
-          console.log(`Updated avatar for team ${editingTeam}`);
-        } catch (avatarError) {
-          console.error("Error updating team avatar:", avatarError);
-          showFeedback("warning", "Partial Success", "Team members updated but avatar upload failed");
-        }
-      }
-
-      // Handle member updates
+      // Handle member updates only (avatar is handled separately)
       const selectedEmails = Object.entries(editedMembers)
         .filter(([_, isSelected]) => isSelected)
         .map(([email]) => email);
@@ -365,9 +397,10 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
       showFeedback(
         "success",
         "Team Updated",
-        `The team "${editingTeam}" has been successfully updated.`
+        `The team "${editingTeam}" members have been successfully updated.`
       );
 
+      // Refresh team data to ensure consistency
       fetchTeamsAndMembers();
     } catch (error) {
       console.error("Error updating team:", error);
@@ -379,6 +412,8 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
       setEditedMembers({});
       setEditingTeamAvatar(null);
       setEditingTeamAvatarPreview(null);
+      setPendingAvatarFile(null);
+      setPendingAvatarPreview(null);
       setSearchQuery2("");
     }
   };
