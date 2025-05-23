@@ -32,6 +32,8 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
   const [confirmationDeleteModalOpen, setConfirmationDeleteModalOpen] =
     useState(false);
   const [teamToDelete, setTeamToDelete] = useState(null);
+  const [editingTeamAvatar, setEditingTeamAvatar] = useState(null); // For storing new avatar file
+  const [editingTeamAvatarPreview, setEditingTeamAvatarPreview] = useState(null); // For preview URL
 
   useEffect(() => {
     fetchTeamsAndMembers();
@@ -219,7 +221,25 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
         return acc;
       }, {})
     );
+    // Reset avatar editing states
+    setEditingTeamAvatar(null);
+    setEditingTeamAvatarPreview(null);
     setIsEditing(true);
+  };
+
+  const handleAvatarChange = (event, teamName) => {
+    const file = event.target.files[0];
+    if (file) {
+      // Store the file for upload
+      setEditingTeamAvatar(file);
+      
+      // Create preview URL
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setEditingTeamAvatarPreview(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleCheckboxToggle = (email, name, action) => {
@@ -257,6 +277,27 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
 
       const teamId = teamObj.id;
 
+      // Handle avatar update if a new one was selected
+      if (editingTeamAvatar) {
+        try {
+          const formData = new FormData();
+          formData.append('name', editingTeam); // Keep the same name
+          formData.append('image', editingTeamAvatar);
+          
+          await api.put(`/api/teams/${teamId}`, formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          });
+          
+          console.log(`Updated avatar for team ${editingTeam}`);
+        } catch (avatarError) {
+          console.error("Error updating team avatar:", avatarError);
+          showFeedback("warning", "Partial Success", "Team members updated but avatar upload failed");
+        }
+      }
+
+      // Handle member updates
       const selectedEmails = Object.entries(editedMembers)
         .filter(([_, isSelected]) => isSelected)
         .map(([email]) => email);
@@ -310,6 +351,8 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
       setIsEditing(false);
       setEditingTeam(null);
       setEditedMembers({});
+      setEditingTeamAvatar(null);
+      setEditingTeamAvatarPreview(null);
       setSearchQuery2("");
     }
   };
@@ -318,6 +361,8 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
     setIsEditing(false);
     setEditingTeam(null);
     setEditedMembers({});
+    setEditingTeamAvatar(null);
+    setEditingTeamAvatarPreview(null);
     setSearchQuery2("");
   };
 
@@ -492,9 +537,83 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
                     gap: 5,
                   }}
                 >
-                  <Typography variant='body1' sx={{ color: "white" }}>
-                    Editing Team: {teamName}
-                  </Typography>
+                  <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                    <Typography variant='body1' sx={{ color: "white", marginBottom: "20px" }}>
+                      Editing Team: {teamName}
+                    </Typography>
+                    
+                    {/* Team Avatar Edit Section */}
+                    <Box sx={{ marginBottom: "20px" }}>
+                      <Typography
+                        variant='body2'
+                        sx={{ color: "#CAC4D0", marginBottom: "10px", textAlign: "center" }}
+                      >
+                        Team Avatar
+                      </Typography>
+                      <div
+                        style={{
+                          border: "1px dashed #888",
+                          borderRadius: "10px",
+                          padding: "15px",
+                          textAlign: "center",
+                          position: "relative",
+                          background: "#1E1E1E",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          minHeight: "120px",
+                          width: "120px"
+                        }}
+                      >
+                        <img
+                          src={editingTeamAvatarPreview || teamsData.find(t => t.name === teamName)?.avatar || "default_avatar.png"}
+                          alt={`${teamName} current avatar`}
+                          style={{
+                            width: "80px",
+                            height: "80px",
+                            borderRadius: "50%",
+                            objectFit: "cover",
+                            border: editingTeamAvatarPreview ? "2px solid #B5EDE4" : "2px solid #82D5C7",
+                            cursor: "pointer"
+                          }}
+                          onClick={() => {
+                            // Trigger file input when clicking on avatar
+                            document.getElementById(`avatar-input-${teamName}`).click();
+                          }}
+                          onError={(e) => {
+                            e.target.src = "default_avatar.png";
+                          }}
+                        />
+                        
+                        {/* Hidden file input */}
+                        <input
+                          id={`avatar-input-${teamName}`}
+                          type='file'
+                          accept='image/*'
+                          style={{ display: "none" }}
+                          onChange={(e) => handleAvatarChange(e, teamName)}
+                        />
+                        
+                        {/* Overlay text */}
+                        <Box
+                          sx={{
+                            position: "absolute",
+                            bottom: "5px",
+                            left: "50%",
+                            transform: "translateX(-50%)",
+                            backgroundColor: "rgba(0,0,0,0.7)",
+                            color: "white",
+                            fontSize: "10px",
+                            padding: "2px 6px",
+                            borderRadius: "4px",
+                            whiteSpace: "nowrap"
+                          }}
+                        >
+                          Click to change
+                        </Box>
+                      </div>
+                    </Box>
+                  </Box>
                   <Box>
                     <Typography
                       variant='body2'
