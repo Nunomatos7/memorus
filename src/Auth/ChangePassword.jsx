@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import "./LoginPage.css";
 import logo from "../assets/images/logo.svg";
-import { TextField, Button, Typography } from "@mui/material";
+import { TextField, Button, Typography, Alert } from "@mui/material";
 import leftBackground from "../assets/images/left-auth.svg";
 import rightBackground from "../assets/images/right-auth.svg";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -16,6 +16,7 @@ const ChangePasswordPage = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
+  
   const { user, token } = useAuth();
   const navigate = useNavigate();
 
@@ -28,32 +29,66 @@ const ChangePasswordPage = () => {
     }
   }, [user]);
 
-  const handleChangePassword = async (e) => {
-    e.preventDefault();
+  const validateForm = () => {
+    // Reset error
     setError("");
-    setSuccess("");
-    setLoading(true);
 
-    // Validate passwords match
+    // Check if username is provided when not logged in
+    if (!user && !username.trim()) {
+      setError("Email is required.");
+      return false;
+    }
+
+    // Check if current password is provided when user is logged in
+    if (user && !currentPassword.trim()) {
+      setError("Current password is required.");
+      return false;
+    }
+
+    // Check if new password is provided
+    if (!newPassword.trim()) {
+      setError("New password is required.");
+      return false;
+    }
+
+    // Basic password length check
+    if (newPassword.length < 8) {
+      setError("Password must be at least 8 characters long.");
+      return false;
+    }
+
+    // Check if passwords match
     if (newPassword !== confirmNewPassword) {
       setError("New passwords do not match.");
-      setLoading(false);
+      return false;
+    }
+
+    // Check if new password is same as current (basic client-side check)
+    if (user && currentPassword === newPassword) {
+      setError("New password must be different from current password.");
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
       return;
     }
 
+    setLoading(true);
+
     // Create request payload
     const payload = {
-      email: username,
+      email: user ? user.email : username,
       newPassword: newPassword,
     };
 
-    // Only include current password if user is logged in
-    if (user && user.email) {
-      if (!currentPassword) {
-        setError("Current password is required.");
-        setLoading(false);
-        return;
-      }
+    // Include current password if user is logged in
+    if (user) {
       payload.currentPassword = currentPassword;
     }
 
@@ -79,13 +114,23 @@ const ChangePasswordPage = () => {
       // Prepare headers
       const headers = {
         "Content-Type": "application/json",
-        "x-tenant": tenant,
       };
+
+      // Add tenant header if available
+      if (tenant) {
+        headers["x-tenant"] = tenant;
+      }
 
       // Add token to headers if available
       if (token) {
         headers["Authorization"] = `Bearer ${token}`;
       }
+
+      console.log("Making password change request with payload:", {
+        ...payload,
+        currentPassword: payload.currentPassword ? "[PROVIDED]" : "[NOT PROVIDED]",
+        newPassword: "[REDACTED]"
+      });
 
       // Make the API request
       const response = await fetch(
@@ -104,7 +149,7 @@ const ChangePasswordPage = () => {
       }
 
       // Show success message
-      setSuccess("Password changed successfully! Redirecting to login...");
+      setSuccess("Password changed successfully! Redirecting to home...");
 
       // Clear form
       setUsername("");
@@ -155,10 +200,17 @@ const ChangePasswordPage = () => {
             ? "Enter your current password and a new password to update your credentials."
             : "Enter your username (email) and a new password to update your credentials."}
         </Typography>
+        
         <form onSubmit={handleChangePassword} className='login-form'>
-          {error && <Typography className='error-message'>{error}</Typography>}
+          {error && (
+            <Alert severity="error" sx={{ mb: 2, backgroundColor: "#d32f2f", color: "#fff" }}>
+              {error}
+            </Alert>
+          )}
           {success && (
-            <Typography className='success-message'>{success}</Typography>
+            <Alert severity="success" sx={{ mb: 2, backgroundColor: "#2e7d32", color: "#fff" }}>
+              {success}
+            </Alert>
           )}
 
           {/* Username Field - Only show if not logged in */}
@@ -168,9 +220,9 @@ const ChangePasswordPage = () => {
               type='email'
               variant='outlined'
               fullWidth
+              required
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              disabled={!!user}
               sx={{
                 mb: 2,
                 "& .MuiInputBase-root": {
@@ -203,6 +255,7 @@ const ChangePasswordPage = () => {
               type='password'
               variant='outlined'
               fullWidth
+              required
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
               sx={{
@@ -236,8 +289,10 @@ const ChangePasswordPage = () => {
             type='password'
             variant='outlined'
             fullWidth
+            required
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
+            helperText="Password must be at least 8 characters long"
             sx={{
               mb: 2,
               "& .MuiInputBase-root": {
@@ -246,6 +301,9 @@ const ChangePasswordPage = () => {
                 color: "#ffffff",
               },
               "& .MuiInputLabel-root": {
+                color: "#ffffff",
+              },
+              "& .MuiFormHelperText-root": {
                 color: "#ffffff",
               },
               "& .MuiOutlinedInput-root": {
@@ -268,10 +326,11 @@ const ChangePasswordPage = () => {
             type='password'
             variant='outlined'
             fullWidth
+            required
             value={confirmNewPassword}
             onChange={(e) => setConfirmNewPassword(e.target.value)}
             sx={{
-              mb: 2,
+              mb: 3,
               "& .MuiInputBase-root": {
                 backgroundColor: "#2c2c2c",
                 borderRadius: "8px",
@@ -304,6 +363,10 @@ const ChangePasswordPage = () => {
             sx={{
               backgroundColor: "#6200ea",
               "&:hover": { backgroundColor: "#4e00d1" },
+              "&:disabled": { 
+                backgroundColor: "#555",
+                color: "#999"
+              },
             }}
           >
             {loading ? "Processing..." : "Change Password"}
