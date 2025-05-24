@@ -1,3 +1,5 @@
+//collab/Home
+
 import { useState, useRef, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Mousewheel, FreeMode } from "swiper/modules";
@@ -9,8 +11,8 @@ import {
   CardContent,
   Typography,
   Box,
-  CircularProgress,
   Alert,
+  Skeleton,
 } from "@mui/material";
 import MemorPicture from "./../../Components/MemorPicture/MemorPicture";
 import "./Home.css";
@@ -21,7 +23,7 @@ import pending from "../../assets/images/pendingHome.svg";
 import completed from "../../assets/images/completedHome.svg";
 import WelcomeModal from "../../Components/WelcomeModal/WelcomeModal";
 import Countdown from "../../Components/Countdown/Countdown";
-import Loader from "../../Components/Loader/Loader";
+// import Loader from "../../Components/Loader/Loader";
 import background1 from "../../assets/images/background1.svg";
 import background2 from "../../assets/images/background2.svg";
 import background3 from "../../assets/images/background3.svg";
@@ -36,6 +38,184 @@ const rankImages = {
   2: rank2,
   3: rank3,
 };
+
+// Skeleton component for carousel items
+const CarouselSkeleton = () => (
+  <div className='latest-wrapper'>
+    {[...Array(5)].map((_, index) => (
+      <div
+        key={index}
+        className='latest-memors-pic'
+        style={{ marginRight: "20px", display: "inline-block", width: "200px" }}
+      >
+        <Skeleton
+          variant='rectangular'
+          width='100%'
+          height={150}
+          sx={{ borderRadius: 2, mb: 1, bgcolor: "#424242" }}
+        />
+        <Skeleton
+          variant='text'
+          sx={{ fontSize: "1rem", mb: 0.5, bgcolor: "#424242" }}
+        />
+        <Skeleton
+          variant='text'
+          sx={{ fontSize: "0.9rem", mb: 0.5, bgcolor: "#424242" }}
+        />
+        <Skeleton
+          variant='text'
+          sx={{ fontSize: "0.8rem", width: "60%", bgcolor: "#424242" }}
+        />
+      </div>
+    ))}
+  </div>
+);
+
+// Skeleton component for stat cards
+const StatCardSkeleton = () => (
+  <Card className='card'>
+    <CardContent>
+      <Box display='flex' alignItems='center' justifyContent='space-between'>
+        <Skeleton
+          variant='text'
+          sx={{ fontSize: "2rem", width: "40px", bgcolor: "#424242" }}
+        />
+        <Skeleton
+          variant='rectangular'
+          width={40}
+          height={40}
+          sx={{ borderRadius: 1, bgcolor: "#424242" }}
+        />
+      </Box>
+      <Skeleton
+        variant='text'
+        sx={{ fontSize: "0.875rem", mt: 1, bgcolor: "#424242" }}
+      />
+    </CardContent>
+  </Card>
+);
+
+// Skeleton component for countdown card
+const CountdownSkeleton = () => (
+  <Card className='card'>
+    <CardContent>
+      <Box
+        style={{
+          display: "flex",
+          alignItems: "center",
+          flexDirection: "column",
+        }}
+      >
+        <Skeleton
+          variant='text'
+          sx={{ fontSize: "1.25rem", width: "80%", mb: 2, bgcolor: "#424242" }}
+        />
+        <Box display='flex' gap={2}>
+          {[...Array(4)].map((_, index) => (
+            <Box key={index} textAlign='center'>
+              <Skeleton
+                variant='text'
+                sx={{ fontSize: "2rem", width: "40px", bgcolor: "#424242" }}
+              />
+              <Skeleton
+                variant='text'
+                sx={{ fontSize: "0.75rem", width: "40px", bgcolor: "#424242" }}
+              />
+            </Box>
+          ))}
+        </Box>
+      </Box>
+    </CardContent>
+  </Card>
+);
+
+// Skeleton component for leaderboard cards
+const LeaderboardSkeleton = () => (
+  <>
+    {[...Array(3)].map((_, index) => (
+      <Grid item xs={12} sm={index === 0 ? 5 : index === 1 ? 4 : 3} key={index}>
+        <Card className='card'>
+          <Box display='flex' alignItems='center' style={{ width: "100%" }}>
+            <Box style={{ flex: 1, textAlign: "center" }}>
+              <Skeleton
+                variant='rectangular'
+                width={60}
+                height={80}
+                sx={{ borderRadius: 1, bgcolor: "#424242" }}
+              />
+            </Box>
+            <Box style={{ flex: index === 0 ? 1 : 1.5, paddingRight: "1rem" }}>
+              <Box
+                className='team-header'
+                display='flex'
+                justifyContent='space-between'
+                alignItems='center'
+              >
+                <Skeleton
+                  variant='text'
+                  sx={{
+                    fontSize: "1.25rem",
+                    width: "120px",
+                    bgcolor: "#424242",
+                  }}
+                />
+                <Skeleton
+                  variant='circular'
+                  width={50}
+                  height={50}
+                  sx={{ bgcolor: "#424242" }}
+                />
+              </Box>
+              <Box
+                className='stats'
+                display='flex'
+                justifyContent='space-between'
+                marginTop='10px'
+              >
+                <Box>
+                  <Skeleton
+                    variant='text'
+                    sx={{
+                      fontSize: "0.875rem",
+                      width: "80px",
+                      bgcolor: "#424242",
+                    }}
+                  />
+                  <Skeleton
+                    variant='text'
+                    sx={{
+                      fontSize: "1.5rem",
+                      width: "40px",
+                      bgcolor: "#424242",
+                    }}
+                  />
+                </Box>
+                <Box>
+                  <Skeleton
+                    variant='text'
+                    sx={{
+                      fontSize: "0.875rem",
+                      width: "80px",
+                      bgcolor: "#424242",
+                    }}
+                  />
+                  <Skeleton
+                    variant='text'
+                    sx={{
+                      fontSize: "1.5rem",
+                      width: "40px",
+                      bgcolor: "#424242",
+                    }}
+                  />
+                </Box>
+              </Box>
+            </Box>
+          </Box>
+        </Card>
+      </Grid>
+    ))}
+  </>
+);
 
 const Home = () => {
   const { token, user } = useAuth();
@@ -130,7 +310,9 @@ const Home = () => {
           setCurrentCompetition(activeCompetition);
 
           const leaderboardResponse = await fetch(
-            `${import.meta.env.VITE_API_URL}/api/leaderboard/competition/${activeCompetition.id}`,
+            `${import.meta.env.VITE_API_URL}/api/leaderboard/competition/${
+              activeCompetition.id
+            }`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -158,7 +340,9 @@ const Home = () => {
           }
 
           const latestMemorsResponse = await fetch(
-            `${import.meta.env.VITE_API_URL}/api/memors/team/${user.teamsId}/latest`,
+            `${import.meta.env.VITE_API_URL}/api/memors/team/${
+              user.teamsId
+            }/latest`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -200,7 +384,9 @@ const Home = () => {
 
             try {
               const completedMemorsResponse = await fetch(
-                `${import.meta.env.VITE_API_URL}/api/memors/team/${user.teamsId}/competition/${activeCompetition.id}/completed`,
+                `${import.meta.env.VITE_API_URL}/api/memors/team/${
+                  user.teamsId
+                }/competition/${activeCompetition.id}/completed`,
                 {
                   headers: {
                     Authorization: `Bearer ${token}`,
@@ -242,8 +428,8 @@ const Home = () => {
                             pic.user_id === user.id
                               ? "You"
                               : pic.first_name
-                                ? `${pic.first_name} ${pic.last_name || ""}`
-                                : "Team member",
+                              ? `${pic.first_name} ${pic.last_name || ""}`
+                              : "Team member",
                         });
                       });
                     }
@@ -264,7 +450,9 @@ const Home = () => {
           }
 
           const progressResponse = await fetch(
-            `${import.meta.env.VITE_API_URL}/api/memors/team/${user.teamsId}/competition/${activeCompetition.id}/progress`,
+            `${import.meta.env.VITE_API_URL}/api/memors/team/${
+              user.teamsId
+            }/competition/${activeCompetition.id}/progress`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -331,11 +519,11 @@ const Home = () => {
 
   return (
     <>
-      <Loader />
+      {/* <Loader /> */}
       <WelcomeModal />
-      <section className="mb-10">
+      <section className='mb-10'>
         <div
-          className="container"
+          className='container'
           style={{
             marginBottom: "1rem",
             marginTop: "2rem",
@@ -344,7 +532,7 @@ const Home = () => {
         >
           <img
             src={background1}
-            alt="Decorative background element"
+            alt='Decorative background element'
             style={{
               position: "absolute",
               top: "2",
@@ -352,11 +540,11 @@ const Home = () => {
               width: "15%",
               zIndex: "0",
             }}
-            aria-hidden="true"
+            aria-hidden='true'
           />
           <img
             src={background2}
-            alt="Decorative background element"
+            alt='Decorative background element'
             style={{
               position: "absolute",
               top: "25%",
@@ -364,11 +552,11 @@ const Home = () => {
               width: "5%",
               zIndex: "0",
             }}
-            aria-hidden="true"
+            aria-hidden='true'
           />
           <img
             src={background3}
-            alt="Decorative background element"
+            alt='Decorative background element'
             style={{
               position: "absolute",
               top: "35%",
@@ -376,29 +564,39 @@ const Home = () => {
               width: "5%",
               zIndex: "0",
             }}
-            aria-hidden="true"
+            aria-hidden='true'
           />
 
-          <h1
-            className="home-title"
-            style={{ display: "flex", alignItems: "center", gap: "1rem" }}
-            tabIndex="0"
-          >
-            Latest Memors <span>•</span>{" "}
-            <span className="team-name" style={{ color: "#9282F9" }}>
-              {user?.teamName || "Your Team"}
-            </span>
-          </h1>
+          {loading ? (
+            <Skeleton
+              variant='text'
+              sx={{
+                fontSize: "2rem",
+                width: "300px",
+                mb: 2,
+                bgcolor: "#424242",
+              }}
+            />
+          ) : (
+            <h1
+              className='home-title'
+              style={{ display: "flex", alignItems: "center", gap: "1rem" }}
+              tabIndex='0'
+            >
+              Latest Memors <span>•</span>{" "}
+              <span className='team-name' style={{ color: "#9282F9" }}>
+                {user?.teamName || "Your Team"}
+              </span>
+            </h1>
+          )}
         </div>
 
-        <div className="overflow-hidden w-full">
-          <div className="container">
+        <div className='overflow-hidden w-full'>
+          <div className='container'>
             {loading ? (
-              <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
-                <CircularProgress size={40} sx={{ color: "#d0bcfe" }} />
-              </Box>
+              <CarouselSkeleton />
             ) : error ? (
-              <Alert severity="error" sx={{ mx: 2 }}>
+              <Alert severity='error' sx={{ mx: 2 }}>
                 {error}
               </Alert>
             ) : teamMemors.length === 0 ? (
@@ -414,19 +612,19 @@ const Home = () => {
                   768: { slidesPerView: 4.3 },
                   1024: { slidesPerView: 5.3 },
                 }}
-                className="latest-wrapper"
+                className='latest-wrapper'
                 freeMode={true}
                 mousewheel={{ releaseOnEdges: true }}
                 modules={[Mousewheel, FreeMode]}
                 keyboard={{ enabled: true, onlyInViewport: true }}
-                aria-label="Latest Memors Carousel"
+                aria-label='Latest Memors Carousel'
               >
                 {teamMemors.map((slide, index) => (
                   <SwiperSlide
                     key={`${slide.id}-${index}`}
-                    className="latest-memors-pic"
-                    tabIndex="0"
-                    role="button"
+                    className='latest-memors-pic'
+                    tabIndex='0'
+                    role='button'
                     aria-label={`Open memor titled ${slide.title}, submitted on ${slide.submittedDate}`}
                     onClick={() => handleImageClick(slide)}
                     onKeyDown={(e) => {
@@ -476,7 +674,7 @@ const Home = () => {
                       }
                     }}
                   >
-                    <div className="image-wrapper">
+                    <div className='image-wrapper'>
                       <img
                         width={"100%"}
                         height={"100%"}
@@ -499,7 +697,7 @@ const Home = () => {
                         }
                       />
                     </div>
-                    <div className="latest-memors-content">
+                    <div className='latest-memors-content'>
                       <h3>{slide.submittedDate}</h3>
                       <p style={{ fontSize: "0.9rem" }}>
                         &quot;{slide.title}&quot;
@@ -530,128 +728,162 @@ const Home = () => {
             title={selectedSlide.title}
             submitDate={selectedSlide.submittedDate}
             onClose={closeModal}
-            memorId={selectedSlide.memorId} // Add this prop to pass the memor ID
+            memorId={selectedSlide.memorId}
           />
         )}
       </section>
 
-      <section id="myMemors" className="container" tabIndex="0">
-        <Typography variant="h6" gutterBottom style={{ color: "white" }}>
-          My Memors
-        </Typography>
+      <section id='myMemors' className='container' tabIndex='0'>
+        {loading ? (
+          <Skeleton
+            variant='text'
+            sx={{
+              fontSize: "1.25rem",
+              width: "150px",
+              mb: 2,
+              bgcolor: "#424242",
+            }}
+          />
+        ) : (
+          <Typography variant='h6' gutterBottom style={{ color: "white" }}>
+            My Memors
+          </Typography>
+        )}
         <Grid container spacing={3}>
           <Grid item xs={12} sm={3}>
-            <Card
-              className="card"
-              onClick={() => (window.location.href = "/memors?tab=incomplete")}
-              style={{ cursor: "pointer" }}
-              tabIndex="0"
-              role="button"
-              aria-label="View pending memors"
-            >
-              <CardContent>
-                <Box
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="space-between"
-                >
-                  <Typography variant="h4" fontWeight="bold">
-                    {loading ? <CircularProgress size={30} /> : pendingMemors}
+            {loading ? (
+              <StatCardSkeleton />
+            ) : (
+              <Card
+                className='card'
+                onClick={() =>
+                  (window.location.href = "/memors?tab=incomplete")
+                }
+                style={{ cursor: "pointer" }}
+                tabIndex='0'
+                role='button'
+                aria-label='View pending memors'
+              >
+                <CardContent>
+                  <Box
+                    display='flex'
+                    alignItems='center'
+                    justifyContent='space-between'
+                  >
+                    <Typography variant='h4' fontWeight='bold'>
+                      {pendingMemors}
+                    </Typography>
+                    <img src={pending} alt='Pending memors icon' />
+                  </Box>
+                  <Typography variant='body2' color='#B0B0B0'>
+                    Pending Memors
                   </Typography>
-                  <img src={pending} alt="Pending memors icon" />
-                </Box>
-                <Typography variant="body2" color="#B0B0B0">
-                  Pending Memors
-                </Typography>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            )}
           </Grid>
 
           <Grid item xs={12} sm={3}>
-            <Card
-              className="card"
-              onClick={() => (window.location.href = "/memors?tab=completed")}
-              style={{ cursor: "pointer" }}
-              tabIndex="0"
-              role="button"
-              aria-label="View completed memors"
-            >
-              <CardContent>
-                <Box
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="space-between"
-                >
-                  <Typography variant="h4" fontWeight="bold">
-                    {loading ? <CircularProgress size={30} /> : completedMemors}
+            {loading ? (
+              <StatCardSkeleton />
+            ) : (
+              <Card
+                className='card'
+                onClick={() => (window.location.href = "/memors?tab=completed")}
+                style={{ cursor: "pointer" }}
+                tabIndex='0'
+                role='button'
+                aria-label='View completed memors'
+              >
+                <CardContent>
+                  <Box
+                    display='flex'
+                    alignItems='center'
+                    justifyContent='space-between'
+                  >
+                    <Typography variant='h4' fontWeight='bold'>
+                      {completedMemors}
+                    </Typography>
+                    <img src={completed} alt='Completed memors icon' />
+                  </Box>
+                  <Typography variant='body2' color='#B0B0B0'>
+                    Completed Memors
                   </Typography>
-                  <img src={completed} alt="Completed memors icon" />
-                </Box>
-                <Typography variant="body2" color="#B0B0B0">
-                  Completed Memors
-                </Typography>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            )}
           </Grid>
 
           <Grid item xs={12} sm={6}>
-            <Card
-              className="card"
-              tabIndex="0"
-              aria-label="Competition countdown"
-            >
-              <CardContent>
-                {loading ? (
-                  <Box
-                    sx={{ display: "flex", justifyContent: "center", py: 2 }}
-                  >
-                    <CircularProgress size={40} sx={{ color: "#d0bcfe" }} />
-                  </Box>
-                ) : currentCompetition ? (
-                  <Box
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      flexDirection: "column",
-                    }}
-                  >
-                    <Box>
-                      <Typography variant="h6" style={{ color: "white" }}>
-                        The competition{" "}
-                        <span style={{ color: "#9282F9", fontWeight: "bold" }}>
-                          {currentCompetition.name}
-                        </span>{" "}
-                        ends in
+            {loading ? (
+              <CountdownSkeleton />
+            ) : (
+              <Card
+                className='card'
+                tabIndex='0'
+                aria-label='Competition countdown'
+              >
+                <CardContent>
+                  {currentCompetition ? (
+                    <Box
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        flexDirection: "column",
+                      }}
+                    >
+                      <Box>
+                        <Typography variant='h6' style={{ color: "white" }}>
+                          The competition{" "}
+                          <span
+                            style={{ color: "#9282F9", fontWeight: "bold" }}
+                          >
+                            {currentCompetition.name}
+                          </span>{" "}
+                          ends in
+                        </Typography>
+                      </Box>
+                      <Countdown
+                        endDate={currentCompetition.end_date}
+                        role='user'
+                      />
+                    </Box>
+                  ) : (
+                    <Box sx={{ p: 2, textAlign: "center" }}>
+                      <Typography variant='body1' sx={{ color: "#d0bcfe" }}>
+                        No active competitions at the moment.
                       </Typography>
                     </Box>
-                    <Countdown
-                      endDate={currentCompetition.end_date}
-                      role="user"
-                    />
-                  </Box>
-                ) : (
-                  <Box sx={{ p: 2, textAlign: "center" }}>
-                    <Typography variant="body1" sx={{ color: "#d0bcfe" }}>
-                      No active competitions at the moment.
-                    </Typography>
-                  </Box>
-                )}
-              </CardContent>
-            </Card>
+                  )}
+                </CardContent>
+              </Card>
+            )}
           </Grid>
         </Grid>
       </section>
 
-      <section id="currentLeaders" className="pb-10 container" tabIndex="0">
-        <Typography variant="h6" gutterBottom style={{ color: "white" }}>
-          Current Leaders
-        </Typography>
+      <section id='currentLeaders' className='pb-10 container' tabIndex='0'>
         {loading ? (
-          <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
-            <CircularProgress size={40} sx={{ color: "#d0bcfe" }} />
-          </Box>
+          <Skeleton
+            variant='text'
+            sx={{
+              fontSize: "1.25rem",
+              width: "200px",
+              mb: 2,
+              bgcolor: "#424242",
+            }}
+          />
+        ) : (
+          <Typography variant='h6' gutterBottom style={{ color: "white" }}>
+            Current Leaders
+          </Typography>
+        )}
+        {loading ? (
+          <Grid container spacing={3}>
+            <LeaderboardSkeleton />
+          </Grid>
         ) : error ? (
-          <Alert severity="warning" sx={{ mx: 2 }}>
+          <Alert severity='warning' sx={{ mx: 2 }}>
             Unable to load leaderboard data.
           </Alert>
         ) : (
@@ -672,18 +904,18 @@ const Home = () => {
                   key={team.rank}
                 >
                   <Card
-                    className="card"
+                    className='card'
                     onClick={() => {
                       window.location.href = "/leaderboard";
                     }}
                     style={{ cursor: "pointer" }}
-                    tabIndex="0"
-                    role="button"
+                    tabIndex='0'
+                    role='button'
                     aria-label={`View leaderboard for ${team.teamName}`}
                   >
                     <Box
-                      display="flex"
-                      alignItems="center"
+                      display='flex'
+                      alignItems='center'
                       style={{ width: "100%" }}
                     >
                       <Box style={{ flex: 1, textAlign: "center" }}>
@@ -706,17 +938,17 @@ const Home = () => {
                         }}
                       >
                         <Box
-                          className="team-header"
-                          display="flex"
-                          justifyContent="space-between"
+                          className='team-header'
+                          display='flex'
+                          justifyContent='space-between'
                         >
-                          <Typography variant="h6" className="team-name">
+                          <Typography variant='h6' className='team-name'>
                             {team.teamName}
                           </Typography>
                           <img
                             src={team.avatar}
                             alt={team.teamName}
-                            className="team-avatar-admin"
+                            className='team-avatar-admin'
                             style={{
                               width: "50px",
                               height: "50px",
@@ -726,24 +958,24 @@ const Home = () => {
                           />
                         </Box>
                         <Box
-                          className="stats"
-                          display="flex"
-                          justifyContent="space-between"
-                          marginTop="10px"
+                          className='stats'
+                          display='flex'
+                          justifyContent='space-between'
+                          marginTop='10px'
                         >
                           <div>
-                            <Typography variant="body2" className="label">
+                            <Typography variant='body2' className='label'>
                               Total Points
                             </Typography>
-                            <Typography variant="h5" className="value">
+                            <Typography variant='h5' className='value'>
                               {team.points}
                             </Typography>
                           </div>
                           <div>
-                            <Typography variant="body2" className="label">
+                            <Typography variant='body2' className='label'>
                               Total Memors
                             </Typography>
-                            <Typography variant="h5" className="value">
+                            <Typography variant='h5' className='value'>
                               {team.memors}
                             </Typography>
                           </div>

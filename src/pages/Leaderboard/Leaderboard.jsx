@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Box, Typography, Card, Avatar, CircularProgress } from "@mui/material";
+import { Box, Typography, Card, Avatar, Skeleton } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import rank1 from "../../assets/images/rank1.svg";
 import rank2 from "../../assets/images/rank2.svg";
@@ -7,12 +7,153 @@ import rank3 from "../../assets/images/rank3.svg";
 import background1 from "../../assets/images/background1.svg";
 import background2 from "../../assets/images/background2.svg";
 import background3 from "../../assets/images/background3.svg";
-import Loader from "../../Components/Loader/Loader";
+// import Loader from "../../Components/Loader/Loader";
 import { useAuth } from "../../context/AuthContext";
-import { getLeaderboardVisibility, LEADERBOARD_VISIBILITY_CHANGE } from "../../assets/utils/leaderboardUtils";
+import {
+  getLeaderboardVisibility,
+  LEADERBOARD_VISIBILITY_CHANGE,
+} from "../../assets/utils/leaderboardUtils";
 import { useNavigate } from "react-router-dom";
 
+// Skeleton component for top 3 podium cards
+const PodiumCardSkeleton = ({ height, isFirst = false }) => (
+  <Card
+    sx={{
+      backgroundColor: "#1E1F20",
+      borderRadius: "20px",
+      textAlign: "center",
+      color: "white",
+      padding: "20px",
+      position: "relative",
+      height: height,
+    }}
+  >
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "start",
+        gap: "10px",
+        position: "absolute",
+        top: "15px",
+        left: "15px",
+      }}
+    >
+      <Skeleton
+        variant='circular'
+        width={40}
+        height={40}
+        sx={{ bgcolor: "#424242" }}
+      />
+      <Skeleton
+        variant='text'
+        sx={{ fontSize: "1.25rem", width: "120px", bgcolor: "#424242" }}
+      />
+    </Box>
 
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        height: "100%",
+      }}
+    >
+      <Skeleton
+        variant='text'
+        sx={{
+          fontSize: isFirst ? "3rem" : "2rem",
+          width: isFirst ? "200px" : "150px",
+          bgcolor: "#424242",
+        }}
+      />
+      <Skeleton
+        variant='text'
+        sx={{
+          fontSize: isFirst ? "1.4rem" : "1.2rem",
+          width: isFirst ? "120px" : "100px",
+          bgcolor: "#424242",
+          mt: 1,
+        }}
+      />
+    </Box>
+
+    <Skeleton
+      variant='rectangular'
+      width={isFirst ? 60 : 40}
+      height={isFirst ? 120 : 80}
+      sx={{
+        bgcolor: "#424242",
+        position: "absolute",
+        bottom: "0px",
+        right: "10px",
+        borderRadius: 1,
+      }}
+    />
+  </Card>
+);
+
+// Skeleton component for global ranking table header
+const GlobalRankingHeaderSkeleton = () => (
+  <Box
+    sx={{
+      display: "grid",
+      gridTemplateColumns: "1fr 1fr 1fr 1fr",
+      textAlign: "center",
+      gap: "10px",
+      borderRadius: "13.576px",
+      border: "2.715px solid #333738",
+      padding: "10px",
+      background: "#232627",
+      marginBottom: "20px",
+    }}
+  >
+    <Skeleton variant='text' sx={{ fontSize: "1.25rem", bgcolor: "#424242" }} />
+    <Skeleton variant='text' sx={{ fontSize: "1.25rem", bgcolor: "#424242" }} />
+    <Skeleton variant='text' sx={{ fontSize: "1.25rem", bgcolor: "#424242" }} />
+    <Skeleton variant='text' sx={{ fontSize: "1.25rem", bgcolor: "#424242" }} />
+  </Box>
+);
+
+// Skeleton component for global ranking table rows
+const GlobalRankingRowSkeleton = () => (
+  <Box
+    sx={{
+      display: "grid",
+      gridTemplateColumns: "1fr 1fr 1fr 1fr",
+      alignItems: "center",
+      textAlign: "center",
+      borderRadius: "13.576px",
+      border: "2.715px solid #333738",
+      padding: "10px",
+      marginTop: "-2px",
+    }}
+  >
+    <Skeleton variant='text' sx={{ fontSize: "1.25rem", bgcolor: "#424242" }} />
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "left",
+        gap: "10px",
+      }}
+    >
+      <Skeleton
+        variant='circular'
+        width={30}
+        height={30}
+        sx={{ bgcolor: "#424242" }}
+      />
+      <Skeleton
+        variant='text'
+        sx={{ fontSize: "1.25rem", width: "100px", bgcolor: "#424242" }}
+      />
+    </Box>
+    <Skeleton variant='text' sx={{ fontSize: "1.25rem", bgcolor: "#424242" }} />
+    <Skeleton variant='text' sx={{ fontSize: "1.25rem", bgcolor: "#424242" }} />
+  </Box>
+);
 
 const Leaderboard = () => {
   const { token, user } = useAuth();
@@ -21,10 +162,11 @@ const Leaderboard = () => {
   const [error, setError] = useState(null);
   const [currentCompetition, setCurrentCompetition] = useState(null);
 
-  const [showLeaderboard, setShowLeaderboard] = useState(getLeaderboardVisibility());
+  const [showLeaderboard, setShowLeaderboard] = useState(
+    getLeaderboardVisibility()
+  );
 
   const navigate = useNavigate();
-
 
   useEffect(() => {
     document.title = `Memor'us | Leaderboard`;
@@ -69,21 +211,27 @@ const Leaderboard = () => {
   useEffect(() => {
     const handleLeaderboardVisibilityChange = () => {
       setShowLeaderboard(getLeaderboardVisibility());
-      
+
       // Optionally redirect if leaderboard is hidden
       if (!getLeaderboardVisibility()) {
-        navigate('/home');
+        navigate("/home");
       }
     };
-  
+
     // Listen for our custom event
-    window.addEventListener(LEADERBOARD_VISIBILITY_CHANGE, handleLeaderboardVisibilityChange);
-    
+    window.addEventListener(
+      LEADERBOARD_VISIBILITY_CHANGE,
+      handleLeaderboardVisibilityChange
+    );
+
     // Also listen for standard storage events (for cross-tab sync)
     window.addEventListener("storage", handleLeaderboardVisibilityChange);
-  
+
     return () => {
-      window.removeEventListener(LEADERBOARD_VISIBILITY_CHANGE, handleLeaderboardVisibilityChange);
+      window.removeEventListener(
+        LEADERBOARD_VISIBILITY_CHANGE,
+        handleLeaderboardVisibilityChange
+      );
       window.removeEventListener("storage", handleLeaderboardVisibilityChange);
     };
   }, [navigate]);
@@ -96,7 +244,9 @@ const Leaderboard = () => {
         setLoading(true);
         // Now fetch the leaderboard for this competition
         const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/leaderboard/competition/${currentCompetition.id}`,
+          `${import.meta.env.VITE_API_URL}/api/leaderboard/competition/${
+            currentCompetition.id
+          }`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -146,11 +296,11 @@ const Leaderboard = () => {
 
   return (
     <>
-      <Loader />
-      <div className="container">
+      {/* <Loader /> */}
+      <div className='container'>
         <img
           src={background1}
-          alt=""
+          alt=''
           style={{
             position: "absolute",
             top: "2",
@@ -161,7 +311,7 @@ const Leaderboard = () => {
         />
         <img
           src={background2}
-          alt=""
+          alt=''
           style={{
             position: "absolute",
             top: "25%",
@@ -172,7 +322,7 @@ const Leaderboard = () => {
         />
         <img
           src={background3}
-          alt=""
+          alt=''
           style={{
             position: "absolute",
             top: "35%",
@@ -190,43 +340,131 @@ const Leaderboard = () => {
           }}
         >
           <Box>
-          {/* Header */}
-          <Typography
-            variant="h4"
-            component="h1"
-            sx={{
-              fontWeight: "bold",
-              color: "white",
-              marginBottom: "10px",
-              marginTop: "32px",
-            }}
-          >
-            Leaderboard
-          </Typography>
-          {currentCompetition && (
-              <Typography
-                variant="subtitle1"
-                sx={{
-                  color: "#d8bcfc",
-                  marginBottom: "30px",
-                }}
-              >
-                {currentCompetition.name}
-              </Typography>
+            {/* Header */}
+            {loading ? (
+              <>
+                <Skeleton
+                  variant='text'
+                  sx={{
+                    fontSize: "2rem",
+                    width: "200px",
+                    bgcolor: "#424242",
+                    mb: 1,
+                    mt: 4,
+                  }}
+                />
+                <Skeleton
+                  variant='text'
+                  sx={{
+                    fontSize: "1.25rem",
+                    width: "300px",
+                    bgcolor: "#424242",
+                    mb: 4,
+                  }}
+                />
+              </>
+            ) : (
+              <>
+                <Typography
+                  variant='h4'
+                  component='h1'
+                  sx={{
+                    fontWeight: "bold",
+                    color: "white",
+                    marginBottom: "10px",
+                    marginTop: "32px",
+                  }}
+                >
+                  Leaderboard
+                </Typography>
+                {currentCompetition && (
+                  <Typography
+                    variant='subtitle1'
+                    sx={{
+                      color: "#d8bcfc",
+                      marginBottom: "30px",
+                    }}
+                  >
+                    {currentCompetition.name}
+                  </Typography>
+                )}
+              </>
             )}
-            </Box>
+          </Box>
 
           {loading ? (
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                minHeight: "300px",
-              }}
-            >
-              <CircularProgress sx={{ color: "#d0bcfe" }} />
-            </Box>
+            <>
+              {/* Top 3 Skeleton */}
+              <Grid
+                container
+                spacing={3}
+                sx={{
+                  justifyContent: "center",
+                  marginBottom: "40px",
+                  alignItems: "end",
+                }}
+              >
+                {/* Rank 2 Skeleton */}
+                <Grid
+                  sx={{
+                    width: "calc(30% - 20px)",
+                    maxWidth: "400px",
+                    minWidth: "300px",
+                  }}
+                  xs={12}
+                  sm={4}
+                >
+                  <PodiumCardSkeleton height='15rem' />
+                </Grid>
+
+                {/* Rank 1 Skeleton */}
+                <Grid
+                  sx={{
+                    width: "calc(38% - 20px)",
+                    maxWidth: "500px",
+                    minWidth: "300px",
+                  }}
+                  xs={12}
+                  sm={4}
+                >
+                  <PodiumCardSkeleton height='20rem' isFirst={true} />
+                </Grid>
+
+                {/* Rank 3 Skeleton */}
+                <Grid
+                  sx={{
+                    width: "calc(30% - 20px)",
+                    maxWidth: "350px",
+                    minWidth: "300px",
+                  }}
+                  xs={12}
+                  sm={4}
+                >
+                  <PodiumCardSkeleton height='12rem' />
+                </Grid>
+              </Grid>
+
+              {/* Global Ranking Skeleton */}
+              <Skeleton
+                variant='text'
+                sx={{
+                  fontSize: "1.5rem",
+                  width: "200px",
+                  bgcolor: "#424242",
+                  mb: 2,
+                  mt: 6,
+                }}
+              />
+
+              <Box sx={{ width: "100%", marginBottom: "20px" }}>
+                <GlobalRankingHeaderSkeleton />
+
+                {/* Show 4 skeleton rows */}
+                {[...Array(4)].map((_, index) => (
+                  <GlobalRankingRowSkeleton key={index} />
+                ))}
+              </Box>
+            </>
           ) : error ? (
             <Box
               sx={{
@@ -238,11 +476,11 @@ const Leaderboard = () => {
                 color: "white",
               }}
             >
-              <Typography variant="h6" color="error" gutterBottom>
+              <Typography variant='h6' color='error' gutterBottom>
                 {error}
               </Typography>
               {!currentCompetition && (
-                <Typography variant="body1" color="#d0bcfe">
+                <Typography variant='body1' color='#d0bcfe'>
                   No active competition found.
                 </Typography>
               )}
@@ -303,7 +541,7 @@ const Leaderboard = () => {
                           }}
                         />
                         <Typography
-                          variant="h6"
+                          variant='h6'
                           sx={{
                             color: "#D0BCFE",
                           }}
@@ -320,11 +558,11 @@ const Leaderboard = () => {
                           height: "100%",
                         }}
                       >
-                        <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+                        <Typography variant='h4' sx={{ fontWeight: "bold" }}>
                           {leaderboardTeams[1]?.points} Points
                         </Typography>
                         <Typography
-                          variant="body1"
+                          variant='body1'
                           sx={{
                             marginTop: "5px",
                             fontSize: "1.2rem",
@@ -335,7 +573,7 @@ const Leaderboard = () => {
                       </Box>
                       <img
                         src={rank2}
-                        alt=""
+                        alt=''
                         style={{
                           position: "absolute",
                           bottom: "0px",
@@ -391,7 +629,7 @@ const Leaderboard = () => {
                           }}
                         />
                         <Typography
-                          variant="h6"
+                          variant='h6'
                           sx={{
                             color: "#381e72",
                           }}
@@ -409,7 +647,7 @@ const Leaderboard = () => {
                         }}
                       >
                         <Typography
-                          variant="h4"
+                          variant='h4'
                           sx={{
                             color: "#381e72",
                             fontWeight: "bold",
@@ -419,7 +657,7 @@ const Leaderboard = () => {
                           {leaderboardTeams[0]?.points} Points
                         </Typography>
                         <Typography
-                          variant="body1"
+                          variant='body1'
                           sx={{
                             marginTop: "5px",
                             color: "#381e72",
@@ -431,7 +669,7 @@ const Leaderboard = () => {
                       </Box>
                       <img
                         src={rank1}
-                        alt=""
+                        alt=''
                         style={{
                           position: "absolute",
                           bottom: "0px",
@@ -487,7 +725,7 @@ const Leaderboard = () => {
                           }}
                         />
                         <Typography
-                          variant="h6"
+                          variant='h6'
                           sx={{
                             color: "#D0BCFE",
                           }}
@@ -505,7 +743,7 @@ const Leaderboard = () => {
                         }}
                       >
                         <Typography
-                          variant="h4"
+                          variant='h4'
                           sx={{
                             fontWeight: "bold",
                             fontSize: "1.8rem",
@@ -513,13 +751,13 @@ const Leaderboard = () => {
                         >
                           {leaderboardTeams[2]?.points} Points
                         </Typography>
-                        <Typography variant="body1" sx={{ marginTop: "5px" }}>
+                        <Typography variant='body1' sx={{ marginTop: "5px" }}>
                           {leaderboardTeams[2]?.memors} Memors
                         </Typography>
                       </Box>
                       <img
                         src={rank3}
-                        alt=""
+                        alt=''
                         style={{
                           position: "absolute",
                           bottom: "0px",
@@ -535,8 +773,8 @@ const Leaderboard = () => {
 
               {/* Global Ranking */}
               <Typography
-                variant="h5"
-                component="h2"
+                variant='h5'
+                component='h2'
                 sx={{
                   color: "white",
                   marginBottom: "20px",
@@ -560,19 +798,19 @@ const Leaderboard = () => {
                     marginBottom: "20px",
                   }}
                 >
-                  <Typography variant="h6" sx={{ color: "white" }}>
+                  <Typography variant='h6' sx={{ color: "white" }}>
                     Rank
                   </Typography>
                   <Typography
-                    variant="h6"
+                    variant='h6'
                     sx={{ color: "white", textAlign: "center" }}
                   >
                     Team
                   </Typography>
-                  <Typography variant="h6" sx={{ color: "white" }}>
+                  <Typography variant='h6' sx={{ color: "white" }}>
                     Memors Completed
                   </Typography>
-                  <Typography variant="h6" sx={{ color: "white" }}>
+                  <Typography variant='h6' sx={{ color: "white" }}>
                     Total Points
                   </Typography>
                 </Box>
@@ -596,7 +834,7 @@ const Leaderboard = () => {
                       tabIndex={0}
                     >
                       <Typography
-                        variant="h6"
+                        variant='h6'
                         sx={{ color: "white", textAlign: "center" }}
                       >
                         {team.rank}
@@ -619,20 +857,20 @@ const Leaderboard = () => {
                           }}
                         />
                         <Typography
-                          variant="h6"
+                          variant='h6'
                           sx={{ color: "white", textAlign: "center" }}
                         >
                           {team.teamName}
                         </Typography>
                       </Box>
                       <Typography
-                        variant="h6"
+                        variant='h6'
                         sx={{ color: "white", textAlign: "center" }}
                       >
                         {team.memors}
                       </Typography>
                       <Typography
-                        variant="h6"
+                        variant='h6'
                         sx={{ color: "white", textAlign: "center" }}
                       >
                         {team.points}
@@ -653,7 +891,7 @@ const Leaderboard = () => {
                       color: "#a0a0a0",
                     }}
                   >
-                    <Typography variant="body1">
+                    <Typography variant='body1'>
                       No more teams in the competition
                     </Typography>
                   </Box>

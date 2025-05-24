@@ -1,3 +1,4 @@
+// ManageTeams.jsx
 import { useState, useEffect } from "react";
 import {
   Box,
@@ -5,6 +6,7 @@ import {
   IconButton,
   Checkbox,
   TextField,
+  Skeleton,
 } from "@mui/material";
 import editIcon from "../../../../assets/images/editIcon.svg";
 import deleteIcon from "../../../../assets/images/deleteIcon.svg";
@@ -12,6 +14,103 @@ import CustomButton from "../../../../Components/CustomButton/CustomButton";
 import ConfirmationModal from "../../../../Components/ConfirmationModal/ConfirmationModal";
 import api from "../../../../api/axiosInstance";
 import PropTypes from "prop-types";
+
+// Skeleton for teams loading state
+const ManageTeamsSkeleton = () => (
+  <Box
+    sx={{
+      width: "100%",
+      marginTop: "20px",
+      borderRadius: "13.576px",
+      border: "2.715px solid #333738",
+      background: "#1E1F20",
+      padding: "20px",
+      backdropFilter: "blur(20px)",
+      marginBottom: "50px",
+    }}
+  >
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "space-between",
+        width: "100%",
+        mb: 5,
+      }}
+    >
+      <Skeleton
+        variant='rounded'
+        width={150}
+        height={40}
+        sx={{ bgcolor: "#424242", borderRadius: "20px" }}
+      />
+    </Box>
+
+    {/* Team cards skeleton */}
+    {[...Array(4)].map((_, index) => (
+      <Box
+        key={index}
+        sx={{
+          marginBottom: "15px",
+          borderRadius: "10.861px",
+          border: "2.715px solid #333738",
+          background: "#272728",
+          padding: "15px",
+        }}
+      >
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: "auto 1fr 4fr 1fr",
+            alignItems: "center",
+            gap: 2,
+          }}
+        >
+          {/* Team Avatar Skeleton */}
+          <Skeleton
+            variant='circular'
+            width={40}
+            height={40}
+            sx={{ bgcolor: "#424242" }}
+          />
+
+          {/* Team Name Skeleton */}
+          <Skeleton
+            variant='text'
+            sx={{ fontSize: "1rem", width: "120px", bgcolor: "#424242" }}
+          />
+
+          {/* Team Members Skeleton */}
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
+            <Skeleton
+              variant='text'
+              sx={{ fontSize: "0.875rem", width: "200px", bgcolor: "#424242" }}
+            />
+            <Skeleton
+              variant='text'
+              sx={{ fontSize: "0.875rem", width: "150px", bgcolor: "#424242" }}
+            />
+          </Box>
+
+          {/* Action Buttons Skeleton */}
+          <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }}>
+            <Skeleton
+              variant='circular'
+              width={24}
+              height={24}
+              sx={{ bgcolor: "#424242" }}
+            />
+            <Skeleton
+              variant='circular'
+              width={24}
+              height={24}
+              sx={{ bgcolor: "#424242" }}
+            />
+          </Box>
+        </Box>
+      </Box>
+    ))}
+  </Box>
+);
 
 const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
   const [teams, setTeams] = useState({});
@@ -28,25 +127,27 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
     teamName: "",
   });
   const [searchQuery2, setSearchQuery2] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   const [confirmationDeleteModalOpen, setConfirmationDeleteModalOpen] =
     useState(false);
   const [teamToDelete, setTeamToDelete] = useState(null);
-  const [editingTeamAvatar, setEditingTeamAvatar] = useState(null); // For storing new avatar file
-  const [editingTeamAvatarPreview, setEditingTeamAvatarPreview] = useState(null); // For preview URL
-  const [pendingAvatarFile, setPendingAvatarFile] = useState(null); // For pending avatar file
-  const [pendingAvatarPreview, setPendingAvatarPreview] = useState(null); // For pending preview
+  const [editingTeamAvatar, setEditingTeamAvatar] = useState(null);
+  const [editingTeamAvatarPreview, setEditingTeamAvatarPreview] =
+    useState(null);
+  const [pendingAvatarFile, setPendingAvatarFile] = useState(null);
+  const [pendingAvatarPreview, setPendingAvatarPreview] = useState(null);
 
   useEffect(() => {
     fetchTeamsAndMembers();
   }, []);
 
   const fetchTeamsAndMembers = async () => {
+    setIsLoading(true);
     setLoading(true);
     try {
       const teamsResponse = await api.get("/api/teams");
-      
-      // Teams now come with pre-signed avatar URLs from the backend
+
       setTeamsData(teamsResponse.data || []);
 
       const teamsObj = {};
@@ -89,6 +190,7 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
       showFeedback("error", "Error", "Failed to load teams and members");
     } finally {
       setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -98,6 +200,7 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
     }
 
     const fetchTeamsAndMembersRef = async () => {
+      setIsLoading(true);
       setLoading(true);
       try {
         const teamsResponse = await api.get("/api/teams");
@@ -145,6 +248,7 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
         showFeedback("error", "Error", "Failed to load teams and members");
       } finally {
         setLoading(false);
+        setIsLoading(false);
       }
     };
 
@@ -223,7 +327,6 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
         return acc;
       }, {})
     );
-    // Reset avatar editing states
     setEditingTeamAvatar(null);
     setEditingTeamAvatarPreview(null);
     setPendingAvatarFile(null);
@@ -234,10 +337,8 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
   const handleAvatarChange = (event, teamName) => {
     const file = event.target.files[0];
     if (file) {
-      // Store the file as pending
       setPendingAvatarFile(file);
-      
-      // Create preview URL for pending state
+
       const reader = new FileReader();
       reader.onload = (e) => {
         setPendingAvatarPreview(e.target.result);
@@ -248,11 +349,10 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
 
   const confirmAvatarChange = async () => {
     if (!pendingAvatarFile || !editingTeam) return;
-    
+
     setLoading(true);
-    
+
     try {
-      // Get team ID
       const teamObj = teamsData.find((t) => t.name === editingTeam);
       if (!teamObj) {
         throw new Error(`Team ${editingTeam} not found`);
@@ -260,48 +360,49 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
 
       const teamId = teamObj.id;
 
-      // Upload the avatar immediately
       const formData = new FormData();
-      formData.append('name', editingTeam); // Keep the same name
-      formData.append('image', pendingAvatarFile);
-      
+      formData.append("name", editingTeam);
+      formData.append("image", pendingAvatarFile);
+
       const response = await api.put(`/api/teams/${teamId}`, formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          "Content-Type": "multipart/form-data",
         },
       });
-      
-      // Update the local teamsData state with the new avatar URL
-      setTeamsData(prevTeamsData => 
-        prevTeamsData.map(team => 
-          team.id === teamId 
-            ? { ...team, avatar: response.data.avatar }
-            : team
+
+      setTeamsData((prevTeamsData) =>
+        prevTeamsData.map((team) =>
+          team.id === teamId ? { ...team, avatar: response.data.avatar } : team
         )
       );
-      
-      // Move to confirmed state
+
       setEditingTeamAvatar(pendingAvatarFile);
       setEditingTeamAvatarPreview(pendingAvatarPreview);
-      
-      // Clear pending state
+
       setPendingAvatarFile(null);
       setPendingAvatarPreview(null);
-      
-      showFeedback("success", "Avatar Updated", "Team avatar has been updated successfully!");
-      
+
+      showFeedback(
+        "success",
+        "Avatar Updated",
+        "Team avatar has been updated successfully!"
+      );
     } catch (error) {
       console.error("Error updating team avatar:", error);
-      showFeedback("error", "Avatar Update Failed", error.response?.data?.error || error.message || "Failed to update avatar");
-      
-      // Clear pending state on error
+      showFeedback(
+        "error",
+        "Avatar Update Failed",
+        error.response?.data?.error ||
+          error.message ||
+          "Failed to update avatar"
+      );
+
       setPendingAvatarFile(null);
       setPendingAvatarPreview(null);
-      
-      // Reset file input
+
       const fileInput = document.getElementById(`avatar-input-${editingTeam}`);
       if (fileInput) {
-        fileInput.value = '';
+        fileInput.value = "";
       }
     } finally {
       setLoading(false);
@@ -309,14 +410,12 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
   };
 
   const cancelAvatarChange = () => {
-    // Clear pending state without applying changes
     setPendingAvatarFile(null);
     setPendingAvatarPreview(null);
-    
-    // Reset file input
+
     const fileInput = document.getElementById(`avatar-input-${editingTeam}`);
     if (fileInput) {
-      fileInput.value = '';
+      fileInput.value = "";
     }
   };
 
@@ -346,7 +445,6 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
   const saveChangesEditTeam = async () => {
     setLoading(true);
     try {
-      // Get team ID
       const teamObj = teamsData.find((t) => t.name === editingTeam);
 
       if (!teamObj) {
@@ -355,7 +453,6 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
 
       const teamId = teamObj.id;
 
-      // Handle member updates only (avatar is handled separately)
       const selectedEmails = Object.entries(editedMembers)
         .filter(([_, isSelected]) => isSelected)
         .map(([email]) => email);
@@ -400,7 +497,6 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
         `The team "${editingTeam}" members have been successfully updated.`
       );
 
-      // Refresh team data to ensure consistency
       fetchTeamsAndMembers();
     } catch (error) {
       console.error("Error updating team:", error);
@@ -442,6 +538,10 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
   const filteredMembers = Object.values(members).filter((member) =>
     member.name.toLowerCase().includes(searchQuery2.toLowerCase())
   );
+
+  if (isLoading) {
+    return <ManageTeamsSkeleton />;
+  }
 
   return (
     <Box
@@ -516,28 +616,29 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
                   display: "grid",
                   gridTemplateColumns: "auto 1fr 4fr 1fr",
                   alignItems: "center",
-                  gap: 2
+                  gap: 2,
                 }}
               >
-                {/* Team Avatar */}
                 <Box>
                   <img
-                    src={teamsData.find(t => t.name === teamName)?.avatar || "default_avatar.png"}
+                    src={
+                      teamsData.find((t) => t.name === teamName)?.avatar ||
+                      "default_avatar.png"
+                    }
                     alt={`${teamName} avatar`}
                     style={{
                       width: "40px",
                       height: "40px",
                       borderRadius: "50%",
                       objectFit: "cover",
-                      border: "2px solid #82D5C7"
+                      border: "2px solid #82D5C7",
                     }}
                     onError={(e) => {
                       e.target.src = "default_avatar.png";
                     }}
                   />
                 </Box>
-                
-                {/* Team Name */}
+
                 <Box
                   sx={{
                     display: "flex",
@@ -551,8 +652,7 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
                     {teamName}
                   </Typography>
                 </Box>
-                
-                {/* Team Members */}
+
                 <Box
                   sx={{
                     display: "flex",
@@ -571,8 +671,7 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
                     {teamMembers.length > 3 && "..."}
                   </Typography>
                 </Box>
-                
-                {/* Action Buttons */}
+
                 <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
                   <IconButton onClick={() => startEditing(teamName)}>
                     <img
@@ -591,7 +690,7 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
                 </Box>
               </Box>
             ) : (
-              // Edit mode
+              // Edit mode content continues...
               <Box sx={{ display: "flex", flexDirection: "column" }}>
                 <Box
                   sx={{
@@ -600,16 +699,28 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
                     gap: 5,
                   }}
                 >
-                  <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                    <Typography variant='body1' sx={{ color: "white", marginBottom: "20px" }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Typography
+                      variant='body1'
+                      sx={{ color: "white", marginBottom: "20px" }}
+                    >
                       Editing Team: {teamName}
                     </Typography>
-                    
-                    {/* Team Avatar Edit Section */}
+
                     <Box sx={{ marginBottom: "20px" }}>
                       <Typography
                         variant='body2'
-                        sx={{ color: "#CAC4D0", marginBottom: "10px", textAlign: "center" }}
+                        sx={{
+                          color: "#CAC4D0",
+                          marginBottom: "10px",
+                          textAlign: "center",
+                        }}
                       >
                         Team Avatar
                       </Typography>
@@ -626,15 +737,15 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
                           justifyContent: "center",
                           alignItems: "center",
                           minHeight: "180px",
-                          width: "150px"
+                          width: "150px",
                         }}
                       >
-                        {/* Avatar Image */}
                         <img
                           src={
-                            pendingAvatarPreview || 
-                            editingTeamAvatarPreview || 
-                            teamsData.find(t => t.name === teamName)?.avatar || 
+                            pendingAvatarPreview ||
+                            editingTeamAvatarPreview ||
+                            teamsData.find((t) => t.name === teamName)
+                              ?.avatar ||
                             "default_avatar.png"
                           }
                           alt={`${teamName} avatar`}
@@ -643,25 +754,28 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
                             height: "80px",
                             borderRadius: "50%",
                             objectFit: "cover",
-                            border: pendingAvatarPreview 
-                              ? "2px solid #FFA726" 
-                              : editingTeamAvatarPreview 
-                              ? "2px solid #B5EDE4" 
+                            border: pendingAvatarPreview
+                              ? "2px solid #FFA726"
+                              : editingTeamAvatarPreview
+                              ? "2px solid #B5EDE4"
                               : "2px solid #82D5C7",
-                            cursor: pendingAvatarPreview ? "default" : "pointer",
-                            opacity: pendingAvatarPreview ? 0.8 : 1
+                            cursor: pendingAvatarPreview
+                              ? "default"
+                              : "pointer",
+                            opacity: pendingAvatarPreview ? 0.8 : 1,
                           }}
                           onClick={() => {
                             if (!pendingAvatarPreview) {
-                              document.getElementById(`avatar-input-${teamName}`).click();
+                              document
+                                .getElementById(`avatar-input-${teamName}`)
+                                .click();
                             }
                           }}
                           onError={(e) => {
                             e.target.src = "default_avatar.png";
                           }}
                         />
-                        
-                        {/* Hidden file input */}
+
                         <input
                           id={`avatar-input-${teamName}`}
                           type='file'
@@ -669,52 +783,50 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
                           style={{ display: "none" }}
                           onChange={(e) => handleAvatarChange(e, teamName)}
                         />
-                        
-                        {/* Status text */}
+
                         {pendingAvatarPreview ? (
                           <Typography
-                            variant="caption"
+                            variant='caption'
                             sx={{
                               color: "#FFA726",
                               marginTop: "8px",
-                              fontWeight: "bold"
+                              fontWeight: "bold",
                             }}
                           >
                             Pending Changes
                           </Typography>
                         ) : editingTeamAvatarPreview ? (
                           <Typography
-                            variant="caption"
+                            variant='caption'
                             sx={{
                               color: "#B5EDE4",
-                              marginTop: "8px"
+                              marginTop: "8px",
                             }}
                           >
                             Updated (Click to change)
                           </Typography>
                         ) : (
                           <Typography
-                            variant="caption"
+                            variant='caption'
                             sx={{
                               color: "#888",
-                              marginTop: "8px"
+                              marginTop: "8px",
                             }}
                           >
                             Click to change
                           </Typography>
                         )}
-                        
-                        {/* Confirmation buttons - only show when there's a pending change */}
+
                         {pendingAvatarPreview && (
                           <Box
                             sx={{
                               display: "flex",
                               gap: 1,
-                              marginTop: "10px"
+                              marginTop: "10px",
                             }}
                           >
                             <CustomButton
-                              text="✓"
+                              text='✓'
                               onClick={confirmAvatarChange}
                               sx={{
                                 minWidth: "30px",
@@ -726,25 +838,8 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
                                 fontSize: "14px",
                                 padding: 0,
                                 "&:hover": {
-                                  backgroundColor: "#45a049"
-                                }
-                              }}
-                            />
-                            <CustomButton
-                              text="✕"
-                              onClick={cancelAvatarChange}
-                              sx={{
-                                minWidth: "30px",
-                                width: "30px",
-                                height: "30px",
-                                borderRadius: "50%",
-                                backgroundColor: "#f44336",
-                                color: "white",
-                                fontSize: "14px",
-                                padding: 0,
-                                "&:hover": {
-                                  backgroundColor: "#da190b"
-                                }
+                                  backgroundColor: "#45a049",
+                                },
                               }}
                             />
                           </Box>
@@ -922,7 +1017,6 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
         </Box>
       )}
 
-      {/* Confirmation Modal for Member Action */}
       <ConfirmationModal
         open={modalOpen}
         onClose={handleModalClose}
@@ -933,7 +1027,6 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
         teamName={modalData.teamName}
       />
 
-      {/* Confirmation Modal for Team Deletion */}
       {confirmationDeleteModalOpen && teamToDelete && (
         <ConfirmationModal
           open={confirmationDeleteModalOpen}
