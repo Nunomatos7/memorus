@@ -1,10 +1,240 @@
+// ManageCompetition.jsx
 import { useState, useEffect } from "react";
-import { Box, Typography, IconButton, Divider } from "@mui/material";
+import { Box, Typography, IconButton, Divider, Skeleton } from "@mui/material";
 import { KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
 import editIcon from "../../../../assets/images/editIcon.svg";
 import CustomButton from "../../../../Components/CustomButton/CustomButton";
 import api from "../../../../api/axiosInstance";
 import PropTypes from "prop-types";
+
+// Skeleton for competition loading state
+const ManageCompetitionSkeleton = () => (
+  <Box
+    sx={{
+      width: "100%",
+      marginTop: "20px",
+      borderRadius: "13.576px",
+      border: "2.715px solid #333738",
+      background: "#1E1F20",
+      padding: "20px",
+      backdropFilter: "blur(20px)",
+      marginBottom: "50px",
+    }}
+  >
+    <Box>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          width: "100%",
+          mb: 5,
+        }}
+      >
+        <Skeleton
+          variant='rounded'
+          width={180}
+          height={40}
+          sx={{ bgcolor: "#424242", borderRadius: "20px" }}
+        />
+      </Box>
+
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: "1fr 4fr",
+          marginTop: "40px",
+        }}
+      >
+        <Skeleton
+          variant='text'
+          sx={{ fontSize: "1rem", width: "150px", bgcolor: "#424242", mb: 2 }}
+        />
+
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            padding: "25px",
+            borderRadius: "10.861px",
+            border: "2.715px solid #333738",
+            background: "#272728",
+          }}
+        >
+          <Box
+            sx={{
+              flex: 2,
+              display: "flex",
+              gap: "15px",
+              flexDirection: "column",
+            }}
+          >
+            <Skeleton
+              variant='text'
+              sx={{ fontSize: "1rem", width: "200px", bgcolor: "#424242" }}
+            />
+            <Skeleton
+              variant='text'
+              sx={{ fontSize: "0.875rem", width: "300px", bgcolor: "#424242" }}
+            />
+            <Skeleton
+              variant='text'
+              sx={{ fontSize: "0.875rem", width: "250px", bgcolor: "#424242" }}
+            />
+          </Box>
+
+          <Box
+            sx={{
+              flex: 2,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "20px",
+            }}
+          >
+            <Skeleton
+              variant='text'
+              sx={{ fontSize: "1rem", width: "80px", bgcolor: "#424242" }}
+            />
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "5px",
+              }}
+            >
+              <Skeleton
+                variant='text'
+                sx={{
+                  fontSize: "0.875rem",
+                  width: "120px",
+                  bgcolor: "#424242",
+                }}
+              />
+              <Skeleton
+                variant='text'
+                sx={{
+                  fontSize: "0.875rem",
+                  width: "150px",
+                  bgcolor: "#424242",
+                }}
+              />
+            </Box>
+          </Box>
+
+          <Box>
+            <Skeleton
+              variant='circular'
+              width={24}
+              height={24}
+              sx={{ bgcolor: "#424242" }}
+            />
+          </Box>
+        </Box>
+      </Box>
+
+      <Skeleton
+        variant='rectangular'
+        width='100%'
+        height={1}
+        sx={{ bgcolor: "#424242", my: 5 }}
+      />
+
+      <Skeleton
+        variant='text'
+        sx={{ fontSize: "1rem", width: "200px", bgcolor: "#424242", mb: 2 }}
+      />
+
+      {/* Table Header */}
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          padding: "15px",
+          marginTop: "20px",
+          width: "100%",
+        }}
+      >
+        <Skeleton
+          variant='text'
+          sx={{ fontSize: "1rem", width: "60px", bgcolor: "#424242", flex: 2 }}
+        />
+        <Skeleton
+          variant='text'
+          sx={{ fontSize: "1rem", width: "100px", bgcolor: "#424242", flex: 4 }}
+        />
+        <Skeleton
+          variant='text'
+          sx={{ fontSize: "1rem", width: "80px", bgcolor: "#424242", flex: 2 }}
+        />
+        <Skeleton
+          variant='text'
+          sx={{ fontSize: "1rem", width: "40px", bgcolor: "#424242", flex: 1 }}
+        />
+      </Box>
+
+      {/* Table Rows */}
+      {[...Array(3)].map((_, index) => (
+        <Box
+          key={index}
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            padding: "15px",
+            alignItems: "center",
+            marginBottom: "10px",
+            borderRadius: "10.861px",
+            border: "2.715px solid #333738",
+            background: "#272728",
+            width: "100%",
+          }}
+        >
+          <Skeleton
+            variant='text'
+            sx={{
+              fontSize: "1rem",
+              width: "120px",
+              bgcolor: "#424242",
+              flex: 2,
+            }}
+          />
+          <Skeleton
+            variant='text'
+            sx={{
+              fontSize: "1rem",
+              width: "200px",
+              bgcolor: "#424242",
+              flex: 4,
+            }}
+          />
+          <Skeleton
+            variant='text'
+            sx={{
+              fontSize: "1rem",
+              width: "100px",
+              bgcolor: "#424242",
+              flex: 2,
+            }}
+          />
+          <Box
+            sx={{
+              flex: 1,
+              display: "flex",
+              justifyContent: "flex-end",
+            }}
+          >
+            <Skeleton
+              variant='circular'
+              width={24}
+              height={24}
+              sx={{ bgcolor: "#424242" }}
+            />
+          </Box>
+        </Box>
+      ))}
+    </Box>
+  </Box>
+);
 
 const ManageCompetition = ({
   searchQuery,
@@ -15,18 +245,18 @@ const ManageCompetition = ({
   const [competitions, setCompetitions] = useState([]);
   const [ongoingCompetition, setOngoingCompetition] = useState(null);
   const [expandedIndex, setExpandedIndex] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     fetchCompetitions();
   }, []);
 
   const fetchCompetitions = async () => {
+    setIsLoading(true);
     setLoading(true);
     try {
-      // First, trigger an update of competition statuses
       await api.get("/api/competitions/update-statuses");
 
-      // Then fetch the competitions
       const response = await api.get("/api/competitions");
 
       const formattedCompetitions = response.data.map((comp) => ({
@@ -52,6 +282,7 @@ const ManageCompetition = ({
       showFeedback("error", "Error", "Failed to load competitions");
     } finally {
       setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -61,6 +292,7 @@ const ManageCompetition = ({
     }
 
     const fetchCompetitionsRef = async () => {
+      setIsLoading(true);
       setLoading(true);
       try {
         await api.get("/api/competitions/update-statuses");
@@ -90,6 +322,7 @@ const ManageCompetition = ({
         showFeedback("error", "Error", "Failed to load competitions");
       } finally {
         setLoading(false);
+        setIsLoading(false);
       }
     };
 
@@ -149,6 +382,10 @@ const ManageCompetition = ({
   const filteredCompetitions = competitions.filter((comp) =>
     comp.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  if (isLoading) {
+    return <ManageCompetitionSkeleton />;
+  }
 
   return (
     <Box
@@ -359,7 +596,6 @@ const ManageCompetition = ({
           )}
         </Box>
 
-        {/* Divider */}
         <Divider
           sx={{
             backgroundColor: "gray",
@@ -367,7 +603,7 @@ const ManageCompetition = ({
             marginBottom: "40px",
           }}
         />
-        {/* Competition History */}
+
         <Typography
           variant='body1'
           sx={{
@@ -379,7 +615,6 @@ const ManageCompetition = ({
           Completed Competitions
         </Typography>
 
-        {/* Table Header */}
         <Box
           sx={{
             display: "flex",
@@ -403,7 +638,6 @@ const ManageCompetition = ({
           <Typography variant='body2' sx={{ flex: 1 }}></Typography>
         </Box>
 
-        {/* Table Rows */}
         {filteredCompetitions.length > 0 ? (
           filteredCompetitions.map((comp, index) => (
             <Box

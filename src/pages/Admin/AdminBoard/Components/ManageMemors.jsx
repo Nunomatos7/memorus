@@ -1,5 +1,13 @@
+// ManageMemors.jsx
 import { useState, useEffect } from "react";
-import { Box, Typography, IconButton, Tabs, Tab } from "@mui/material";
+import {
+  Box,
+  Typography,
+  IconButton,
+  Tabs,
+  Tab,
+  Skeleton,
+} from "@mui/material";
 import { KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
 import editIcon from "../../../../assets/images/editIcon.svg";
 import deleteIcon from "../../../../assets/images/deleteIcon.svg";
@@ -7,6 +15,169 @@ import CustomButton from "../../../../Components/CustomButton/CustomButton";
 import ConfirmationModal from "../../../../Components/ConfirmationModal/ConfirmationModal";
 import api from "../../../../api/axiosInstance";
 import PropTypes from "prop-types";
+
+// Skeleton for memors loading state
+const ManageMemorsSkeleton = () => (
+  <Box
+    sx={{
+      width: "100%",
+      marginTop: "20px",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      flexDirection: "column",
+      borderRadius: "13.576px",
+      border: "2.715px solid #333738",
+      background: "#1E1F20",
+      padding: "20px",
+      backdropFilter: "blur(20px)",
+      marginBottom: "50px",
+    }}
+  >
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "space-between",
+        width: "100%",
+        mb: 3,
+      }}
+    >
+      <Skeleton
+        variant='rounded'
+        width={150}
+        height={40}
+        sx={{ bgcolor: "#424242", borderRadius: "20px" }}
+      />
+
+      <Box sx={{ display: "flex", gap: 1 }}>
+        <Skeleton
+          variant='rounded'
+          width={80}
+          height={32}
+          sx={{ bgcolor: "#424242", borderRadius: "20px" }}
+        />
+        <Skeleton
+          variant='rounded'
+          width={70}
+          height={32}
+          sx={{ bgcolor: "#424242", borderRadius: "20px" }}
+        />
+        <Skeleton
+          variant='rounded'
+          width={60}
+          height={32}
+          sx={{ bgcolor: "#424242", borderRadius: "20px" }}
+        />
+      </Box>
+    </Box>
+
+    {/* Table Header */}
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "space-between",
+        padding: "10px",
+        width: "100%",
+        mb: 2,
+      }}
+    >
+      <Skeleton
+        variant='text'
+        sx={{ fontSize: "1rem", width: "80px", bgcolor: "#424242" }}
+      />
+      <Skeleton
+        variant='text'
+        sx={{ fontSize: "1rem", width: "150px", bgcolor: "#424242" }}
+      />
+      <Skeleton
+        variant='text'
+        sx={{ fontSize: "1rem", width: "60px", bgcolor: "#424242" }}
+      />
+      <Skeleton
+        variant='text'
+        sx={{ fontSize: "1rem", width: "80px", bgcolor: "#424242" }}
+      />
+      <Skeleton
+        variant='text'
+        sx={{ fontSize: "1rem", width: "80px", bgcolor: "#424242" }}
+      />
+      <Skeleton
+        variant='text'
+        sx={{ fontSize: "1rem", width: "40px", bgcolor: "#424242" }}
+      />
+    </Box>
+
+    {/* Table Rows */}
+    {[...Array(5)].map((_, index) => (
+      <Box
+        key={index}
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          padding: "15px",
+          alignItems: "center",
+          marginBottom: "10px",
+          borderRadius: "10.861px",
+          border: "2.715px solid #333738",
+          background: "#272728",
+          width: "100%",
+        }}
+      >
+        <Box sx={{ flex: 2 }}>
+          <Skeleton
+            variant='text'
+            sx={{
+              fontSize: "1rem",
+              width: "120px",
+              bgcolor: "#424242",
+              mb: 0.5,
+            }}
+          />
+          <Skeleton
+            variant='text'
+            sx={{ fontSize: "0.75rem", width: "80px", bgcolor: "#424242" }}
+          />
+        </Box>
+        <Skeleton
+          variant='text'
+          sx={{ fontSize: "1rem", width: "200px", bgcolor: "#424242", flex: 4 }}
+        />
+        <Skeleton
+          variant='text'
+          sx={{ fontSize: "1rem", width: "60px", bgcolor: "#424242", flex: 1 }}
+        />
+        <Skeleton
+          variant='text'
+          sx={{ fontSize: "1rem", width: "80px", bgcolor: "#424242", flex: 1 }}
+        />
+        <Skeleton
+          variant='text'
+          sx={{ fontSize: "1rem", width: "50px", bgcolor: "#424242", flex: 1 }}
+        />
+        <Box sx={{ flex: 1, display: "flex", justifyContent: "right", gap: 1 }}>
+          <Skeleton
+            variant='circular'
+            width={24}
+            height={24}
+            sx={{ bgcolor: "#424242" }}
+          />
+          <Skeleton
+            variant='circular'
+            width={24}
+            height={24}
+            sx={{ bgcolor: "#424242" }}
+          />
+          <Skeleton
+            variant='circular'
+            width={24}
+            height={24}
+            sx={{ bgcolor: "#424242" }}
+          />
+        </Box>
+      </Box>
+    ))}
+  </Box>
+);
 
 const ManageMemors = ({
   searchQuery,
@@ -20,12 +191,14 @@ const ManageMemors = ({
   const [expandedIndex, setExpandedIndex] = useState(null);
   const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
   const [memorToDelete, setMemorToDelete] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     fetchMemors();
   }, [tab2]);
 
   const fetchMemors = async () => {
+    setIsLoading(true);
     setLoading(true);
     try {
       const competitionsResponse = await api.get("/api/competitions");
@@ -36,6 +209,7 @@ const ManageMemors = ({
       if (!activeCompetition) {
         setMemors([]);
         setLoading(false);
+        setIsLoading(false);
         return;
       }
 
@@ -59,6 +233,7 @@ const ManageMemors = ({
       showFeedback("error", "Error", "Failed to load memors");
     } finally {
       setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -68,6 +243,7 @@ const ManageMemors = ({
     }
 
     const fetchMemorsRef = async () => {
+      setIsLoading(true);
       setLoading(true);
       try {
         const competitionsResponse = await api.get("/api/competitions");
@@ -78,6 +254,7 @@ const ManageMemors = ({
         if (!activeCompetition) {
           setMemors([]);
           setLoading(false);
+          setIsLoading(false);
           return;
         }
 
@@ -101,6 +278,7 @@ const ManageMemors = ({
         showFeedback("error", "Error", "Failed to load memors");
       } finally {
         setLoading(false);
+        setIsLoading(false);
       }
     };
 
@@ -185,6 +363,10 @@ const ManageMemors = ({
       if (tab2 === "closed") return calculateDaysLeft(memor.date) <= 0;
       return true;
     });
+
+  if (isLoading) {
+    return <ManageMemorsSkeleton />;
+  }
 
   return (
     <Box
@@ -271,6 +453,7 @@ const ManageMemors = ({
           <Tab value='closed' label='Closed' />
         </Tabs>
       </Box>
+
       {/* Table Header */}
       <Box
         sx={{
@@ -416,6 +599,7 @@ const ManageMemors = ({
           No memors found
         </Box>
       )}
+
       {/* Confirmation Modal */}
       {confirmationModalOpen && memorToDelete && (
         <ConfirmationModal

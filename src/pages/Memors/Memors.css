@@ -99,19 +99,21 @@
   padding-bottom: 15px;
 }
 
-/* Custom scrollbar styling */
-.memors-swiper-container::-webkit-scrollbar {
-  height: 8px;
+/* Style the Swiper scrollbar */
+.swiper-scrollbar {
+  background: rgba(255, 255, 255, 0.1) !important;
+  height: 4px !important;
+  border-radius: 10px !important;
 }
 
-.memors-swiper-container::-webkit-scrollbar-track {
-  background: rgba(121, 87, 194, 0.1);
-  border-radius: 4px;
+.swiper-scrollbar-drag {
+  background: #9282f9 !important; /* Your purple theme color */
+  border-radius: 10px !important;
 }
 
-.memors-swiper-container::-webkit-scrollbar-thumb {
-  background-color: #7957c2;
-  border-radius: 4px;
+/* Optional: Style on hover */
+.swiper-scrollbar-drag:hover {
+  background: #d0bcfe !important;
 }
 
 /* Firefox scrollbar */

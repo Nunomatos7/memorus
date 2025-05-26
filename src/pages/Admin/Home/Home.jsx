@@ -1,7 +1,17 @@
+// Admin/Home.jsx
+
 import { useState, useRef, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Mousewheel, FreeMode } from "swiper/modules";
-import { Grid, Card, CardContent, Typography, Box, CircularProgress, Alert } from "@mui/material";
+import {
+  Grid,
+  Card,
+  CardContent,
+  Typography,
+  Box,
+  Alert,
+  Skeleton,
+} from "@mui/material";
 import MemorPicture from "./../../../Components/MemorPicture/MemorPicture";
 import "swiper/css";
 import "swiper/css/free-mode";
@@ -11,9 +21,8 @@ import rank2 from "../../../assets/images/adminRank2.svg";
 import rank3 from "../../../assets/images/adminRank3.svg";
 import ongoing from "../../../assets/images/ongoingAdmin.svg";
 import closed from "../../../assets/images/closedAdmin.svg";
-import { leaderboardData } from "../Leaderboard/Leaderboard";
 import CustomButton from "../../../Components/CustomButton/CustomButton";
-import Loader from "../../../Components/Loader/Loader";
+// import Loader from "../../../Components/Loader/Loader";
 import background1 from "../../../assets/images/adminBackground1.svg";
 import background2 from "../../../assets/images/adminBackground2.svg";
 import background3 from "../../../assets/images/adminBackground3.svg";
@@ -26,6 +35,184 @@ const rankImages = {
   3: rank3,
 };
 
+// Skeleton component for carousel items
+const CarouselSkeleton = () => (
+  <div className='latest-wrapper'>
+    {[...Array(5)].map((_, index) => (
+      <div
+        key={index}
+        className='latest-memors-pic'
+        style={{ marginRight: "20px", display: "inline-block", width: "200px" }}
+      >
+        <Skeleton
+          variant='rectangular'
+          width='100%'
+          height={150}
+          sx={{ borderRadius: 2, mb: 1, bgcolor: "#424242" }}
+        />
+        <Skeleton
+          variant='text'
+          sx={{ fontSize: "1rem", mb: 0.5, bgcolor: "#424242" }}
+        />
+        <Skeleton
+          variant='text'
+          sx={{ fontSize: "0.9rem", mb: 0.5, bgcolor: "#424242" }}
+        />
+        <Skeleton
+          variant='text'
+          sx={{ fontSize: "0.8rem", width: "60%", bgcolor: "#424242" }}
+        />
+      </div>
+    ))}
+  </div>
+);
+
+// Skeleton component for stat cards
+const StatCardSkeleton = () => (
+  <Card className='card'>
+    <CardContent>
+      <Box display='flex' alignItems='center' justifyContent='space-between'>
+        <Skeleton
+          variant='text'
+          sx={{ fontSize: "2rem", width: "40px", bgcolor: "#424242" }}
+        />
+        <Skeleton
+          variant='rectangular'
+          width={40}
+          height={40}
+          sx={{ borderRadius: 1, bgcolor: "#424242" }}
+        />
+      </Box>
+      <Skeleton
+        variant='text'
+        sx={{ fontSize: "0.875rem", mt: 1, bgcolor: "#424242" }}
+      />
+    </CardContent>
+  </Card>
+);
+
+// Skeleton component for countdown card
+const CountdownSkeleton = () => (
+  <Card className='card'>
+    <CardContent>
+      <Box
+        style={{
+          display: "flex",
+          alignItems: "center",
+          flexDirection: "column",
+        }}
+      >
+        <Skeleton
+          variant='text'
+          sx={{ fontSize: "1.25rem", width: "80%", mb: 2, bgcolor: "#424242" }}
+        />
+        <Box display='flex' gap={2}>
+          {[...Array(4)].map((_, index) => (
+            <Box key={index} textAlign='center'>
+              <Skeleton
+                variant='text'
+                sx={{ fontSize: "2rem", width: "40px", bgcolor: "#424242" }}
+              />
+              <Skeleton
+                variant='text'
+                sx={{ fontSize: "0.75rem", width: "40px", bgcolor: "#424242" }}
+              />
+            </Box>
+          ))}
+        </Box>
+      </Box>
+    </CardContent>
+  </Card>
+);
+
+// Skeleton component for leaderboard cards
+const LeaderboardSkeleton = () => (
+  <>
+    {[...Array(3)].map((_, index) => (
+      <Grid item xs={12} sm={index === 0 ? 5 : index === 1 ? 4 : 3} key={index}>
+        <Card className='card'>
+          <Box display='flex' alignItems='center' style={{ width: "100%" }}>
+            <Box style={{ flex: 1, textAlign: "center" }}>
+              <Skeleton
+                variant='rectangular'
+                width={60}
+                height={80}
+                sx={{ borderRadius: 1, bgcolor: "#424242" }}
+              />
+            </Box>
+            <Box style={{ flex: index === 0 ? 1 : 1.5, paddingRight: "1rem" }}>
+              <Box
+                className='team-header'
+                display='flex'
+                justifyContent='space-between'
+                alignItems='center'
+              >
+                <Skeleton
+                  variant='text'
+                  sx={{
+                    fontSize: "1.25rem",
+                    width: "120px",
+                    bgcolor: "#424242",
+                  }}
+                />
+                <Skeleton
+                  variant='circular'
+                  width={50}
+                  height={50}
+                  sx={{ bgcolor: "#424242" }}
+                />
+              </Box>
+              <Box
+                className='stats'
+                display='flex'
+                justifyContent='space-between'
+                marginTop='10px'
+              >
+                <Box>
+                  <Skeleton
+                    variant='text'
+                    sx={{
+                      fontSize: "0.875rem",
+                      width: "80px",
+                      bgcolor: "#424242",
+                    }}
+                  />
+                  <Skeleton
+                    variant='text'
+                    sx={{
+                      fontSize: "1.5rem",
+                      width: "40px",
+                      bgcolor: "#424242",
+                    }}
+                  />
+                </Box>
+                <Box>
+                  <Skeleton
+                    variant='text'
+                    sx={{
+                      fontSize: "0.875rem",
+                      width: "80px",
+                      bgcolor: "#424242",
+                    }}
+                  />
+                  <Skeleton
+                    variant='text'
+                    sx={{
+                      fontSize: "1.5rem",
+                      width: "40px",
+                      bgcolor: "#424242",
+                    }}
+                  />
+                </Box>
+              </Box>
+            </Box>
+          </Box>
+        </Card>
+      </Grid>
+    ))}
+  </>
+);
+
 const Home = () => {
   const { token, user } = useAuth();
   const [selectedSlide, setSelectedSlide] = useState(null);
@@ -36,7 +223,7 @@ const Home = () => {
   const [currentCompetition, setCurrentCompetition] = useState(null);
   const [ongoingMemors, setOngoingMemors] = useState(0);
   const [closedMemors, setClosedMemors] = useState(0);
-  
+
   const swiperRef = useRef(null);
 
   useEffect(() => {
@@ -50,7 +237,7 @@ const Home = () => {
     const fetchData = async () => {
       setLoading(true);
       setError(null);
-      
+
       try {
         // Fetch active competition
         const competitionResponse = await fetch(
@@ -62,20 +249,22 @@ const Home = () => {
             },
           }
         );
-        
+
         if (!competitionResponse.ok) {
           throw new Error("Failed to fetch active competition");
         }
-        
+
         const competitionsData = await competitionResponse.json();
-        
+
         if (competitionsData && competitionsData.length > 0) {
           const activeCompetition = competitionsData[0];
           setCurrentCompetition(activeCompetition);
-          
+
           // Fetch leaderboard for the current competition
           const leaderboardResponse = await fetch(
-            `${import.meta.env.VITE_API_URL}/api/leaderboard/competition/${activeCompetition.id}`,
+            `${import.meta.env.VITE_API_URL}/api/leaderboard/competition/${
+              activeCompetition.id
+            }`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -83,7 +272,7 @@ const Home = () => {
               },
             }
           );
-          
+
           if (leaderboardResponse.ok) {
             const leaderboardData = await leaderboardResponse.json();
             if (leaderboardData && leaderboardData.teams) {
@@ -98,11 +287,11 @@ const Home = () => {
                   memors: team.memors || 0,
                   avatar: team.avatar || "https://via.placeholder.com/150",
                 }));
-              
+
               setLeaderboardTeams(teams);
             }
           }
-          
+
           // Fetch latest memors for all teams - using new endpoint
           const latestMemorsResponse = await fetch(
             `${import.meta.env.VITE_API_URL}/api/memors/latest/all`,
@@ -113,22 +302,27 @@ const Home = () => {
               },
             }
           );
-          
+
           if (latestMemorsResponse.ok) {
             const latestMemorsData = await latestMemorsResponse.json();
-            
+
             if (Array.isArray(latestMemorsData)) {
               // Already formatted for display
               setMemors(latestMemorsData);
             }
           } else {
-            console.error("Error fetching latest memors:", await latestMemorsResponse.text());
-            
+            console.error(
+              "Error fetching latest memors:",
+              await latestMemorsResponse.text()
+            );
+
             // Fallback to old approach if new endpoint isn't available
             try {
               // Fetch memors for the active competition (all teams)
               const memorResponse = await fetch(
-                `${import.meta.env.VITE_API_URL}/api/competitions/${activeCompetition.id}/memors`,
+                `${import.meta.env.VITE_API_URL}/api/competitions/${
+                  activeCompetition.id
+                }/memors`,
                 {
                   headers: {
                     Authorization: `Bearer ${token}`,
@@ -136,21 +330,21 @@ const Home = () => {
                   },
                 }
               );
-              
+
               if (!memorResponse.ok) {
                 throw new Error("Failed to fetch memors");
               }
-              
+
               const memorsData = await memorResponse.json();
-              
+
               // Process memors
               let ongoingCount = 0;
               let closedCount = 0;
               let allSubmissions = [];
-              
+
               if (Array.isArray(memorsData)) {
                 // Count ongoing vs closed
-                memorsData.forEach(memor => {
+                memorsData.forEach((memor) => {
                   const dueDate = new Date(memor.due_date);
                   const now = new Date();
                   if (dueDate > now) {
@@ -159,7 +353,7 @@ const Home = () => {
                     closedCount++;
                   }
                 });
-                
+
                 // Now fetch all teams
                 const teamsResponse = await fetch(
                   `${import.meta.env.VITE_API_URL}/api/teams`,
@@ -170,15 +364,17 @@ const Home = () => {
                     },
                   }
                 );
-                
+
                 if (teamsResponse.ok) {
                   const teamsData = await teamsResponse.json();
-                  
+
                   // For each team, get their completed memors
                   for (const team of teamsData) {
                     try {
                       const teamMemorsResponse = await fetch(
-                        `${import.meta.env.VITE_API_URL}/api/memors/team/${team.id}/competition/${activeCompetition.id}/completed`,
+                        `${import.meta.env.VITE_API_URL}/api/memors/team/${
+                          team.id
+                        }/competition/${activeCompetition.id}/completed`,
                         {
                           headers: {
                             Authorization: `Bearer ${token}`,
@@ -186,24 +382,30 @@ const Home = () => {
                           },
                         }
                       );
-                      
+
                       if (teamMemorsResponse.ok) {
                         const teamMemorsData = await teamMemorsResponse.json();
-                        
+
                         if (Array.isArray(teamMemorsData)) {
                           // Process each memor and its pictures
-                          teamMemorsData.forEach(memor => {
+                          teamMemorsData.forEach((memor) => {
                             if (memor.pictures && memor.pictures.length > 0) {
-                              memor.pictures.forEach(pic => {
+                              memor.pictures.forEach((pic) => {
                                 allSubmissions.push({
                                   id: `${memor.id}-${pic.id}`,
                                   memorId: memor.id,
                                   title: memor.title,
                                   description: memor.description,
-                                  submittedDate: new Date(pic.created_at || memor.updated_at || memor.created_at).toLocaleDateString(),
+                                  submittedDate: new Date(
+                                    pic.created_at ||
+                                      memor.updated_at ||
+                                      memor.created_at
+                                  ).toLocaleDateString(),
                                   team: team.name,
                                   image: [pic.img_src],
-                                  submitter: pic.first_name ? `${pic.first_name} ${pic.last_name || ''}` : "Team member"
+                                  submitter: pic.first_name
+                                    ? `${pic.first_name} ${pic.last_name || ""}`
+                                    : "Team member",
                                 });
                               });
                             }
@@ -211,15 +413,20 @@ const Home = () => {
                         }
                       }
                     } catch (teamError) {
-                      console.error(`Error fetching memors for team ${team.id}:`, teamError);
+                      console.error(
+                        `Error fetching memors for team ${team.id}:`,
+                        teamError
+                      );
                     }
                   }
                 }
               }
-              
+
               // Sort by most recent first
-              allSubmissions.sort((a, b) => new Date(b.submittedDate) - new Date(a.submittedDate));
-              
+              allSubmissions.sort(
+                (a, b) => new Date(b.submittedDate) - new Date(a.submittedDate)
+              );
+
               setMemors(allSubmissions);
               setOngoingMemors(ongoingCount);
               setClosedMemors(closedCount);
@@ -228,10 +435,12 @@ const Home = () => {
               setError(`Failed to load memors: ${fallbackError.message}`);
             }
           }
-          
+
           // Get memor counts for admin dashboard
           const memorsResponse = await fetch(
-            `${import.meta.env.VITE_API_URL}/api/competitions/${activeCompetition.id}/memors`,
+            `${import.meta.env.VITE_API_URL}/api/competitions/${
+              activeCompetition.id
+            }/memors`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -239,16 +448,16 @@ const Home = () => {
               },
             }
           );
-          
+
           if (memorsResponse.ok) {
             const memorsData = await memorsResponse.json();
-            
+
             if (Array.isArray(memorsData)) {
               // Count ongoing vs closed
               let ongoing = 0;
               let closed = 0;
-              
-              memorsData.forEach(memor => {
+
+              memorsData.forEach((memor) => {
                 const dueDate = new Date(memor.due_date);
                 const now = new Date();
                 if (dueDate > now) {
@@ -257,7 +466,7 @@ const Home = () => {
                   closed++;
                 }
               });
-              
+
               setOngoingMemors(ongoing);
               setClosedMemors(closed);
             }
@@ -286,7 +495,7 @@ const Home = () => {
 
   return (
     <>
-      <Loader />
+      {/* <Loader /> */}
       <section className='mb-10' aria-labelledby='latest-memors-heading'>
         <div
           className='container'
@@ -328,20 +537,32 @@ const Home = () => {
             }}
             aria-hidden='true'
           />
-          <h1 id='latest-memors-heading' className='home-title'>
-            Latest Memors
-          </h1>
+          {loading ? (
+            <Skeleton
+              variant='text'
+              sx={{
+                fontSize: "2rem",
+                width: "300px",
+                mb: 2,
+                bgcolor: "#424242",
+              }}
+            />
+          ) : (
+            <h1 id='latest-memors-heading' className='home-title'>
+              Latest Memors
+            </h1>
+          )}
         </div>
 
         {/* Swiper */}
         <div className='overflow-hidden w-full'>
           <div className='container'>
             {loading ? (
-              <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
-                <CircularProgress size={40} sx={{ color: "#82D5C7" }} />
-              </Box>
+              <CarouselSkeleton />
             ) : error ? (
-              <Alert severity="error" sx={{ mx: 2 }}>{error}</Alert>
+              <Alert severity='error' sx={{ mx: 2 }}>
+                {error}
+              </Alert>
             ) : memors.length === 0 ? (
               <Box sx={{ p: 4, textAlign: "center", color: "#aaa" }}>
                 <Typography>No memors available for any teams yet.</Typography>
@@ -366,7 +587,9 @@ const Home = () => {
                   <SwiperSlide
                     key={memor.id}
                     className={
-                      memor.image && memor.image.length > 0 ? "latest-memors-pic" : "latest-memors"
+                      memor.image && memor.image.length > 0
+                        ? "latest-memors-pic"
+                        : "latest-memors"
                     }
                     tabIndex='0'
                     role='button'
@@ -414,28 +637,28 @@ const Home = () => {
                             by {memor.submitter}
                           </p>
                         </div>
-                        </div>
-                        )}
-                        </SwiperSlide>
-                        ))}
-                        </Swiper>
-                        )}
-                        </div>
-                        </div>
+                      </div>
+                    )}
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            )}
+          </div>
+        </div>
 
-                        {selectedSlide && (
-                        <MemorPicture
-                          images={selectedSlide.image}
-                          teamName={selectedSlide.team}
-                          title={selectedSlide.title}
-                          submitDate={selectedSlide.submittedDate}
-                          onClose={closeModal}
-                          onNavigate={handleImageClick}
-                        />
-                        )}
-                        </section>
+        {selectedSlide && (
+          <MemorPicture
+            images={selectedSlide.image}
+            teamName={selectedSlide.team}
+            title={selectedSlide.title}
+            submitDate={selectedSlide.submittedDate}
+            onClose={closeModal}
+            onNavigate={handleImageClick}
+          />
+        )}
+      </section>
 
-{/* The rest of the Admin Home component remains unchanged */}
+      {/* The rest of the Admin Home component remains unchanged */}
 
       <section
         id='adminStats'
@@ -443,129 +666,153 @@ const Home = () => {
         aria-labelledby='memors-dashboard-heading'
         style={{ marginTop: "2rem" }}
       >
-        <Typography
-          variant='h6'
-          gutterBottom
-          style={{ color: "white" }}
-          id='memors-dashboard-heading'
-        >
-          Memors Dashboard
-        </Typography>
+        {loading ? (
+          <Skeleton
+            variant='text'
+            sx={{
+              fontSize: "1.25rem",
+              width: "200px",
+              mb: 2,
+              bgcolor: "#424242",
+            }}
+          />
+        ) : (
+          <Typography
+            variant='h6'
+            gutterBottom
+            style={{ color: "white" }}
+            id='memors-dashboard-heading'
+          >
+            Memors Dashboard
+          </Typography>
+        )}
         <Grid container spacing={3}>
           <Grid item xs={12} sm={3}>
-            <Card
-              className='card'
-              onClick={() =>
-                (window.location.href = "/admin/adminBoard?tab=ongoing")
-              }
-              onKeyPress={(e) =>
-                handleKeyPress(
-                  e,
-                  () => (window.location.href = "/admin/adminBoard?tab=ongoing")
-                )
-              }
-              style={{ cursor: "pointer" }}
-              tabIndex='0'
-              role='button'
-              aria-label='View ongoing Memors'
-            >
-              <CardContent>
-                <Box
-                  display='flex'
-                  alignItems='center'
-                  justifyContent='space-between'
-                >
-                  <Typography variant='h4' fontWeight='bold'>
-                    {loading ? <CircularProgress size={30} /> : ongoingMemors}
+            {loading ? (
+              <StatCardSkeleton />
+            ) : (
+              <Card
+                className='card'
+                onClick={() =>
+                  (window.location.href = "/admin/adminBoard?tab=ongoing")
+                }
+                onKeyPress={(e) =>
+                  handleKeyPress(
+                    e,
+                    () =>
+                      (window.location.href = "/admin/adminBoard?tab=ongoing")
+                  )
+                }
+                style={{ cursor: "pointer" }}
+                tabIndex='0'
+                role='button'
+                aria-label='View ongoing Memors'
+              >
+                <CardContent>
+                  <Box
+                    display='flex'
+                    alignItems='center'
+                    justifyContent='space-between'
+                  >
+                    <Typography variant='h4' fontWeight='bold'>
+                      {ongoingMemors}
+                    </Typography>
+                    <img src={ongoing} alt='Ongoing Memors' />
+                  </Box>
+                  <Typography variant='body2' color='#B0B0B0'>
+                    Ongoing Memors
                   </Typography>
-                  <img src={ongoing} alt='Ongoing Memors' />
-                </Box>
-                <Typography variant='body2' color='#B0B0B0'>
-                  Ongoing Memors
-                </Typography>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            )}
           </Grid>
 
           <Grid item xs={12} sm={3}>
-            <Card
-              className='card'
-              onClick={() =>
-                (window.location.href = "/admin/adminBoard?tab=closed")
-              }
-              onKeyPress={(e) =>
-                handleKeyPress(
-                  e,
-                  () => (window.location.href = "/admin/adminBoard?tab=closed")
-                )
-              }
-              style={{ cursor: "pointer" }}
-              tabIndex='0'
-              role='button'
-              aria-label='View closed Memors'
-            >
-              <CardContent>
-                <Box
-                  display='flex'
-                  alignItems='center'
-                  justifyContent='space-between'
-                >
-                  <Typography variant='h4' fontWeight='bold'>
-                    {loading ? <CircularProgress size={30} /> : closedMemors}
+            {loading ? (
+              <StatCardSkeleton />
+            ) : (
+              <Card
+                className='card'
+                onClick={() =>
+                  (window.location.href = "/admin/adminBoard?tab=closed")
+                }
+                onKeyPress={(e) =>
+                  handleKeyPress(
+                    e,
+                    () =>
+                      (window.location.href = "/admin/adminBoard?tab=closed")
+                  )
+                }
+                style={{ cursor: "pointer" }}
+                tabIndex='0'
+                role='button'
+                aria-label='View closed Memors'
+              >
+                <CardContent>
+                  <Box
+                    display='flex'
+                    alignItems='center'
+                    justifyContent='space-between'
+                  >
+                    <Typography variant='h4' fontWeight='bold'>
+                      {closedMemors}
+                    </Typography>
+                    <img src={closed} alt='Closed Memors' />
+                  </Box>
+                  <Typography variant='body2' color='#B0B0B0'>
+                    Closed Memors
                   </Typography>
-                  <img src={closed} alt='Closed Memors' />
-                </Box>
-                <Typography variant='body2' color='#B0B0B0'>
-                  Closed Memors
-                </Typography>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            )}
           </Grid>
 
           <Grid item xs={12} sm={6}>
-            <Card className='card' aria-labelledby='competition-heading'>
-              <CardContent>
-                {loading ? (
-                  <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
-                    <CircularProgress size={40} sx={{ color: "#82D5C7" }} />
-                  </Box>
-                ) : currentCompetition ? (
-                  <Box
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      flexDirection: "column",
-                    }}
-                  >
-                    <Box>
-                      <Typography
-                        variant='h6'
-                        style={{ color: "white" }}
-                        id='competition-heading'
-                      >
-                        The competition{" "}
-                        <span style={{ color: "#409C90", fontWeight: "bold" }}>
-                          {currentCompetition.name}
-                        </span>{" "}
-                        ends in
+            {loading ? (
+              <CountdownSkeleton />
+            ) : (
+              <Card className='card' aria-labelledby='competition-heading'>
+                <CardContent>
+                  {currentCompetition ? (
+                    <Box
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        flexDirection: "column",
+                      }}
+                    >
+                      <Box>
+                        <Typography
+                          variant='h6'
+                          style={{ color: "white" }}
+                          id='competition-heading'
+                        >
+                          The competition{" "}
+                          <span
+                            style={{ color: "#409C90", fontWeight: "bold" }}
+                          >
+                            {currentCompetition.name}
+                          </span>{" "}
+                          ends in
+                        </Typography>
+                      </Box>
+                      <Countdown
+                        endDate={currentCompetition.end_date}
+                        role='admin'
+                        aria-label='Countdown to competition end'
+                        aria-live='polite'
+                      />
+                    </Box>
+                  ) : (
+                    <Box sx={{ p: 2, textAlign: "center" }}>
+                      <Typography variant='body1' sx={{ color: "#82D5C7" }}>
+                        No active competitions at the moment.
                       </Typography>
                     </Box>
-                    <Countdown
-                      endDate={currentCompetition.end_date}
-                      role='admin'
-                      aria-label='Countdown to competition end'
-                      aria-live='polite'
-                    />
-                  </Box>
-                ) : (
-                  <Box sx={{ p: 2, textAlign: "center" }}>
-                    <Typography variant='body1' sx={{ color: "#82D5C7" }}>
-                      No active competitions at the moment.
-                    </Typography>
-                  </Box>
-                )}
-              </CardContent>
-            </Card>
+                  )}
+                </CardContent>
+              </Card>
+            )}
           </Grid>
         </Grid>
       </section>
@@ -575,20 +822,32 @@ const Home = () => {
         className='pb-10 container'
         aria-labelledby='current-leaders-heading'
       >
-        <Typography
-          variant='h6'
-          gutterBottom
-          style={{ color: "white" }}
-          id='current-leaders-heading'
-        >
-          Current Leaders
-        </Typography>
         {loading ? (
-          <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
-            <CircularProgress size={40} sx={{ color: "#82D5C7" }} />
-          </Box>
+          <Skeleton
+            variant='text'
+            sx={{
+              fontSize: "1.25rem",
+              width: "200px",
+              mb: 2,
+              bgcolor: "#424242",
+            }}
+          />
+        ) : (
+          <Typography
+            variant='h6'
+            gutterBottom
+            style={{ color: "white" }}
+            id='current-leaders-heading'
+          >
+            Current Leaders
+          </Typography>
+        )}
+        {loading ? (
+          <Grid container spacing={2}>
+            <LeaderboardSkeleton />
+          </Grid>
         ) : error ? (
-          <Alert severity="warning" sx={{ mx: 2 }}>
+          <Alert severity='warning' sx={{ mx: 2 }}>
             Unable to load leaderboard data.
           </Alert>
         ) : (
@@ -605,7 +864,9 @@ const Home = () => {
                   >
                     <Card
                       className='card'
-                      onClick={() => (window.location.href = "/admin/leaderboard")}
+                      onClick={() =>
+                        (window.location.href = "/admin/leaderboard")
+                      }
                       style={{ cursor: "pointer" }}
                       tabIndex='0'
                       role='button'
@@ -685,9 +946,7 @@ const Home = () => {
             ) : (
               <Grid item xs={12}>
                 <Box sx={{ p: 4, textAlign: "center", color: "#aaa" }}>
-                  <Typography>
-                    No leaderboard data available yet.
-                  </Typography>
+                  <Typography>No leaderboard data available yet.</Typography>
                 </Box>
               </Grid>
             )}

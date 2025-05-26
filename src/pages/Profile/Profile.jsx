@@ -67,7 +67,7 @@ const Profile = () => {
       setLoading(false);
     }
   }, [user]);
-  
+
   // Add an additional effect to fetch team details if teamsId is present but team name is missing
   useEffect(() => {
     const fetchTeamDetails = async () => {
@@ -82,7 +82,7 @@ const Profile = () => {
               },
             }
           );
-          
+
           if (response.ok) {
             const teamData = await response.json();
             // Update the user context with team information
@@ -91,8 +91,8 @@ const Profile = () => {
               team: {
                 id: teamData.id,
                 name: teamData.name,
-                avatar: teamData.avatar
-              }
+                avatar: teamData.avatar,
+              },
             });
           }
         } catch (error) {
@@ -100,7 +100,7 @@ const Profile = () => {
         }
       }
     };
-    
+
     fetchTeamDetails();
   }, [user?.teamsId, user?.team?.name, token, user, setUser]);
 
@@ -124,13 +124,15 @@ const Profile = () => {
       }
 
       const competitionsData = await compResponse.json();
-      
+
       if (competitionsData && competitionsData.length > 0) {
         const activeCompetition = competitionsData[0];
-        
+
         // Fetch team progress for this user's team
         const progressResponse = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/memors/team/${user.teamsId}/competition/${activeCompetition.id}/progress`,
+          `${import.meta.env.VITE_API_URL}/api/memors/team/${
+            user.teamsId
+          }/competition/${activeCompetition.id}/progress`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -138,10 +140,12 @@ const Profile = () => {
             },
           }
         );
-        
+
         // Fetch leaderboard to get team rank and points
         const leaderboardResponse = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/leaderboard/competition/${activeCompetition.id}`,
+          `${import.meta.env.VITE_API_URL}/api/leaderboard/competition/${
+            activeCompetition.id
+          }`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -153,12 +157,12 @@ const Profile = () => {
         if (progressResponse.ok && leaderboardResponse.ok) {
           const progressData = await progressResponse.json();
           const leaderboardData = await leaderboardResponse.json();
-          
+
           // Find user's team in leaderboard
           const userTeam = leaderboardData.teams.find(
-            team => team.teamId === user.teamsId
+            (team) => team.teamId === user.teamsId
           );
-          
+
           setStats({
             completedMemors: progressData.completedMemors || 0,
             teamRank: userTeam ? userTeam.rank : "-",
@@ -237,7 +241,7 @@ const Profile = () => {
       }
 
       const updatedUser = await response.json();
-      
+
       // Update user in context
       setUser({
         ...user,
@@ -250,7 +254,7 @@ const Profile = () => {
         message: "Profile updated successfully!",
         severity: "success",
       });
-      
+
       toast.success("Profile updated successfully!");
       setEditMode(false);
     } catch (error) {
@@ -268,7 +272,7 @@ const Profile = () => {
 
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       setAlert({
         open: true,
@@ -308,7 +312,7 @@ const Profile = () => {
         message: "Password changed successfully!",
         severity: "success",
       });
-      
+
       toast.success("Password changed successfully!");
       setPasswordForm(false);
       setPasswordData({
@@ -320,7 +324,8 @@ const Profile = () => {
       console.error("Error changing password:", error);
       setAlert({
         open: true,
-        message: error.message || "Failed to change password. Please try again.",
+        message:
+          error.message || "Failed to change password. Please try again.",
         severity: "error",
       });
       toast.error(error.message || "Failed to change password");
@@ -351,7 +356,7 @@ const Profile = () => {
       {/* Background Elements */}
       <img
         src={background1}
-        alt=""
+        alt=''
         style={{
           position: "absolute",
           top: "2",
@@ -359,11 +364,11 @@ const Profile = () => {
           width: "15%",
           zIndex: "0",
         }}
-        aria-hidden="true"
+        aria-hidden='true'
       />
       <img
         src={background2}
-        alt=""
+        alt=''
         style={{
           position: "absolute",
           top: "25%",
@@ -371,11 +376,11 @@ const Profile = () => {
           width: "5%",
           zIndex: "0",
         }}
-        aria-hidden="true"
+        aria-hidden='true'
       />
       <img
         src={background3}
-        alt=""
+        alt=''
         style={{
           position: "absolute",
           top: "35%",
@@ -383,7 +388,7 @@ const Profile = () => {
           width: "5%",
           zIndex: "0",
         }}
-        aria-hidden="true"
+        aria-hidden='true'
       />
 
       <Box
@@ -395,7 +400,7 @@ const Profile = () => {
         }}
       >
         <Typography
-          variant="h4"
+          variant='h4'
           sx={{ color: "white", fontWeight: "bold", mb: 4 }}
         >
           My Profile
@@ -421,7 +426,7 @@ const Profile = () => {
                 }}
               >
                 <Typography
-                  variant="h5"
+                  variant='h5'
                   sx={{ color: "white", display: "flex", alignItems: "center" }}
                 >
                   <PersonIcon sx={{ mr: 1, color: "#d0bcfe" }} />
@@ -429,7 +434,7 @@ const Profile = () => {
                 </Typography>
                 {!editMode && (
                   <Button
-                    variant="outlined"
+                    variant='outlined'
                     startIcon={<EditIcon />}
                     onClick={handleEditClick}
                     sx={{
@@ -450,18 +455,18 @@ const Profile = () => {
                 <Grid container spacing={3}>
                   <Grid item xs={12} sm={6}>
                     <Typography
-                      variant="body2"
+                      variant='body2'
                       sx={{ color: "#999", mb: 1, ml: 1 }}
                     >
                       First Name
                     </Typography>
                     <TextField
                       fullWidth
-                      name="firstName"
+                      name='firstName'
                       value={formData.firstName}
                       onChange={handleInputChange}
                       disabled={!editMode}
-                      variant="outlined"
+                      variant='outlined'
                       sx={{
                         mb: 2,
                         "& .MuiInputBase-root": {
@@ -488,18 +493,18 @@ const Profile = () => {
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <Typography
-                      variant="body2"
+                      variant='body2'
                       sx={{ color: "#999", mb: 1, ml: 1 }}
                     >
                       Last Name
                     </Typography>
                     <TextField
                       fullWidth
-                      name="lastName"
+                      name='lastName'
                       value={formData.lastName}
                       onChange={handleInputChange}
                       disabled={!editMode}
-                      variant="outlined"
+                      variant='outlined'
                       sx={{
                         mb: 2,
                         "& .MuiInputBase-root": {
@@ -526,17 +531,17 @@ const Profile = () => {
                   </Grid>
                   <Grid item xs={12}>
                     <Typography
-                      variant="body2"
+                      variant='body2'
                       sx={{ color: "#999", mb: 1, ml: 1 }}
                     >
                       Email Address
                     </Typography>
                     <TextField
                       fullWidth
-                      name="email"
+                      name='email'
                       value={formData.email}
                       disabled={true}
-                      variant="outlined"
+                      variant='outlined'
                       sx={{
                         mb: 3,
                         "& .MuiInputBase-root": {
@@ -557,7 +562,7 @@ const Profile = () => {
                   </Grid>
                   <Grid item xs={12}>
                     <Typography
-                      variant="body2"
+                      variant='body2'
                       sx={{ color: "#999", mb: 1, ml: 1 }}
                     >
                       Team
@@ -565,11 +570,13 @@ const Profile = () => {
                     <TextField
                       fullWidth
                       value={
-                        user?.team?.name || 
-                        (user?.teamsId ? `Team ID: ${user.teamsId}` : "Not assigned to a team")
+                        user?.team?.name ||
+                        (user?.teamsId
+                          ? `Team ID: ${user.teamsId}`
+                          : "Not assigned to a team")
                       }
                       disabled
-                      variant="outlined"
+                      variant='outlined'
                       sx={{
                         mb: 2,
                         "& .MuiInputBase-root": {
@@ -600,8 +607,8 @@ const Profile = () => {
                     }}
                   >
                     <Button
-                      variant="outlined"
-                      color="error"
+                      variant='outlined'
+                      color='error'
                       startIcon={<CancelIcon />}
                       onClick={handleCancelEdit}
                       disabled={submitting}
@@ -609,9 +616,15 @@ const Profile = () => {
                       Cancel
                     </Button>
                     <Button
-                      type="submit"
-                      variant="contained"
-                      startIcon={submitting ? <CircularProgress size={20} /> : <SaveIcon />}
+                      type='submit'
+                      variant='contained'
+                      startIcon={
+                        submitting ? (
+                          <CircularProgress size={20} />
+                        ) : (
+                          <SaveIcon />
+                        )
+                      }
                       disabled={submitting}
                       sx={{
                         backgroundColor: "#d0bcfe",
@@ -647,14 +660,14 @@ const Profile = () => {
                 }}
               >
                 <Typography
-                  variant="h5"
+                  variant='h5'
                   sx={{ color: "white", display: "flex", alignItems: "center" }}
                 >
                   <LockIcon sx={{ mr: 1, color: "#d0bcfe" }} />
                   Password
                 </Typography>
                 <Button
-                  variant="outlined"
+                  variant='outlined'
                   startIcon={passwordForm ? <CancelIcon /> : <EditIcon />}
                   onClick={handlePasswordFormToggle}
                   sx={{
@@ -662,8 +675,8 @@ const Profile = () => {
                     borderColor: passwordForm ? "#ff5252" : "#d0bcfe",
                     "&:hover": {
                       borderColor: passwordForm ? "#ff1744" : "#b39ddb",
-                      backgroundColor: passwordForm 
-                        ? "rgba(255, 82, 82, 0.08)" 
+                      backgroundColor: passwordForm
+                        ? "rgba(255, 82, 82, 0.08)"
                         : "rgba(208, 188, 254, 0.08)",
                     },
                   }}
@@ -676,13 +689,13 @@ const Profile = () => {
                 <form onSubmit={handlePasswordSubmit}>
                   <TextField
                     fullWidth
-                    type="password"
-                    name="currentPassword"
-                    label="Current Password"
+                    type='password'
+                    name='currentPassword'
+                    label='Current Password'
                     value={passwordData.currentPassword}
                     onChange={handlePasswordChange}
                     required
-                    variant="outlined"
+                    variant='outlined'
                     sx={{
                       mb: 3,
                       "& .MuiInputBase-root": {
@@ -708,13 +721,13 @@ const Profile = () => {
                   />
                   <TextField
                     fullWidth
-                    type="password"
-                    name="newPassword"
-                    label="New Password"
+                    type='password'
+                    name='newPassword'
+                    label='New Password'
                     value={passwordData.newPassword}
                     onChange={handlePasswordChange}
                     required
-                    variant="outlined"
+                    variant='outlined'
                     sx={{
                       mb: 3,
                       "& .MuiInputBase-root": {
@@ -740,13 +753,13 @@ const Profile = () => {
                   />
                   <TextField
                     fullWidth
-                    type="password"
-                    name="confirmPassword"
-                    label="Confirm New Password"
+                    type='password'
+                    name='confirmPassword'
+                    label='Confirm New Password'
                     value={passwordData.confirmPassword}
                     onChange={handlePasswordChange}
                     required
-                    variant="outlined"
+                    variant='outlined'
                     sx={{
                       mb: 3,
                       "& .MuiInputBase-root": {
@@ -779,9 +792,15 @@ const Profile = () => {
                     }}
                   >
                     <Button
-                      type="submit"
-                      variant="contained"
-                      startIcon={submitting ? <CircularProgress size={20} /> : <SaveIcon />}
+                      type='submit'
+                      variant='contained'
+                      startIcon={
+                        submitting ? (
+                          <CircularProgress size={20} />
+                        ) : (
+                          <SaveIcon />
+                        )
+                      }
                       disabled={submitting}
                       sx={{
                         backgroundColor: "#d0bcfe",
@@ -796,8 +815,9 @@ const Profile = () => {
                   </Box>
                 </form>
               ) : (
-                <Typography variant="body1" color="#999">
-                  Your password is securely stored. You can change it anytime by clicking the button above.
+                <Typography variant='body1' color='#999'>
+                  Your password is securely stored. You can change it anytime by
+                  clicking the button above.
                 </Typography>
               )}
             </Paper>
@@ -830,18 +850,18 @@ const Profile = () => {
                 {user?.firstName?.charAt(0)}
                 {user?.lastName?.charAt(0)}
               </Avatar>
-              
-              <Typography variant="h5" sx={{ color: "white", mb: 1 }}>
+
+              <Typography variant='h5' sx={{ color: "white", mb: 1 }}>
                 {user?.firstName} {user?.lastName}
               </Typography>
-              
+
               <Typography
-                variant="body1"
+                variant='body1'
                 sx={{ color: "#999", mb: 3, textAlign: "center" }}
               >
                 {user?.email}
               </Typography>
-              
+
               <Box
                 sx={{
                   display: "flex",
@@ -851,7 +871,7 @@ const Profile = () => {
                 }}
               >
                 <Button
-                  variant="outlined"
+                  variant='outlined'
                   startIcon={<CloudUploadIcon />}
                   sx={{
                     color: "#d0bcfe",
@@ -867,7 +887,7 @@ const Profile = () => {
                 >
                   Change Avatar
                 </Button>
-                <Typography variant="caption" sx={{ color: "#777" }}>
+                <Typography variant='caption' sx={{ color: "#777" }}>
                   Avatar upload coming soon!
                 </Typography>
               </Box>
@@ -882,13 +902,10 @@ const Profile = () => {
                 border: "1px solid #333738",
               }}
             >
-              <Typography
-                variant="h6"
-                sx={{ color: "white", mb: 3 }}
-              >
+              <Typography variant='h6' sx={{ color: "white", mb: 3 }}>
                 Activity Stats
               </Typography>
-              
+
               <Box
                 sx={{
                   display: "flex",
@@ -903,18 +920,18 @@ const Profile = () => {
                   }}
                 >
                   <CardContent>
-                    <Typography variant="body2" color="#999">
+                    <Typography variant='body2' color='#999'>
                       Completed Memors
                     </Typography>
                     <Typography
-                      variant="h4"
+                      variant='h4'
                       sx={{ color: "#d0bcfe", fontWeight: "bold" }}
                     >
                       {stats.completedMemors}
                     </Typography>
                   </CardContent>
                 </Card>
-                
+
                 <Card
                   sx={{
                     backgroundColor: "#272728",
@@ -922,18 +939,18 @@ const Profile = () => {
                   }}
                 >
                   <CardContent>
-                    <Typography variant="body2" color="#999">
+                    <Typography variant='body2' color='#999'>
                       Team Rank
                     </Typography>
                     <Typography
-                      variant="h4"
+                      variant='h4'
                       sx={{ color: "#d0bcfe", fontWeight: "bold" }}
                     >
                       {stats.teamRank}
                     </Typography>
                   </CardContent>
                 </Card>
-                
+
                 <Card
                   sx={{
                     backgroundColor: "#272728",
@@ -941,11 +958,11 @@ const Profile = () => {
                   }}
                 >
                   <CardContent>
-                    <Typography variant="body2" color="#999">
+                    <Typography variant='body2' color='#999'>
                       Total Points
                     </Typography>
                     <Typography
-                      variant="h4"
+                      variant='h4'
                       sx={{ color: "#d0bcfe", fontWeight: "bold" }}
                     >
                       {stats.totalPoints}
@@ -968,7 +985,7 @@ const Profile = () => {
         <Alert
           onClose={handleAlertClose}
           severity={alert.severity}
-          variant="filled"
+          variant='filled'
           sx={{ width: "100%" }}
         >
           {alert.message}
