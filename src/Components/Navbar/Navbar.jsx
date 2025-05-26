@@ -1,7 +1,7 @@
-// Updated Navbar.jsx with fixed team rendering
+// Updated Navbar.jsx with immersive MemoryBoard support
 
 import { useState, useEffect } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import {
   AppBar,
   Toolbar,
@@ -28,7 +28,6 @@ import { makeStyles } from "@mui/styles";
 import toast from "react-hot-toast";
 import notifPurple from "../../assets/images/notifPurple.svg";
 import notifGreen from "../../assets/images/notifGreen.svg";
-
 
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
@@ -118,6 +117,10 @@ const Navbar = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { user, setToken, setUser, token } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Check if current page is MemoryBoard
+  const isMemoryBoard = location.pathname.toLowerCase().includes('/memoryboard');
 
   const [showLeaderboard, setShowLeaderboard] = useState(
     getLeaderboardVisibility()
@@ -325,12 +328,23 @@ const Navbar = () => {
 
   return (
     <AppBar
-      position='sticky'
+      position={isMemoryBoard ? 'fixed' : 'sticky'}
       sx={{
-        backgroundColor: "#111315",
+        backgroundColor: isMemoryBoard ? "transparent" : "#111315",
         height: "60px",
         boxShadow: "none",
-        borderBottom: "1px solid #444444",
+        borderBottom: isMemoryBoard ? "none" : "1px solid #444444",
+        opacity: isMemoryBoard ? 0.3 : 1,
+        transition: "all 0.3s ease",
+        zIndex: 1100, // Ensure navbar stays above memory board content
+        top: 0,
+        left: 0,
+        right: 0,
+        "&:hover": {
+          opacity: 1,
+          backgroundColor: isMemoryBoard ? "rgba(17, 19, 21, 0.95)" : "#111315",
+          backdropFilter: isMemoryBoard ? "blur(10px)" : "none",
+        },
       }}
     >
       <Toolbar

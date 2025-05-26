@@ -397,7 +397,7 @@ const MemoryBoard = () => {
         className="memory-board-container"
         style={{
           width: "100%",
-          height: "93vh",
+          height: "100vh", // Changed to full viewport height
           position: "relative",
           backgroundColor: "#9990d8",
         }}
