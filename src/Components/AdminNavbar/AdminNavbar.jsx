@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import {
   AppBar,
   Toolbar,
@@ -41,6 +41,10 @@ const AdminNavbar = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { user, setToken, setUser } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Check if current page is MemoryBoard
+  const isMemoryBoard = location.pathname.toLowerCase().includes('/memoryboard');
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -69,12 +73,23 @@ const AdminNavbar = () => {
 
   return (
     <AppBar
-      position='sticky'
+      position={isMemoryBoard ? 'fixed' : 'sticky'}
       sx={{
-        backgroundColor: "#111315",
+        backgroundColor: isMemoryBoard ? "transparent" : "#111315",
         height: "60px",
         boxShadow: "none",
-        borderBottom: "1px solid #444444",
+        borderBottom: isMemoryBoard ? "none" : "1px solid #444444",
+        opacity: isMemoryBoard ? 0.3 : 1,
+        transition: "all 0.3s ease",
+        zIndex: 1100, // Ensure navbar stays above memory board content
+        top: 0,
+        left: 0,
+        right: 0,
+        "&:hover": {
+          opacity: 1,
+          backgroundColor: isMemoryBoard ? "rgba(17, 19, 21, 0.95)" : "#111315",
+          backdropFilter: isMemoryBoard ? "blur(10px)" : "none",
+        },
       }}
     >
       <Toolbar
@@ -210,10 +225,10 @@ const AdminNavbar = () => {
                 }}
               />
               <Typography variant='body1' sx={{ fontWeight: 600 }}>
-                Blip Admin
+                {user?.firstName} {user?.lastName}
               </Typography>
               <Typography variant='body2' color='gray'>
-                admin.blip@example.com
+                {user?.email}
               </Typography>
             </Box>
             <Divider sx={{ backgroundColor: "#444" }} />
