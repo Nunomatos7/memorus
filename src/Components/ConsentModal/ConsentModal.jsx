@@ -107,7 +107,7 @@ const ConsentModal = ({ setUser }) => {
                 textDecoration: "none",
               }}
             >
-              Cookie Policy
+              Privacy Policy
             </Link>{" "}
             for more details.
           </p>
