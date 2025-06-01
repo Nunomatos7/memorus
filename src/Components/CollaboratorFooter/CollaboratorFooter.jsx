@@ -126,7 +126,7 @@ const Footer = () => {
             onClick={() => openTermsModal("cookies")}
             sx={{ cursor: "pointer" }}
           >
-            Cookie Policy
+            Privacy Policy
           </StyledLink>
           <StyledLink href='mailto:geral@memor-us.com'>Contact Us</StyledLink>
         </FooterLinks>

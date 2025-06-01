@@ -17,7 +17,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useAuth } from "../../context/AuthContext";
 
 /**
- * Modal component for displaying Terms of Service and Cookie Policy
+ * Modal component for displaying Terms of Service and Privacy Policy
  *
  * @param {Object} props Component properties
  * @param {boolean} props.open Whether the modal is open
@@ -57,10 +57,10 @@ const TermsModal = ({ open, onClose, initialTab = "terms" }) => {
             cookies: acceptanceStatus.cookiesAccepted,
           });
         } catch (error) {
-          // Fallback to localStorage if API fails
+          // Fallback to React state if API fails
           setHasAccepted({
-            terms: localStorage.getItem("termsAccepted") === "true",
-            cookies: localStorage.getItem("cookiesAccepted") === "true",
+            terms: false,
+            cookies: false,
           });
         }
       };
@@ -112,10 +112,11 @@ const TermsModal = ({ open, onClose, initialTab = "terms" }) => {
 
   const handleAccept = async () => {
     if (!token || !user) {
-      // Fallback to localStorage if not logged in
-      localStorage.setItem("termsAccepted", "true");
-      localStorage.setItem("cookiesAccepted", "true");
-      localStorage.setItem("termsAcceptedDate", new Date().toISOString());
+      // Store acceptance in component state since localStorage is not supported
+      setHasAccepted((prev) => ({
+        ...prev,
+        [activeTab]: true,
+      }));
       onClose();
       return;
     }
@@ -123,7 +124,7 @@ const TermsModal = ({ open, onClose, initialTab = "terms" }) => {
     setIsSubmitting(true);
 
     try {
-      // Save to both database and localStorage
+      // Save to database
       await saveTermsAcceptance(
         token,
         user.tenant_subdomain,
@@ -136,22 +137,14 @@ const TermsModal = ({ open, onClose, initialTab = "terms" }) => {
         [activeTab]: true,
       }));
 
-      // Also save to localStorage as backup
-      localStorage.setItem(`${activeTab}Accepted`, "true");
-      localStorage.setItem(
-        `${activeTab}AcceptedDate`,
-        new Date().toISOString()
-      );
-
       onClose();
     } catch (error) {
       console.error("Failed to save acceptance:", error);
-      // Fallback to localStorage
-      localStorage.setItem(`${activeTab}Accepted`, "true");
-      localStorage.setItem(
-        `${activeTab}AcceptedDate`,
-        new Date().toISOString()
-      );
+      // Fallback to component state
+      setHasAccepted((prev) => ({
+        ...prev,
+        [activeTab]: true,
+      }));
       onClose();
     } finally {
       setIsSubmitting(false);
@@ -221,7 +214,7 @@ const TermsModal = ({ open, onClose, initialTab = "terms" }) => {
           </IconButton>
         </Box>
 
-        {/* Tabs for Terms and Cookie Policy */}
+        {/* Tabs for Terms and Privacy Policy */}
         <Tabs
           value={activeTab}
           onChange={handleTabChange}
@@ -251,7 +244,7 @@ const TermsModal = ({ open, onClose, initialTab = "terms" }) => {
             aria-controls='terms-panel'
           />
           <Tab
-            label='Cookie Policy'
+            label='Privacy Policy'
             value='cookies'
             id='cookies-tab'
             aria-controls='cookies-panel'
@@ -288,7 +281,7 @@ const TermsModal = ({ open, onClose, initialTab = "terms" }) => {
           {activeTab === "terms" ? (
             <TermsOfServiceContent />
           ) : (
-            <CookiePolicyContent />
+            <PrivacyPolicyContent />
           )}
         </Box>
 
@@ -311,20 +304,6 @@ const TermsModal = ({ open, onClose, initialTab = "terms" }) => {
           </Typography>
           <Box sx={{ display: "flex", gap: 2 }}>
             <Button
-              onClick={onClose}
-              sx={{
-                color: "#d0bcfe",
-                borderColor: "#d0bcfe",
-                "&:hover": {
-                  borderColor: "#b39ddb",
-                  backgroundColor: "rgba(208, 188, 254, 0.08)",
-                },
-              }}
-              variant='outlined'
-            >
-              Decline
-            </Button>
-            <Button
               onClick={handleAccept}
               disabled={!canAccept || isSubmitting}
               sx={{
@@ -344,7 +323,7 @@ const TermsModal = ({ open, onClose, initialTab = "terms" }) => {
               {isSubmitting ? (
                 <CircularProgress size={24} sx={{ color: "#381e72" }} />
               ) : (
-                "Accept"
+                "I understand"
               )}
             </Button>
           </Box>
@@ -358,108 +337,117 @@ const TermsModal = ({ open, onClose, initialTab = "terms" }) => {
 const TermsOfServiceContent = () => (
   <Box sx={{ color: "white", textAlign: "left" }}>
     <Typography variant='h5' sx={{ color: "white", mb: 2 }}>
-      Terms of Service
+      Legal Terms
     </Typography>
-    <Typography variant='subtitle1' sx={{ color: "#d0bcfe", mb: 2 }}>
-      Last Updated: May 20, 2025
+    <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
+      You can contact us by email at{" "}
+      <Link href='mailto:geral@memor-us.com' sx={{ color: "#d0bcfe" }}>
+        geral@memor-us.com
+      </Link>{" "}
+      or by mail to Universidade de Aveiro, Aveiro 3810-193, Portugal.
     </Typography>
-    <Typography variant='body1' sx={{ color: "white", mb: 3 }}>
-      Please read these Terms of Service ("Terms") carefully before using the
-      Memor'us platform operated by Memor'us Ltd.
+
+    <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
+      These Legal Terms constitute a legally binding agreement made between you,
+      whether personally or on behalf of an entity ("you"), and Memor'us,
+      concerning your access to and use of the Services. You agree that by
+      accessing the Services, you have read, understood, and agreed to be bound
+      by all of these Legal Terms. IF YOU DO NOT AGREE WITH ALL OF THESE LEGAL
+      TERMS, THEN YOU ARE EXPRESSLY PROHIBITED FROM USING THE SERVICES AND YOU
+      MUST DISCONTINUE USE IMMEDIATELY.
+    </Typography>
+
+    <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
+      We will provide you with prior notice of any scheduled changes to the
+      Services you are using. The modified Legal Terms will become effective
+      upon posting or notifying you by{" "}
+      <Link href='mailto:geral@memor-us.com' sx={{ color: "#d0bcfe" }}>
+        geral@memor-us.com
+      </Link>
+      , as stated in the email message. By continuing to use the Services after
+      the effective date of any changes, you agree to be bound by the modified
+      terms.
+    </Typography>
+
+    <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
+      The Services are intended for users who are at least 18 years old. Persons
+      under the age of 18 are not permitted to use or register for the Services.
     </Typography>
 
     <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 1 }}>
-      1. Acceptance of Terms
+      1. OUR SERVICES
     </Typography>
     <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 2 }}>
-      By accessing or using our service, you agree to be bound by these Terms.
-      If you disagree with any part of the terms, you may not access the
-      service.
+      The information provided when using the Services is not intended for
+      distribution to or use by any person or entity in any jurisdiction or
+      country where such distribution or use would be contrary to law or
+      regulation or which would subject us to any registration requirement
+      within such jurisdiction or country.
     </Typography>
 
     <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 1 }}>
-      2. Use License
+      2. INTELLECTUAL PROPERTY RIGHTS
     </Typography>
     <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 2 }}>
-      Permission is granted to temporarily use the Memor'us platform for
-      personal, non-commercial transitory viewing only. This is the grant of a
-      license, not a transfer of title, and under this license you may not:
+      We are the owner or the licensee of all intellectual property rights in
+      our Services, including all source code, databases, functionality,
+      software, website designs, audio, video, text, photographs, and graphics
+      in the Services (collectively, the "Content"), as well as the trademarks,
+      service marks, and logos contained therein (the "Marks").
+    </Typography>
+
+    <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 1 }}>
+      3. USER REPRESENTATIONS
+    </Typography>
+    <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 2 }}>
+      By using the Services, you represent and warrant that: (1) all
+      registration information you submit will be true, accurate, current, and
+      complete; (2) you will maintain the accuracy of such information and
+      promptly update such registration information as necessary; (3) you have
+      the legal capacity and you agree to comply with these Legal Terms.
+    </Typography>
+
+    <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 1 }}>
+      4. PROHIBITED ACTIVITIES
+    </Typography>
+    <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 2 }}>
+      You may not access or use the Services for any purpose other than that for
+      which we make the Services available. As a user of the Services, you agree
+      not to:
     </Typography>
     <Typography component='ul' sx={{ color: "#e0e0e0", mb: 2, pl: 4 }}>
-      <li>modify or copy the materials;</li>
-      <li>use the materials for any commercial purpose;</li>
+      <li>Systematically retrieve data or other content from the Services</li>
+      <li>Trick, defraud, or mislead us and other users</li>
       <li>
-        attempt to decompile or reverse engineer any software contained on the
-        platform;
+        Use any information obtained from the Services to harass, abuse, or harm
+        another person
       </li>
       <li>
-        remove any copyright or other proprietary notations from the materials;
+        Use the Services in a manner inconsistent with any applicable laws or
+        regulations
       </li>
       <li>
-        transfer the materials to another person or "mirror" the materials on
-        any other server.
+        Post or share content that is abusive, discriminatory, threatening,
+        pornographic, or offensive
       </li>
+      <li>Advocate or promote violence, terrorism, or hate speech</li>
     </Typography>
 
     <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 1 }}>
-      3. User Accounts
+      5. SUBSCRIPTIONS
     </Typography>
     <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 2 }}>
-      When you create an account with us, you must provide information that is
-      accurate, complete, and current at all times. Failure to do so constitutes
-      a breach of the Terms, which may result in immediate termination of your
-      account on our service.
-    </Typography>
-    <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 2 }}>
-      You are responsible for safeguarding the password that you use to access
-      the service and for any activities or actions under your password. You
-      agree not to disclose your password to any third party.
+      Your subscription will continue and automatically renew unless canceled.
+      We offer a 30-day free trial to new users who register with the Services.
+      You can cancel your subscription at any time by contacting us at{" "}
+      <Link href='mailto:geral@memor-us.com' sx={{ color: "#d0bcfe" }}>
+        geral@memor-us.com
+      </Link>
+      .
     </Typography>
 
     <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 1 }}>
-      4. Content Ownership
-    </Typography>
-    <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 2 }}>
-      The Memor'us platform allows you to post, link, store, share and otherwise
-      make available certain information, text, graphics, videos, or other
-      material. You retain any and all of your rights to any Content you submit,
-      post or display on or through the Service and you are responsible for
-      protecting those rights.
-    </Typography>
-    <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 2 }}>
-      By posting Content, you grant us the right and license to use, modify,
-      perform, display, reproduce, and distribute such Content on and through
-      the Service.
-    </Typography>
-
-    <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 1 }}>
-      5. Prohibited Uses
-    </Typography>
-    <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 2 }}>
-      You may use the platform only for lawful purposes and in accordance with
-      these Terms. You agree not to use the platform:
-    </Typography>
-    <Typography component='ul' sx={{ color: "#e0e0e0", mb: 2, pl: 4 }}>
-      <li>
-        In any way that violates any applicable national or international law or
-        regulation.
-      </li>
-      <li>
-        To transmit, or procure the sending of, any advertising or promotional
-        material, including any "junk mail", "chain letter" or "spam".
-      </li>
-      <li>
-        To impersonate or attempt to impersonate the platform, a platform
-        employee, another user, or any other person or entity.
-      </li>
-      <li>
-        To engage in any other conduct that restricts or inhibits anyone's use
-        or enjoyment of the platform, or which may harm or offend.
-      </li>
-    </Typography>
-
-    <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 1 }}>
-      6. Termination
+      6. TERMINATION
     </Typography>
     <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 2 }}>
       We may terminate or suspend your account immediately, without prior notice
@@ -469,179 +457,177 @@ const TermsOfServiceContent = () => (
     </Typography>
 
     <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 1 }}>
-      7. Limitation of Liability
+      7. GOVERNING LAW
     </Typography>
     <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 2 }}>
-      In no event shall Memor'us Ltd, nor its directors, employees, partners,
-      agents, suppliers, or affiliates, be liable for any indirect, incidental,
-      special, consequential or punitive damages, including without limitation,
-      loss of profits, data, use, goodwill, or other intangible losses,
-      resulting from your access to or use of or inability to access or use the
-      service.
+      These Legal Terms are governed by and interpreted following the laws of
+      Portugal. Memor'us and yourself both agree to submit to the non-exclusive
+      jurisdiction of the courts of Aveiro, Portugal.
     </Typography>
 
     <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 1 }}>
-      8. Governing Law
-    </Typography>
-    <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 2 }}>
-      These Terms shall be governed and construed in accordance with the laws of
-      the European Union, without regard to its conflict of law provisions.
-    </Typography>
-
-    <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 1 }}>
-      9. Changes to Terms
-    </Typography>
-    <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
-      We reserve the right, at our sole discretion, to modify or replace these
-      Terms at any time. If a revision is material we will try to provide at
-      least 30 days' notice prior to any new terms taking effect. What
-      constitutes a material change will be determined at our sole discretion.
-    </Typography>
-
-    <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 1 }}>
-      10. Contact Us
+      8. CONTACT US
     </Typography>
     <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 4 }}>
-      If you have any questions about these Terms, please contact us at{" "}
-      <Link href='mailto:legal@memor-us.com' sx={{ color: "#d0bcfe" }}>
+      In order to resolve a complaint regarding the Services or to receive
+      further information regarding use of the Services, please contact us at:
+      <br />
+      <br />
+      Memor'us
+      <br />
+      Universidade de Aveiro
+      <br />
+      Aveiro 3810-193
+      <br />
+      Portugal
+      <br />
+      <Link href='mailto:geral@memor-us.com' sx={{ color: "#d0bcfe" }}>
         geral@memor-us.com
       </Link>
     </Typography>
   </Box>
 );
 
-// Cookie Policy Content Component
-const CookiePolicyContent = () => (
+// Privacy Policy Content Component (replacing Privacy Policy)
+const PrivacyPolicyContent = () => (
   <Box sx={{ color: "white", textAlign: "left" }}>
     <Typography variant='h5' sx={{ color: "white", mb: 2 }}>
-      Cookie Policy
-    </Typography>
-    <Typography variant='subtitle1' sx={{ color: "#d0bcfe", mb: 2 }}>
-      Last Updated: May 20, 2025
+      Privacy Policy
     </Typography>
     <Typography variant='body1' sx={{ color: "white", mb: 3 }}>
-      This Cookie Policy explains how Memor'us Ltd ("we", "us", or "our") uses
-      cookies and similar technologies to recognize you when you visit our
-      website and application.
+      This privacy policy will explain how our organization uses the personal
+      data we collect from you when you use our website.
     </Typography>
 
     <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 1 }}>
-      1. What are cookies?
-    </Typography>
-    <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 2 }}>
-      Cookies are small data files that are placed on your computer or mobile
-      device when you visit a website. Cookies are widely used by website owners
-      to make their websites work, or to work more efficiently, as well as to
-      provide reporting information.
-    </Typography>
-
-    <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 2 }}>
-      Cookies set by us are called "first-party cookies". Cookies set by parties
-      other than us are called "third-party cookies". Third-party cookies enable
-      third-party features or functionality to be provided on or through the
-      website (e.g., advertising, interactive content, and analytics).
-    </Typography>
-
-    <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 1 }}>
-      2. Why do we use cookies?
-    </Typography>
-    <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 2 }}>
-      We use first-party and third-party cookies for several reasons. Some
-      cookies are required for technical reasons in order for our platform to
-      operate, and we refer to these as "essential" or "strictly necessary"
-      cookies.
-    </Typography>
-
-    <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 2 }}>
-      Other cookies also enable us to track and target the interests of our
-      users to enhance the experience on our platform. Third parties may serve
-      cookies through our platform for analytics and other purposes.
-    </Typography>
-
-    <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 1 }}>
-      3. Types of cookies we use
+      What data do we collect?
     </Typography>
     <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 1 }}>
-      The specific types of cookies served through our platform and the purposes
-      they perform include:
+      Memor'us collects the following data:
     </Typography>
-    <Typography sx={{ color: "#e0e0e0", mb: 0.5, fontWeight: "bold" }}>
-      3.1 Essential cookies:
-    </Typography>
-    <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 1, pl: 2 }}>
-      These cookies are strictly necessary to provide you with services
-      available through our platform and to use some of its features, such as
-      access to secure areas. These cookies include session cookies, which are
-      temporary cookies that are erased when you close your browser.
-    </Typography>
-
-    <Typography sx={{ color: "#e0e0e0", mb: 0.5, fontWeight: "bold" }}>
-      3.2 Functional cookies:
-    </Typography>
-    <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 1, pl: 2 }}>
-      These cookies allow us to remember choices you make when you use our
-      platform, such as remembering your login details or language preference.
-      The purpose of these cookies is to provide you with a more personal
-      experience and to avoid you having to re-enter your preferences every time
-      you visit our platform.
-    </Typography>
-
-    <Typography sx={{ color: "#e0e0e0", mb: 0.5, fontWeight: "bold" }}>
-      3.3 Analytics cookies:
-    </Typography>
-    <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 2, pl: 2 }}>
-      These cookies collect information that is used either in aggregate form to
-      help us understand how our platform is being used or how effective our
-      marketing campaigns are, or to help us customize our platform for you.
+    <Typography component='ul' sx={{ color: "#e0e0e0", mb: 2, pl: 4 }}>
+      <li>Personal identification information</li>
+      <li>Name</li>
+      <li>Email Address</li>
+      <li>Password</li>
+      <li>Auth Cookies</li>
+      <li>Images Shared By Collaborators</li>
+      <li>Profile Pictures</li>
     </Typography>
 
     <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 1 }}>
-      4. How can you control cookies?
+      How do we collect your data?
     </Typography>
     <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 2 }}>
-      You have the right to decide whether to accept or reject cookies. You can
-      exercise your cookie rights by setting your preferences in the Cookie
-      Consent Manager. The Cookie Consent Manager allows you to select which
-      categories of cookies you accept or reject.
+      Users will have to put their First and Last name upon their account
+      creation. The user's first and last name are used to identify the account
+      owner. Upon registration the email address used for platform access: This
+      is the method by which users are able to log in to the platform.
     </Typography>
-
     <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 2 }}>
-      Essential cookies cannot be rejected as they are strictly necessary to
-      provide you with services. If you choose to reject cookies, you may still
-      use our platform though your access to some functionality and areas may be
-      restricted.
-    </Typography>
-
-    <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 2 }}>
-      You may also set or amend your web browser controls to accept or refuse
-      cookies. Most web browsers automatically accept cookies, but you can
-      usually modify your browser setting to decline cookies if you prefer.
+      Authentication Cookies: These are used to keep the user's session active.
+      When Images are shared by collaborators: Users need to upload photographs
+      to complete challenges, and sometimes individuals can be identified in
+      these photos.
     </Typography>
 
     <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 1 }}>
-      5. How often will we update this Cookie Policy?
+      How will we use your data?
     </Typography>
     <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 2 }}>
-      We may update this Cookie Policy from time to time in order to reflect,
-      for example, changes to the cookies we use or for other operational,
-      legal, or regulatory reasons. Please therefore re-visit this Cookie Policy
-      regularly to stay informed about our use of cookies and related
-      technologies.
+      Memor'us collects your data so that we can:
     </Typography>
-
-    <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 2 }}>
-      The date at the top of this Cookie Policy indicates when it was last
-      updated.
+    <Typography component='ul' sx={{ color: "#e0e0e0", mb: 2, pl: 4 }}>
+      <li>Identify the account owner using first and last name</li>
+      <li>Enable users to log in to the platform using their email address</li>
+      <li>Keep user sessions active through authentication cookies</li>
+      <li>Allow users to upload photographs to complete challenges</li>
+      <li>Enable users to personalize their accounts with profile photos</li>
     </Typography>
 
     <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 1 }}>
-      6. Where can you get further information?
+      How do we store your data?
     </Typography>
+    <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 2 }}>
+      Memor'us securely stores your personal data at the following locations:
+    </Typography>
+    <Typography component='ul' sx={{ color: "#e0e0e0", mb: 2, pl: 4 }}>
+      <li>
+        Cookies are stored in the user's browser and are protected by browser
+        security mechanisms
+      </li>
+      <li>
+        First and last name and email address are stored in our secure company
+        database, which is protected by encryption and access controls
+      </li>
+      <li>
+        Photographs are hosted on AWS S3, a secure cloud storage server with
+        restricted access and encrypted transfer protocols
+      </li>
+      <li>
+        Passwords are processed in encrypted form; Memor'us does not have access
+        to their content
+      </li>
+    </Typography>
+
+    <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 2 }}>
+      Memor'us will keep your personal data for as long as your account is
+      active or as required to provide you with services. If you choose to
+      delete your account, we implement a soft delete process: your account
+      becomes inaccessible and is partially deleted, but the data remains stored
+      in our database for 30 days in case recovery is needed. After this 30-day
+      period, your data will be permanently deleted.
+    </Typography>
+
+    <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 1 }}>
+      Marketing
+    </Typography>
+    <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 2 }}>
+      Memor'us does not use your personal data for marketing purposes and will
+      not send you information about products or services, nor will we share
+      your data with partner companies for marketing. You will not receive
+      marketing communications from us, and your data will not be provided to
+      any third parties for marketing purposes.
+    </Typography>
+
+    <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 1 }}>
+      What are your data protection rights?
+    </Typography>
+    <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 1 }}>
+      Every user is entitled to the following:
+    </Typography>
+    <Typography component='ul' sx={{ color: "#e0e0e0", mb: 2, pl: 4 }}>
+      <li>
+        The right to access – You have the right to request Memor'us for copies
+        of your personal data
+      </li>
+      <li>
+        The right to rectification – You have the right to request that Memor'us
+        corrects any information you believe is inaccurate
+      </li>
+      <li>
+        The right to erasure – You have the right to request that Memor'us
+        erases your personal data, under certain conditions
+      </li>
+      <li>
+        The right to restrict processing – You have the right to request that
+        Memor'us restricts the processing of your personal data
+      </li>
+      <li>
+        The right to object to processing – You have the right to object to
+        Memor'us' processing of your personal data
+      </li>
+      <li>
+        The right to data portability – You have the right to request that
+        Memor'us transfers the data to another organization
+      </li>
+    </Typography>
+
     <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 4 }}>
-      If you have any questions about our use of cookies or other technologies,
-      please contact us at{" "}
-      <Link href='mailto:privacy@memor-us.com' sx={{ color: "#d0bcfe" }}>
-        privacy@memor-us.com
+      If you make a request, we have one month to respond to you. If you would
+      like to exercise any of these rights, please contact us at our email:{" "}
+      <Link href='mailto:geral@memor-us.com' sx={{ color: "#d0bcfe" }}>
+        geral@memor-us.com
       </Link>
     </Typography>
   </Box>

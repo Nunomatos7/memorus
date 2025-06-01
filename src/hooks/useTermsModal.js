@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
 /**
- * Custom hook to manage Terms of Service and Cookie Policy modal
+ * Custom hook to manage Terms of Service and Privacy Policy modal
  *
  * @param {Object} options Configuration options
  * @param {boolean} options.requireAcceptance Whether to force the user to accept terms before using the app
