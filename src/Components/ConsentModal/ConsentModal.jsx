@@ -91,6 +91,7 @@ const ConsentModal = ({ setUser }) => {
                 color: "#d0bcfe",
                 cursor: "pointer",
                 fontSize: "12px",
+                padding: "0 0 5px!important",
                 textDecoration: "none",
               }}
             >
@@ -104,6 +105,7 @@ const ConsentModal = ({ setUser }) => {
                 color: "#d0bcfe",
                 cursor: "pointer",
                 fontSize: "12px",
+                padding: "0 0 5px!important",
                 textDecoration: "none",
               }}
             >
