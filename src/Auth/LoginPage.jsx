@@ -225,7 +225,6 @@ const LoginPage = () => {
                 handleTenantConfirm();
               }
             }}
-            placeholder='e.g., bosch'
             helperText='Enter your organization subdomain (without .memor-us.com)'
             sx={{
               mb: 3,

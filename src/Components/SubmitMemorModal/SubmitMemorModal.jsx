@@ -60,10 +60,9 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
       return parts.length > 1 ? parts[0] : null;
     }
 
-    // Handle production domains like bosch.memor-us.com
     const parts = hostname.split(".");
     if (parts.length >= 3) {
-      return parts[0]; // Returns "bosch" from "bosch.memor-us.com"
+      return parts[0];
     }
 
     return null;
