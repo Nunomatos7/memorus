@@ -215,7 +215,7 @@ const LoginPage = () => {
           )}
 
           <TextField
-            label='Tenant Subdomain'
+            label='Company name'
             variant='outlined'
             fullWidth
             value={tenantInput}
