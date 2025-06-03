@@ -3,69 +3,69 @@
 
   <!-- Public Pages -->
   <url>
-    <loc>https://memor-us.com/login</loc>
+    <loc>https://memor-us.com/app/login</loc>
     <priority>1.0</priority>
     <changefreq>monthly</changefreq>
   </url>
 
   <url>
-    <loc>https://memor-us.com/register</loc>
+    <loc>https://memor-us.com/app/register</loc>
     <priority>0.9</priority>
     <changefreq>monthly</changefreq>
   </url>
 
   <url>
-    <loc>https://memor-us.com/change-password</loc>
+    <loc>https://memor-us.com/app/change-password</loc>
     <priority>0.8</priority>
     <changefreq>yearly</changefreq>
   </url>
 
   <!-- Regular User Pages -->
   <url>
-    <loc>https://memor-us.com/home</loc>
+    <loc>https://memor-us.com/app/home</loc>
     <priority>0.8</priority>
     <changefreq>weekly</changefreq>
   </url>
 
   <url>
-    <loc>https://memor-us.com/memors</loc>
+    <loc>https://memor-us.com/app/memors</loc>
     <priority>0.8</priority>
     <changefreq>weekly</changefreq>
   </url>
 
   <url>
-    <loc>https://memor-us.com/leaderboard</loc>
+    <loc>https://memor-us.com/app/leaderboard</loc>
     <priority>0.8</priority>
     <changefreq>monthly</changefreq>
   </url>
 
   <url>
-    <loc>https://memor-us.com/memoryboard</loc>
+    <loc>https://memor-us.com/app/memoryboard</loc>
     <priority>0.8</priority>
     <changefreq>monthly</changefreq>
   </url>
 
   <!-- Admin Pages -->
   <url>
-    <loc>https://memor-us.com/admin/home</loc>
+    <loc>https://memor-us.com/app/admin/home</loc>
     <priority>0.9</priority>
     <changefreq>monthly</changefreq>
   </url>
 
   <url>
-    <loc>https://memor-us.com/admin/leaderboard</loc>
+    <loc>https://memor-us.com/app/admin/leaderboard</loc>
     <priority>0.8</priority>
     <changefreq>monthly</changefreq>
   </url>
 
   <url>
-    <loc>https://memor-us.com/admin/memoryboard</loc>
+    <loc>https://memor-us.com/app/admin/memoryboard</loc>
     <priority>0.8</priority>
     <changefreq>monthly</changefreq>
   </url>
 
   <url>
-    <loc>https://memor-us.com/admin/adminboard</loc>
+    <loc>https://memor-us.com/app/admin/adminboard</loc>
     <priority>0.8</priority>
     <changefreq>monthly</changefreq>
   </url>

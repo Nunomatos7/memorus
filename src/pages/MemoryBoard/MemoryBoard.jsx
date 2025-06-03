@@ -7,7 +7,6 @@ import "./MemoryBoard.css";
 import Loader from "../../Components/Loader/Loader";
 import { useAuth } from "../../context/AuthContext";
 import { CircularProgress } from "@mui/material";
-import { memorsData as staticMemorsData } from "../../Data/Memors.json";
 
 // Canvas dimensions
 const canvasWidth = 2000;
@@ -160,32 +159,6 @@ const MemoryBoard = () => {
 
     // Reset posts first to avoid showing old data
     setPosts([]);
-
-    // First load static data immediately as fallback
-    try {
-      // Filter static data to match selected team
-      const filteredStaticData = staticMemorsData.filter(
-        (memor) =>
-          memor.team === teamName && memor.image && memor.image.length > 0
-      );
-
-      console.log(
-        `Found ${filteredStaticData.length} static memors for team "${teamName}"`
-      );
-
-      if (filteredStaticData.length > 0) {
-        const positions = [];
-        const staticPosts = filteredStaticData.map((memor) => {
-          const position = generateNonOverlappingPosition(positions);
-          positions.push(position);
-          return { ...memor, ...position };
-        });
-
-        setPosts(staticPosts);
-      }
-    } catch (err) {
-      console.error("Error loading static data:", err);
-    }
 
     // Then try to fetch from API
     const fetchMemorData = async () => {
@@ -394,29 +367,29 @@ const MemoryBoard = () => {
     <>
       <Loader />
       <div
-        className="memory-board-container"
+        className='memory-board-container'
         style={{
           width: "100%",
-          height: "93vh",
+          height: "100vh", // Changed to full viewport height
           position: "relative",
           backgroundColor: "#9990d8",
         }}
       >
         {/* Filter Controls */}
-        <div className="filter-controls">
+        <div className='filter-controls'>
           {/* Competition Filter */}
           <label
-            htmlFor="competition-filter"
-            className="sr-only"
+            htmlFor='competition-filter'
+            className='sr-only'
             style={{ color: "#341881", fontWeight: "600" }}
           >
             Filter by competition:
           </label>
           <select
-            id="competition-filter"
+            id='competition-filter'
             value={selectedCompetition}
             onChange={handleCompetitionChange}
-            className="filter-dropdown"
+            className='filter-dropdown'
           >
             {competitions.map((competition) => (
               <option key={competition.id} value={competition.id}>
@@ -427,17 +400,17 @@ const MemoryBoard = () => {
 
           {/* Team Filter */}
           <label
-            htmlFor="team-filter"
-            className="sr-only"
+            htmlFor='team-filter'
+            className='sr-only'
             style={{ color: "#341881", fontWeight: "600" }}
           >
             Filter by team:
           </label>
           <select
-            id="team-filter"
+            id='team-filter'
             value={selectedTeam}
             onChange={handleTeamChange}
-            className="filter-dropdown"
+            className='filter-dropdown'
           >
             {teams.map((team) => (
               <option key={team.id} value={team.id}>
@@ -448,12 +421,12 @@ const MemoryBoard = () => {
         </div>
 
         {loading && posts.length === 0 ? (
-          <div className="loading-container">
+          <div className='loading-container'>
             <CircularProgress size={60} sx={{ color: "#d0bcfe" }} />
           </div>
         ) : posts.length === 0 ? (
-          <div className="empty-container">
-            <p className="empty-message">
+          <div className='empty-container'>
+            <p className='empty-message'>
               No memors found for this team in the selected competition
             </p>
           </div>
@@ -463,12 +436,12 @@ const MemoryBoard = () => {
             onCanvasMount={(mountFunc) => {
               mountFunc.fitContentToView({ scale: 0.5 });
             }}
-            backgroundType="none" // This disables the dotted background
+            backgroundType='none' // This disables the dotted background
             customComponents={[
               {
                 component: (
                   <button
-                    className="start-btn"
+                    className='start-btn'
                     onClick={() => {
                       canvasRef.current?.fitContentToView({ scale: 1 });
                     }}
@@ -485,7 +458,7 @@ const MemoryBoard = () => {
             {posts.map((post, postIndex) => (
               <div
                 key={postIndex}
-                className="polaroid-container"
+                className='polaroid-container'
                 style={{
                   position: "absolute",
                   top: post.y + canvasHeight / 2,
@@ -510,8 +483,8 @@ const MemoryBoard = () => {
                         typeof image === "string"
                           ? image
                           : image && image.img_src
-                            ? image.img_src
-                            : "";
+                          ? image.img_src
+                          : "";
 
                       const altText =
                         image && image.alt_text
@@ -521,7 +494,7 @@ const MemoryBoard = () => {
                       return (
                         <div
                           key={cardIndex}
-                          className="polaroid-card"
+                          className='polaroid-card'
                           onClick={() =>
                             openModal(
                               reversedArray.length - 1 - cardIndex,
@@ -546,7 +519,7 @@ const MemoryBoard = () => {
                           }}
                         >
                           {/* Submitted Date */}
-                          <p className="card-date">{post.submittedDate}</p>
+                          <p className='card-date'>{post.submittedDate}</p>
 
                           {/* Image */}
                           <img
@@ -565,7 +538,7 @@ const MemoryBoard = () => {
 
                           {/* Title - Only for the first image */}
                           {cardIndex === reversedArray.length - 1 && (
-                            <p className="card-title">{post.title}</p>
+                            <p className='card-title'>{post.title}</p>
                           )}
                         </div>
                       );
@@ -588,12 +561,12 @@ const MemoryBoard = () => {
           />
         )}
 
-        <div className="zoom-controls">
-          <button className="zoom-btn" onClick={() => handleZoom("out")}>
+        <div className='zoom-controls'>
+          <button className='zoom-btn' onClick={() => handleZoom("out")}>
             -
           </button>
-          <span className="zoom-display">{Math.round(zoomLevel * 100)}%</span>
-          <button className="zoom-btn" onClick={() => handleZoom("in")}>
+          <span className='zoom-display'>{Math.round(zoomLevel * 100)}%</span>
+          <button className='zoom-btn' onClick={() => handleZoom("in")}>
             +
           </button>
         </div>

@@ -757,7 +757,7 @@ const Home = () => {
               <Card
                 className='card'
                 onClick={() =>
-                  (window.location.href = "/memors?tab=incomplete")
+                  (window.location.href = "/app/memors?tab=incomplete")
                 }
                 style={{ cursor: "pointer" }}
                 tabIndex='0'

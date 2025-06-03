@@ -82,6 +82,7 @@ const LoginPage = () => {
 
     const cleanTenant = tenantInput.trim().toLowerCase();
 
+    // Redirect to the tenant's subdomain URL
     const currentHost = window.location.hostname;
     let newUrl;
 
@@ -94,6 +95,7 @@ const LoginPage = () => {
 
     console.log("Redirecting to:", newUrl);
 
+    // Redirect to the tenant subdomain
     window.location.href = newUrl;
   };
 
@@ -155,7 +157,7 @@ const LoginPage = () => {
       setToken(data.token);
 
       // Navigate to appropriate page
-      navigate(payload.role === "admin" ? "/admin/home" : "/home");
+      navigate(payload.role === "admin" ? "/app/admin/home" : "/app/home");
     } catch (err) {
       console.error("Login error:", err);
       setError(
@@ -195,7 +197,7 @@ const LoginPage = () => {
             <img src={logo} alt='Memor-us Logo' className='logo' />
           </div>
           <Typography variant='h5' className='login-title'>
-            Welcome to Memor&quot;us
+            Welcome to Memor'us
           </Typography>
           <Typography variant='body2' className='login-subtitle' sx={{ mb: 3 }}>
             Please type out the subdomain of your tenant
@@ -427,7 +429,7 @@ const LoginPage = () => {
               }
             />
             <a
-              href='/change-password'
+              href='/app/change-password'
               className='forgot-password'
               aria-label='Forgot Password'
             >

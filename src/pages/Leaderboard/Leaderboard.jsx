@@ -214,7 +214,7 @@ const Leaderboard = () => {
 
       // Optionally redirect if leaderboard is hidden
       if (!getLeaderboardVisibility()) {
-        navigate("/home");
+        navigate("/app/home");
       }
     };
 
