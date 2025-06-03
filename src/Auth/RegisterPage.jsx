@@ -101,7 +101,7 @@ const RegisterPage = () => {
 
       // Redirect to login page
       setTimeout(() => {
-        navigate("/login");
+        navigate("/app/login");
       }, 2000);
     } catch (error) {
       console.error("Registration error:", error);

@@ -223,7 +223,7 @@ const Navbar = () => {
     setAnchorEl(null);
 
     toast.success("You've been logged out successfully 👋");
-    navigate("/login");
+    navigate("/app/login");
   };
 
   const [notifAnchorEl, setNotifAnchorEl] = useState(null);

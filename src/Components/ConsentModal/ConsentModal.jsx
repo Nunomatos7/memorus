@@ -47,7 +47,7 @@ const ConsentModal = ({ setUser }) => {
     } else {
       localStorage.removeItem("user");
       setUser(null);
-      navigate("/login");
+      navigate("/app/login");
     }
 
     setIsOpen(false);
