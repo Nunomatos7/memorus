@@ -178,7 +178,7 @@ const LoginPage = () => {
           <Button
             variant='text'
             startIcon={<ArrowBackIosIcon />}
-            href='https://landing.memor-us.com/'
+            href='https://memor-us.com/'
             sx={{
               color: "#ffffff",
               textTransform: "none",
@@ -289,7 +289,7 @@ const LoginPage = () => {
         <Button
           variant='text'
           startIcon={<ArrowBackIosIcon />}
-          href='https://landing.memor-us.com/'
+          href='https://memor-us.com/'
           sx={{
             color: "#ffffff",
             textTransform: "none",
