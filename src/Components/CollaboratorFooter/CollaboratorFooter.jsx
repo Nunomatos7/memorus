@@ -11,6 +11,7 @@ const FooterContainer = styled(Box)(({ theme }) => ({
   borderTop: "1px solid #444444",
   width: "100%",
   marginTop: "auto",
+  zIndex: 1000,
 }));
 
 const FooterContent = styled(Container)(({ theme }) => ({
