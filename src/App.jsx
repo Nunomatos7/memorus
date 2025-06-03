@@ -16,13 +16,14 @@ import ChangePassword from "./Auth/ChangePassword";
 import ConsentModal from "./Components/ConsentModal/ConsentModal";
 import CollaboratorFooter from "./Components/CollaboratorFooter/CollaboratorFooter";
 import AdminFooter from "./Components/AdminFooter/AdminFooter";
+import LandingPage from "./pages/LandingPage/LandingPage";
+import Terms from "./pages/Terms/Terms";
 import { useAuth } from "./context/AuthContext";
 import Loader from "./Components/Loader/Loader";
 import { Toaster } from "react-hot-toast";
 import TeamGuard from "./Components/TeamGuard/TeamGuard";
 import { Box } from "@mui/material";
 import Profile from "./pages/Profile/Profile";
-import Terms from "./pages/Terms/Terms";
 
 function App() {
   const { user, setUser, loading, cookiesAccepted } = useAuth();
@@ -38,11 +39,11 @@ function App() {
     }
 
     if (!user) {
-      return <Navigate to='/login' state={{ from: location }} replace />;
+      return <Navigate to='/app/login' state={{ from: location }} replace />;
     }
 
     if (role && !user.roles?.includes(role.toLowerCase())) {
-      return <Navigate to='/login' replace />;
+      return <Navigate to='/app/login' replace />;
     }
 
     return children;
@@ -53,12 +54,19 @@ function App() {
     role: PropTypes.string,
   };
 
-  // Determine if we're on an auth page to not show footer
-  const isAuthPage = ["/login", "/register", "/change-password"].includes(
-    location.pathname
-  );
+  // Determine if we're on an auth page or landing page to not show footer
+  const isAuthPage = [
+    "/app/login",
+    "/app/register",
+    "/app/change-password",
+  ].includes(location.pathname);
+
+  const isLandingPage = location.pathname === "/landing";
+
   const hideFooter =
-    isAuthPage || location.pathname.toLowerCase().includes("/memoryboard");
+    isAuthPage ||
+    isLandingPage ||
+    location.pathname.toLowerCase().includes("/app/memoryboard");
 
   const isAdmin = user?.roles?.some((role) => role.toLowerCase() === "admin");
 
@@ -74,13 +82,20 @@ function App() {
       <ConsentModal setUser={setUser} />
 
       <Routes>
+        {/* Landing Page Route - Available to everyone */}
+        <Route path='/landing' element={<LandingPage />} />
+
         {/* Auth Routes */}
         <Route
-          path='/login'
+          path='/app/login'
           element={
             user ? (
               <Navigate
-                to={user.roles?.includes("admin") ? "/admin/home" : "/home"}
+                to={
+                  user.roles?.includes("admin")
+                    ? "/app/admin/home"
+                    : "/app/home"
+                }
                 replace
               />
             ) : (
@@ -89,11 +104,15 @@ function App() {
           }
         />
         <Route
-          path='/register'
+          path='/app/register'
           element={
             user ? (
               <Navigate
-                to={user.roles?.includes("admin") ? "/admin/home" : "/home"}
+                to={
+                  user.roles?.includes("admin")
+                    ? "/app/admin/home"
+                    : "/app/home"
+                }
                 replace
               />
             ) : (
@@ -101,17 +120,12 @@ function App() {
             )
           }
         />
-        <Route path='/change-password' element={<ChangePassword />} />
-        <Route
-          path='/terms'
-          element={
-              <Terms />
-          }
-        />
+        <Route path='/app/change-password' element={<ChangePassword />} />
+        <Route path='/terms' element={<Terms />} />
 
         {/* Collaborator Routes */}
         <Route
-          path='/*'
+          path='/app/*'
           element={
             <ProtectedRoute role='member'>
               <TeamGuard>
@@ -131,7 +145,7 @@ function App() {
 
         {/* Admin Routes */}
         <Route
-          path='/admin/*'
+          path='/app/admin/*'
           element={
             <ProtectedRoute role='admin'>
               <AdminLayout />
@@ -144,8 +158,17 @@ function App() {
           <Route path='adminboard' element={<AdminBoard />} />
         </Route>
 
-        {/* Catch-All */}
-        <Route path='*' element={<Navigate to='/login' replace />} />
+        {/* Catch-All - Redirect to landing page for main domain, login for subdomains */}
+        <Route
+          path='*'
+          element={
+            window.location.hostname === "memor-us.com" ? (
+              <Navigate to='/landing' replace />
+            ) : (
+              <Navigate to='/app/login' replace />
+            )
+          }
+        />
       </Routes>
 
       {/* Footer (conditional) */}
