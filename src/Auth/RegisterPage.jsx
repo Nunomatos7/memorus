@@ -318,7 +318,7 @@ const RegisterPage = () => {
             )}
           </Button>
         </form>
-        <a href='/login' className='admin-link'>
+        <a href='/app/login' className='admin-link'>
           Already have an account? Login here
         </a>
       </div>
