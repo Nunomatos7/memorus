@@ -1,0 +1,90 @@
+.cookie-consent-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+
+.cookie-consent-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-content {
+  background-color: #1e1e1e;
+  border-radius: 8px;
+  padding: 30px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transform: translateY(50px) scale(0.7);
+  opacity: 0;
+  transition: all 0.5s ease;
+}
+
+.modal-content.open {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+.modal-content.exit {
+  transform: translateY(50px) scale(0.7);
+  opacity: 0;
+}
+
+.modal-content h2 {
+  font-size: 20px;
+  margin-bottom: 15px;
+  color: #fff;
+}
+
+.modal-content p {
+  font-size: 14px;
+  margin-bottom: 20px;
+  color: #a9a9a9;
+  line-height: 1.5;
+}
+
+.modal-content div {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.modal-content button {
+  flex: 1;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button.accept {
+  background-color: #6200ea;
+  color: white;
+}
+
+button.decline {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.modal-content button:hover {
+  opacity: 0.9;
+}
+
+.modal-content button:focus {
+  outline: none;
+}

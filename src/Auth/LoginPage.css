@@ -1,0 +1,146 @@
+/* Login Page Styling */
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #121212;
+  color: #ffffff;
+}
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100%;
+  position: relative;
+}
+
+.left-background {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 10%;
+}
+
+.right-background {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 10%;
+}
+
+.login-card {
+  background-color: #1e1e1e;
+  border-radius: 12px;
+  padding: 40px;
+  width: 400px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+  text-align: center;
+}
+
+.logo-container {
+  margin-bottom: 20px;
+}
+
+.logo {
+  width: 50px;
+  height: auto;
+  margin: auto;
+}
+
+.login-title {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.login-subtitle {
+  font-size: 14px;
+  color: #a9a9a9;
+  margin-bottom: 20px;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.input-label {
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.login-input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: none;
+  border-radius: 8px;
+  background-color: #2c2c2c;
+  color: #ffffff;
+}
+
+.login-input:focus {
+  outline: none;
+  border: 1px solid #6200ea;
+}
+
+.remember-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.forgot-password {
+  color: rgb(146, 130, 249);
+  text-decoration: none;
+  height: min-content;
+}
+
+.forgot-password:hover {
+  text-decoration: underline;
+}
+
+.login-button {
+  width: 100%;
+  padding: 10px;
+  background-color: #6200ea;
+  border: none;
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.login-button:hover {
+  background-color: #4e00d1;
+}
+
+.error-message {
+  color: red;
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+.admin-link {
+  display: block;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  color: #a9a9a9;
+  text-decoration: none;
+}
+
+.admin-link:hover {
+  color: #ffffff;
+}
+
+.success-message {
+  color: #4caf50;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
