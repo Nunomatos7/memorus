@@ -16,7 +16,8 @@ import ChangePassword from "./Auth/ChangePassword";
 import ConsentModal from "./Components/ConsentModal/ConsentModal";
 import CollaboratorFooter from "./Components/CollaboratorFooter/CollaboratorFooter";
 import AdminFooter from "./Components/AdminFooter/AdminFooter";
-import LandingPage from "./pages/LandingPage/LandingPage"; // Import the new landing page
+import LandingPage from "./pages/LandingPage/LandingPage";
+import Terms from "./pages/Terms/Terms";
 import { useAuth } from "./context/AuthContext";
 import Loader from "./Components/Loader/Loader";
 import { Toaster } from "react-hot-toast";
@@ -120,6 +121,7 @@ function App() {
           }
         />
         <Route path='/app/change-password' element={<ChangePassword />} />
+        <Route path='/terms' element={<Terms />} />
 
         {/* Collaborator Routes */}
         <Route

@@ -1,65 +1,32 @@
-import { useState, useEffect, useRef } from "react";
-import PropTypes from "prop-types";
+import React, { useState, useEffect, useRef } from "react";
 import {
-  Modal,
   Box,
   Typography,
-  Button,
-  IconButton,
-  Tabs,
-  Tab,
-  Divider,
-  Link,
-  CircularProgress,
+  Container,
   List,
   ListItem,
   ListItemButton,
   ListItemText,
+  Link,
+  Paper,
+  AppBar,
+  Toolbar,
+  IconButton,
+  Drawer,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
+import MenuIcon from "@mui/icons-material/Menu";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { useAuth } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
-/**
- * Modal component for displaying Terms and Conditions and Privacy Policy
- *
- * @param {Object} props Component properties
- * @param {boolean} props.open Whether the modal is open
- * @param {Function} props.onClose Function to call when modal is closed
- * @param {string} props.initialTab Which tab should be active on open ('terms' or 'cookies')
- */
-const TermsModal = ({ open, onClose, initialTab = "terms" }) => {
-  const { token, user } = useAuth();
-
-  // Placeholder functions for API calls (to be implemented)
-  const checkTermsAcceptance = async (token, tenantSubdomain) => {
-    // TODO: Implement API call to check terms acceptance
-    return {
-      termsAccepted: false,
-      cookiesAccepted: false,
-    };
-  };
-
-  const saveTermsAcceptance = async (token, tenantSubdomain, type) => {
-    // TODO: Implement API call to save terms acceptance
-    console.log(`Saving ${type} acceptance for tenant: ${tenantSubdomain}`);
-  };
-
-  TermsModal.propTypes = {
-    open: PropTypes.bool.isRequired,
-    onClose: PropTypes.func.isRequired,
-    initialTab: PropTypes.oneOf(["terms", "cookies"]),
-  };
-
-  const [activeTab, setActiveTab] = useState(initialTab);
-  const [scrollPosition, setScrollPosition] = useState(0);
-  const [canAccept, setCanAccept] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [hasAccepted, setHasAccepted] = useState({
-    terms: false,
-    cookies: false,
-  });
+const Terms = () => {
+  const navigate = useNavigate();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  
   const [activeSection, setActiveSection] = useState("agreement");
+  const [mobileOpen, setMobileOpen] = useState(false);
   const contentRef = useRef(null);
   const sectionRefs = useRef({});
 
@@ -119,76 +86,12 @@ const TermsModal = ({ open, onClose, initialTab = "terms" }) => {
     { id: "contact-us", title: "Contact Us", number: "23" },
   ];
 
-  // Additional useEffect to ensure body overflow is restored when component unmounts
-  useEffect(() => {
-    return () => {
-      // Final cleanup - ensure overflow is restored when component unmounts
-      document.body.style.overflow = "auto";
-    };
-  }, []);
-
-  // Check if user has already accepted terms
-  useEffect(() => {
-    if (open && token && user) {
-      const checkAcceptance = async () => {
-        try {
-          // Try to fetch from database first
-          const acceptanceStatus = await checkTermsAcceptance(
-            token,
-            user.tenant_subdomain
-          );
-          setHasAccepted({
-            terms: acceptanceStatus.termsAccepted,
-            cookies: acceptanceStatus.cookiesAccepted,
-          });
-        } catch (error) {
-          // Fallback to React state if API fails
-          setHasAccepted({
-            terms: false,
-            cookies: false,
-          });
-        }
-      };
-
-      checkAcceptance();
-    }
-  }, [open, token, user]);
-
-  useEffect(() => {
-    // Handle body overflow when modal opens/closes
-    if (open) {
-      // Store the current overflow style
-      const originalOverflow = document.body.style.overflow;
-      document.body.style.overflow = "hidden";
-
-      // Return cleanup function that will run when component unmounts or 'open' changes
-      return () => {
-        document.body.style.overflow = originalOverflow || "auto";
-      };
-    }
-
-    // If modal is closed, ensure overflow is restored
-    document.body.style.overflow = "auto";
-
-    return () => {};
-  }, [open]);
-
-  useEffect(() => {
-    // Reset scroll position and acceptance status when tab changes
-    setScrollPosition(0);
-    setCanAccept(hasAccepted[activeTab] || false);
-    setActiveSection(activeTab === "terms" ? "agreement" : "what-data-collect");
-  }, [activeTab, hasAccepted]);
-
- 
-
-  // Detect which section is currently visible - VERSÃO CORRIGIDA
+  // Detect which section is currently visible
   const detectActiveSection = (scrollTop) => {
     const sections = termsOfServiceSections;
     let currentSection = sections[0].id;
-    const offset = 150; // Ajustado para melhor detecção
+    const offset = 150;
 
-    // Percorre as seções de baixo para cima para encontrar a ativa
     for (let i = sections.length - 1; i >= 0; i--) {
       const section = sections[i];
       const element = sectionRefs.current[section.id];
@@ -197,7 +100,7 @@ const TermsModal = ({ open, onClose, initialTab = "terms" }) => {
         const elementTop = element.offsetTop - offset;
         if (scrollTop >= elementTop) {
           currentSection = section.id;
-          break; // Para no primeiro match (da última seção visível)
+          break;
         }
       }
     }
@@ -205,14 +108,12 @@ const TermsModal = ({ open, onClose, initialTab = "terms" }) => {
     setActiveSection(currentSection);
   };
 
-  // Navigate to specific section - VERSÃO CORRIGIDA
+  // Navigate to specific section
   const navigateToSection = (sectionId) => {
     const element = sectionRefs.current[sectionId];
     if (element && contentRef.current) {
-      // Define imediatamente a seção ativa para feedback visual
       setActiveSection(sectionId);
       
-      // Scroll suave para a seção
       const offset = 100;
       const elementTop = element.offsetTop - offset;
       
@@ -220,345 +121,216 @@ const TermsModal = ({ open, onClose, initialTab = "terms" }) => {
         top: elementTop,
         behavior: "smooth"
       });
+
+      // Close mobile drawer after navigation
+      if (isMobile) {
+        setMobileOpen(false);
+      }
     }
   };
 
-  // Handle scroll and section detection - VERSÃO MELHORADA
+  // Handle scroll and section detection
   const handleScroll = (e) => {
-    const { scrollTop, scrollHeight, clientHeight } = e.target;
+    const { scrollTop } = e.target;
     
-    // Calculate how far user has scrolled (as a percentage)
-    const scrollPercentage = (scrollTop / (scrollHeight - clientHeight)) * 100;
-    setScrollPosition(scrollPercentage);
-
-    // Enable accept button when scrolled at least 70% through the content
-    if (scrollPercentage > 70 && !canAccept) {
-      setCanAccept(true);
-    }
-
-    // Detect active section based on scroll position (apenas para terms)
-    if (activeTab === "terms") {
-      // Usar throttling para melhor performance
-      clearTimeout(window.scrollTimeout);
-      window.scrollTimeout = setTimeout(() => {
-        detectActiveSection(scrollTop);
-      }, 50);
-    }
+    clearTimeout(window.scrollTimeout);
+    window.scrollTimeout = setTimeout(() => {
+      detectActiveSection(scrollTop);
+    }, 50);
   };
 
-  const handleTabChange = (_, newValue) => {
-    setActiveTab(newValue);
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
   };
 
-  const handleAccept = async () => {
-    if (!token || !user) {
-      // Store acceptance in component state since localStorage is not supported
-      setHasAccepted((prev) => ({
-        ...prev,
-        [activeTab]: true,
-      }));
-      onClose();
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      // Save to database
-      await saveTermsAcceptance(
-        token,
-        user.tenant_subdomain,
-        activeTab === "terms" ? "terms" : "cookies"
-      );
-
-      // Update local state
-      setHasAccepted((prev) => ({
-        ...prev,
-        [activeTab]: true,
-      }));
-
-      onClose();
-    } catch (error) {
-      console.error("Failed to save acceptance:", error);
-      // Fallback to component state
-      setHasAccepted((prev) => ({
-        ...prev,
-        [activeTab]: true,
-      }));
-      onClose();
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  return (
-    <Modal
-      open={open}
-      onClose={onClose}
-      aria-labelledby="terms-modal-title"
-      aria-describedby="terms-modal-description"
+  // Table of Contents Component
+  const TableOfContents = () => (
+    <Box
+      sx={{
+        width: isMobile ? 280 : "100%",
+        height: isMobile ? "100%" : "calc(87vh)",
+        backgroundColor: "#232627",
+        overflow: "auto",
+        position: "sticky",
+        maxHeight: "calc(100vh - 64px)",
+        "&::-webkit-scrollbar": {
+          width: "6px",
+        },
+        "&::-webkit-scrollbar-track": {
+          background: "#1e1e1e",
+        },
+        "&::-webkit-scrollbar-thumb": {
+          background: "#444",
+          borderRadius: "3px",
+        },
+      }}
     >
-      <Box
+      <Typography
+        variant="subtitle2"
         sx={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: { xs: "95%", sm: "90%", md: "85%", lg: "80%" },
-          maxWidth: "1200px",
-          maxHeight: "90vh",
-          bgcolor: "#1E1F20",
-          border: "1px solid #333738",
-          borderRadius: "16px",
-          boxShadow: 24,
-          display: "flex",
-          flexDirection: "column",
-          height: "85vh",
+          color: "#d0bcfe",
+          p: 2,
+          fontWeight: "bold",
+          borderBottom: "1px solid #333738",
         }}
       >
-        {/* Header with title and close button */}
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            p: 2,
-            px: 3,
-            backgroundColor: "#232627",
-            borderBottom: "1px solid #333738",
-          }}
-        >
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <IconButton
-              onClick={onClose}
-              sx={{ color: "#CAC4D0", mr: 1 }}
-              aria-label="Back"
-            >
-              <ArrowBackIcon />
-            </IconButton>
-            <Typography
-              id="terms-modal-title"
-              variant="h6"
-              component="h2"
-              color="white"
-            >
-              Legal Policies
-            </Typography>
-          </Box>
-          <IconButton
-            onClick={onClose}
-            sx={{ color: "#CAC4D0" }}
-            aria-label="Close"
-          >
-            <CloseIcon />
-          </IconButton>
-        </Box>
-
-        {/* Tabs for Terms and Privacy Policy */}
-        <Tabs
-          value={activeTab}
-          onChange={handleTabChange}
-          sx={{
-            borderBottom: 1,
-            borderColor: "#333738",
-            backgroundColor: "#232627",
-            "& .MuiTabs-indicator": {
-              backgroundColor: "#d0bcfe",
-              height: "3px",
-            },
-            "& .MuiTab-root": {
-              color: "#CAC4D0",
-              fontWeight: "bold",
-              fontSize: "14px",
-              padding: "12px 16px",
-              "&.Mui-selected": {
-                color: "#d0bcfe",
-              },
-            },
-          }}
-        >
-          <Tab
-            label="Terms and Conditions"
-            value="terms"
-            id="terms-tab"
-            aria-controls="terms-panel"
-          />
-          <Tab
-            label="Privacy Policy"
-            value="cookies"
-            id="cookies-tab"
-            aria-controls="cookies-panel"
-          />
-        </Tabs>
-
-        {/* Main content area with sidebar and content */}
-        <Box
-          sx={{
-            display: "flex",
-            flex: 1,
-            overflow: "hidden",
-          }}
-        >
-          {/* Sidebar with table of contents (only for Terms tab) */}
-          {activeTab === "terms" && (
-            <Box
+        Table of Contents
+      </Typography>
+      <List dense sx={{ p: 0 }}>
+        {termsOfServiceSections.map((section) => (
+          <ListItem key={section.id} disablePadding>
+            <ListItemButton
+              onClick={() => navigateToSection(section.id)}
               sx={{
-                width: "280px",
-                borderRight: "1px solid #333738",
-                backgroundColor: "#232627",
-                overflow: "auto",
+                py: 1,
+                px: 2,
+                backgroundColor:
+                  activeSection === section.id
+                    ? "rgba(208, 188, 254, 0.1)"
+                    : "transparent",
+                borderLeft:
+                  activeSection === section.id
+                    ? "3px solid #d0bcfe"
+                    : "3px solid transparent",
+                "&:hover": {
+                  backgroundColor: "rgba(208, 188, 254, 0.05)",
+                },
+              }}
+            >
+              <ListItemText
+                primary={
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color:
+                        activeSection === section.id
+                          ? "#d0bcfe"
+                          : "#CAC4D0",
+                      fontSize: "13px",
+                      fontWeight:
+                        activeSection === section.id
+                          ? "bold"
+                          : "normal",
+                    }}
+                  >
+                    {section.number && `${section.number}. `}
+                    {section.title}
+                  </Typography>
+                }
+              />
+            </ListItemButton>
+          </ListItem>
+        ))}
+      </List>
+    </Box>
+  );
+
+  return (
+    <Box sx={{ height: "90vh", backgroundColor: "#1E1F20" }}>
+      {/* Header */}
+      <AppBar position="sticky" sx={{ backgroundColor: "#232627" }}>
+        <Toolbar>
+          <IconButton
+            edge="start"
+            color="inherit"
+            onClick={() => navigate("/")}
+            sx={{ mr: 2 }}
+          >
+            <ArrowBackIcon />
+          </IconButton>
+          <Typography variant="h6" sx={{ flexGrow: 1, color: "white" }}>
+            Terms and Conditions
+          </Typography>
+          {isMobile && (
+            <IconButton
+              color="inherit"
+              onClick={handleDrawerToggle}
+              sx={{ ml: 2 }}
+            >
+              <MenuIcon />
+            </IconButton>
+          )}
+        </Toolbar>
+      </AppBar>
+
+      <Box sx={{ display: "flex", height: "calc(100vh - 64px)" }}>
+        {/* Desktop Sidebar */}
+        {!isMobile && (
+          <Paper
+            sx={{
+              width: 300,
+              backgroundColor: "#232627",
+              borderRadius: 0,
+              borderRight: "1px solid #333738",
+            }}
+            elevation={0}
+          >
+            <TableOfContents />
+          </Paper>
+        )}
+
+        {/* Mobile Drawer */}
+        <Drawer
+          variant="temporary"
+          open={mobileOpen}
+          onClose={handleDrawerToggle}
+          ModalProps={{
+            keepMounted: true,
+          }}
+          sx={{
+            display: { xs: 'block', md: 'none' },
+            '& .MuiDrawer-paper': {
+              backgroundColor: "#232627",
+              borderRight: "1px solid #333738",
+            },
+          }}
+        >
+          <TableOfContents />
+        </Drawer>
+
+        {/* Main Content */}
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            backgroundColor: "#1E1F20",
+          }}
+        >
+          <Container
+            maxWidth="lg"
+            sx={{
+              py: 4,
+              px: { xs: 2, sm: 3, md: 4 },
+            }}
+          >
+            <Box
+              ref={contentRef}
+              sx={{
+                maxHeight: "calc(95vh - 120px)",
+                overflowY: "auto",
                 "&::-webkit-scrollbar": {
-                  width: "6px",
+                  width: "10px",
                 },
                 "&::-webkit-scrollbar-track": {
                   background: "#1e1e1e",
+                  borderRadius: "10px",
                 },
                 "&::-webkit-scrollbar-thumb": {
                   background: "#444",
-                  borderRadius: "3px",
+                  borderRadius: "10px",
+                  "&:hover": {
+                    background: "#555",
+                  },
                 },
               }}
+              onScroll={handleScroll}
             >
-              <Typography
-                variant="subtitle2"
-                sx={{
-                  color: "#d0bcfe",
-                  p: 2,
-                  fontWeight: "bold",
-                  borderBottom: "1px solid #333738",
-                }}
-              >
-                Table of Contents
-              </Typography>
-              <List dense sx={{ p: 0 }}>
-                {termsOfServiceSections.map((section) => (
-                  <ListItem key={section.id} disablePadding>
-                    <ListItemButton
-                      onClick={() => navigateToSection(section.id)}
-                      sx={{
-                        py: 1,
-                        px: 2,
-                        backgroundColor:
-                          activeSection === section.id
-                            ? "rgba(208, 188, 254, 0.1)"
-                            : "transparent",
-                        borderLeft:
-                          activeSection === section.id
-                            ? "3px solid #d0bcfe"
-                            : "3px solid transparent",
-                        "&:hover": {
-                          backgroundColor: "rgba(208, 188, 254, 0.05)",
-                        },
-                      }}
-                    >
-                      <ListItemText
-                        primary={
-                          <Typography
-                            variant="body2"
-                            sx={{
-                              color:
-                                activeSection === section.id
-                                  ? "#d0bcfe"
-                                  : "#CAC4D0",
-                              fontSize: "13px",
-                              fontWeight:
-                                activeSection === section.id
-                                  ? "bold"
-                                  : "normal",
-                            }}
-                          >
-                            {section.number && `${section.number}. `}
-                            {section.title}
-                          </Typography>
-                        }
-                      />
-                    </ListItemButton>
-                  </ListItem>
-                ))}
-              </List>
-            </Box>
-          )}
-
-          {/* Content area with scrolling */}
-          <Box
-            ref={contentRef}
-            sx={{
-              flex: 1,
-              p: 3,
-              overflowY: "auto",
-              "&::-webkit-scrollbar": {
-                width: "10px",
-              },
-              "&::-webkit-scrollbar-track": {
-                background: "#1e1e1e",
-                borderRadius: "10px",
-              },
-              "&::-webkit-scrollbar-thumb": {
-                background: "#444",
-                borderRadius: "10px",
-                "&:hover": {
-                  background: "#555",
-                },
-              },
-            }}
-            onScroll={handleScroll}
-            role="tabpanel"
-            id={`${activeTab}-panel`}
-            aria-labelledby={`${activeTab}-tab`}
-          >
-            {activeTab === "terms" ? (
               <TermsOfServiceContent sectionRefs={sectionRefs} />
-            ) : (
-              <PrivacyPolicyContent />
-            )}
-          </Box>
-        </Box>
-
-        {/* Footer with buttons */}
-        <Box
-          sx={{
-            p: 2,
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            borderTop: "1px solid #333738",
-            backgroundColor: "#232627",
-            minHeight: "64px",
-          }}
-        >
-          <Typography variant="caption" color="#999">
-            {scrollPosition < 70 && !canAccept
-              ? "Please scroll to read the full document"
-              : "Thank you for reviewing our policies"}
-          </Typography>
-          <Box sx={{ display: "flex", gap: 2 }}>
-            <Button
-              onClick={handleAccept}
-              disabled={!canAccept || isSubmitting}
-              sx={{
-                backgroundColor: "#d0bcfe",
-                color: "#381e72",
-                "&:hover": {
-                  backgroundColor: "#b39ddb",
-                },
-                "&.Mui-disabled": {
-                  backgroundColor: "#4a4a4a",
-                  color: "#999",
-                },
-                minWidth: "100px",
-              }}
-              variant="contained"
-            >
-              {isSubmitting ? (
-                <CircularProgress size={24} sx={{ color: "#381e72" }} />
-              ) : (
-                "I understand"
-              )}
-            </Button>
-          </Box>
+            </Box>
+          </Container>
         </Box>
       </Box>
-    </Modal>
+    </Box>
   );
 };
 
@@ -1818,160 +1590,4 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
   </Box>
 );
 
-// Privacy Policy Content Component (mantém a mesma estrutura atual)
-const PrivacyPolicyContent = () => (
-  <Box sx={{ color: "white", textAlign: "left" }}>
-    <Typography variant="h5" sx={{ color: "white", mb: 2 }}>
-      Privacy Policy
-    </Typography>
-    <Typography variant="body1" sx={{ color: "white", mb: 3 }}>
-      This privacy policy will explain how our organization uses the personal
-      data we collect from you when you use our website.
-    </Typography>
-
-    <Typography variant="h6" sx={{ color: "#d0bcfe", mt: 3, mb: 1 }}>
-      What data do we collect?
-    </Typography>
-    <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 1 }}>
-      Memor'us collects the following data:
-    </Typography>
-    <Typography component="ul" sx={{ color: "#e0e0e0", mb: 2, pl: 4 }}>
-      <li>Personal identification information</li>
-      <li>Name</li>
-      <li>Email Address</li>
-      <li>Password</li>
-      <li>Auth Cookies</li>
-      <li>Images Shared By Collaborators</li>
-      <li>Profile Pictures</li>
-    </Typography>
-
-    <Typography variant="h6" sx={{ color: "#d0bcfe", mt: 3, mb: 1 }}>
-      How do we collect your data?
-    </Typography>
-    <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 2 }}>
-      Users will have to put their First and Last name upon their account
-      creation. The user's first and last name are used to identify the account
-      owner. Upon registration the email address used for platform access: This
-      is the method by which users are able to log in to the platform.
-    </Typography>
-    <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 2 }}>
-      Authentication Cookies: These are used to keep the user's session active.
-      When Images are shared by collaborators: Users need to upload photographs
-      to complete challenges, and sometimes individuals can be identified in
-      these photos.
-    </Typography>
-
-    <Typography variant="h6" sx={{ color: "#d0bcfe", mt: 3, mb: 1 }}>
-      How will we use your data?
-    </Typography>
-    <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 2 }}>
-      Memor'us collects your data so that we can:
-    </Typography>
-    <Typography component="ul" sx={{ color: "#e0e0e0", mb: 2, pl: 4 }}>
-      <li>Identify the account owner using first and last name</li>
-      <li>Enable users to log in to the platform using their email address</li>
-      <li>Keep user sessions active through authentication cookies</li>
-      <li>Allow users to upload photographs to complete challenges</li>
-      <li>Enable users to personalize their accounts with profile photos</li>
-    </Typography>
-
-    <Typography variant="h6" sx={{ color: "#d0bcfe", mt: 3, mb: 1 }}>
-      How do we store your data?
-    </Typography>
-    <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 2 }}>
-      Memor'us securely stores your personal data at the following locations:
-    </Typography>
-    <Typography component="ul" sx={{ color: "#e0e0e0", mb: 2, pl: 4 }}>
-      <li>
-        Cookies are stored in the user's browser and are protected by browser
-        security mechanisms
-      </li>
-      <li>
-        First and last name and email address are stored in our secure company
-        database, which is protected by encryption and access controls
-      </li>
-      <li>
-        Photographs are hosted on AWS S3, a secure cloud storage server with
-        restricted access and encrypted transfer protocols
-      </li>
-      <li>
-        Passwords are processed in encrypted form; Memor'us does not have access
-        to their content
-      </li>
-    </Typography>
-
-    <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 2 }}>
-      Memor'us will keep your personal data for as long as your account is
-      active or as required to provide you with services. If you choose to
-      delete your account, we implement a soft delete process: your account
-      becomes inaccessible and is partially deleted, but the data remains stored
-      in our database for 30 days in case recovery is needed. After this 30-day
-      period, your data will be permanently deleted.
-    </Typography>
-
-    <Typography variant="h6" sx={{ color: "#d0bcfe", mt: 3, mb: 1 }}>
-      Marketing
-    </Typography>
-    <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 2 }}>
-      Memor'us does not use your personal data for marketing purposes and will
-      not send you information about products or services, nor will we share
-      your data with partner companies for marketing. You will not receive
-      marketing communications from us, and your data will not be provided to
-      any third parties for marketing purposes.
-    </Typography>
-
-    <Typography variant="h6" sx={{ color: "#d0bcfe", mt: 3, mb: 1 }}>
-      What are your data protection rights?
-    </Typography>
-    <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 1 }}>
-      Every user is entitled to the following:
-    </Typography>
-    <Typography component="ul" sx={{ color: "#e0e0e0", mb: 2, pl: 4 }}>
-      <li>
-        The right to access – You have the right to request Memor'us for copies
-        of your personal data
-      </li>
-      <li>
-        The right to rectification – You have the right to request that Memor'us
-        corrects any information you believe is inaccurate
-      </li>
-      <li>
-        The right to erasure – You have the right to request that Memor'us
-        erases your personal data, under certain conditions
-      </li>
-      <li>
-        The right to restrict processing – You have the right to request that
-        Memor'us restricts the processing of your personal data
-      </li>
-      <li>
-        The right to object to processing – You have the right to object to
-        Memor'us' processing of your personal data
-      </li>
-      <li>
-        The right to data portability – You have the right to request that
-        Memor'us transfers the data to another organization
-      </li>
-    </Typography>
-
-    <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 4 }}>
-      If you make a request, we have one month to respond to you. If you would
-      like to exercise any of these rights, please contact us at our email:{" "}
-      <Link href="mailto:geral@memor-us.com" sx={{ color: "#d0bcfe" }}>
-        geral@memor-us.com
-      </Link>
-    </Typography>
-  </Box>
-);
-
-TermsModal.propTypes = {
-  open: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
-  initialTab: PropTypes.oneOf(["terms", "cookies"]),
-};
-
-PrivacyPolicyContent.propTypes = {
-  open: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
-};
-
-export default TermsModal;
+export default Terms;
