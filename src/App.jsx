@@ -37,11 +37,11 @@ function App() {
     }
 
     if (!user) {
-      return <Navigate to='/login' state={{ from: location }} replace />;
+      return <Navigate to='/app/login' state={{ from: location }} replace />;
     }
 
     if (role && !user.roles?.includes(role.toLowerCase())) {
-      return <Navigate to='/login' replace />;
+      return <Navigate to='/app/login' replace />;
     }
 
     return children;
@@ -53,11 +53,13 @@ function App() {
   };
 
   // Determine if we're on an auth page to not show footer
-  const isAuthPage = ["/login", "/register", "/change-password"].includes(
-    location.pathname
-  );
+  const isAuthPage = [
+    "/app/login",
+    "/app/register",
+    "/app/change-password",
+  ].includes(location.pathname);
   const hideFooter =
-    isAuthPage || location.pathname.toLowerCase().includes("/memoryboard");
+    isAuthPage || location.pathname.toLowerCase().includes("/app/memoryboard");
 
   const isAdmin = user?.roles?.some((role) => role.toLowerCase() === "admin");
 
@@ -75,11 +77,15 @@ function App() {
       <Routes>
         {/* Auth Routes */}
         <Route
-          path='/login'
+          path='/app/login'
           element={
             user ? (
               <Navigate
-                to={user.roles?.includes("admin") ? "/admin/home" : "/home"}
+                to={
+                  user.roles?.includes("admin")
+                    ? "/app/admin/home"
+                    : "/app/home"
+                }
                 replace
               />
             ) : (
@@ -88,11 +94,15 @@ function App() {
           }
         />
         <Route
-          path='/register'
+          path='/app/register'
           element={
             user ? (
               <Navigate
-                to={user.roles?.includes("admin") ? "/admin/home" : "/home"}
+                to={
+                  user.roles?.includes("admin")
+                    ? "/app/admin/home"
+                    : "/app/home"
+                }
                 replace
               />
             ) : (
@@ -100,11 +110,11 @@ function App() {
             )
           }
         />
-        <Route path='/change-password' element={<ChangePassword />} />
+        <Route path='/app/change-password' element={<ChangePassword />} />
 
         {/* Collaborator Routes */}
         <Route
-          path='/*'
+          path='/app/*'
           element={
             <ProtectedRoute role='member'>
               <TeamGuard>
@@ -124,7 +134,7 @@ function App() {
 
         {/* Admin Routes */}
         <Route
-          path='/admin/*'
+          path='/app/admin/*'
           element={
             <ProtectedRoute role='admin'>
               <AdminLayout />
@@ -138,7 +148,7 @@ function App() {
         </Route>
 
         {/* Catch-All */}
-        <Route path='*' element={<Navigate to='/login' replace />} />
+        <Route path='*' element={<Navigate to='/app/login' replace />} />
       </Routes>
 
       {/* Footer (conditional) */}

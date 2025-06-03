@@ -32,7 +32,11 @@ import notifGreen from "../../assets/images/notifGreen.svg";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { useAuth } from "../../context/AuthContext";
-import { getLeaderboardVisibility, setLeaderboardVisibility, LEADERBOARD_VISIBILITY_CHANGE } from "../../assets/utils/leaderboardUtils";
+import {
+  getLeaderboardVisibility,
+  setLeaderboardVisibility,
+  LEADERBOARD_VISIBILITY_CHANGE,
+} from "../../assets/utils/leaderboardUtils";
 
 import PersonIcon from "@mui/icons-material/Person";
 import LockIcon from "@mui/icons-material/Lock";
@@ -61,7 +65,6 @@ const NotificationItem = ({ notification, onDelete, onClick }) => {
       }}
       onClick={notification.memorId ? () => onClick(notification) : null}
     >
-      
       <IconButton
         src={notification.read ? notifPurple : notifGreen}
         alt='Notification Icon'
@@ -120,7 +123,9 @@ const Navbar = () => {
   const location = useLocation();
 
   // Check if current page is MemoryBoard
-  const isMemoryBoard = location.pathname.toLowerCase().includes('/memoryboard');
+  const isMemoryBoard = location.pathname
+    .toLowerCase()
+    .includes("/memoryboard");
 
   const [showLeaderboard, setShowLeaderboard] = useState(
     getLeaderboardVisibility()
@@ -133,7 +138,7 @@ const Navbar = () => {
     const newValue = !showLeaderboard;
     setShowLeaderboard(newValue);
     setLeaderboardVisibility(newValue);
-    
+
     // No need to navigate away if hiding - we'll handle this in the Home component
   };
 
@@ -141,18 +146,21 @@ const Navbar = () => {
   useEffect(() => {
     const fetchNotifications = async () => {
       if (!token || !user) return;
-      
+
       setLoadingNotifications(true);
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/me/notifications`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "X-Tenant": user.tenant_subdomain || user.tenant,
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/users/me/notifications`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "X-Tenant": user.tenant_subdomain || user.tenant,
+            },
           }
-        });
+        );
 
         if (!response.ok) {
-          throw new Error('Failed to fetch notifications');
+          throw new Error("Failed to fetch notifications");
         }
 
         const data = await response.json();
@@ -165,10 +173,10 @@ const Navbar = () => {
     };
 
     fetchNotifications();
-    
+
     // Set up a polling interval to check for new notifications
     const intervalId = setInterval(fetchNotifications, 60000); // Check every minute
-    
+
     return () => clearInterval(intervalId);
   }, [token, user]);
 
@@ -176,17 +184,20 @@ const Navbar = () => {
     const handleStorageChange = () => {
       setShowLeaderboard(getLeaderboardVisibility());
     };
-  
+
     // Set initial value
     setShowLeaderboard(getLeaderboardVisibility());
-  
+
     // Listen for both localStorage events and our custom event
     window.addEventListener("storage", handleStorageChange);
     window.addEventListener(LEADERBOARD_VISIBILITY_CHANGE, handleStorageChange);
-  
+
     return () => {
       window.removeEventListener("storage", handleStorageChange);
-      window.removeEventListener(LEADERBOARD_VISIBILITY_CHANGE, handleStorageChange);
+      window.removeEventListener(
+        LEADERBOARD_VISIBILITY_CHANGE,
+        handleStorageChange
+      );
     };
   }, []);
 
@@ -218,37 +229,40 @@ const Navbar = () => {
   const [notifAnchorEl, setNotifAnchorEl] = useState(null);
   const handleNotifClick = (event) => {
     setNotifAnchorEl(event.currentTarget);
-    
+
     // Mark all notifications as read when opening the menu
-    notifications.forEach(notification => {
+    notifications.forEach((notification) => {
       if (!notification.read) {
         markNotificationAsRead(notification.id);
       }
     });
   };
-  
+
   const handleNotifClose = () => {
     setNotifAnchorEl(null);
   };
-  
+
   const handleDeleteNotification = async (id) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/me/notifications/${id}`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "X-Tenant": user.tenant_subdomain || user.tenant,
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/users/me/notifications/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "X-Tenant": user.tenant_subdomain || user.tenant,
+          },
         }
-      });
+      );
 
       if (!response.ok) {
-        throw new Error('Failed to delete notification');
+        throw new Error("Failed to delete notification");
       }
 
-      setNotifications(prevNotifications => 
-        prevNotifications.filter(notification => notification.id !== id)
+      setNotifications((prevNotifications) =>
+        prevNotifications.filter((notification) => notification.id !== id)
       );
-      
+
       toast.success("Notification removed");
     } catch (error) {
       console.error("Error deleting notification:", error);
@@ -258,23 +272,26 @@ const Navbar = () => {
 
   const markNotificationAsRead = async (id) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/me/notifications/${id}/read`, {
-        method: 'PUT',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "X-Tenant": user.tenant_subdomain || user.tenant,
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/users/me/notifications/${id}/read`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "X-Tenant": user.tenant_subdomain || user.tenant,
+          },
         }
-      });
+      );
 
       if (!response.ok) {
-        throw new Error('Failed to mark notification as read');
+        throw new Error("Failed to mark notification as read");
       }
 
       // Update the local state to mark as read
-      setNotifications(prev => 
-        prev.map(notification => 
-          notification.id === id 
-            ? { ...notification, read: true } 
+      setNotifications((prev) =>
+        prev.map((notification) =>
+          notification.id === id
+            ? { ...notification, read: true }
             : notification
         )
       );
@@ -285,16 +302,19 @@ const Navbar = () => {
 
   const handleMarkAllRead = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/me/notifications`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "X-Tenant": user.tenant_subdomain || user.tenant,
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/users/me/notifications`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "X-Tenant": user.tenant_subdomain || user.tenant,
+          },
         }
-      });
+      );
 
       if (!response.ok) {
-        throw new Error('Failed to clear notifications');
+        throw new Error("Failed to clear notifications");
       }
 
       setNotifications([]);
@@ -304,31 +324,32 @@ const Navbar = () => {
       toast.error("Failed to clear notifications");
     }
   };
-  
+
   const handleNotificationClick = (notification) => {
     // Navigate to the memor details page if it's a memor-related notification
     if (notification.memorId) {
-      navigate(`/memors/${notification.memorId}`);
+      navigate(`/app/memors/${notification.memorId}`);
       handleNotifClose();
     }
   };
 
   // Get unread notification count
-  const unreadCount = notifications.filter(notif => !notif.read).length;
+  const unreadCount = notifications.filter((notif) => !notif.read).length;
 
   const classes = useStyles();
-  
+
   // Safely extract team name
   const getTeamName = () => {
     if (!user) return "";
-    if (typeof user.team === 'string') return user.team;
-    if (user.team && typeof user.team === 'object' && user.team.name) return user.team.name;
+    if (typeof user.team === "string") return user.team;
+    if (user.team && typeof user.team === "object" && user.team.name)
+      return user.team.name;
     return "";
   };
 
   return (
     <AppBar
-      position={isMemoryBoard ? 'fixed' : 'sticky'}
+      position={isMemoryBoard ? "fixed" : "sticky"}
       sx={{
         backgroundColor: isMemoryBoard ? "transparent" : "#111315",
         height: "60px",
@@ -357,7 +378,7 @@ const Navbar = () => {
       >
         {/* Logo */}
         <Box>
-          <NavLink to='/home'>
+          <NavLink to='/app/home'>
             <img
               src={logo}
               alt='Memorus Logo'
@@ -374,14 +395,14 @@ const Navbar = () => {
             alignItems: "center",
           }}
         >
-          <StyledNavLink to='/home' end>
+          <StyledNavLink to='/app/home' end>
             Home
           </StyledNavLink>
-          <StyledNavLink to='/memors'>Memors</StyledNavLink>
+          <StyledNavLink to='/app/memors'>Memors</StyledNavLink>
           {showLeaderboard && (
-            <StyledNavLink to='/leaderboard'>Leaderboard</StyledNavLink>
+            <StyledNavLink to='/app/leaderboard'>Leaderboard</StyledNavLink>
           )}
-          <StyledNavLink to='/memoryBoard'>Memory Board</StyledNavLink>
+          <StyledNavLink to='/app/memoryBoard'>Memory Board</StyledNavLink>
           <Box>
             <IconButton onClick={handleMenuOpen}>
               <img
@@ -410,7 +431,7 @@ const Navbar = () => {
                   <Typography variant='body1' sx={{ fontWeight: 600 }}>
                     {user?.firstName} {user?.lastName}
                   </Typography>
-                  <Typography variant='body2' color="gray">
+                  <Typography variant='body2' color='gray'>
                     {user?.email}
                   </Typography>
                   <Typography variant='body2' sx={{ color: "#00C896" }}>
@@ -421,7 +442,7 @@ const Navbar = () => {
               <Divider sx={{ backgroundColor: "gray" }} />
               <MenuItem
                 onClick={() => {
-                  navigate("/profile");
+                  navigate("/app/profile");
                   handleMenuClose();
                 }}
                 sx={{
@@ -431,7 +452,7 @@ const Navbar = () => {
                   },
                 }}
               >
-                <Typography sx={{ display: 'flex', alignItems: 'center' }}>
+                <Typography sx={{ display: "flex", alignItems: "center" }}>
                   <PersonIcon sx={{ mr: 1, fontSize: "1rem" }} />
                   My Profile
                 </Typography>
@@ -459,7 +480,7 @@ const Navbar = () => {
               </MenuItem>
               <MenuItem
                 onClick={() => {
-                  navigate("/change-password");
+                  navigate("/app/change-password");
                   handleMenuClose();
                 }}
                 sx={{
@@ -469,7 +490,7 @@ const Navbar = () => {
                   },
                 }}
               >
-                <Typography sx={{ display: 'flex', alignItems: 'center' }}>
+                <Typography sx={{ display: "flex", alignItems: "center" }}>
                   <LockIcon sx={{ mr: 1, fontSize: "1rem" }} />
                   Change Password
                 </Typography>
@@ -483,7 +504,7 @@ const Navbar = () => {
                   },
                 }}
               >
-                <Typography sx={{ display: 'flex', alignItems: 'center' }}>
+                <Typography sx={{ display: "flex", alignItems: "center" }}>
                   <ExitToAppIcon sx={{ mr: 1, fontSize: "1rem" }} />
                   Log Out
                 </Typography>
@@ -534,10 +555,16 @@ const Navbar = () => {
                   Remove All
                 </Button>
               </Box>
-              <Box sx={{ maxHeight: "300px", overflowY: "auto", padding: "0 10px" }}>
+              <Box
+                sx={{
+                  maxHeight: "300px",
+                  overflowY: "auto",
+                  padding: "0 10px",
+                }}
+              >
                 {loadingNotifications ? (
-                  <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
-                    <CircularProgress size={24} sx={{ color: '#d0bcfe' }} />
+                  <Box sx={{ display: "flex", justifyContent: "center", p: 2 }}>
+                    <CircularProgress size={24} sx={{ color: "#d0bcfe" }} />
                   </Box>
                 ) : notifications.length > 0 ? (
                   notifications.map((notification) => (
@@ -549,7 +576,7 @@ const Navbar = () => {
                     />
                   ))
                 ) : (
-                  <Box sx={{ p: 2, textAlign: 'center', color: '#888' }}>
+                  <Box sx={{ p: 2, textAlign: "center", color: "#888" }}>
                     No notifications
                   </Box>
                 )}
@@ -597,7 +624,7 @@ const Navbar = () => {
               <Typography variant='body1' sx={{ fontWeight: 600 }}>
                 {user?.firstName} {user?.lastName}
               </Typography>
-              <Typography variant='body2' color="gray">
+              <Typography variant='body2' color='gray'>
                 {user?.email}
               </Typography>
               <Typography variant='body2' sx={{ color: "#00C896" }}>
@@ -615,21 +642,27 @@ const Navbar = () => {
                 marginTop: "20px",
               }}
             >
-              <StyledNavLink to='/home' onClick={toggleDrawer(false)}>
+              <StyledNavLink to='/app/home' onClick={toggleDrawer(false)}>
                 Home
               </StyledNavLink>
-              <StyledNavLink to='/memors' onClick={toggleDrawer(false)}>
+              <StyledNavLink to='/app/memors' onClick={toggleDrawer(false)}>
                 Memors
               </StyledNavLink>
               {showLeaderboard && (
-                <StyledNavLink to='/leaderboard' onClick={toggleDrawer(false)}>
+                <StyledNavLink
+                  to='/app/leaderboard'
+                  onClick={toggleDrawer(false)}
+                >
                   Leaderboard
                 </StyledNavLink>
               )}
-              <StyledNavLink to='/memoryBoard' onClick={toggleDrawer(false)}>
+              <StyledNavLink
+                to='/app/memoryBoard'
+                onClick={toggleDrawer(false)}
+              >
                 Memory Board
               </StyledNavLink>
-              <StyledNavLink to='/profile' onClick={toggleDrawer(false)}>
+              <StyledNavLink to='/app/profile' onClick={toggleDrawer(false)}>
                 My Profile
               </StyledNavLink>
             </List>
@@ -652,7 +685,7 @@ const Navbar = () => {
                   "&:hover": { color: "#ccff33" },
                 }}
                 onClick={() => {
-                  navigate("/change-password");
+                  navigate("/app/change-password");
                   toggleDrawer(false)();
                 }}
               >
@@ -684,10 +717,10 @@ NotificationItem.propTypes = {
     title: PropTypes.string.isRequired,
     description: PropTypes.string.isRequired,
     memorId: PropTypes.number,
-    read: PropTypes.bool
+    read: PropTypes.bool,
   }).isRequired,
   onDelete: PropTypes.func.isRequired,
-  onClick: PropTypes.func.isRequired
+  onClick: PropTypes.func.isRequired,
 };
 
 export default Navbar;

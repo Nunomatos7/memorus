@@ -11,13 +11,6 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     let storedToken = localStorage.getItem("token");
-
-    // if (!storedToken && import.meta.env.DEV) {
-    //   storedToken =
-    //     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZmlyc3ROYW1lIjoiUm9kcmlnbyIsImxhc3ROYW1lIjoiU2lsdmEiLCJlbWFpbCI6InJvZHJpZ29zaWx2YUBsb2JhLmNvbSIsInRlYW1zSWQiOm51bGwsInRlbmFudF9zdWJkb21haW4iOiJsb2JhIiwicm9sZXMiOlsibWVtYmVyIl0sImlzU3VwZXJBZG1pbiI6ZmFsc2UsImlhdCI6MTc0MzAyMzUwMSwiZXhwIjoxNzQzMTA5OTAxfQ.uEONeIu9zh3kusjK2rytJORT8ZkKDgR4y0rwU81H5nU";
-    //   localStorage.setItem("token", storedToken);
-    // }
-
     if (storedToken) {
       try {
         const payload = JSON.parse(atob(storedToken.split(".")[1]));

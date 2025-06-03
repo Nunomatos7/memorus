@@ -566,7 +566,7 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
                   <>
                     <div className='qr-code-placeholder'>
                       <QRCode
-                        value={`https://${user.tenant_subdomain}.memor-us.com/memors/${memor.id}`}
+                        value={`https://${user.tenant_subdomain}.memor-us.com/app/memors/${memor.id}`}
                         size={128}
                         bgColor='transparent'
                         fgColor='#d0bcfe'

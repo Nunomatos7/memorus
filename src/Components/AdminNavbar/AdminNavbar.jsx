@@ -44,7 +44,9 @@ const AdminNavbar = () => {
   const location = useLocation();
 
   // Check if current page is MemoryBoard
-  const isMemoryBoard = location.pathname.toLowerCase().includes('/memoryboard');
+  const isMemoryBoard = location.pathname
+    .toLowerCase()
+    .includes("/memoryboard");
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -68,12 +70,12 @@ const AdminNavbar = () => {
     setAnchorEl(null);
 
     toast.success("Logged out successfully 👋");
-    navigate("/admin/login");
+    navigate("/app/admin/login");
   };
 
   return (
     <AppBar
-      position={isMemoryBoard ? 'fixed' : 'sticky'}
+      position={isMemoryBoard ? "fixed" : "sticky"}
       sx={{
         backgroundColor: isMemoryBoard ? "transparent" : "#111315",
         height: "60px",
@@ -102,7 +104,7 @@ const AdminNavbar = () => {
       >
         {/* Logo */}
         <Box>
-          <NavLink to='/admin/home'>
+          <NavLink to='/app/admin/home'>
             <img
               src={logo}
               alt='Admin Dashboard Logo'
@@ -119,12 +121,14 @@ const AdminNavbar = () => {
             alignItems: "center",
           }}
         >
-          <StyledNavLink to='/admin/home' end>
+          <StyledNavLink to='/app/admin/home' end>
             Home
           </StyledNavLink>
-          <StyledNavLink to='/admin/leaderboard'>Leaderboard</StyledNavLink>
-          <StyledNavLink to='/admin/memoryBoard'>Memory Board</StyledNavLink>
-          <StyledNavLink to='/admin/adminBoard'>Admin Board</StyledNavLink>
+          <StyledNavLink to='/app/admin/leaderboard'>Leaderboard</StyledNavLink>
+          <StyledNavLink to='/app/admin/memoryBoard'>
+            Memory Board
+          </StyledNavLink>
+          <StyledNavLink to='/app/admin/adminBoard'>Admin Board</StyledNavLink>
           <Box>
             <IconButton onClick={handleMenuOpen}>
               <img
@@ -161,7 +165,7 @@ const AdminNavbar = () => {
               <Divider sx={{ backgroundColor: "gray" }} />
               <MenuItem
                 onClick={() => {
-                  navigate("/change-password");
+                  navigate("/app/change-password");
                   handleMenuClose();
                 }}
                 sx={{
@@ -242,23 +246,23 @@ const AdminNavbar = () => {
                 marginTop: "20px",
               }}
             >
-              <StyledNavLink to='/admin/home' onClick={toggleDrawer(false)}>
+              <StyledNavLink to='/app/admin/home' onClick={toggleDrawer(false)}>
                 Home
               </StyledNavLink>
               <StyledNavLink
-                to='/admin/leaderboard'
+                to='/app/admin/leaderboard'
                 onClick={toggleDrawer(false)}
               >
                 Leaderboard
               </StyledNavLink>
               <StyledNavLink
-                to='/admin/memoryBoard'
+                to='/app/admin/memoryBoard'
                 onClick={toggleDrawer(false)}
               >
                 Memory Board
               </StyledNavLink>
               <StyledNavLink
-                to='/admin/adminBoard'
+                to='/app/admin/adminBoard'
                 onClick={toggleDrawer(false)}
               >
                 Admin Board
@@ -283,7 +287,7 @@ const AdminNavbar = () => {
                   "&:hover": { color: "#ccff33" },
                 }}
                 onClick={() => {
-                  navigate("/change-password");
+                  navigate("/app/change-password");
                   toggleDrawer(false)();
                 }}
               >

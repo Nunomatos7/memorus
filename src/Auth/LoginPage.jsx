@@ -157,7 +157,7 @@ const LoginPage = () => {
       setToken(data.token);
 
       // Navigate to appropriate page
-      navigate(payload.role === "admin" ? "/admin/home" : "/home");
+      navigate(payload.role === "admin" ? "/app/admin/home" : "/app/home");
     } catch (err) {
       console.error("Login error:", err);
       setError(
@@ -429,7 +429,7 @@ const LoginPage = () => {
               }
             />
             <a
-              href='/change-password'
+              href='/app/change-password'
               className='forgot-password'
               aria-label='Forgot Password'
             >

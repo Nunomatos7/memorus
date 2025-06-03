@@ -401,7 +401,7 @@ const Memors = () => {
 
         // Check for memor ID in URL
         const pathnameParts = location.pathname.split("/");
-        const memorIdFromUrl = pathnameParts[2]; // ex: /memors/1 → "1"
+        const memorIdFromUrl = pathnameParts[2];
 
         if (memorIdFromUrl) {
           const memorToOpen = allProcessedMemors.find(
@@ -530,7 +530,7 @@ const Memors = () => {
     document.body.style.overflow = "hidden";
 
     // Update URL without causing a page refresh using replaceState
-    window.history.replaceState(null, "", `/memors/${memor.id}`);
+    window.history.replaceState(null, "", `/app/memors/${memor.id}`);
   };
 
   const handleCloseModal = () => {
@@ -539,7 +539,7 @@ const Memors = () => {
     document.body.style.overflow = "auto";
 
     // Update URL without causing a page refresh using replaceState
-    window.history.replaceState(null, "", "/memors");
+    window.history.replaceState(null, "", "/app/memors");
   };
 
   const handleSubmitMemor = (id) => {

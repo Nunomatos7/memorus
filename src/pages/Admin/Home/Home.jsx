@@ -694,13 +694,14 @@ const Home = () => {
               <Card
                 className='card'
                 onClick={() =>
-                  (window.location.href = "/admin/adminBoard?tab=ongoing")
+                  (window.location.href = "/app/admin/adminBoard?tab=ongoing")
                 }
                 onKeyPress={(e) =>
                   handleKeyPress(
                     e,
                     () =>
-                      (window.location.href = "/admin/adminBoard?tab=ongoing")
+                      (window.location.href =
+                        "/app/admin/adminBoard?tab=ongoing")
                   )
                 }
                 style={{ cursor: "pointer" }}
@@ -733,14 +734,11 @@ const Home = () => {
             ) : (
               <Card
                 className='card'
-                onClick={() =>
-                  (window.location.href = "/admin/adminBoard?tab=closed")
-                }
+                onClick={() => (window.location.href = "/app/admin/adminBoard")}
                 onKeyPress={(e) =>
                   handleKeyPress(
                     e,
-                    () =>
-                      (window.location.href = "/admin/adminBoard?tab=closed")
+                    () => (window.location.href = "/app/admin/adminBoard")
                   )
                 }
                 style={{ cursor: "pointer" }}
@@ -865,7 +863,7 @@ const Home = () => {
                     <Card
                       className='card'
                       onClick={() =>
-                        (window.location.href = "/admin/leaderboard")
+                        (window.location.href = "/app/admin/leaderboard")
                       }
                       style={{ cursor: "pointer" }}
                       tabIndex='0'
