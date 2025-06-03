@@ -83,7 +83,7 @@ function App() {
 
       <Routes>
         {/* Landing Page Route - Available to everyone */}
-        <Route path='/landing' element={<LandingPage />} />
+        <Route path='/' element={<LandingPage />} />
 
         {/* Auth Routes */}
         <Route
