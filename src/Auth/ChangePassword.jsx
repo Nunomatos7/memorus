@@ -16,7 +16,7 @@ const ChangePasswordPage = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
-  
+
   const { user, token } = useAuth();
   const navigate = useNavigate();
 
@@ -74,7 +74,7 @@ const ChangePasswordPage = () => {
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -128,8 +128,10 @@ const ChangePasswordPage = () => {
 
       console.log("Making password change request with payload:", {
         ...payload,
-        currentPassword: payload.currentPassword ? "[PROVIDED]" : "[NOT PROVIDED]",
-        newPassword: "[REDACTED]"
+        currentPassword: payload.currentPassword
+          ? "[PROVIDED]"
+          : "[NOT PROVIDED]",
+        newPassword: "[REDACTED]",
       });
 
       // Make the API request
@@ -159,7 +161,7 @@ const ChangePasswordPage = () => {
 
       // Redirect to login after a delay
       setTimeout(() => {
-        navigate("/login");
+        navigate("/app/login");
       }, 2000);
     } catch (error) {
       console.error("Error changing password:", error);
@@ -200,15 +202,21 @@ const ChangePasswordPage = () => {
             ? "Enter your current password and a new password to update your credentials."
             : "Enter your username (email) and a new password to update your credentials."}
         </Typography>
-        
+
         <form onSubmit={handleChangePassword} className='login-form'>
           {error && (
-            <Alert severity="error" sx={{ mb: 2, backgroundColor: "#d32f2f", color: "#fff" }}>
+            <Alert
+              severity='error'
+              sx={{ mb: 2, backgroundColor: "#d32f2f", color: "#fff" }}
+            >
               {error}
             </Alert>
           )}
           {success && (
-            <Alert severity="success" sx={{ mb: 2, backgroundColor: "#2e7d32", color: "#fff" }}>
+            <Alert
+              severity='success'
+              sx={{ mb: 2, backgroundColor: "#2e7d32", color: "#fff" }}
+            >
               {success}
             </Alert>
           )}
@@ -292,7 +300,7 @@ const ChangePasswordPage = () => {
             required
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
-            helperText="Password must be at least 8 characters long"
+            helperText='Password must be at least 8 characters long'
             sx={{
               mb: 2,
               "& .MuiInputBase-root": {
@@ -363,9 +371,9 @@ const ChangePasswordPage = () => {
             sx={{
               backgroundColor: "#6200ea",
               "&:hover": { backgroundColor: "#4e00d1" },
-              "&:disabled": { 
+              "&:disabled": {
                 backgroundColor: "#555",
-                color: "#999"
+                color: "#999",
               },
             }}
           >

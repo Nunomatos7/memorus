@@ -5,7 +5,7 @@ import {
   Typography,
   Paper,
   Button,
-  CircularProgress
+  CircularProgress,
 } from "@mui/material";
 import background1 from "../../assets/images/background1.svg";
 import background2 from "../../assets/images/background2.svg";
@@ -25,34 +25,39 @@ const TeamGuard = ({ children }) => {
   useEffect(() => {
     const fetchAdminContact = async () => {
       if (!user?.tenant_subdomain) return;
-      
+
       try {
         setLoadingAdmin(true);
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users`, {
-          headers: {
-            "Authorization": `Bearer ${localStorage.getItem("token")}`,
-            "X-Tenant": user.tenant_subdomain
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/users`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+              "X-Tenant": user.tenant_subdomain,
+            },
           }
-        });
-        
+        );
+
         if (response.ok) {
           const users = await response.json();
           // Find the first user with admin role
           for (const potentialAdmin of users) {
             try {
               const rolesResponse = await fetch(
-                `${import.meta.env.VITE_API_URL}/api/users/${potentialAdmin.id}/roles`, 
+                `${import.meta.env.VITE_API_URL}/api/users/${
+                  potentialAdmin.id
+                }/roles`,
                 {
                   headers: {
-                    "Authorization": `Bearer ${localStorage.getItem("token")}`,
-                    "X-Tenant": user.tenant_subdomain
-                  }
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    "X-Tenant": user.tenant_subdomain,
+                  },
                 }
               );
-              
+
               if (rolesResponse.ok) {
                 const roles = await rolesResponse.json();
-                if (roles.some(role => role.title === "admin")) {
+                if (roles.some((role) => role.title === "admin")) {
                   setAdminEmail(potentialAdmin.email);
                   break;
                 }
@@ -68,7 +73,7 @@ const TeamGuard = ({ children }) => {
         setLoadingAdmin(false);
       }
     };
-    
+
     fetchAdminContact();
   }, [user?.tenant_subdomain]);
 
@@ -81,7 +86,7 @@ const TeamGuard = ({ children }) => {
           justifyContent: "center",
           alignItems: "center",
           height: "100vh",
-          bgcolor: "#111315"
+          bgcolor: "#111315",
         }}
       >
         <CircularProgress sx={{ color: "#d0bcfe" }} />
@@ -105,13 +110,13 @@ const TeamGuard = ({ children }) => {
         bgcolor: "#111315",
         padding: "20px",
         position: "relative",
-        overflow: "hidden"
+        overflow: "hidden",
       }}
     >
       {/* Background elements */}
       <img
         src={background1}
-        alt=""
+        alt=''
         style={{
           position: "absolute",
           top: "2",
@@ -119,11 +124,11 @@ const TeamGuard = ({ children }) => {
           width: "15%",
           zIndex: "0",
         }}
-        aria-hidden="true"
+        aria-hidden='true'
       />
       <img
         src={background2}
-        alt=""
+        alt=''
         style={{
           position: "absolute",
           top: "25%",
@@ -131,11 +136,11 @@ const TeamGuard = ({ children }) => {
           width: "5%",
           zIndex: "0",
         }}
-        aria-hidden="true"
+        aria-hidden='true'
       />
       <img
         src={background3}
-        alt=""
+        alt=''
         style={{
           position: "absolute",
           top: "35%",
@@ -143,7 +148,7 @@ const TeamGuard = ({ children }) => {
           width: "5%",
           zIndex: "0",
         }}
-        aria-hidden="true"
+        aria-hidden='true'
       />
 
       {/* Message card */}
@@ -157,49 +162,59 @@ const TeamGuard = ({ children }) => {
           borderRadius: "16px",
           border: "1px solid #333738",
           position: "relative",
-          zIndex: 2
+          zIndex: 2,
         }}
       >
-        <Typography variant="h4" component="h1" gutterBottom sx={{ color: "#d0bcfe", fontWeight: "bold" }}>
+        <Typography
+          variant='h4'
+          component='h1'
+          gutterBottom
+          sx={{ color: "#d0bcfe", fontWeight: "bold" }}
+        >
           Team Assignment Required
         </Typography>
-        
-        <Typography variant="body1" paragraph sx={{ color: "white", my: 3 }}>
-          Welcome to Memor&apos;us! To participate in competitions and submit memors, you need to be assigned to a team. 
-          Please contact your administrator to request team assignment.
+
+        <Typography variant='body1' paragraph sx={{ color: "white", my: 3 }}>
+          Welcome to Memor&apos;us! To participate in competitions and submit
+          memors, you need to be assigned to a team. Please contact your
+          administrator to request team assignment.
         </Typography>
-        
+
         {loadingAdmin ? (
           <CircularProgress size={20} sx={{ color: "#d0bcfe", my: 2 }} />
         ) : adminEmail ? (
           <Box sx={{ my: 3 }}>
-            <Typography variant="body1" sx={{ color: "#aaa" }}>
+            <Typography variant='body1' sx={{ color: "#aaa" }}>
               You can contact your administrator at:
             </Typography>
-            <Typography variant="body1" sx={{ color: "#d0bcfe", fontWeight: "bold", my: 1 }}>
+            <Typography
+              variant='body1'
+              sx={{ color: "#d0bcfe", fontWeight: "bold", my: 1 }}
+            >
               {adminEmail}
             </Typography>
           </Box>
         ) : (
-          <Typography variant="body2" sx={{ color: "#aaa", my: 2 }}>
-            Please check with your organization for your administrator&apos;s contact information.
+          <Typography variant='body2' sx={{ color: "#aaa", my: 2 }}>
+            Please check with your organization for your administrator&apos;s
+            contact information.
           </Typography>
         )}
 
         <Button
-          variant="contained"
+          variant='contained'
           sx={{
             mt: 3,
             bgcolor: "#d0bcfe",
             color: "#381e72",
             "&:hover": {
-              bgcolor: "#b39ddb"
-            }
+              bgcolor: "#b39ddb",
+            },
           }}
           onClick={() => {
             if (user) {
               localStorage.removeItem("token");
-              window.location.href = "/login";
+              window.location.href = "/app/login";
             }
           }}
         >
@@ -211,7 +226,7 @@ const TeamGuard = ({ children }) => {
 };
 
 TeamGuard.propTypes = {
-  children: PropTypes.node.isRequired
+  children: PropTypes.node.isRequired,
 };
 
 export default TeamGuard;

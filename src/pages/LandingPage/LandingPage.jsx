@@ -175,7 +175,7 @@ const LandingPage = () => {
         allowFullScreen
         loading='eager'
         onLoad={handleIframeLoad}
-        sandbox='allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation'
+        // sandbox='allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation'
       />
     </div>
   );
