@@ -22,6 +22,7 @@ import { Toaster } from "react-hot-toast";
 import TeamGuard from "./Components/TeamGuard/TeamGuard";
 import { Box } from "@mui/material";
 import Profile from "./pages/Profile/Profile";
+import QRMemorAccess from "./Components/QRMemorAccess/QRMemorAccess";
 
 function App() {
   const { user, setUser, loading, cookiesAccepted } = useAuth();
@@ -57,7 +58,9 @@ function App() {
     location.pathname
   );
   const hideFooter =
-    isAuthPage || location.pathname.toLowerCase().includes("/memoryboard");
+    isAuthPage ||
+    location.pathname.toLowerCase().includes("/memoryboard") ||
+    location.pathname.startsWith("/qr-memor/"); // Hide footer for QR access
 
   const isAdmin = user?.roles?.some((role) => role.toLowerCase() === "admin");
 
@@ -101,6 +104,9 @@ function App() {
           }
         />
         <Route path='/change-password' element={<ChangePassword />} />
+
+        {/* QR Code Access Route - PUBLIC (must come before protected routes) */}
+        <Route path='/qr-memor/:id' element={<QRMemorAccess />} />
 
         {/* Collaborator Routes */}
         <Route

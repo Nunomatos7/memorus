@@ -36,6 +36,11 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
   const [loadingTeamPhotos, setLoadingTeamPhotos] = useState(false);
   const [normalizedImages, setNormalizedImages] = useState([]);
 
+  // QR Code states
+  const [qrCodeUrl, setQrCodeUrl] = useState(null);
+  const [loadingQR, setLoadingQR] = useState(false);
+  const [qrError, setQrError] = useState(null);
+
   const modalRef = useRef(null);
   const fileInputRef = useRef(null);
 
@@ -67,6 +72,66 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
 
     return null;
   };
+
+  // Generate QR code with temporary token when modal opens
+  useEffect(() => {
+    if (!memor?.id || !token || !user?.tenant_subdomain) return;
+
+    const generateQRCode = async () => {
+      setLoadingQR(true);
+      setQrError(null);
+
+      try {
+        console.log(`Generating QR code for memor ${memor.id}`);
+
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/memors/${memor.id}/temp-token`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "X-Tenant": user.tenant_subdomain,
+            },
+          }
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          setQrCodeUrl(data.qrUrl);
+          console.log("QR code generated with temp token:", data.qrUrl);
+          console.log("Token expires in:", data.expiresIn, "seconds");
+        } else {
+          const errorData = await response.json().catch(() => ({}));
+          console.error(
+            "Failed to generate QR code:",
+            response.status,
+            errorData
+          );
+
+          // Fallback to basic URL without token
+          const fallbackUrl = `https://${user.tenant_subdomain}.memor-us.com/memors/${memor.id}`;
+          setQrCodeUrl(fallbackUrl);
+          setQrError(
+            "Could not generate secure link. QR code will require manual login."
+          );
+          console.log("Using fallback QR URL:", fallbackUrl);
+        }
+      } catch (error) {
+        console.error("Error generating QR code:", error);
+
+        // Fallback to basic URL without token
+        const fallbackUrl = `https://${user.tenant_subdomain}.memor-us.com/memors/${memor.id}`;
+        setQrCodeUrl(fallbackUrl);
+        setQrError(
+          "Could not generate secure link. QR code will require manual login."
+        );
+        console.log("Using fallback QR URL due to error:", fallbackUrl);
+      } finally {
+        setLoadingQR(false);
+      }
+    };
+
+    generateQRCode();
+  }, [memor?.id, token, user?.tenant_subdomain]);
 
   // Fetch team photos when component mounts or memor changes
   useEffect(() => {
@@ -306,32 +371,40 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
       // Set up loading state
       setIsSubmitting(true);
 
-      // Send the request using fetch with FormData
-      const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/memors/${memor.id}/pictures`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "X-Tenant": user?.tenant_subdomain,
-          },
-          body: formData,
-        }
-      );
+      // Prepare headers
+      const headers = {
+        "X-Tenant": user?.tenant_subdomain,
+      };
 
-      {
-        memor?.id && (
-          <div
-            style={{
-              marginTop: "20px",
-              padding: "10px",
-              background: "#f5f5f5",
-            }}
-          >
-            {/* <TestAltText memorId={memor.id} /> */}
-          </div>
-        );
+      // Check for temporary token (from QR code access)
+      const tempToken = sessionStorage.getItem("tempToken");
+      const tempMemorId = sessionStorage.getItem("tempMemorId");
+
+      if (tempToken && tempMemorId && parseInt(tempMemorId) === memor.id) {
+        // Use temporary token for authentication
+        console.log("Using temporary token for submission");
+      } else if (token) {
+        // Use regular authentication
+        headers["Authorization"] = `Bearer ${token}`;
+      } else {
+        throw new Error("No authentication available");
       }
+
+      // Build URL with temp token if available
+      let url = `${import.meta.env.VITE_API_URL}/api/memors/${
+        memor.id
+      }/pictures`;
+      if (tempToken && tempMemorId && parseInt(tempMemorId) === memor.id) {
+        url += `?tempToken=${tempToken}`;
+      }
+
+      // Send the request using fetch with FormData
+      const res = await fetch(url, {
+        method: "POST",
+        headers: headers,
+        body: formData,
+      });
+
       // Reset loading state
       setIsSubmitting(false);
 
@@ -473,6 +546,7 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
               </Button>
               <h4>Details</h4>
             </div>
+
             <div className='modal-header'>
               <Typography
                 variant='h5'
@@ -491,6 +565,7 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
                 {memor.description}
               </Typography>
             </div>
+
             <div className='modal-details'>
               <div className='modal-details-header'>
                 <Groups />
@@ -518,6 +593,21 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
                 }}
               >
                 {uploadError}
+              </Alert>
+            )}
+
+            {/* Display QR error if any */}
+            {qrError && (
+              <Alert
+                severity='warning'
+                sx={{
+                  mt: 2,
+                  mb: 2,
+                  backgroundColor: "rgba(237, 108, 2, 0.1)",
+                  color: "#ff9800",
+                }}
+              >
+                {qrError}
               </Alert>
             )}
 
@@ -565,15 +655,30 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
                 ) : (
                   <>
                     <div className='qr-code-placeholder'>
-                      <QRCode
-                        value={`https://${user.tenant_subdomain}.memor-us.com/memors/${memor.id}`}
-                        size={128}
-                        bgColor='transparent'
-                        fgColor='#d0bcfe'
-                        style={{ padding: "8px", borderRadius: "8px" }}
-                      />
+                      {loadingQR ? (
+                        <CircularProgress size={40} sx={{ color: "#d0bcfe" }} />
+                      ) : qrCodeUrl ? (
+                        <QRCode
+                          value={qrCodeUrl}
+                          size={128}
+                          bgColor='transparent'
+                          fgColor='#d0bcfe'
+                          style={{ padding: "8px", borderRadius: "8px" }}
+                        />
+                      ) : (
+                        <Typography
+                          variant='body2'
+                          style={{ color: "#ff5252" }}
+                        >
+                          Could not generate QR code
+                        </Typography>
+                      )}
                       <Typography variant='body2' style={{ color: "#DDDAF2" }}>
-                        Scan it with your phone
+                        {loadingQR
+                          ? "Generating secure link..."
+                          : qrCodeUrl
+                          ? "Scan it with your phone"
+                          : "QR code unavailable"}
                       </Typography>
                     </div>
                     <Typography variant='body2' className='or-text'>
@@ -627,6 +732,7 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
                 )}
               </div>
             </div>
+
             <Typography variant='body2' className='uploaded-photos-title'>
               Your team&apos;s photos for this Memor
             </Typography>

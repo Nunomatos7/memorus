@@ -82,7 +82,6 @@ const LoginPage = () => {
 
     const cleanTenant = tenantInput.trim().toLowerCase();
 
-    // Redirect to the tenant's subdomain URL
     const currentHost = window.location.hostname;
     let newUrl;
 
@@ -95,7 +94,6 @@ const LoginPage = () => {
 
     console.log("Redirecting to:", newUrl);
 
-    // Redirect to the tenant subdomain
     window.location.href = newUrl;
   };
 
@@ -197,7 +195,7 @@ const LoginPage = () => {
             <img src={logo} alt='Memor-us Logo' className='logo' />
           </div>
           <Typography variant='h5' className='login-title'>
-            Welcome to Memor'us
+            Welcome to Memor&quot;us
           </Typography>
           <Typography variant='body2' className='login-subtitle' sx={{ mb: 3 }}>
             Please type out the subdomain of your tenant
