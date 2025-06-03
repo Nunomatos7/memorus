@@ -88,9 +88,11 @@ const LoginPage = () => {
 
     if (currentHost.includes("localhost")) {
       const port = window.location.port;
-      newUrl = `http://${cleanTenant}.localhost${port ? ":" + port : ""}`;
+      newUrl = `http://${cleanTenant}.localhost${
+        port ? ":" + port : ""
+      }/app/login`;
     } else {
-      newUrl = `https://${cleanTenant}.memor-us.com`;
+      newUrl = `https://${cleanTenant}.memor-us.com/app/login`;
     }
 
     console.log("Redirecting to:", newUrl);
