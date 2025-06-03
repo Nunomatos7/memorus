@@ -1,0 +1,60 @@
+@import url("https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+
+/* #root {
+  margin: 0 auto;
+  text-align: center;
+  overflow-x: hidden;
+  overflow-y: hidden;
+} */
+
+.collaborator {
+  background-color: #381e72;
+  position: relative;
+  margin-bottom: 50px;
+  z-index: 1;
+  margin-top: 50px;
+}
+
+.collaborator::before {
+  content: "";
+  background: url("./assets/collab-before.svg") no-repeat bottom;
+  background-size: contain;
+  position: absolute;
+
+  top: 1px;
+  transform: translateY(-100%);
+  width: 100%;
+  left: 0;
+  height: 200px;
+  z-index: 1;
+}
+.collaborator::after {
+  content: "";
+  background: url("./assets/collab-after.svg") no-repeat top;
+  background-size: contain;
+  position: absolute;
+
+  bottom: 1px;
+  transform: translateY(100%);
+  width: 100%;
+  left: 0;
+  height: 200px;
+  z-index: 1;
+}
+
+/* Add the animation */
+@keyframes float {
+  0% {
+    transform: translate(-50%, -50%) translateY(0);
+  }
+  50% {
+    transform: translate(-50%, -50%) translateY(5px);
+  }
+  100% {
+    transform: translate(-50%, -50%) translateY(0);
+  }
+}
+
+.iframe-container {
+  animation: float 3s ease-in-out infinite;
+}

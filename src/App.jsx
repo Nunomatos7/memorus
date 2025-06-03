@@ -16,6 +16,7 @@ import ChangePassword from "./Auth/ChangePassword";
 import ConsentModal from "./Components/ConsentModal/ConsentModal";
 import CollaboratorFooter from "./Components/CollaboratorFooter/CollaboratorFooter";
 import AdminFooter from "./Components/AdminFooter/AdminFooter";
+import LandingPage from "./pages/LandingPage/LandingPage"; // Import the new landing page
 import { useAuth } from "./context/AuthContext";
 import Loader from "./Components/Loader/Loader";
 import { Toaster } from "react-hot-toast";
@@ -52,14 +53,19 @@ function App() {
     role: PropTypes.string,
   };
 
-  // Determine if we're on an auth page to not show footer
+  // Determine if we're on an auth page or landing page to not show footer
   const isAuthPage = [
     "/app/login",
     "/app/register",
     "/app/change-password",
   ].includes(location.pathname);
+
+  const isLandingPage = location.pathname === "/landing";
+
   const hideFooter =
-    isAuthPage || location.pathname.toLowerCase().includes("/app/memoryboard");
+    isAuthPage ||
+    isLandingPage ||
+    location.pathname.toLowerCase().includes("/app/memoryboard");
 
   const isAdmin = user?.roles?.some((role) => role.toLowerCase() === "admin");
 
@@ -75,6 +81,9 @@ function App() {
       <ConsentModal setUser={setUser} />
 
       <Routes>
+        {/* Landing Page Route - Available to everyone */}
+        <Route path='/landing' element={<LandingPage />} />
+
         {/* Auth Routes */}
         <Route
           path='/app/login'
@@ -147,8 +156,17 @@ function App() {
           <Route path='adminboard' element={<AdminBoard />} />
         </Route>
 
-        {/* Catch-All */}
-        <Route path='*' element={<Navigate to='/app/login' replace />} />
+        {/* Catch-All - Redirect to landing page for main domain, login for subdomains */}
+        <Route
+          path='*'
+          element={
+            window.location.hostname === "memor-us.com" ? (
+              <Navigate to='/landing' replace />
+            ) : (
+              <Navigate to='/app/login' replace />
+            )
+          }
+        />
       </Routes>
 
       {/* Footer (conditional) */}
