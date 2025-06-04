@@ -453,7 +453,7 @@ const LoginPage = () => {
           </Button>
         </form>
         <a
-          href='/register'
+          href='/app/register'
           className='admin-link'
           aria-label='Register for a new account'
         >
