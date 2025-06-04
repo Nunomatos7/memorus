@@ -31,13 +31,20 @@ function App() {
 
   // Helper function to determine if we're on the main domain or a tenant subdomain
   const isMainDomain = () => {
-    return window.location.hostname === "memor-us.com";
+    const hostname = window.location.hostname;
+    return (
+      hostname === "memor-us.com" ||
+      hostname === "www.memor-us.com" ||
+      hostname === "localhost"
+    );
   };
 
   const isTenantSubdomain = () => {
+    const hostname = window.location.hostname;
     return (
-      window.location.hostname.endsWith(".memor-us.com") &&
-      window.location.hostname !== "memor-us.com"
+      hostname.endsWith(".memor-us.com") &&
+      hostname !== "memor-us.com" &&
+      hostname !== "www.memor-us.com"
     );
   };
 
@@ -90,10 +97,7 @@ function App() {
       <ConsentModal setUser={setUser} />
 
       <Routes>
-        {/* Landing Page Route - Only available on main domain */}
-        {isMainDomain() && <Route path='/*' element={<LandingPage />} />}
-
-        {/* Auth Routes */}
+        {/* Auth Routes - Available on all domains */}
         <Route
           path='/app/login'
           element={
@@ -166,19 +170,16 @@ function App() {
           <Route path='adminboard' element={<AdminBoard />} />
         </Route>
 
+        {/* Landing Page Routes - Only for main domain (memor-us.com, www.memor-us.com, localhost) */}
+        {isMainDomain() && (
+          <>
+            <Route path='/' element={<LandingPage />} />
+            <Route path='/landing' element={<LandingPage />} />
+          </>
+        )}
+
         {/* Catch-All Routes */}
-        <Route
-          path='*'
-          element={
-            isMainDomain() ? (
-              <Navigate to='/landing' replace />
-            ) : isTenantSubdomain() ? (
-              <Navigate to='/app/login' replace />
-            ) : (
-              <Navigate to='/app/login' replace />
-            )
-          }
-        />
+        <Route path='*' element={<Navigate to='/app/login' replace />} />
       </Routes>
 
       {/* Footer (conditional) */}
