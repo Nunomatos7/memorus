@@ -29,9 +29,17 @@ function App() {
   const { user, setUser, loading, cookiesAccepted } = useAuth();
   const location = useLocation();
 
-  if (loading) {
-    return <div className='p-4 text-center'>A carregar dados...</div>;
-  }
+  // Helper function to determine if we're on the main domain or a tenant subdomain
+  const isMainDomain = () => {
+    return window.location.hostname === "memor-us.com";
+  };
+
+  const isTenantSubdomain = () => {
+    return (
+      window.location.hostname.endsWith(".memor-us.com") &&
+      window.location.hostname !== "memor-us.com"
+    );
+  };
 
   const ProtectedRoute = ({ children, role }) => {
     if (loading || !cookiesAccepted) {
@@ -82,8 +90,8 @@ function App() {
       <ConsentModal setUser={setUser} />
 
       <Routes>
-        {/* Landing Page Route - Available to everyone */}
-        <Route path='/' element={<LandingPage />} />
+        {/* Landing Page Route - Only available on main domain */}
+        {isMainDomain() && <Route path='/*' element={<LandingPage />} />}
 
         {/* Auth Routes */}
         <Route
@@ -158,12 +166,14 @@ function App() {
           <Route path='adminboard' element={<AdminBoard />} />
         </Route>
 
-        {/* Catch-All - Redirect to landing page for main domain, login for subdomains */}
+        {/* Catch-All Routes */}
         <Route
           path='*'
           element={
-            window.location.hostname === "memor-us.com" ? (
+            isMainDomain() ? (
               <Navigate to='/landing' replace />
+            ) : isTenantSubdomain() ? (
+              <Navigate to='/app/login' replace />
             ) : (
               <Navigate to='/app/login' replace />
             )
