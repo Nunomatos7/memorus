@@ -29,7 +29,6 @@ function App() {
   const { user, setUser, loading, cookiesAccepted } = useAuth();
   const location = useLocation();
 
-  // Helper function to determine if we're on the main domain or a tenant subdomain
   const isMainDomain = () => {
     const hostname = window.location.hostname;
     return (
@@ -69,7 +68,6 @@ function App() {
     role: PropTypes.string,
   };
 
-  // Determine if we're on an auth page or landing page to not show footer
   const isAuthPage = [
     "/app/login",
     "/app/register",
@@ -97,7 +95,12 @@ function App() {
       <ConsentModal setUser={setUser} />
 
       <Routes>
+<<<<<<< Updated upstream
         {/* Auth Routes - Available on all domains */}
+=======
+        {isMainDomain() && <Route path='/*' element={<LandingPage />} />}
+
+>>>>>>> Stashed changes
         <Route
           path='/app/login'
           element={
@@ -135,7 +138,6 @@ function App() {
         <Route path='/app/change-password' element={<ChangePassword />} />
         <Route path='/terms' element={<Terms />} />
 
-        {/* Collaborator Routes */}
         <Route
           path='/app/*'
           element={
@@ -155,7 +157,6 @@ function App() {
           <Route path='profile' element={<Profile />} />
         </Route>
 
-        {/* Admin Routes */}
         <Route
           path='/app/admin/*'
           element={
@@ -170,6 +171,7 @@ function App() {
           <Route path='adminboard' element={<AdminBoard />} />
         </Route>
 
+<<<<<<< Updated upstream
         {/* Landing Page Routes - Only for main domain (memor-us.com, www.memor-us.com, localhost) */}
         {isMainDomain() && (
           <>
@@ -180,12 +182,24 @@ function App() {
 
         {/* Catch-All Routes */}
         <Route path='*' element={<Navigate to='/app/login' replace />} />
+=======
+        <Route
+          path='*'
+          element={
+            isMainDomain() ? (
+              <Navigate to='/landing' replace />
+            ) : isTenantSubdomain() ? (
+              <Navigate to='/app/login' replace />
+            ) : (
+              <Navigate to='/app/login' replace />
+            )
+          }
+        />
+>>>>>>> Stashed changes
       </Routes>
 
-      {/* Footer (conditional) */}
       {!hideFooter && (isAdmin ? <AdminFooter /> : <CollaboratorFooter />)}
 
-      {/* Toast Notifications */}
       <Toaster
         position='top-right'
         toastOptions={{

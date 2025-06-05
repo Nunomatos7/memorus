@@ -1,4 +1,3 @@
-// ManageTeams.jsx
 import { useState, useEffect } from "react";
 import {
   Box,
@@ -15,7 +14,6 @@ import ConfirmationModal from "../../../../Components/ConfirmationModal/Confirma
 import api from "../../../../api/axiosInstance";
 import PropTypes from "prop-types";
 
-// Skeleton for teams loading state
 const ManageTeamsSkeleton = () => (
   <Box
     sx={{
@@ -45,7 +43,6 @@ const ManageTeamsSkeleton = () => (
       />
     </Box>
 
-    {/* Team cards skeleton */}
     {[...Array(4)].map((_, index) => (
       <Box
         key={index}
@@ -65,7 +62,6 @@ const ManageTeamsSkeleton = () => (
             gap: 2,
           }}
         >
-          {/* Team Avatar Skeleton */}
           <Skeleton
             variant='circular'
             width={40}
@@ -73,13 +69,11 @@ const ManageTeamsSkeleton = () => (
             sx={{ bgcolor: "#424242" }}
           />
 
-          {/* Team Name Skeleton */}
           <Skeleton
             variant='text'
             sx={{ fontSize: "1rem", width: "120px", bgcolor: "#424242" }}
           />
 
-          {/* Team Members Skeleton */}
           <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
             <Skeleton
               variant='text'
@@ -91,7 +85,6 @@ const ManageTeamsSkeleton = () => (
             />
           </Box>
 
-          {/* Action Buttons Skeleton */}
           <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }}>
             <Skeleton
               variant='circular'
@@ -690,7 +683,6 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
                 </Box>
               </Box>
             ) : (
-              // Edit mode content continues...
               <Box sx={{ display: "flex", flexDirection: "column" }}>
                 <Box
                   sx={{

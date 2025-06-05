@@ -6,12 +6,10 @@ import {
   Button,
   Paper,
   Avatar,
-  Divider,
   Grid,
   Snackbar,
   Alert,
   CircularProgress,
-  IconButton,
   Card,
   CardContent,
 } from "@mui/material";
@@ -68,7 +66,6 @@ const Profile = () => {
     }
   }, [user]);
 
-  // Add an additional effect to fetch team details if teamsId is present but team name is missing
   useEffect(() => {
     const fetchTeamDetails = async () => {
       if (user?.teamsId && !user?.team?.name && token) {
@@ -85,7 +82,6 @@ const Profile = () => {
 
           if (response.ok) {
             const teamData = await response.json();
-            // Update the user context with team information
             setUser({
               ...user,
               team: {
@@ -108,7 +104,6 @@ const Profile = () => {
     if (!token || !user || !user.teamsId) return;
 
     try {
-      // Fetch any active competition first
       const compResponse = await fetch(
         `${import.meta.env.VITE_API_URL}/api/competitions/active`,
         {
@@ -128,7 +123,6 @@ const Profile = () => {
       if (competitionsData && competitionsData.length > 0) {
         const activeCompetition = competitionsData[0];
 
-        // Fetch team progress for this user's team
         const progressResponse = await fetch(
           `${import.meta.env.VITE_API_URL}/api/memors/team/${
             user.teamsId
@@ -141,7 +135,6 @@ const Profile = () => {
           }
         );
 
-        // Fetch leaderboard to get team rank and points
         const leaderboardResponse = await fetch(
           `${import.meta.env.VITE_API_URL}/api/leaderboard/competition/${
             activeCompetition.id
@@ -158,7 +151,6 @@ const Profile = () => {
           const progressData = await progressResponse.json();
           const leaderboardData = await leaderboardResponse.json();
 
-          // Find user's team in leaderboard
           const userTeam = leaderboardData.teams.find(
             (team) => team.teamId === user.teamsId
           );
@@ -242,7 +234,6 @@ const Profile = () => {
 
       const updatedUser = await response.json();
 
-      // Update user in context
       setUser({
         ...user,
         firstName: updatedUser.first_name,
@@ -353,7 +344,6 @@ const Profile = () => {
         position: "relative",
       }}
     >
-      {/* Background Elements */}
       <img
         src={background1}
         alt=''
@@ -407,7 +397,6 @@ const Profile = () => {
         </Typography>
 
         <Grid container spacing={4}>
-          {/* Profile Information */}
           <Grid item xs={12} md={8}>
             <Paper
               sx={{
@@ -641,7 +630,6 @@ const Profile = () => {
               </form>
             </Paper>
 
-            {/* Password Section */}
             <Paper
               sx={{
                 p: 4,

@@ -23,15 +23,12 @@ const RegisterPage = () => {
   const getTenantFromSubdomain = () => {
     const host = window.location.hostname;
 
-    // In dev: "loba.localhost" → ["loba", "localhost"]
-    // In prod: "loba.memor-us.com" → ["loba", "memor-us", "com"]
     const parts = host.split(".");
 
     if (host.includes("localhost")) {
       return parts.length > 1 ? parts[0] : null;
     }
 
-    // production — assumes subdomain is at the beginning
     if (parts.length >= 3) {
       return parts[0];
     }
@@ -43,7 +40,6 @@ const RegisterPage = () => {
     e.preventDefault();
     setError("");
 
-    // Get tenant from subdomain
     const tenant = getTenantFromSubdomain()?.toLowerCase();
 
     if (!tenant) {
@@ -51,7 +47,6 @@ const RegisterPage = () => {
       return;
     }
 
-    // Validation
     if (password !== confirmPassword) {
       setError("Passwords do not match!");
       return;
@@ -65,7 +60,6 @@ const RegisterPage = () => {
     try {
       setIsSubmitting(true);
 
-      // Make API call to register endpoint
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/register`,
         {
@@ -83,23 +77,19 @@ const RegisterPage = () => {
         }
       );
 
-      // Handle response
       if (!response.ok) {
         const data = await response.text();
         throw new Error(data || "Registration failed");
       }
 
-      // Registration successful
       toast.success("Registration successful! You can now log in.");
 
-      // Clear form
       setFirstName("");
       setLastName("");
       setEmail("");
       setPassword("");
       setConfirmPassword("");
 
-      // Redirect to login page
       setTimeout(() => {
         navigate("/app/login");
       }, 2000);
@@ -127,7 +117,6 @@ const RegisterPage = () => {
         <form onSubmit={handleRegister} className='login-form'>
           {error && <p className='error-message'>{error}</p>}
 
-          {/* Name Fields */}
           <div style={{ display: "flex", gap: "16px", marginBottom: "16px" }}>
             <TextField
               label='First Name'

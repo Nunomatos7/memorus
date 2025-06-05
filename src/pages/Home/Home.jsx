@@ -23,7 +23,6 @@ import pending from "../../assets/images/pendingHome.svg";
 import completed from "../../assets/images/completedHome.svg";
 import WelcomeModal from "../../Components/WelcomeModal/WelcomeModal";
 import Countdown from "../../Components/Countdown/Countdown";
-// import Loader from "../../Components/Loader/Loader";
 import background1 from "../../assets/images/background1.svg";
 import background2 from "../../assets/images/background2.svg";
 import background3 from "../../assets/images/background3.svg";
@@ -32,6 +31,7 @@ import {
   getLeaderboardVisibility,
   LEADERBOARD_VISIBILITY_CHANGE,
 } from "../../assets/utils/leaderboardUtils";
+import PropTypes from "prop-types";
 
 const rankImages = {
   1: rank1,
@@ -42,7 +42,7 @@ const rankImages = {
 // Skeleton component for carousel items
 const CarouselSkeleton = () => (
   <div className='latest-wrapper'>
-    {[...Array(5)].map((_, index) => (
+    {[...Array(3)].map((_, index) => (
       <div
         key={index}
         className='latest-memors-pic'
@@ -72,7 +72,7 @@ const CarouselSkeleton = () => (
 );
 
 // Skeleton component for stat cards
-const StatCardSkeleton = () => (
+const StatCardSkeleton = ({ cardId }) => (
   <Card className='card'>
     <CardContent>
       <Box display='flex' alignItems='center' justifyContent='space-between'>
@@ -80,17 +80,15 @@ const StatCardSkeleton = () => (
           variant='text'
           sx={{ fontSize: "2rem", width: "40px", bgcolor: "#424242" }}
         />
-        <Skeleton
-          variant='rectangular'
-          width={40}
-          height={40}
-          sx={{ borderRadius: 1, bgcolor: "#424242" }}
-        />
+        {cardId === "pending" ? (
+          <img src={pending} alt='Pending memors icon' />
+        ) : (
+          <img src={completed} alt='Completed memors icon' />
+        )}
       </Box>
-      <Skeleton
-        variant='text'
-        sx={{ fontSize: "0.875rem", mt: 1, bgcolor: "#424242" }}
-      />
+      <Typography variant='body2' color='#B0B0B0'>
+        {cardId === "pending" ? "Pending Memors" : "Completed Memors"}
+      </Typography>
     </CardContent>
   </Card>
 );
@@ -129,7 +127,6 @@ const CountdownSkeleton = () => (
   </Card>
 );
 
-// Skeleton component for leaderboard cards
 const LeaderboardSkeleton = () => (
   <>
     {[...Array(3)].map((_, index) => (
@@ -567,28 +564,27 @@ const Home = () => {
             aria-hidden='true'
           />
 
-          {loading ? (
-            <Skeleton
-              variant='text'
-              sx={{
-                fontSize: "2rem",
-                width: "300px",
-                mb: 2,
-                bgcolor: "#424242",
-              }}
-            />
-          ) : (
-            <h1
-              className='home-title'
-              style={{ display: "flex", alignItems: "center", gap: "1rem" }}
-              tabIndex='0'
-            >
-              Latest Memors <span>•</span>{" "}
+          <h1
+            className='home-title'
+            style={{ display: "flex", alignItems: "center", gap: "1rem" }}
+            tabIndex='0'
+          >
+            Latest Memors <span>•</span>{" "}
+            {loading ? (
+              <Skeleton
+                variant='text'
+                sx={{
+                  fontSize: "2rem",
+                  width: "100px",
+                  bgcolor: "#424242",
+                }}
+              />
+            ) : (
               <span className='team-name' style={{ color: "#9282F9" }}>
-                {user?.teamName || "Your Team"}
+                {user?.teamName || ""}
               </span>
-            </h1>
-          )}
+            )}
+          </h1>
         </div>
 
         <div className='overflow-hidden w-full'>
@@ -734,25 +730,13 @@ const Home = () => {
       </section>
 
       <section id='myMemors' className='container' tabIndex='0'>
-        {loading ? (
-          <Skeleton
-            variant='text'
-            sx={{
-              fontSize: "1.25rem",
-              width: "150px",
-              mb: 2,
-              bgcolor: "#424242",
-            }}
-          />
-        ) : (
-          <Typography variant='h6' gutterBottom style={{ color: "white" }}>
-            My Memors
-          </Typography>
-        )}
+        <Typography variant='h6' gutterBottom style={{ color: "white" }}>
+          My Memors
+        </Typography>
         <Grid container spacing={3}>
           <Grid item xs={12} sm={3}>
             {loading ? (
-              <StatCardSkeleton />
+              <StatCardSkeleton cardId='pending' />
             ) : (
               <Card
                 className='card'
@@ -785,7 +769,7 @@ const Home = () => {
 
           <Grid item xs={12} sm={3}>
             {loading ? (
-              <StatCardSkeleton />
+              <StatCardSkeleton cardId='completed' />
             ) : (
               <Card
                 className='card'
@@ -863,21 +847,9 @@ const Home = () => {
       </section>
 
       <section id='currentLeaders' className='pb-10 container' tabIndex='0'>
-        {loading ? (
-          <Skeleton
-            variant='text'
-            sx={{
-              fontSize: "1.25rem",
-              width: "200px",
-              mb: 2,
-              bgcolor: "#424242",
-            }}
-          />
-        ) : (
-          <Typography variant='h6' gutterBottom style={{ color: "white" }}>
-            Current Leaders
-          </Typography>
-        )}
+        <Typography variant='h6' gutterBottom style={{ color: "white" }}>
+          Current Leaders
+        </Typography>
         {loading ? (
           <Grid container spacing={3}>
             <LeaderboardSkeleton />
@@ -997,6 +969,10 @@ const Home = () => {
       </section>
     </>
   );
+};
+
+StatCardSkeleton.propTypes = {
+  cardId: PropTypes.string.isRequired,
 };
 
 export default Home;

@@ -1,4 +1,3 @@
-// AdminBoard.jsx
 import { useEffect, useState } from "react";
 import {
   Box,
@@ -13,7 +12,6 @@ import { Search } from "@mui/icons-material";
 import background1 from "../../../assets/images/adminBackground1.svg";
 import background2 from "../../../assets/images/adminBackground2.svg";
 import background3 from "../../../assets/images/adminBackground3.svg";
-// import Loader from "../../../Components/Loader/Loader";
 import ManageMemors from "./Components/ManageMemors";
 import ManageTeams from "./Components/ManageTeams";
 import ManageCompetition from "./Components/ManageCompetition";
@@ -21,7 +19,6 @@ import DynamicModal from "./Components/DynamicModal";
 import FeedbackModal from "../../../Components/FeedbackModal/FeedbackModal";
 import { useLocation } from "react-router-dom";
 
-// Skeleton for admin header and tabs
 const AdminHeaderSkeleton = () => (
   <Box>
     <Skeleton
@@ -99,7 +96,6 @@ const AdminBoard = () => {
   });
 
   useEffect(() => {
-    // Simulate initial loading
     setTimeout(() => {
       setInitialLoading(false);
     }, 1500);
@@ -218,7 +214,6 @@ const AdminBoard = () => {
           >
             <AdminHeaderSkeleton />
 
-            {/* Content skeleton based on tab */}
             <Box
               sx={{
                 width: "100%",
@@ -231,7 +226,6 @@ const AdminBoard = () => {
                 marginBottom: "50px",
               }}
             >
-              {/* Create button skeleton */}
               <Skeleton
                 variant='rounded'
                 width={150}
@@ -239,7 +233,6 @@ const AdminBoard = () => {
                 sx={{ bgcolor: "#424242", borderRadius: "20px", mb: 3 }}
               />
 
-              {/* Table header skeleton */}
               <Box
                 sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}
               >
@@ -265,7 +258,6 @@ const AdminBoard = () => {
                 />
               </Box>
 
-              {/* Table rows skeleton */}
               {[...Array(5)].map((_, index) => (
                 <Box
                   key={index}
@@ -339,8 +331,6 @@ const AdminBoard = () => {
 
   return (
     <>
-      {/* <Loader loading={loading} /> */}
-
       <div className='container'>
         <img
           src={background1}
@@ -491,7 +481,6 @@ const AdminBoard = () => {
             />
           )}
 
-          {/* Dynamic Modal */}
           {modalState.open && (
             <DynamicModal
               modalType={modalState.type}
@@ -504,7 +493,6 @@ const AdminBoard = () => {
             />
           )}
 
-          {/* Feedback Modal */}
           {feedbackModal.open && (
             <FeedbackModal
               type={feedbackModal.type}
