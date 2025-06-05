@@ -95,12 +95,8 @@ function App() {
       <ConsentModal setUser={setUser} />
 
       <Routes>
-<<<<<<< Updated upstream
-        {/* Auth Routes - Available on all domains */}
-=======
         {isMainDomain() && <Route path='/*' element={<LandingPage />} />}
 
->>>>>>> Stashed changes
         <Route
           path='/app/login'
           element={
@@ -171,7 +167,7 @@ function App() {
           <Route path='adminboard' element={<AdminBoard />} />
         </Route>
 
-<<<<<<< Updated upstream
+
         {/* Landing Page Routes - Only for main domain (memor-us.com, www.memor-us.com, localhost) */}
         {isMainDomain() && (
           <>
@@ -182,7 +178,6 @@ function App() {
 
         {/* Catch-All Routes */}
         <Route path='*' element={<Navigate to='/app/login' replace />} />
-=======
         <Route
           path='*'
           element={
@@ -195,7 +190,6 @@ function App() {
             )
           }
         />
->>>>>>> Stashed changes
       </Routes>
 
       {!hideFooter && (isAdmin ? <AdminFooter /> : <CollaboratorFooter />)}
