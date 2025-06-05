@@ -7,13 +7,13 @@ import rank3 from "../../assets/images/rank3.svg";
 import background1 from "../../assets/images/background1.svg";
 import background2 from "../../assets/images/background2.svg";
 import background3 from "../../assets/images/background3.svg";
-// import Loader from "../../Components/Loader/Loader";
 import { useAuth } from "../../context/AuthContext";
 import {
   getLeaderboardVisibility,
   LEADERBOARD_VISIBILITY_CHANGE,
 } from "../../assets/utils/leaderboardUtils";
 import { useNavigate } from "react-router-dom";
+import PropTypes from "prop-types";
 
 // Skeleton component for top 3 podium cards
 const PodiumCardSkeleton = ({ height, isFirst = false }) => (
@@ -340,19 +340,20 @@ const Leaderboard = () => {
           }}
         >
           <Box>
-            {/* Header */}
+            <Typography
+              variant='h4'
+              component='h1'
+              sx={{
+                fontWeight: "bold",
+                color: "white",
+                marginBottom: "10px",
+                marginTop: "32px",
+              }}
+            >
+              Leaderboard
+            </Typography>
             {loading ? (
               <>
-                <Skeleton
-                  variant='text'
-                  sx={{
-                    fontSize: "2rem",
-                    width: "200px",
-                    bgcolor: "#424242",
-                    mb: 1,
-                    mt: 4,
-                  }}
-                />
                 <Skeleton
                   variant='text'
                   sx={{
@@ -365,18 +366,6 @@ const Leaderboard = () => {
               </>
             ) : (
               <>
-                <Typography
-                  variant='h4'
-                  component='h1'
-                  sx={{
-                    fontWeight: "bold",
-                    color: "white",
-                    marginBottom: "10px",
-                    marginTop: "32px",
-                  }}
-                >
-                  Leaderboard
-                </Typography>
                 {currentCompetition && (
                   <Typography
                     variant='subtitle1'
@@ -903,6 +892,11 @@ const Leaderboard = () => {
       </div>
     </>
   );
+};
+
+Leaderboard.propTypes = {
+  height: PropTypes.string.isRequired,
+  isFirst: PropTypes.bool,
 };
 
 export default Leaderboard;

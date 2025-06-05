@@ -218,45 +218,6 @@ const MemorListItemSkeleton = () => (
   </Box>
 );
 
-// Skeleton component for the tabs and search section
-const TabsSearchSkeleton = () => (
-  <Box
-    sx={{
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between",
-      padding: "0px 16px 8px 16px",
-    }}
-  >
-    <Box sx={{ display: "flex", gap: 1 }}>
-      <Skeleton
-        variant='rounded'
-        width={80}
-        height={32}
-        sx={{ bgcolor: "#424242", borderRadius: "20px" }}
-      />
-      <Skeleton
-        variant='rounded'
-        width={90}
-        height={32}
-        sx={{ bgcolor: "#424242", borderRadius: "20px" }}
-      />
-      <Skeleton
-        variant='rounded'
-        width={85}
-        height={32}
-        sx={{ bgcolor: "#424242", borderRadius: "20px" }}
-      />
-    </Box>
-    <Skeleton
-      variant='rounded'
-      width={250}
-      height={40}
-      sx={{ bgcolor: "#424242", borderRadius: "20px" }}
-    />
-  </Box>
-);
-
 const Memors = () => {
   const { token, user } = useAuth();
   const location = useLocation();
@@ -592,30 +553,32 @@ const Memors = () => {
       <div className='container'>
         <Box>
           <div className='memors-header'>
-            {loading ? (
-              <Skeleton
-                variant='text'
-                sx={{ fontSize: "2rem", width: "300px", bgcolor: "#424242" }}
-              />
-            ) : (
-              <Typography
-                variant='h4'
-                component='h1'
-                sx={{ fontWeight: "bold", color: "white" }}
-              >
-                {currentCompetition ? (
-                  <>
-                    Ongoing Memors
-                    <span className='memors-ongoing'>
-                      {" "}
-                      ({ongoingMemors.length})
-                    </span>
-                  </>
-                ) : (
-                  "No Active Competition"
-                )}
-              </Typography>
-            )}
+            <Typography
+              variant='h4'
+              component='h1'
+              sx={{ fontWeight: "bold", color: "white" }}
+            >
+              {currentCompetition ? (
+                <>
+                  Ongoing Memors
+                  <span className='memors-ongoing'>{ongoingMemors.length}</span>
+                </>
+              ) : (
+                <>
+                  Ongoing Memors
+                  <Skeleton
+                    variant='text'
+                    sx={{
+                      fontSize: "2rem",
+                      width: "60px",
+                      bgcolor: "#424242",
+                      display: "inline-block",
+                      marginRight: "8px",
+                    }}
+                  />
+                </>
+              )}
+            </Typography>
           </div>
 
           {loading ? (
@@ -838,75 +801,72 @@ const Memors = () => {
         )}
 
         {/* Tabs Section */}
-        {loading ? (
-          <TabsSearchSkeleton />
-        ) : (
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              padding: "0px 16px 8px 16px",
-            }}
-          >
-            <Tabs
-              value={tab}
-              onChange={handleTabChange}
-              TabIndicatorProps={{ style: { display: "none" } }}
-              sx={{
-                "& .MuiTab-root": {
-                  textTransform: "none",
-                  fontSize: "14px",
-                  color: "#d0bcfe",
-                  padding: "6px 16px",
-                  borderRadius: "40px",
-                  border: "1px solid #938f99",
-                  marginRight: "10px",
-                  "&:hover": {
-                    backgroundColor: "rgba(163, 133, 242, 0.2)",
-                  },
-                  "&.Mui-selected": {
-                    backgroundColor: "#d0bcfe",
-                    color: "#381e72",
-                    fontWeight: 600,
-                  },
-                },
-              }}
-              aria-label='Memor Tabs'
-            >
-              <Tab value='all' label='All Memors' />
-              <Tab value='completed' label='Completed' />
-              <Tab value='incomplete' label='Incomplete' />
-            </Tabs>
 
-            <TextField
-              placeholder='Search Memors'
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              variant='outlined'
-              size='small'
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position='start'>
-                    <Search fontSize='small' sx={{ color: "#CBCBCB" }} />
-                  </InputAdornment>
-                ),
-              }}
-              inputProps={{
-                "aria-label": "Search Memors",
-              }}
-              sx={{
-                backgroundColor: "#1E1F20",
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "0px 16px 8px 16px",
+          }}
+        >
+          <Tabs
+            value={tab}
+            onChange={handleTabChange}
+            TabIndicatorProps={{ style: { display: "none" } }}
+            sx={{
+              "& .MuiTab-root": {
+                textTransform: "none",
+                fontSize: "14px",
+                color: "#d0bcfe",
+                padding: "6px 16px",
                 borderRadius: "40px",
-                input: { color: "white" },
-                width: "250px",
-                border: "0.905px solid #88938F",
-                "& fieldset": { border: "none" },
-                "&:hover": { backgroundColor: "#2E2F30" },
-              }}
-            />
-          </Box>
-        )}
+                border: "1px solid #938f99",
+                marginRight: "10px",
+                "&:hover": {
+                  backgroundColor: "rgba(163, 133, 242, 0.2)",
+                },
+                "&.Mui-selected": {
+                  backgroundColor: "#d0bcfe",
+                  color: "#381e72",
+                  fontWeight: 600,
+                },
+              },
+            }}
+            aria-label='Memor Tabs'
+          >
+            <Tab value='all' label='All Memors' />
+            <Tab value='completed' label='Completed' />
+            <Tab value='incomplete' label='Incomplete' />
+          </Tabs>
+
+          <TextField
+            placeholder='Search Memors'
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            variant='outlined'
+            size='small'
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position='start'>
+                  <Search fontSize='small' sx={{ color: "#CBCBCB" }} />
+                </InputAdornment>
+              ),
+            }}
+            inputProps={{
+              "aria-label": "Search Memors",
+            }}
+            sx={{
+              backgroundColor: "#1E1F20",
+              borderRadius: "40px",
+              input: { color: "white" },
+              width: "250px",
+              border: "0.905px solid #88938F",
+              "& fieldset": { border: "none" },
+              "&:hover": { backgroundColor: "#2E2F30" },
+            }}
+          />
+        </Box>
 
         {loading ? (
           <Paper sx={{ backgroundColor: "transparent", paddingBottom: "40px" }}>
