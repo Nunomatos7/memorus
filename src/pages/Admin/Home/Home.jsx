@@ -22,12 +22,12 @@ import rank3 from "../../../assets/images/adminRank3.svg";
 import ongoing from "../../../assets/images/ongoingAdmin.svg";
 import closed from "../../../assets/images/closedAdmin.svg";
 import CustomButton from "../../../Components/CustomButton/CustomButton";
-// import Loader from "../../../Components/Loader/Loader";
 import background1 from "../../../assets/images/adminBackground1.svg";
 import background2 from "../../../assets/images/adminBackground2.svg";
 import background3 from "../../../assets/images/adminBackground3.svg";
 import Countdown from "../../../Components/Countdown/Countdown";
 import { useAuth } from "../../../context/AuthContext";
+import PropTypes from "prop-types";
 
 const rankImages = {
   1: rank1,
@@ -38,7 +38,7 @@ const rankImages = {
 // Skeleton component for carousel items
 const CarouselSkeleton = () => (
   <div className='latest-wrapper'>
-    {[...Array(5)].map((_, index) => (
+    {[...Array(3)].map((_, index) => (
       <div
         key={index}
         className='latest-memors-pic'
@@ -68,7 +68,7 @@ const CarouselSkeleton = () => (
 );
 
 // Skeleton component for stat cards
-const StatCardSkeleton = () => (
+const StatCardSkeleton = ({ cardId }) => (
   <Card className='card'>
     <CardContent>
       <Box display='flex' alignItems='center' justifyContent='space-between'>
@@ -76,17 +76,15 @@ const StatCardSkeleton = () => (
           variant='text'
           sx={{ fontSize: "2rem", width: "40px", bgcolor: "#424242" }}
         />
-        <Skeleton
-          variant='rectangular'
-          width={40}
-          height={40}
-          sx={{ borderRadius: 1, bgcolor: "#424242" }}
-        />
+        {cardId === "ongoing" ? (
+          <img src={ongoing} alt='Ongoing memors icon' />
+        ) : (
+          <img src={closed} alt='Closed memors icon' />
+        )}
       </Box>
-      <Skeleton
-        variant='text'
-        sx={{ fontSize: "0.875rem", mt: 1, bgcolor: "#424242" }}
-      />
+      <Typography variant='body2' color='#B0B0B0'>
+        {cardId === "ongoing" ? "Pending Memors" : "Completed Memors"}
+      </Typography>
     </CardContent>
   </Card>
 );
@@ -537,21 +535,9 @@ const Home = () => {
             }}
             aria-hidden='true'
           />
-          {loading ? (
-            <Skeleton
-              variant='text'
-              sx={{
-                fontSize: "2rem",
-                width: "300px",
-                mb: 2,
-                bgcolor: "#424242",
-              }}
-            />
-          ) : (
-            <h1 id='latest-memors-heading' className='home-title'>
-              Latest Memors
-            </h1>
-          )}
+          <h1 id='latest-memors-heading' className='home-title'>
+            Latest Memors
+          </h1>
         </div>
 
         {/* Swiper */}
@@ -666,30 +652,18 @@ const Home = () => {
         aria-labelledby='memors-dashboard-heading'
         style={{ marginTop: "2rem" }}
       >
-        {loading ? (
-          <Skeleton
-            variant='text'
-            sx={{
-              fontSize: "1.25rem",
-              width: "200px",
-              mb: 2,
-              bgcolor: "#424242",
-            }}
-          />
-        ) : (
-          <Typography
-            variant='h6'
-            gutterBottom
-            style={{ color: "white" }}
-            id='memors-dashboard-heading'
-          >
-            Memors Dashboard
-          </Typography>
-        )}
+        <Typography
+          variant='h6'
+          gutterBottom
+          style={{ color: "white" }}
+          id='memors-dashboard-heading'
+        >
+          Memors Dashboard
+        </Typography>
         <Grid container spacing={3}>
           <Grid item xs={12} sm={3}>
             {loading ? (
-              <StatCardSkeleton />
+              <StatCardSkeleton cardId='ongoing' />
             ) : (
               <Card
                 className='card'
@@ -730,7 +704,7 @@ const Home = () => {
 
           <Grid item xs={12} sm={3}>
             {loading ? (
-              <StatCardSkeleton />
+              <StatCardSkeleton cardId='closed' />
             ) : (
               <Card
                 className='card'
@@ -820,26 +794,14 @@ const Home = () => {
         className='pb-10 container'
         aria-labelledby='current-leaders-heading'
       >
-        {loading ? (
-          <Skeleton
-            variant='text'
-            sx={{
-              fontSize: "1.25rem",
-              width: "200px",
-              mb: 2,
-              bgcolor: "#424242",
-            }}
-          />
-        ) : (
-          <Typography
-            variant='h6'
-            gutterBottom
-            style={{ color: "white" }}
-            id='current-leaders-heading'
-          >
-            Current Leaders
-          </Typography>
-        )}
+        <Typography
+          variant='h6'
+          gutterBottom
+          style={{ color: "white" }}
+          id='current-leaders-heading'
+        >
+          Current Leaders
+        </Typography>
         {loading ? (
           <Grid container spacing={2}>
             <LeaderboardSkeleton />
@@ -955,12 +917,15 @@ const Home = () => {
   );
 };
 
-// Helper function for keyboard navigation
 const handleKeyPress = (event, callback) => {
   if (event.key === "Enter" || event.key === " ") {
     event.preventDefault();
     callback();
   }
+};
+
+StatCardSkeleton.propTypes = {
+  cardId: PropTypes.string,
 };
 
 export default Home;

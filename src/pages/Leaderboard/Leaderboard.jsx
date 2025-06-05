@@ -899,4 +899,9 @@ Leaderboard.propTypes = {
   isFirst: PropTypes.bool,
 };
 
+PodiumCardSkeleton.propTypes = {
+  height: PropTypes.string,
+  isFirst: PropTypes.bool,
+};
+
 export default Leaderboard;
