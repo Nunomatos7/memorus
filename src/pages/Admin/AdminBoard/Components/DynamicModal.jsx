@@ -33,7 +33,7 @@ const DynamicModal = ({
   const [newMemorPoints, setNewMemorPoints] = useState(null);
   const [newTeamName, setNewTeamName] = useState("");
   const [newTeamThumbnail, setNewTeamThumbnail] = useState(null);
-  const [newTeamThumbnailFile, setNewTeamThumbnailFile] = useState(null); // Add this for file handling
+  const [newTeamThumbnailFile, setNewTeamThumbnailFile] = useState(null);
   const [newTeamMembers, setNewTeamMembers] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
   const [unassignedMembers, setUnassignedMembers] = useState([]);
@@ -44,18 +44,15 @@ const DynamicModal = ({
   const [newCompetitionEndDate, setNewCompetitionEndDate] = useState("");
 
   useEffect(() => {
-    // If editing, populate fields with data
     if ((action === "edit" || action === "delete") && data) {
       switch (modalType) {
         case "memor":
           setNewMemorTitle(data.title || "");
           setNewMemorDescription(data.description || "");
-          // Convert date format
           if (data.date) {
             const parts = data.date.split("/");
             setNewMemorDate(`${parts[2]}-${parts[1]}-${parts[0]}`);
           }
-          // Extract points number
           if (data.points) {
             const pointsMatch = data.points.match(/\d+/);
             if (pointsMatch) {
@@ -127,10 +124,8 @@ const DynamicModal = ({
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (file) {
-      // Store the actual file for upload
       setNewTeamThumbnailFile(file);
-      
-      // Create preview URL for display
+
       const reader = new FileReader();
       reader.onload = (e) => {
         setNewTeamThumbnail(e.target.result);
@@ -196,15 +191,12 @@ const DynamicModal = ({
           break;
       }
 
-      // If operation was successful
       if (success) {
-        // Call both the specific refresh data function and the global refresh
         if (typeof refreshData === "function") {
           console.log(`Refreshing after ${action} ${modalType}`);
           refreshData();
         }
 
-        // Also use the global force refresh function after a short delay
         setTimeout(() => {
           forceRefreshAdminBoard();
         }, 300);
@@ -229,7 +221,6 @@ const DynamicModal = ({
       setLoading(false);
       setConfirmationModalOpen(false);
 
-      // Close modal only if operation was successful
       if (success) {
         onClose();
       }
@@ -292,9 +283,6 @@ const DynamicModal = ({
 
   const handleTeamSubmit = async () => {
     if (action === "delete" && data?.name) {
-      // Implement team deletion logic here
-      // For example:
-      // await api.delete(`/api/teams/${data.id}`);
       showFeedback(
         "success",
         "Team Deleted",
@@ -302,32 +290,26 @@ const DynamicModal = ({
       );
       return;
     }
-  
-    // Create team
+
     if (action === "create") {
       try {
         setLoading(true);
-        
-        // Create FormData for file upload
         const formData = new FormData();
-        formData.append('name', newTeamName);
-        
-        // Add avatar file if selected
+        formData.append("name", newTeamName);
+
         if (newTeamThumbnailFile) {
-          formData.append('image', newTeamThumbnailFile);
+          formData.append("image", newTeamThumbnailFile);
         }
-        
-        // Create the team with avatar
+
         const teamResponse = await api.post("/api/teams", formData, {
           headers: {
-            'Content-Type': 'multipart/form-data',
+            "Content-Type": "multipart/form-data",
           },
         });
 
         const teamId = teamResponse.data.id;
         console.log(`Created team with ID: ${teamId}`);
 
-        // Assign selected members to team
         const selectedMemberIds = Object.entries(newTeamMembers)
           .filter(([_, isSelected]) => isSelected)
           .map(([email]) => {
@@ -336,41 +318,45 @@ const DynamicModal = ({
           })
           .filter((id) => id !== null);
 
-        // Update each user using the correct endpoint
         for (const userId of selectedMemberIds) {
           try {
-            // Use PATCH instead of PUT and the correct endpoint format
             await api.patch(`/api/users/${userId}/team`, { teamsId: teamId });
           } catch (error) {
             console.error(`Error assigning user ${userId} to team:`, error);
-            // Continue with other users even if one fails
           }
         }
 
-        // ADDED: Get active competition and add team to it
         try {
-          const competitionsResponse = await api.get("/api/competitions/active");
-          if (competitionsResponse.data && competitionsResponse.data.length > 0) {
+          const competitionsResponse = await api.get(
+            "/api/competitions/active"
+          );
+          if (
+            competitionsResponse.data &&
+            competitionsResponse.data.length > 0
+          ) {
             const activeCompetition = competitionsResponse.data[0];
             console.log(`Found active competition: ${activeCompetition.id}`);
-            
-            // Add team to the active competition
+
             const addTeamResponse = await api.post(
               `/api/competitions/${activeCompetition.id}/teams/${teamId}`,
               {}
             );
-            
+
             if (addTeamResponse.status === 201) {
-              console.log(`Team ${teamId} added to competition ${activeCompetition.id} successfully`);
+              console.log(
+                `Team ${teamId} added to competition ${activeCompetition.id} successfully`
+              );
             } else {
-              console.warn(`Unexpected response when adding team to competition:`, addTeamResponse);
+              console.warn(
+                `Unexpected response when adding team to competition:`,
+                addTeamResponse
+              );
             }
           } else {
             console.log("No active competition found to add the team to");
           }
         } catch (compError) {
           console.error("Error adding team to competition:", compError);
-          // Don't fail if this step fails - the team is still created
         }
 
         setLoading(false);
@@ -379,8 +365,8 @@ const DynamicModal = ({
           "Team Created",
           `The team "${newTeamName}" has been successfully created with ${selectedMemberIds.length} members.`
         );
-        
-        return true; // Signal success to the caller
+
+        return true;
       } catch (error) {
         setLoading(false);
         console.error("Error creating team:", error);
@@ -389,28 +375,24 @@ const DynamicModal = ({
           "Team Creation Failed",
           error.response?.data?.error || error.message || "Unknown error"
         );
-        throw error; // Propagate the error
+        throw error;
       }
     }
-    
-    // Edit team functionality
+
     if (action === "edit" && data?.id) {
       try {
         setLoading(true);
-        
-        // Create FormData for file upload
+
         const formData = new FormData();
-        formData.append('name', newTeamName);
-        
-        // Add avatar file if selected
+        formData.append("name", newTeamName);
+
         if (newTeamThumbnailFile) {
-          formData.append('image', newTeamThumbnailFile);
+          formData.append("image", newTeamThumbnailFile);
         }
-        
-        // Update the team with avatar
+
         const teamResponse = await api.put(`/api/teams/${data.id}`, formData, {
           headers: {
-            'Content-Type': 'multipart/form-data',
+            "Content-Type": "multipart/form-data",
           },
         });
 
@@ -422,7 +404,7 @@ const DynamicModal = ({
           "Team Updated",
           `The team "${newTeamName}" has been successfully updated.`
         );
-        
+
         return true;
       } catch (error) {
         setLoading(false);
@@ -439,9 +421,6 @@ const DynamicModal = ({
 
   const handleCompetitionSubmit = async () => {
     if (action === "delete" && data?.id) {
-      // Implement competition deletion logic here
-      // For example:
-      // await api.delete(`/api/competitions/${data.id}`);
       showFeedback(
         "success",
         "Competition Deleted",
@@ -450,7 +429,6 @@ const DynamicModal = ({
       return;
     }
 
-    // Format data for API
     const competitionData = {
       name: newCompetitionTitle,
       description: newCompetitionDescription,
@@ -477,7 +455,6 @@ const DynamicModal = ({
   };
 
   const renderModalContent = () => {
-    // Handle delete action for all entity types
     if (action === "delete") {
       return (
         <>
@@ -514,7 +491,6 @@ const DynamicModal = ({
       );
     }
 
-    // Handle create/edit forms for each entity type
     switch (modalType) {
       case "memor":
         return (
@@ -569,7 +545,6 @@ const DynamicModal = ({
                 },
                 "& .MuiInputLabel-root": { color: "#888" },
                 "&hover": { backgroundColor: "#80ccbc" },
-                // Add these new styles for the calendar icon
                 "& .MuiSvgIcon-root": { color: "#FFFFFF" },
                 "& .MuiInputAdornment-root": { color: "#FFFFFF" },
                 "& input::-webkit-calendar-picker-indicator": {
@@ -696,11 +671,11 @@ const DynamicModal = ({
                   <img
                     src={newTeamThumbnail}
                     alt='Team Avatar Preview'
-                    style={{ 
-                      borderRadius: "10px", 
+                    style={{
+                      borderRadius: "10px",
                       height: "120px",
                       maxWidth: "120px",
-                      objectFit: "cover"
+                      objectFit: "cover",
                     }}
                     aria-label='Team Avatar Preview'
                   />
@@ -720,7 +695,7 @@ const DynamicModal = ({
                       backgroundColor: "#D64545",
                       color: "white",
                       fontSize: "12px",
-                      "&:hover": { backgroundColor: "#B03C3C" }
+                      "&:hover": { backgroundColor: "#B03C3C" },
                     }}
                   >
                     ×
@@ -748,7 +723,10 @@ const DynamicModal = ({
                       <Typography variant='body2' sx={{ color: "#888" }}>
                         Upload team avatar from computer
                       </Typography>
-                      <Typography variant='caption' sx={{ color: "#666", mt: 1 }}>
+                      <Typography
+                        variant='caption'
+                        sx={{ color: "#666", mt: 1 }}
+                      >
                         Recommended: Square image, max 5MB
                       </Typography>
                     </div>
@@ -1028,7 +1006,6 @@ const DynamicModal = ({
           />
         </Box>
 
-        {/* Confirmation Modal */}
         {confirmationModalOpen && (
           <ConfirmationModal
             open={confirmationModalOpen}

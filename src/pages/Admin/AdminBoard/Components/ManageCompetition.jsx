@@ -1,4 +1,3 @@
-// ManageCompetition.jsx
 import { useState, useEffect } from "react";
 import { Box, Typography, IconButton, Divider, Skeleton } from "@mui/material";
 import { KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
@@ -7,7 +6,6 @@ import CustomButton from "../../../../Components/CustomButton/CustomButton";
 import api from "../../../../api/axiosInstance";
 import PropTypes from "prop-types";
 
-// Skeleton for competition loading state
 const ManageCompetitionSkeleton = () => (
   <Box
     sx={{
@@ -145,7 +143,6 @@ const ManageCompetitionSkeleton = () => (
         sx={{ fontSize: "1rem", width: "200px", bgcolor: "#424242", mb: 2 }}
       />
 
-      {/* Table Header */}
       <Box
         sx={{
           display: "flex",
@@ -173,7 +170,6 @@ const ManageCompetitionSkeleton = () => (
         />
       </Box>
 
-      {/* Table Rows */}
       {[...Array(3)].map((_, index) => (
         <Box
           key={index}

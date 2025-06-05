@@ -31,23 +31,19 @@ const LoginPage = () => {
     const parts = host.split(".");
 
     if (host.includes("localhost")) {
-      // For localhost, check if there's actually a subdomain
       if (parts.length > 1 && parts[0] !== "localhost") {
         return parts[0];
       }
       return null;
     }
 
-    // For production
     if (parts.length >= 3) {
-      // Check if it's www or if it's the main domain
       if (parts[0] === "www") {
         return null;
       }
       return parts[0];
     }
 
-    // If it's just memor-us.com (2 parts), no subdomain
     if (parts.length === 2) {
       return null;
     }
@@ -60,16 +56,13 @@ const LoginPage = () => {
   useEffect(() => {
     document.title = `Memor'us | Login`;
 
-    // Set tenant on component mount
     const detectedTenant = getTenantFromSubdomain();
     console.log("Detected tenant:", detectedTenant);
 
     if (detectedTenant) {
-      // Tenant detected in URL - proceed with normal login
       setTenant(detectedTenant.toLowerCase());
       setShowTenantInput(false);
     } else {
-      // No tenant in URL - show tenant input for redirection
       setShowTenantInput(true);
     }
   }, []);
@@ -82,7 +75,6 @@ const LoginPage = () => {
 
     const cleanTenant = tenantInput.trim().toLowerCase();
 
-    // Redirect to the tenant's subdomain URL
     const currentHost = window.location.hostname;
     let newUrl;
 
@@ -97,7 +89,6 @@ const LoginPage = () => {
 
     console.log("Redirecting to:", newUrl);
 
-    // Redirect to the tenant subdomain
     window.location.href = newUrl;
   };
 
@@ -106,7 +97,6 @@ const LoginPage = () => {
     setError("");
 
     try {
-      // CRITICAL: Only use tenant from URL, never from input
       const urlTenant = getTenantFromSubdomain()?.toLowerCase();
 
       if (!urlTenant) {
@@ -124,14 +114,13 @@ const LoginPage = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "x-tenant": urlTenant, // Always use URL tenant
+            "x-tenant": urlTenant,
           },
           credentials: "include",
           body: JSON.stringify({ email, password, tenant: urlTenant }),
         }
       );
 
-      // Check if response is OK
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || "Login failed");
@@ -143,10 +132,8 @@ const LoginPage = () => {
         throw new Error("Invalid response from server - no token");
       }
 
-      // Store token and user info
       localStorage.setItem("token", data.token);
 
-      // Parse the token
       const parts = data.token.split(".");
       const base64Url = parts[1];
       const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
@@ -158,7 +145,6 @@ const LoginPage = () => {
       setUser(payload);
       setToken(data.token);
 
-      // Navigate to appropriate page
       navigate(payload.role === "admin" ? "/app/admin/home" : "/app/home");
     } catch (err) {
       console.error("Login error:", err);
@@ -172,7 +158,6 @@ const LoginPage = () => {
     setRememberMe(event.target.checked);
   };
 
-  // If we need to show tenant input, show that form instead
   if (showTenantInput) {
     return (
       <div className='login-container' role='main'>
@@ -199,7 +184,7 @@ const LoginPage = () => {
             <img src={logo} alt='Memor-us Logo' className='logo' />
           </div>
           <Typography variant='h5' className='login-title'>
-            Welcome to Memor'us
+            Welcome to Memor&apos;us
           </Typography>
           <Typography variant='body2' className='login-subtitle' sx={{ mb: 3 }}>
             Please type out the subdomain of your tenant
@@ -284,7 +269,6 @@ const LoginPage = () => {
     );
   }
 
-  // Normal login form (only when tenant is detected in URL)
   return (
     <div className='login-container' role='main'>
       <div style={{ position: "absolute", top: "20px", left: "20px" }}>
@@ -453,7 +437,7 @@ const LoginPage = () => {
           </Button>
         </form>
         <a
-          href='/register'
+          href='/app/register'
           className='admin-link'
           aria-label='Register for a new account'
         >

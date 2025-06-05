@@ -29,15 +29,21 @@ function App() {
   const { user, setUser, loading, cookiesAccepted } = useAuth();
   const location = useLocation();
 
-  // Helper function to determine if we're on the main domain or a tenant subdomain
   const isMainDomain = () => {
-    return window.location.hostname === "memor-us.com";
+    const hostname = window.location.hostname;
+    return (
+      hostname === "memor-us.com" ||
+      hostname === "www.memor-us.com" ||
+      hostname === "localhost"
+    );
   };
 
   const isTenantSubdomain = () => {
+    const hostname = window.location.hostname;
     return (
-      window.location.hostname.endsWith(".memor-us.com") &&
-      window.location.hostname !== "memor-us.com"
+      hostname.endsWith(".memor-us.com") &&
+      hostname !== "memor-us.com" &&
+      hostname !== "www.memor-us.com"
     );
   };
 
@@ -62,7 +68,6 @@ function App() {
     role: PropTypes.string,
   };
 
-  // Determine if we're on an auth page or landing page to not show footer
   const isAuthPage = [
     "/app/login",
     "/app/register",
@@ -90,10 +95,8 @@ function App() {
       <ConsentModal setUser={setUser} />
 
       <Routes>
-        {/* Landing Page Route - Only available on main domain */}
         {isMainDomain() && <Route path='/*' element={<LandingPage />} />}
 
-        {/* Auth Routes */}
         <Route
           path='/app/login'
           element={
@@ -131,7 +134,6 @@ function App() {
         <Route path='/app/change-password' element={<ChangePassword />} />
         <Route path='/terms' element={<Terms />} />
 
-        {/* Collaborator Routes */}
         <Route
           path='/app/*'
           element={
@@ -151,7 +153,6 @@ function App() {
           <Route path='profile' element={<Profile />} />
         </Route>
 
-        {/* Admin Routes */}
         <Route
           path='/app/admin/*'
           element={
@@ -166,7 +167,17 @@ function App() {
           <Route path='adminboard' element={<AdminBoard />} />
         </Route>
 
+
+        {/* Landing Page Routes - Only for main domain (memor-us.com, www.memor-us.com, localhost) */}
+        {isMainDomain() && (
+          <>
+            <Route path='/' element={<LandingPage />} />
+            <Route path='/landing' element={<LandingPage />} />
+          </>
+        )}
+
         {/* Catch-All Routes */}
+        <Route path='*' element={<Navigate to='/app/login' replace />} />
         <Route
           path='*'
           element={
@@ -181,10 +192,8 @@ function App() {
         />
       </Routes>
 
-      {/* Footer (conditional) */}
       {!hideFooter && (isAdmin ? <AdminFooter /> : <CollaboratorFooter />)}
 
-      {/* Toast Notifications */}
       <Toaster
         position='top-right'
         toastOptions={{

@@ -1,4 +1,3 @@
-// ManageMemors.jsx
 import { useState, useEffect } from "react";
 import {
   Box,
@@ -16,7 +15,6 @@ import ConfirmationModal from "../../../../Components/ConfirmationModal/Confirma
 import api from "../../../../api/axiosInstance";
 import PropTypes from "prop-types";
 
-// Skeleton for memors loading state
 const ManageMemorsSkeleton = () => (
   <Box
     sx={{
@@ -71,7 +69,6 @@ const ManageMemorsSkeleton = () => (
       </Box>
     </Box>
 
-    {/* Table Header */}
     <Box
       sx={{
         display: "flex",
@@ -107,7 +104,6 @@ const ManageMemorsSkeleton = () => (
       />
     </Box>
 
-    {/* Table Rows */}
     {[...Array(5)].map((_, index) => (
       <Box
         key={index}
@@ -454,7 +450,6 @@ const ManageMemors = ({
         </Tabs>
       </Box>
 
-      {/* Table Header */}
       <Box
         sx={{
           display: "flex",
@@ -484,7 +479,6 @@ const ManageMemors = ({
         <Typography variant='body2' sx={{ flex: 1 }}></Typography>
       </Box>
 
-      {/* Table Rows */}
       {filteredMemors.length > 0 ? (
         filteredMemors.map((memor, index) => (
           <Box
@@ -600,7 +594,6 @@ const ManageMemors = ({
         </Box>
       )}
 
-      {/* Confirmation Modal */}
       {confirmationModalOpen && memorToDelete && (
         <ConfirmationModal
           open={confirmationModalOpen}

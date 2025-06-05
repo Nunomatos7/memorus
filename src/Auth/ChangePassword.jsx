@@ -23,47 +23,39 @@ const ChangePasswordPage = () => {
   useEffect(() => {
     document.title = `Memor'us | Change password`;
 
-    // If user is logged in, pre-fill the email field
     if (user && user.email) {
       setUsername(user.email);
     }
   }, [user]);
 
   const validateForm = () => {
-    // Reset error
     setError("");
 
-    // Check if username is provided when not logged in
     if (!user && !username.trim()) {
       setError("Email is required.");
       return false;
     }
 
-    // Check if current password is provided when user is logged in
     if (user && !currentPassword.trim()) {
       setError("Current password is required.");
       return false;
     }
 
-    // Check if new password is provided
     if (!newPassword.trim()) {
       setError("New password is required.");
       return false;
     }
 
-    // Basic password length check
     if (newPassword.length < 8) {
       setError("Password must be at least 8 characters long.");
       return false;
     }
 
-    // Check if passwords match
     if (newPassword !== confirmNewPassword) {
       setError("New passwords do not match.");
       return false;
     }
 
-    // Check if new password is same as current (basic client-side check)
     if (user && currentPassword === newPassword) {
       setError("New password must be different from current password.");
       return false;
@@ -81,19 +73,16 @@ const ChangePasswordPage = () => {
 
     setLoading(true);
 
-    // Create request payload
     const payload = {
       email: user ? user.email : username,
       newPassword: newPassword,
     };
 
-    // Include current password if user is logged in
     if (user) {
       payload.currentPassword = currentPassword;
     }
 
     try {
-      // Determine tenant from subdomain or header
       const getTenantFromSubdomain = () => {
         const host = window.location.hostname;
         const parts = host.split(".");
@@ -111,17 +100,14 @@ const ChangePasswordPage = () => {
 
       const tenant = getTenantFromSubdomain();
 
-      // Prepare headers
       const headers = {
         "Content-Type": "application/json",
       };
 
-      // Add tenant header if available
       if (tenant) {
         headers["x-tenant"] = tenant;
       }
 
-      // Add token to headers if available
       if (token) {
         headers["Authorization"] = `Bearer ${token}`;
       }
@@ -134,7 +120,6 @@ const ChangePasswordPage = () => {
         newPassword: "[REDACTED]",
       });
 
-      // Make the API request
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/users/change-password`,
         {
@@ -150,16 +135,13 @@ const ChangePasswordPage = () => {
         throw new Error(data.error || "Error changing password");
       }
 
-      // Show success message
       setSuccess("Password changed successfully! Redirecting to home...");
 
-      // Clear form
       setUsername("");
       setCurrentPassword("");
       setNewPassword("");
       setConfirmNewPassword("");
 
-      // Redirect to login after a delay
       setTimeout(() => {
         navigate("/app/login");
       }, 2000);
@@ -174,7 +156,6 @@ const ChangePasswordPage = () => {
   return (
     <div className='login-container'>
       <div className='login-card'>
-        {/* Back Button */}
         <Button
           startIcon={<ArrowBackIcon />}
           onClick={() => window.history.back()}
@@ -221,7 +202,6 @@ const ChangePasswordPage = () => {
             </Alert>
           )}
 
-          {/* Username Field - Only show if not logged in */}
           {!user && (
             <TextField
               label='Username (Email)'
@@ -256,7 +236,6 @@ const ChangePasswordPage = () => {
             />
           )}
 
-          {/* Current Password Field - Only show if logged in */}
           {user && (
             <TextField
               label='Current Password'
@@ -291,7 +270,6 @@ const ChangePasswordPage = () => {
             />
           )}
 
-          {/* New Password Field */}
           <TextField
             label='New Password'
             type='password'
@@ -328,7 +306,6 @@ const ChangePasswordPage = () => {
             }}
           />
 
-          {/* Confirm New Password Field */}
           <TextField
             label='Confirm New Password'
             type='password'
@@ -361,7 +338,6 @@ const ChangePasswordPage = () => {
             }}
           />
 
-          {/* Submit Button */}
           <Button
             type='submit'
             fullWidth
