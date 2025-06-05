@@ -34,6 +34,14 @@
   height: 100%;
 }
 
+.memors-ongoing::before {
+  content: " (";
+}
+
+.memors-ongoing::after {
+  content: ")";
+}
+
 .memor .title_date {
   display: flex;
   flex-direction: column;
