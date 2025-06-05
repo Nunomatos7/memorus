@@ -21,17 +21,6 @@ import { useLocation } from "react-router-dom";
 
 const AdminHeaderSkeleton = () => (
   <Box>
-    <Skeleton
-      variant='text'
-      sx={{
-        fontSize: "2rem",
-        width: "200px",
-        bgcolor: "#424242",
-        mb: 4,
-        mx: 2.5,
-      }}
-    />
-
     <Box
       sx={{
         display: "flex",
@@ -203,16 +192,92 @@ const AdminBoard = () => {
             }}
           />
 
+          <Typography
+            variant='h4'
+            sx={{
+              fontWeight: "bold",
+              color: "white",
+              marginBottom: "30px",
+              padding: "20px",
+            }}
+          >
+            Admin Board
+          </Typography>
+
           <Box
             sx={{
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
               flexDirection: "column",
-              pt: 2.5,
             }}
           >
-            <AdminHeaderSkeleton />
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                width: "100%",
+              }}
+            >
+              <Tabs
+                value={tab}
+                onChange={(event, newValue) => {
+                  handleTabChange(event, newValue);
+                  cleanSearchQuery();
+                }}
+                TabIndicatorProps={{ style: { display: "none" } }}
+                sx={{
+                  "& .MuiTab-root": {
+                    textTransform: "none",
+                    fontSize: "14px",
+                    color: "#CCE8E2",
+                    padding: "6px 16px",
+                    borderRadius: "40px",
+                    border: "1px solid #938f99",
+                    marginRight: "10px",
+                    "&:hover": {
+                      backgroundColor: "rgba(204, 232, 226, 0.08)",
+                    },
+                    "&.Mui-selected": {
+                      backgroundColor: "#384c44",
+                      color: "#CCE8E2",
+                    },
+                  },
+                }}
+              >
+                <Tab value='memors' label='Manage Memors' />
+                <Tab value='teams' label='Manage Teams' />
+                <Tab value='competition' label='Manage Competition' />
+              </Tabs>
+              <TextField
+                placeholder='Search'
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                variant='outlined'
+                size='small'
+                slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position='start'>
+                        <Search fontSize='small' sx={{ color: "gray" }} />
+                      </InputAdornment>
+                    ),
+                  },
+                }}
+                inputProps={{
+                  "aria-label": "Search",
+                }}
+                sx={{
+                  borderRadius: "40px",
+                  input: { color: "white" },
+                  width: "250px",
+                  border: "0.905px solid #88938F",
+                  "& fieldset": { border: "none" },
+                  "&:hover": { backgroundColor: "#2E2F30" },
+                }}
+              />
+            </Box>
 
             <Box
               sx={{

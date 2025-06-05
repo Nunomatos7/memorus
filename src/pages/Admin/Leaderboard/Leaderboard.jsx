@@ -7,10 +7,9 @@ import rank3 from "../../../assets/images/adminRank3.svg";
 import background1 from "../../../assets/images/adminBackground1.svg";
 import background3 from "../../../assets/images/adminBackground2.svg";
 import background2 from "../../../assets/images/adminBackground3.svg";
-// import Loader from "../../../Components/Loader/Loader";
 import { useAuth } from "../../../context/AuthContext";
+import PropTypes from "prop-types";
 
-// Export empty array for leaderboardData that other components might be importing
 export const leaderboardData = [];
 
 // Skeleton component for top 3 podium cards
@@ -90,28 +89,6 @@ const PodiumCardSkeleton = ({ height, isFirst = false }) => (
       }}
     />
   </Card>
-);
-
-// Skeleton component for global ranking table header
-const GlobalRankingHeaderSkeleton = () => (
-  <Box
-    sx={{
-      display: "grid",
-      gridTemplateColumns: "1fr 1fr 1fr 1fr",
-      textAlign: "center",
-      gap: "10px",
-      borderRadius: "13.576px",
-      border: "2.715px solid #333738",
-      padding: "10px",
-      background: "#232627",
-      marginBottom: "20px",
-    }}
-  >
-    <Skeleton variant='text' sx={{ fontSize: "1.25rem", bgcolor: "#424242" }} />
-    <Skeleton variant='text' sx={{ fontSize: "1.25rem", bgcolor: "#424242" }} />
-    <Skeleton variant='text' sx={{ fontSize: "1.25rem", bgcolor: "#424242" }} />
-    <Skeleton variant='text' sx={{ fontSize: "1.25rem", bgcolor: "#424242" }} />
-  </Box>
 );
 
 // Skeleton component for global ranking table rows
@@ -206,7 +183,6 @@ const Leaderboard = () => {
 
       try {
         setLoading(true);
-        // Now fetch the leaderboard for this competition
         const response = await fetch(
           `${import.meta.env.VITE_API_URL}/api/leaderboard/competition/${
             currentCompetition.id
@@ -309,18 +285,20 @@ const Leaderboard = () => {
         >
           {/* Header */}
           <Box>
+            <Typography
+              variant='h4'
+              sx={{
+                fontWeight: "bold",
+                color: "white",
+                marginBottom: "10px",
+              }}
+              tabIndex={0}
+              aria-label='Leaderboard'
+            >
+              Leaderboard
+            </Typography>
             {loading ? (
               <>
-                <Skeleton
-                  variant='text'
-                  sx={{
-                    fontSize: "2rem",
-                    width: "200px",
-                    bgcolor: "#424242",
-                    mb: 1,
-                    mt: 4,
-                  }}
-                />
                 <Skeleton
                   variant='text'
                   sx={{
@@ -333,18 +311,6 @@ const Leaderboard = () => {
               </>
             ) : (
               <>
-                <Typography
-                  variant='h4'
-                  sx={{
-                    fontWeight: "bold",
-                    color: "white",
-                    marginBottom: "10px",
-                  }}
-                  tabIndex={0}
-                  aria-label='Leaderboard'
-                >
-                  Leaderboard
-                </Typography>
                 {currentCompetition && (
                   <Typography
                     variant='subtitle1'
@@ -415,19 +381,65 @@ const Leaderboard = () => {
               </Grid>
 
               {/* Global Ranking Skeleton */}
-              <Skeleton
-                variant='text'
+              <Typography
+                variant='h5'
                 sx={{
-                  fontSize: "1.5rem",
-                  width: "200px",
-                  bgcolor: "#424242",
-                  mb: 2,
-                  mt: 6,
+                  color: "white",
+                  marginBottom: "20px",
+                  marginTop: "50px",
                 }}
-              />
+              >
+                Global Ranking
+              </Typography>
 
               <Box sx={{ width: "100%", marginBottom: "20px" }}>
-                <GlobalRankingHeaderSkeleton />
+                <Box
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr 1fr 1fr",
+                    textAlign: "center",
+                    gap: "10px",
+                    borderRadius: "13.576px",
+                    border: "2.715px solid #333738",
+                    padding: "10px",
+                    background: "#232627",
+                    marginBottom: "20px",
+                  }}
+                >
+                  <Typography
+                    variant='h6'
+                    sx={{
+                      color: "white",
+                    }}
+                  >
+                    Rank
+                  </Typography>
+                  <Typography
+                    variant='h6'
+                    sx={{
+                      color: "white",
+                      textAlign: "center",
+                    }}
+                  >
+                    Team
+                  </Typography>
+                  <Typography
+                    variant='h6'
+                    sx={{
+                      color: "white",
+                    }}
+                  >
+                    Memors Completed
+                  </Typography>
+                  <Typography
+                    variant='h6'
+                    sx={{
+                      color: "white",
+                    }}
+                  >
+                    Total Points
+                  </Typography>
+                </Box>
 
                 {/* Show 4 skeleton rows */}
                 {[...Array(4)].map((_, index) => (
@@ -809,82 +821,13 @@ const Leaderboard = () => {
                     Total Points
                   </Typography>
                 </Box>
-                {leaderboardTeams
-                  .filter((team) => team.rank >= 4)
-                  .map((team) => (
-                    <Box
-                      key={team.teamId || `${team.teamName}-${team.rank}`}
-                      sx={{
-                        display: "grid",
-                        gridTemplateColumns: "1fr 1fr 1fr 1fr",
-                        alignItems: "center",
-                        textAlign: "center",
-                        borderRadius: "13.576px",
-                        border: "2.715px solid #333738",
-                        padding: "10px",
-                        marginTop: "-2px",
-                      }}
-                      tabIndex={0}
-                      aria-label={`Rank ${team.rank}: ${team.teamName}, ${team.memors} Memors, ${team.points} Points`}
-                    >
-                      <Typography
-                        variant='h6'
-                        sx={{
-                          color: "white",
-                          textAlign: "center",
-                        }}
-                      >
-                        {team.rank}
-                      </Typography>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "left",
-                          gap: "10px",
-                        }}
-                      >
-                        <Avatar
-                          src={team.avatar}
-                          alt={team.teamName}
-                          sx={{
-                            width: "30px",
-                            height: "30px",
-                            border: "2px solid white",
-                          }}
-                        />
-                        <Typography
-                          variant='h6'
-                          sx={{
-                            color: "white",
-                            textAlign: "center",
-                          }}
-                        >
-                          {team.teamName}
-                        </Typography>
-                      </Box>
-                      <Typography
-                        variant='h6'
-                        sx={{
-                          color: "white",
-                          textAlign: "center",
-                        }}
-                      >
-                        {team.memors}
-                      </Typography>
-                      <Typography
-                        variant='h6'
-                        sx={{
-                          color: "white",
-                          textAlign: "center",
-                        }}
-                      >
-                        {team.points}
-                      </Typography>
-                    </Box>
-                  ))}
-                {leaderboardTeams.filter((team) => team.rank >= 4).length ===
-                  0 && (
+
+                {loading ? (
+                  // Show skeleton rows when loading
+                  [...Array(4)].map((_, index) => (
+                    <GlobalRankingRowSkeleton key={index} />
+                  ))
+                ) : error ? (
                   <Box
                     sx={{
                       display: "flex",
@@ -895,10 +838,102 @@ const Leaderboard = () => {
                       color: "#a0a0a0",
                     }}
                   >
-                    <Typography variant='body1'>
-                      No more teams in the competition
-                    </Typography>
+                    <Typography variant='body1'>{error}</Typography>
                   </Box>
+                ) : (
+                  <>
+                    {leaderboardTeams
+                      .filter((team) => team.rank >= 4)
+                      .map((team) => (
+                        <Box
+                          key={team.teamId || `${team.teamName}-${team.rank}`}
+                          sx={{
+                            display: "grid",
+                            gridTemplateColumns: "1fr 1fr 1fr 1fr",
+                            alignItems: "center",
+                            textAlign: "center",
+                            borderRadius: "13.576px",
+                            border: "2.715px solid #333738",
+                            padding: "10px",
+                            marginTop: "-2px",
+                          }}
+                          tabIndex={0}
+                          aria-label={`Rank ${team.rank}: ${team.teamName}, ${team.memors} Memors, ${team.points} Points`}
+                        >
+                          <Typography
+                            variant='h6'
+                            sx={{
+                              color: "white",
+                              textAlign: "center",
+                            }}
+                          >
+                            {team.rank}
+                          </Typography>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "left",
+                              gap: "10px",
+                            }}
+                          >
+                            <Avatar
+                              src={team.avatar}
+                              alt={team.teamName}
+                              sx={{
+                                width: "30px",
+                                height: "30px",
+                                border: "2px solid white",
+                              }}
+                            />
+                            <Typography
+                              variant='h6'
+                              sx={{
+                                color: "white",
+                                textAlign: "center",
+                              }}
+                            >
+                              {team.teamName}
+                            </Typography>
+                          </Box>
+                          <Typography
+                            variant='h6'
+                            sx={{
+                              color: "white",
+                              textAlign: "center",
+                            }}
+                          >
+                            {team.memors}
+                          </Typography>
+                          <Typography
+                            variant='h6'
+                            sx={{
+                              color: "white",
+                              textAlign: "center",
+                            }}
+                          >
+                            {team.points}
+                          </Typography>
+                        </Box>
+                      ))}
+                    {leaderboardTeams.filter((team) => team.rank >= 4)
+                      .length === 0 && (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          padding: "20px",
+                          borderRadius: "13.576px",
+                          border: "2.715px solid #333738",
+                          color: "#a0a0a0",
+                        }}
+                      >
+                        <Typography variant='body1'>
+                          No more teams in the competition
+                        </Typography>
+                      </Box>
+                    )}
+                  </>
                 )}
               </Box>
             </>
@@ -907,6 +942,11 @@ const Leaderboard = () => {
       </div>
     </>
   );
+};
+
+PodiumCardSkeleton.propTypes = {
+  height: PropTypes.string,
+  isFirst: PropTypes.bool,
 };
 
 export default Leaderboard;

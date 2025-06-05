@@ -219,7 +219,7 @@ const ManageMemors = ({
         description: memor.description,
         date: new Date(memor.due_date).toLocaleDateString("en-GB"),
         points: `+ ${memor.points} pts`,
-        teamsLeft: memor.team_submissions ? memor.team_submissions.length : 0,
+        teamsLeft: memor.team_submissions?.length || 0,
         is_done: memor.is_done,
       }));
 
@@ -264,7 +264,7 @@ const ManageMemors = ({
           description: memor.description,
           date: new Date(memor.due_date).toLocaleDateString("en-GB"),
           points: `+ ${memor.points} pts`,
-          teamsLeft: memor.team_submissions ? memor.team_submissions.length : 0,
+          teamsLeft: memor.team_submissions?.length || 0,
           is_done: memor.is_done,
         }));
 

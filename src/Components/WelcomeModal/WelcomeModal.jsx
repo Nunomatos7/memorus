@@ -2,18 +2,32 @@ import { useState, useEffect } from "react";
 import "./WelcomeModal.css";
 import { styled } from "@mui/material/styles";
 import Button from "@mui/material/Button";
+import api from "../../api/axiosInstance";
 import { useAuth } from "../../context/AuthContext";
 
 const WelcomeModal = () => {
+  const { user } = useAuth();
   const [isVisible, setIsVisible] = useState(false);
-  const { user } = useAuth(); // Add this to get user context
+  const [teamData, setTeamData] = useState(null);
 
   useEffect(() => {
     const hasClickedBegin = localStorage.getItem("hasClickedBegin");
     if (!hasClickedBegin) {
       setIsVisible(true);
+      fetchTeamData();
     }
   }, []);
+
+  const fetchTeamData = async () => {
+    try {
+      const response = await api.get("/api/teams");
+      if (response.data && response.data.length > 0) {
+        setTeamData(response.data[0]);
+      }
+    } catch (error) {
+      console.error("Error fetching team data:", error);
+    }
+  };
 
   const handleBeginClick = () => {
     localStorage.setItem("hasClickedBegin", "true");
@@ -21,11 +35,11 @@ const WelcomeModal = () => {
   };
 
   const getTeamName = () => {
-    if (!user) return "Your Team";
-    if (typeof user.team === "string") return user.team;
-    if (user.team && typeof user.team === "object" && user.team.name)
-      return user.team.name;
-    return "Your Team"; // Fallback
+    return teamData?.name || "Your Team";
+  };
+
+  const getTeamImage = () => {
+    return teamData?.avatar || "default_avatar.png";
   };
 
   const BeginButton = styled(Button)({
@@ -58,8 +72,8 @@ const WelcomeModal = () => {
           <p style={{ fontSize: "40px", margin: "0px" }}>🎉</p>
         </div>
         <p>
-          Hello, <span className='user'>dear user</span>! Welcome to Team&apos;s
-          family!
+          Hello, <span className='user'>{user?.firstName || "dear user"}</span>!
+          Welcome to Team&apos;s family!
         </p>
         <p className='mt-4'>
           We believe that teamwork makes the dream work. Together, we&apos;ll
@@ -73,8 +87,18 @@ const WelcomeModal = () => {
         <div className='team'>
           <img
             className='team-image'
-            src='https://media.istockphoto.com/id/2177790198/pt/foto/group-of-young-multi-ethnic-startup-business-team-collaborating-on-project-in-modern-office.jpg?s=2048x2048&w=is&k=20&c=d2l8WTbB8dPYIaybpizLbH-ZFj5moLpM9DHV9vFNG6Q='
-            alt='team'
+            src={getTeamImage()}
+            alt={getTeamName()}
+            onError={(e) => {
+              e.target.src = "default_avatar.png";
+            }}
+            style={{
+              width: "40px",
+              height: "40px",
+              borderRadius: "50%",
+              objectFit: "cover",
+              border: "2px solid #82D5C7",
+            }}
           />
           <span>{getTeamName()}</span>
         </div>
