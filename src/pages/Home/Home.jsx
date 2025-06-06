@@ -26,6 +26,7 @@ import Countdown from "../../Components/Countdown/Countdown";
 import background1 from "../../assets/images/background1.svg";
 import background2 from "../../assets/images/background2.svg";
 import background3 from "../../assets/images/background3.svg";
+import defaultAvatar from "../../assets/images/default_avatar.png";
 import { useAuth } from "../../context/AuthContext";
 import {
   getLeaderboardVisibility,
@@ -329,7 +330,7 @@ const Home = () => {
                   teamName: team.name || `Team ${team.teamId}`,
                   points: team.points || 0,
                   memors: team.memors || 0,
-                  avatar: team.avatar || "https://via.placeholder.com/150",
+                  avatar: team.avatar || defaultAvatar,
                 }));
 
               setLeaderboardData(teams);
@@ -878,7 +879,7 @@ const Home = () => {
                   <Card
                     className='card'
                     onClick={() => {
-                      window.location.href = "/leaderboard";
+                      window.location.href = "/app/leaderboard";
                     }}
                     style={{ cursor: "pointer" }}
                     tabIndex='0'
@@ -920,6 +921,9 @@ const Home = () => {
                           <img
                             src={team.avatar}
                             alt={team.teamName}
+                            onError={(e) => {
+                              e.target.src = defaultAvatar;
+                            }}
                             className='team-avatar-admin'
                             style={{
                               width: "50px",

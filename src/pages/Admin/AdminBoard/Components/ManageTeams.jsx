@@ -13,6 +13,7 @@ import CustomButton from "../../../../Components/CustomButton/CustomButton";
 import ConfirmationModal from "../../../../Components/ConfirmationModal/ConfirmationModal";
 import api from "../../../../api/axiosInstance";
 import PropTypes from "prop-types";
+import defaultAvatar from "../../../../assets/images/default_avatar.png";
 
 const ManageTeamsSkeleton = () => (
   <Box
@@ -130,6 +131,7 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
     useState(null);
   const [pendingAvatarFile, setPendingAvatarFile] = useState(null);
   const [pendingAvatarPreview, setPendingAvatarPreview] = useState(null);
+  const [avatarError, setAvatarError] = useState({});
 
   useEffect(() => {
     fetchTeamsAndMembers();
@@ -327,7 +329,7 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
     setIsEditing(true);
   };
 
-  const handleAvatarChange = (event, teamName) => {
+  const handleAvatarChange = (event) => {
     const file = event.target.files[0];
     if (file) {
       setPendingAvatarFile(file);
@@ -447,7 +449,7 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
       const teamId = teamObj.id;
 
       const selectedEmails = Object.entries(editedMembers)
-        .filter(([_, isSelected]) => isSelected)
+        .filter(([, isSelected]) => isSelected)
         .map(([email]) => email);
 
       const usersResponse = await api.get("/api/users");
@@ -532,6 +534,10 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
     member.name.toLowerCase().includes(searchQuery2.toLowerCase())
   );
 
+  const handleImgError = (teamName) => {
+    setAvatarError((prev) => ({ ...prev, [teamName]: true }));
+  };
+
   if (isLoading) {
     return <ManageTeamsSkeleton />;
   }
@@ -615,8 +621,10 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
                 <Box>
                   <img
                     src={
-                      teamsData.find((t) => t.name === teamName)?.avatar ||
-                      "default_avatar.png"
+                      avatarError[teamName]
+                        ? defaultAvatar
+                        : teamsData.find((t) => t.name === teamName)?.avatar ||
+                          defaultAvatar
                     }
                     alt={`${teamName} avatar`}
                     style={{
@@ -626,9 +634,7 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
                       objectFit: "cover",
                       border: "2px solid #82D5C7",
                     }}
-                    onError={(e) => {
-                      e.target.src = "default_avatar.png";
-                    }}
+                    onError={() => handleImgError(teamName)}
                   />
                 </Box>
 
@@ -736,9 +742,11 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
                           src={
                             pendingAvatarPreview ||
                             editingTeamAvatarPreview ||
-                            teamsData.find((t) => t.name === teamName)
-                              ?.avatar ||
-                            "default_avatar.png"
+                            (avatarError[teamName]
+                              ? defaultAvatar
+                              : teamsData.find((t) => t.name === teamName)
+                                  ?.avatar) ||
+                            defaultAvatar
                           }
                           alt={`${teamName} avatar`}
                           style={{
@@ -763,9 +771,7 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
                                 .click();
                             }
                           }}
-                          onError={(e) => {
-                            e.target.src = "default_avatar.png";
-                          }}
+                          onError={() => handleImgError(teamName)}
                         />
 
                         <input
@@ -773,7 +779,7 @@ const ManageTeams = ({ searchQuery, openModal, showFeedback, setLoading }) => {
                           type='file'
                           accept='image/*'
                           style={{ display: "none" }}
-                          onChange={(e) => handleAvatarChange(e, teamName)}
+                          onChange={(e) => handleAvatarChange(e)}
                         />
 
                         {pendingAvatarPreview ? (

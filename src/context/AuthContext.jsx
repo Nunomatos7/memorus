@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import PropTypes from "prop-types";
+import { toast } from "react-hot-toast";
 
 const AuthContext = createContext(null);
 
@@ -25,6 +26,24 @@ export function AuthProvider({ children }) {
     const consent = document.cookie.includes("cookiesAccepted=true");
     setCookiesAccepted(consent);
     setLoading(false);
+
+    // Listen for sessionExpired event
+    const handleSessionExpired = (e) => {
+      setUser(null);
+      setToken(null);
+      localStorage.removeItem("token");
+      toast.error(
+        (e && e.detail && e.detail.message) ||
+          "Your session has ended. Please log in again to continue."
+      );
+      setTimeout(() => {
+        window.location.href = "/app/login";
+      }, 100);
+    };
+    window.addEventListener("sessionExpired", handleSessionExpired);
+    return () => {
+      window.removeEventListener("sessionExpired", handleSessionExpired);
+    };
   }, []);
 
   return (
