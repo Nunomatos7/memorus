@@ -13,7 +13,7 @@ import CustomButton from "../../../../Components/CustomButton/CustomButton";
 import ConfirmationModal from "../../../../Components/ConfirmationModal/ConfirmationModal";
 import api from "../../../../api/axiosInstance";
 import PropTypes from "prop-types";
-import defaultAvatar from "./assets/default_avatar.png.png";
+import defaultAvatar from "../../../../assets/images/default_avatar.png";
 
 const ManageTeamsSkeleton = () => (
   <Box

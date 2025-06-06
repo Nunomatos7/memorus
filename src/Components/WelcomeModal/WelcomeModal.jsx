@@ -4,6 +4,7 @@ import { styled } from "@mui/material/styles";
 import Button from "@mui/material/Button";
 import api from "../../api/axiosInstance";
 import { useAuth } from "../../context/AuthContext";
+import defaultAvatar from "../../assets/images/default_avatar.png";
 
 const WelcomeModal = () => {
   const { user } = useAuth();
@@ -90,7 +91,7 @@ const WelcomeModal = () => {
             src={getTeamImage()}
             alt={getTeamName()}
             onError={(e) => {
-              e.target.src = "default_avatar.png";
+              e.target.src = defaultAvatar;
             }}
             style={{
               width: "40px",
