@@ -75,7 +75,21 @@ const LoginPage = () => {
       return;
     }
 
-    const cleanTenant = tenantInput.trim().toLowerCase();
+    // Sanitize the tenant input - only allow alphanumeric characters and hyphens
+    const cleanTenant = tenantInput
+      .trim()
+      .toLowerCase()
+      .replace(/'/g, "") // First remove apostrophes
+      .replace(/[^a-z0-9-]/g, "") // Remove all characters except alphanumeric and hyphens
+      .replace(/-+/g, "-") // Replace multiple consecutive hyphens with a single hyphen
+      .replace(/^-|-$/g, ""); // Remove leading and trailing hyphens
+
+    if (!cleanTenant) {
+      setError(
+        "Please enter a valid tenant subdomain (only letters, numbers, and hyphens allowed)."
+      );
+      return;
+    }
 
     const currentHost = window.location.hostname;
     let newUrl;
@@ -97,7 +111,7 @@ const LoginPage = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
-    setLoading(true); // Start loading
+    setLoading(true);
 
     try {
       const urlTenant = getTenantFromSubdomain()?.toLowerCase();
