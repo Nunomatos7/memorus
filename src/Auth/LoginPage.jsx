@@ -75,7 +75,20 @@ const LoginPage = () => {
       return;
     }
 
-    const cleanTenant = tenantInput.trim().toLowerCase();
+    const cleanTenant = tenantInput
+      .trim()
+      .toLowerCase()
+      .replace(/'/g, "")
+      .replace(/[^a-z0-9-]/g, "")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "");
+
+    if (!cleanTenant) {
+      setError(
+        "Please enter a valid tenant subdomain (only letters, numbers, and hyphens allowed)."
+      );
+      return;
+    }
 
     const currentHost = window.location.hostname;
     let newUrl;
@@ -97,7 +110,7 @@ const LoginPage = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
-    setLoading(true); // Start loading
+    setLoading(true);
 
     try {
       const urlTenant = getTenantFromSubdomain()?.toLowerCase();
@@ -155,7 +168,7 @@ const LoginPage = () => {
         err.message || "Error logging in. Please check your credentials."
       );
     } finally {
-      setLoading(false); // Stop loading
+      setLoading(false);
     }
   };
 
