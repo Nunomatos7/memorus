@@ -75,14 +75,13 @@ const LoginPage = () => {
       return;
     }
 
-    // Sanitize the tenant input - only allow alphanumeric characters and hyphens
     const cleanTenant = tenantInput
       .trim()
       .toLowerCase()
-      .replace(/'/g, "") // First remove apostrophes
-      .replace(/[^a-z0-9-]/g, "") // Remove all characters except alphanumeric and hyphens
-      .replace(/-+/g, "-") // Replace multiple consecutive hyphens with a single hyphen
-      .replace(/^-|-$/g, ""); // Remove leading and trailing hyphens
+      .replace(/'/g, "")
+      .replace(/[^a-z0-9-]/g, "")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "");
 
     if (!cleanTenant) {
       setError(
@@ -169,7 +168,7 @@ const LoginPage = () => {
         err.message || "Error logging in. Please check your credentials."
       );
     } finally {
-      setLoading(false); // Stop loading
+      setLoading(false);
     }
   };
 
