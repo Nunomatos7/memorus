@@ -8,6 +8,7 @@ import {
   FormControlLabel,
   Checkbox,
   Typography,
+  CircularProgress,
 } from "@mui/material";
 import leftBackground from "../assets/images/left-auth.svg";
 import rightBackground from "../assets/images/right-auth.svg";
@@ -20,6 +21,7 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false); // Add loading state
   const [tenant, setTenant] = useState("");
   const [tenantInput, setTenantInput] = useState("");
   const [showTenantInput, setShowTenantInput] = useState(false);
@@ -95,6 +97,7 @@ const LoginPage = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true); // Start loading
 
     try {
       const urlTenant = getTenantFromSubdomain()?.toLowerCase();
@@ -151,6 +154,8 @@ const LoginPage = () => {
       setError(
         err.message || "Error logging in. Please check your credentials."
       );
+    } finally {
+      setLoading(false); // Stop loading
     }
   };
 
@@ -427,13 +432,18 @@ const LoginPage = () => {
             fullWidth
             variant='contained'
             className='login-button'
+            disabled={loading} // Disable button when loading
             aria-label='Login to your account'
             sx={{
               backgroundColor: "#6200ea",
               "&:hover": { backgroundColor: "#4e00d1" },
+              "&:disabled": {
+                backgroundColor: "#555",
+                color: "#999",
+              },
             }}
           >
-            Login
+            {loading ? <CircularProgress size={24} color='inherit' /> : "Login"}
           </Button>
         </form>
         <a
