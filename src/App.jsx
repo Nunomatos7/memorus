@@ -18,10 +18,9 @@ import CollaboratorFooter from "./Components/CollaboratorFooter/CollaboratorFoot
 import AdminFooter from "./Components/AdminFooter/AdminFooter";
 import LandingPage from "./pages/LandingPage/LandingPage";
 import Terms from "./pages/Terms/Terms";
-import { useAuth, SessionManager } from "./context/AuthContext";
-import { SocketProvider } from "./context/SocketContext";
+import { useAuth } from "./context/AuthContext";
 import Loader from "./Components/Loader/Loader";
-import { Toaster, toast } from "react-hot-toast";
+import { Toaster } from "react-hot-toast";
 import TeamGuard from "./Components/TeamGuard/TeamGuard";
 import { Box } from "@mui/material";
 import Profile from "./pages/Profile/Profile";
@@ -30,9 +29,23 @@ function App() {
   const { user, setUser, loading, cookiesAccepted } = useAuth();
   const location = useLocation();
 
-  if (loading) {
-    return <div className='p-4 text-center'>A carregar dados...</div>;
-  }
+  const isMainDomain = () => {
+    const hostname = window.location.hostname;
+    return (
+      hostname === "memor-us.com" ||
+      hostname === "www.memor-us.com" ||
+      hostname === "localhost"
+    );
+  };
+
+  const isTenantSubdomain = () => {
+    const hostname = window.location.hostname;
+    return (
+      hostname.endsWith(".memor-us.com") &&
+      hostname !== "memor-us.com" &&
+      hostname !== "www.memor-us.com"
+    );
+  };
 
   const ProtectedRoute = ({ children, role }) => {
     if (loading || !cookiesAccepted) {
@@ -40,24 +53,10 @@ function App() {
     }
 
     if (!user) {
-      toast.error("Please log in to access this page.", {
-        duration: 4000,
-        style: {
-          background: "#d32f2f",
-          color: "#fff",
-        },
-      });
       return <Navigate to='/app/login' state={{ from: location }} replace />;
     }
 
     if (role && !user.roles?.includes(role.toLowerCase())) {
-      toast.error("You don't have permission to access this page.", {
-        duration: 4000,
-        style: {
-          background: "#d32f2f",
-          color: "#fff",
-        },
-      });
       return <Navigate to='/app/login' replace />;
     }
 
@@ -84,14 +83,6 @@ function App() {
 
   const isAdmin = user?.roles?.some((role) => role.toLowerCase() === "admin");
 
-  const AuthenticatedApp = ({ children }) => {
-    return user ? <SocketProvider>{children}</SocketProvider> : children;
-  };
-
-  AuthenticatedApp.propTypes = {
-    children: PropTypes.node.isRequired,
-  };
-
   return (
     <Box
       sx={{
@@ -102,103 +93,107 @@ function App() {
       }}
     >
       <ConsentModal setUser={setUser} />
-      <SessionManager />
 
-      <AuthenticatedApp>
-        <Routes>
-          {/* Landing Page Route - Available to everyone */}
-          <Route path='/' element={<LandingPage />} />
+      <Routes>
+        {isMainDomain() && <Route path='/*' element={<LandingPage />} />}
 
-          {/* Auth Routes */}
-          <Route
-            path='/app/login'
-            element={
-              user ? (
-                <Navigate
-                  to={
-                    user.roles?.includes("admin")
-                      ? "/app/admin/home"
-                      : "/app/home"
-                  }
-                  replace
-                />
-              ) : (
-                <LoginPage />
-              )
-            }
-          />
-          <Route
-            path='/app/register'
-            element={
-              user ? (
-                <Navigate
-                  to={
-                    user.roles?.includes("admin")
-                      ? "/app/admin/home"
-                      : "/app/home"
-                  }
-                  replace
-                />
-              ) : (
-                <RegisterPage />
-              )
-            }
-          />
-          <Route path='/app/change-password' element={<ChangePassword />} />
-          <Route path='/terms' element={<Terms />} />
+        <Route
+          path='/app/login'
+          element={
+            user ? (
+              <Navigate
+                to={
+                  user.roles?.includes("admin")
+                    ? "/app/admin/home"
+                    : "/app/home"
+                }
+                replace
+              />
+            ) : (
+              <LoginPage />
+            )
+          }
+        />
+        <Route
+          path='/app/register'
+          element={
+            user ? (
+              <Navigate
+                to={
+                  user.roles?.includes("admin")
+                    ? "/app/admin/home"
+                    : "/app/home"
+                }
+                replace
+              />
+            ) : (
+              <RegisterPage />
+            )
+          }
+        />
+        <Route path='/app/change-password' element={<ChangePassword />} />
+        <Route path='/terms' element={<Terms />} />
 
-          {/* Collaborator Routes */}
-          <Route
-            path='/app/*'
-            element={
-              <ProtectedRoute role='member'>
-                <TeamGuard>
-                  <CollaboratorLayout />
-                </TeamGuard>
-              </ProtectedRoute>
-            }
-          >
-            <Route path='' element={<Navigate to='home' replace />} />
-            <Route path='home' index element={<Home />} />
-            <Route path='memors' element={<Memors />} />
-            <Route path='memors/:memorId' element={<Memors />} />
-            <Route path='leaderboard' element={<Leaderboard />} />
-            <Route path='memoryboard' element={<MemoryBoard />} />
-            <Route path='profile' element={<Profile />} />
-          </Route>
+        <Route
+          path='/app/*'
+          element={
+            <ProtectedRoute role='member'>
+              <TeamGuard>
+                <CollaboratorLayout />
+              </TeamGuard>
+            </ProtectedRoute>
+          }
+        >
+          <Route path='' element={<Navigate to='home' replace />} />
+          <Route path='home' index element={<Home />} />
+          <Route path='memors' element={<Memors />} />
+          <Route path='memors/:memorId' element={<Memors />} />
+          <Route path='leaderboard' element={<Leaderboard />} />
+          <Route path='memoryboard' element={<MemoryBoard />} />
+          <Route path='profile' element={<Profile />} />
+        </Route>
 
-          {/* Admin Routes */}
-          <Route
-            path='/app/admin/*'
-            element={
-              <ProtectedRoute role='admin'>
-                <AdminLayout />
-              </ProtectedRoute>
-            }
-          >
-            <Route path='home' element={<AdminHome />} />
-            <Route path='leaderboard' element={<AdminLeaderboard />} />
-            <Route path='memoryboard' element={<MemoryBoard />} />
-            <Route path='adminboard' element={<AdminBoard />} />
-          </Route>
+        <Route
+          path='/app/admin/*'
+          element={
+            <ProtectedRoute role='admin'>
+              <AdminLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path='home' element={<AdminHome />} />
+          <Route path='leaderboard' element={<AdminLeaderboard />} />
+          <Route path='memoryboard' element={<MemoryBoard />} />
+          <Route path='adminboard' element={<AdminBoard />} />
+        </Route>
 
-          {/* Catch-All - Redirect to landing page for main domain, login for subdomains */}
-          <Route
-            path='*'
-            element={
-              window.location.hostname === "memor-us.com" ? (
-                <Navigate to='/landing' replace />
-              ) : (
-                <Navigate to='/app/login' replace />
-              )
-            }
-          />
-        </Routes>
 
-        {!hideFooter && (isAdmin ? <AdminFooter /> : <CollaboratorFooter />)}
-      </AuthenticatedApp>
+        {/* Landing Page Routes - Only for main domain (memor-us.com, www.memor-us.com, localhost) */}
+        {isMainDomain() && (
+          <>
+            <Route path='/' element={<LandingPage />} />
+            <Route path='/landing' element={<LandingPage />} />
+          </>
+        )}
 
-      {/* Toast Notifications */}
+        {/* Catch-All Routes */}
+        <Route path='*' element={<Navigate to='/app/login' replace />} />
+        <Route
+          path='*'
+          element={
+            isMainDomain() ? (
+              <Navigate to='/landing' replace />
+            ) : isTenantSubdomain() ? (
+              <Navigate to='/app/login' replace />
+            ) : (
+              <Navigate to='/app/login' replace />
+            )
+          }
+        />
+      </Routes>
+
+      {!hideFooter && (isAdmin ? <AdminFooter /> : <CollaboratorFooter />)}
+
       <Toaster
         position='top-right'
         toastOptions={{
