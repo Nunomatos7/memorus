@@ -305,8 +305,24 @@ const Home = () => {
             const latestMemorsData = await latestMemorsResponse.json();
 
             if (Array.isArray(latestMemorsData)) {
-              // Already formatted for display
-              setMemors(latestMemorsData);
+              // Already formatted for display - but we need to enhance for correct image indexing
+              const enhancedMemors = latestMemorsData.map((memor) => {
+                // If memor has multiple images, we need to track which one this slide represents
+                if (
+                  memor.image &&
+                  Array.isArray(memor.image) &&
+                  memor.image.length > 1
+                ) {
+                  // For admin view, we'll show the first image but track all images
+                  return {
+                    ...memor,
+                    currentImageIndex: 0, // This slide shows the first image
+                    allImages: memor.image, // Store all images for modal
+                  };
+                }
+                return memor;
+              });
+              setMemors(enhancedMemors);
             }
           } else {
             console.error(
@@ -388,7 +404,8 @@ const Home = () => {
                           // Process each memor and its pictures
                           teamMemorsData.forEach((memor) => {
                             if (memor.pictures && memor.pictures.length > 0) {
-                              memor.pictures.forEach((pic) => {
+                              // For admin view, create individual slides for each picture
+                              memor.pictures.forEach((pic, picIndex) => {
                                 allSubmissions.push({
                                   id: `${memor.id}-${pic.id}`,
                                   memorId: memor.id,
@@ -404,6 +421,10 @@ const Home = () => {
                                   submitter: pic.first_name
                                     ? `${pic.first_name} ${pic.last_name || ""}`
                                     : "Team member",
+                                  allImages: memor.pictures.map(
+                                    (p) => p.img_src
+                                  ), // Store all images
+                                  currentImageIndex: picIndex, // Which image this slide represents
                                 });
                               });
                             }
@@ -481,8 +502,102 @@ const Home = () => {
     fetchData();
   }, [token, user]);
 
-  const handleImageClick = (slide) => {
-    setSelectedSlide(slide);
+  const handleImageClick = async (slide, imageIndex = null) => {
+    console.log(
+      "Admin Home: handleImageClick called with slide:",
+      slide,
+      "imageIndex:",
+      imageIndex
+    );
+
+    const preparedSlide = { ...slide };
+
+    // Determine the current index
+    let currentIndex = 0;
+
+    if (imageIndex !== null) {
+      currentIndex = imageIndex;
+    } else if (slide.currentImageIndex !== undefined) {
+      currentIndex = slide.currentImageIndex;
+    }
+
+    // If we have allImages, use those (all images from the memor)
+    // Otherwise try to fetch all images for this memor
+    if (slide.allImages && Array.isArray(slide.allImages)) {
+      preparedSlide.image = slide.allImages.map((imgSrc) => ({
+        img_src: imgSrc,
+        alt_text: `Image for ${slide.title}`,
+      }));
+    } else if (slide.memorId && token) {
+      // Try to fetch all images for this memor
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/memors/${
+            slide.memorId
+          }/pictures`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "X-Tenant": user.tenant_subdomain,
+            },
+          }
+        );
+
+        if (response.ok) {
+          const allPictures = await response.json();
+          if (allPictures && allPictures.length > 0) {
+            preparedSlide.image = allPictures.map((pic) => ({
+              img_src: pic.img_src,
+              alt_text: pic.alt_text || `Image for ${slide.title}`,
+            }));
+
+            // Find the index of the current image in the full array
+            const clickedImageSrc = Array.isArray(slide.image)
+              ? slide.image[0]
+              : slide.image;
+            const clickedSrc =
+              typeof clickedImageSrc === "object"
+                ? clickedImageSrc.img_src
+                : clickedImageSrc;
+            const foundIndex = allPictures.findIndex(
+              (pic) => pic.img_src === clickedSrc
+            );
+            if (foundIndex !== -1) {
+              currentIndex = foundIndex;
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching all pictures for memor:", error);
+        // Fall back to the slide's existing image
+        if (slide.image) {
+          preparedSlide.image = Array.isArray(slide.image)
+            ? slide.image.map((img) =>
+                typeof img === "string"
+                  ? { img_src: img, alt_text: `Image for ${slide.title}` }
+                  : img
+              )
+            : [{ img_src: slide.image, alt_text: `Image for ${slide.title}` }];
+        }
+      }
+    } else {
+      // Use the slide's existing image
+      if (slide.image) {
+        preparedSlide.image = Array.isArray(slide.image)
+          ? slide.image.map((img) =>
+              typeof img === "string"
+                ? { img_src: img, alt_text: `Image for ${slide.title}` }
+                : img
+            )
+          : [{ img_src: slide.image, alt_text: `Image for ${slide.title}` }];
+      }
+    }
+
+    console.log("Admin Home: Final prepared slide image:", preparedSlide.image);
+    console.log("Admin Home: Using currentIndex:", currentIndex);
+
+    preparedSlide.currentIndex = currentIndex;
+    setSelectedSlide(preparedSlide);
     document.body.style.overflow = "hidden";
   };
 
@@ -569,7 +684,7 @@ const Home = () => {
                 aria-label='Latest Memors'
                 keyboard={{ enabled: true, onlyInViewport: true }}
               >
-                {memors.map((memor, index) => (
+                {memors.map((memor) => (
                   <SwiperSlide
                     key={memor.id}
                     className={
@@ -595,7 +710,11 @@ const Home = () => {
                             width={"100%"}
                             height={"100%"}
                             style={{ objectFit: "cover" }}
-                            src={memor.image[0]}
+                            src={
+                              Array.isArray(memor.image)
+                                ? memor.image[0]
+                                : memor.image
+                            }
                             alt='Memor Image'
                           />
                         </div>
@@ -635,6 +754,7 @@ const Home = () => {
         {selectedSlide && (
           <MemorPicture
             images={selectedSlide.image}
+            currentIndex={selectedSlide.currentIndex || 0}
             teamName={selectedSlide.team}
             title={selectedSlide.title}
             submitDate={selectedSlide.submittedDate}

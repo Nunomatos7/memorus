@@ -43,7 +43,6 @@ const AdminNavbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Check if current page is MemoryBoard
   const isMemoryBoard = location.pathname
     .toLowerCase()
     .includes("/memoryboard");
@@ -83,7 +82,7 @@ const AdminNavbar = () => {
         borderBottom: isMemoryBoard ? "none" : "1px solid #444444",
         opacity: isMemoryBoard ? 0.3 : 1,
         transition: "all 0.3s ease",
-        zIndex: 1100, // Ensure navbar stays above memory board content
+        zIndex: 1100,
         top: 0,
         left: 0,
         right: 0,
@@ -102,7 +101,6 @@ const AdminNavbar = () => {
           margin: "auto",
         }}
       >
-        {/* Logo */}
         <Box>
           <NavLink to='/app/admin/home'>
             <img
@@ -113,7 +111,6 @@ const AdminNavbar = () => {
           </NavLink>
         </Box>
 
-        {/* Desktop Navigation */}
         <Box
           sx={{
             display: { xs: "none", md: "flex" },
@@ -192,7 +189,7 @@ const AdminNavbar = () => {
           </Box>
         </Box>
 
-        {/* Mobile Burger Menu */}
+        {/* Mobile Drawer */}
         <Box sx={{ display: { xs: "block", md: "none" } }}>
           <IconButton onClick={toggleDrawer(true)}>
             <MenuIcon sx={{ color: "#82D5C7" }} />
@@ -209,7 +206,6 @@ const AdminNavbar = () => {
               },
             }}
           >
-            {/* User Info */}
             <Box
               sx={{
                 display: "flex",
@@ -236,7 +232,6 @@ const AdminNavbar = () => {
               </Typography>
             </Box>
             <Divider sx={{ backgroundColor: "#444" }} />
-            {/* Navigation Links */}
             <List
               sx={{
                 display: "flex",
@@ -269,7 +264,6 @@ const AdminNavbar = () => {
               </StyledNavLink>
             </List>
             <Divider sx={{ backgroundColor: "#444", marginTop: "20px" }} />
-            {/* Change Password and Log Out */}
             <Box
               sx={{
                 display: "flex",

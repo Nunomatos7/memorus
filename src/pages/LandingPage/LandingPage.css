@@ -1,7 +1,5 @@
-/* Import Google Fonts */
 @import url("https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
 
-/* Landing Page Root Styles - match original #root */
 .landing-page {
   margin: 0 auto;
   text-align: center;
@@ -10,7 +8,6 @@
   min-height: 100vh;
 }
 
-/* Collaborator section background with decorative elements - exact match */
 .collaborator {
   background-color: #381e72;
   position: relative;
@@ -45,7 +42,6 @@
   z-index: 1;
 }
 
-/* Floating animation - exact match */
 @keyframes float {
   0% {
     transform: translate(-50%, -50%) translateY(0);
@@ -62,43 +58,37 @@
   animation: float 3s ease-in-out infinite;
 }
 
-/* Background decorative elements positioning */
 .landing-page img[alt*="background"],
 .landing-page img[alt*="Background"] {
   pointer-events: none;
   user-select: none;
 }
 
-/* Ensure proper spacing for sections */
 .landing-page section {
   position: relative;
   z-index: 1;
 }
 
-/* Mobile responsive adjustments */
 @media (max-width: 640px) {
   .landing-page .container {
     padding: 0 0.5rem;
   }
 
   .iframe-container {
-    padding-bottom: 75%; /* Adjust aspect ratio for mobile */
+    padding-bottom: 75%;
   }
 }
 
-/* Smooth scroll behavior */
 html {
   scroll-behavior: smooth;
 }
 
-/* Focus styles for accessibility */
 .landing-page button:focus,
 .landing-page a:focus {
   outline: 2px solid #d0bcfe;
   outline-offset: 2px;
 }
 
-/* Swiper container adjustments */
 .swiper {
   overflow: visible;
 }
@@ -107,18 +97,15 @@ html {
   height: auto;
 }
 
-/* Footer link hover effects */
 .landing-page footer a:hover {
   text-decoration: underline;
 }
 
-/* Button hover animations */
 .landing-page button,
 .landing-page a[class*="bg-"] {
   transition: all 0.3s ease;
 }
 
-/* Ensure proper z-index layering */
 .landing-page .relative {
   position: relative;
 }
@@ -127,36 +114,31 @@ html {
   position: absolute;
 }
 
-/* Background image positioning */
 .landing-page img[style*="position: absolute"] {
   pointer-events: none;
 }
 
-/* Dark theme overrides */
 .dark .landing-page {
   background-color: #111827;
 }
 
-/* Responsive text scaling */
 @media (max-width: 480px) {
   .landing-page h1 {
-    font-size: 1.875rem !important; /* 30px */
-    line-height: 2.25rem !important; /* 36px */
+    font-size: 1.875rem !important;
+    line-height: 2.25rem !important;
   }
 
   .landing-page h2 {
-    font-size: 1.5rem !important; /* 24px */
-    line-height: 2rem !important; /* 32px */
+    font-size: 1.5rem !important;
+    line-height: 2rem !important;
   }
 }
 
-/* Loading state styles */
 .landing-page .loading {
   opacity: 0.5;
   pointer-events: none;
 }
 
-/* Animation performance optimization */
 .landing-page * {
   will-change: auto;
 }
@@ -165,14 +147,12 @@ html {
   will-change: transform, opacity;
 }
 
-/* High contrast mode support */
 @media (prefers-contrast: high) {
   .landing-page {
     filter: contrast(1.2);
   }
 }
 
-/* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
   .landing-page * {
     animation-duration: 0.01ms !important;

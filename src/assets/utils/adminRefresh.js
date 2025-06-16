@@ -1,4 +1,3 @@
-// src/utils/adminRefresh.js
 /**
  * Utility for managing Admin Board component refresh operations
  */

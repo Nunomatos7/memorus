@@ -44,31 +44,12 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
     console.log("SubmitMemorModal: memor.image=", memor.image);
   }, [memor]);
 
-  // Restore body overflow when component unmounts
   useEffect(() => {
     return () => {
       document.body.style.overflow = "auto";
     };
   }, []);
 
-  const getCurrentSubdomain = () => {
-    const hostname = window.location.hostname;
-
-    // Handle localhost development
-    if (hostname.includes("localhost")) {
-      const parts = hostname.split(".");
-      return parts.length > 1 ? parts[0] : null;
-    }
-
-    const parts = hostname.split(".");
-    if (parts.length >= 3) {
-      return parts[0];
-    }
-
-    return null;
-  };
-
-  // Fetch team photos when component mounts or memor changes
   useEffect(() => {
     if (!memor || !memor.id || !token || !user?.tenant_subdomain) return;
 
@@ -80,7 +61,6 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
           `Fetching pictures for memor ID: ${memor.id} (Team: ${user?.teamsId})`
         );
 
-        // Fetch photos for this memor - API already updated to filter by team
         const response = await fetch(
           `${import.meta.env.VITE_API_URL}/api/memors/${memor.id}/pictures`,
           {
@@ -101,13 +81,10 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
           `Received ${pictures.length} team pictures for memor ${memor.id}`
         );
 
-        // Store the complete picture objects
         setNormalizedImages(pictures);
         console.log("Set normalizedImages to:", pictures);
 
-        // For backward compatibility
         if (!memor.image || memor.image.length === 0) {
-          // Preserve alt_text from the API response
           memor.image = pictures.map((pic) => ({
             img_src: pic.img_src,
             alt_text: pic.alt_text,
@@ -116,17 +93,15 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
         }
       } catch (error) {
         console.error("Error fetching team photos:", error);
-        // Use existing memor.image if available
         if (memor.image && memor.image.length > 0) {
-          // Convert URL strings to objects if needed
           const objectImages = memor.image.map((url) => {
             if (typeof url === "string") {
               return {
                 img_src: url,
-                alt_text: "Memor image", // Fallback alt text
+                alt_text: "Memor image",
               };
             }
-            return url; // Already an object
+            return url;
           });
           setNormalizedImages(objectImages);
           console.log(
@@ -201,19 +176,15 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
 
     console.log("SubmitMemorModal: handleImageClick called with image:", image);
 
-    // Find the image index in the normalized images array
     let imageIndex = -1;
 
-    // If the image is an object with img_src, find by img_src
     if (typeof image === "object" && image.img_src) {
       imageIndex = normalizedImages.findIndex(
         (img) =>
           (typeof img === "object" && img.img_src === image.img_src) ||
           (typeof img === "string" && img === image.img_src)
       );
-    }
-    // If the image is a string URL, find by string matching
-    else if (typeof image === "string") {
+    } else if (typeof image === "string") {
       imageIndex = normalizedImages.findIndex(
         (img) =>
           (typeof img === "string" && img === image) ||
@@ -221,13 +192,10 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
       );
     }
 
-    // Set the selected image index
     console.log("SubmitMemorModal: Found image at index:", imageIndex);
 
-    // If found, use that index, otherwise use 0
     const selectedIndex = imageIndex >= 0 ? imageIndex : 0;
 
-    // Log what we're selecting
     if (selectedIndex < normalizedImages.length) {
       console.log(
         "SubmitMemorModal: Selected image:",
@@ -249,7 +217,6 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
       return;
     }
 
-    // Validate file type
     const validTypes = [
       "image/jpeg",
       "image/jpg",
@@ -266,8 +233,7 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
       return;
     }
 
-    // Validate file size (max 10MB)
-    const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+    const maxSize = 10 * 1024 * 1024; // 10MB
     if (file.size > maxSize) {
       setUploadError("File is too large. Maximum size is 10MB.");
       setUploadedImage(null);
@@ -275,10 +241,8 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
       return;
     }
 
-    // Set the uploaded file for submission
     setUploadedFile(file);
 
-    // Create preview
     const reader = new FileReader();
     reader.onload = (e) => {
       setUploadedImage(e.target.result);
@@ -299,14 +263,11 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
     }
 
     try {
-      // Create FormData object and append the file
       const formData = new FormData();
       formData.append("image", uploadedFile);
 
-      // Set up loading state
       setIsSubmitting(true);
 
-      // Send the request using fetch with FormData
       const res = await fetch(
         `${import.meta.env.VITE_API_URL}/api/memors/${memor.id}/pictures`,
         {
@@ -327,12 +288,9 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
               padding: "10px",
               background: "#f5f5f5",
             }}
-          >
-            {/* <TestAltText memorId={memor.id} /> */}
-          </div>
+          ></div>
         );
       }
-      // Reset loading state
       setIsSubmitting(false);
 
       if (!res.ok) {
@@ -342,14 +300,12 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
 
       const responseData = await res.json();
 
-      // If we have the new image URL in the response, add it to our images
       if (responseData.img_src) {
         const newImages = [...normalizedImages, responseData.img_src];
         setNormalizedImages(newImages);
         memor.image = newImages;
       }
 
-      // Show success feedback
       setFeedback({
         type: "success",
         title: "You submitted a Memor",
@@ -377,7 +333,6 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
       onClose();
     } else {
       setIsSubmitMemorOpen(true);
-      // Reset file input for a new attempt
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
@@ -506,7 +461,7 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
               </div>
             </div>
 
-            {/* Display upload error if any */}
+            {/* Display error*/}
             {uploadError && (
               <Alert
                 severity='error'
@@ -631,7 +586,6 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
               Your team&apos;s photos for this Memor
             </Typography>
 
-            {/* Display loading indicator while fetching images */}
             {loadingTeamPhotos ? (
               <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
                 <CircularProgress size={30} sx={{ color: "#d0bcfe" }} />

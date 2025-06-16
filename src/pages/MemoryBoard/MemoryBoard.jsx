@@ -8,22 +8,18 @@ import Loader from "../../Components/Loader/Loader";
 import { useAuth } from "../../context/AuthContext";
 import { CircularProgress } from "@mui/material";
 
-// Canvas dimensions
 const canvasWidth = 2000;
 const canvasHeight = 2000;
 const cardWidth = 350;
 const cardHeight = 400;
 const spacing = 200;
 
-// Create a fixed seed for consistent randomness
 const rng = seedrandom("fixed-seed");
 
 const MemoryBoard = () => {
-  // References
   const canvasRef = useRef(null);
   const { token, user } = useAuth();
 
-  // Basic state
   const [selectedMemor, setSelectedMemor] = useState(null);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [loadedImages, setLoadedImages] = useState(new Set());
@@ -31,13 +27,11 @@ const MemoryBoard = () => {
   const [error, setError] = useState(null);
   const [posts, setPosts] = useState([]);
 
-  // Filter state
   const [competitions, setCompetitions] = useState([]);
   const [teams, setTeams] = useState([]);
   const [selectedCompetition, setSelectedCompetition] = useState("");
   const [selectedTeam, setSelectedTeam] = useState("");
 
-  // Helper function to generate non-overlapping positions
   const generateNonOverlappingPosition = (positions) => {
     let position;
     let overlaps;
@@ -58,12 +52,10 @@ const MemoryBoard = () => {
     return position;
   };
 
-  // Initialize page title
   useEffect(() => {
     document.title = `Memor'us | Memory Board`;
   }, []);
 
-  // Load initial data: competitions and teams
   useEffect(() => {
     if (!token || !user) return;
 
@@ -71,7 +63,6 @@ const MemoryBoard = () => {
       setLoading(true);
 
       try {
-        // Fetch ALL competitions instead of just active ones
         const competitionsResponse = await fetch(
           `${import.meta.env.VITE_API_URL}/api/competitions`,
           {
@@ -86,7 +77,6 @@ const MemoryBoard = () => {
           const competitionsData = await competitionsResponse.json();
           setCompetitions(competitionsData);
 
-          // Find currently active competition
           const today = new Date().toISOString().split("T")[0];
           const activeCompetition = competitionsData.find(
             (comp) =>
@@ -95,7 +85,6 @@ const MemoryBoard = () => {
               comp.end_date >= today
           );
 
-          // Set default to active competition, or first in list if none are active
           if (activeCompetition) {
             setSelectedCompetition(activeCompetition.id);
           } else if (competitionsData.length > 0) {
@@ -118,7 +107,6 @@ const MemoryBoard = () => {
           const teamsData = await teamsResponse.json();
           setTeams(teamsData);
 
-          // Set default team (user's team or first team)
           if (user?.teamsId) {
             setSelectedTeam(user.teamsId);
           } else if (teamsData.length > 0) {
@@ -136,7 +124,6 @@ const MemoryBoard = () => {
     fetchInitialData();
   }, [token, user]);
 
-  // Fetch memory board data when competition or team selection changes
   useEffect(() => {
     if (
       !selectedCompetition ||
@@ -152,18 +139,14 @@ const MemoryBoard = () => {
     );
     setLoading(true);
 
-    // Get team name for static data filtering
     const teamName =
       teams.find((t) => t.id === parseInt(selectedTeam))?.name || "Your Team";
     console.log(`Selected team name: ${teamName}`);
 
-    // Reset posts first to avoid showing old data
     setPosts([]);
 
-    // Then try to fetch from API
     const fetchMemorData = async () => {
       try {
-        // Attempt to fetch from the completed memors endpoint
         const memorUrl = `${
           import.meta.env.VITE_API_URL
         }/api/memors/team/${selectedTeam}/competition/${selectedCompetition}/completed`;
@@ -186,7 +169,6 @@ const MemoryBoard = () => {
         console.log(`API response from ${memorUrl}:`, memorData);
 
         if (memorData && memorData.length > 0) {
-          // Process memor data
           const positions = [];
           const apiPosts = memorData
             .filter((memor) => memor.pictures && memor.pictures.length > 0)
@@ -194,7 +176,6 @@ const MemoryBoard = () => {
               const position = generateNonOverlappingPosition(positions);
               positions.push(position);
 
-              // Extract images
               const images = memor.pictures.map((pic) => ({
                 img_src: pic.img_src,
                 alt_text: pic.alt_text || `Image for ${memor.title}`,
@@ -202,6 +183,7 @@ const MemoryBoard = () => {
 
               return {
                 ...position,
+                memorId: memor.id,
                 title: memor.title,
                 description: memor.description || "",
                 team: memor.team || teamName,
@@ -225,7 +207,6 @@ const MemoryBoard = () => {
         }
       } catch (err) {
         console.error("Error fetching from API:", err);
-        // We already loaded static data, so no need to update error state
       } finally {
         setLoading(false);
       }
@@ -234,7 +215,6 @@ const MemoryBoard = () => {
     fetchMemorData();
   }, [selectedCompetition, selectedTeam, token, user, teams]);
 
-  // Handle lazy loading of images
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -255,7 +235,6 @@ const MemoryBoard = () => {
     return () => observer.disconnect();
   }, [posts]);
 
-  // Handle zoom controls
   useEffect(() => {
     const handleWheel = (e) => {
       if (e.ctrlKey) {
@@ -294,7 +273,6 @@ const MemoryBoard = () => {
     };
   }, []);
 
-  // Event handlers
   const handleZoom = (action = "out") => {
     const canvasState = canvasRef.current?.getCanvasState?.();
     if (!canvasState) return;
@@ -315,20 +293,16 @@ const MemoryBoard = () => {
       `MemoryBoard: openModal called with imageIndex: ${imageIndex}, postIndex: ${postIndex}`
     );
 
-    // Get the post from the posts array
     const post = posts[postIndex];
     console.log("MemoryBoard: post data:", post);
 
-    // Just use the post images directly, don't modify the format
     let images = [];
 
     if (post.image && Array.isArray(post.image)) {
-      // Just use the post images directly, don't modify the format
       images = post.image;
       console.log("MemoryBoard: Using post images directly:", images);
     }
 
-    // Create the selectedMemor object
     setSelectedMemor({
       images: images,
       currentIndex: imageIndex,
@@ -336,6 +310,7 @@ const MemoryBoard = () => {
       submittedDate: post.submittedDate || post.created_at,
       team: post.team?.name || post.team,
       postIndex,
+      memorId: post.memorId,
     });
   };
 
@@ -351,18 +326,15 @@ const MemoryBoard = () => {
   };
 
   const handleCompetitionChange = (event) => {
-    // Clear posts when changing competition to avoid showing old data
     setPosts([]);
     setSelectedCompetition(event.target.value);
   };
 
   const handleTeamChange = (event) => {
-    // Clear posts when changing team to avoid showing old data
     setPosts([]);
     setSelectedTeam(event.target.value);
   };
 
-  // Render
   return (
     <>
       <Loader />
@@ -370,14 +342,12 @@ const MemoryBoard = () => {
         className='memory-board-container'
         style={{
           width: "100%",
-          height: "100vh", // Changed to full viewport height
+          height: "100vh",
           position: "relative",
           backgroundColor: "#9990d8",
         }}
       >
-        {/* Filter Controls */}
         <div className='filter-controls'>
-          {/* Competition Filter */}
           <label
             htmlFor='competition-filter'
             className='sr-only'
@@ -398,7 +368,6 @@ const MemoryBoard = () => {
             ))}
           </select>
 
-          {/* Team Filter */}
           <label
             htmlFor='team-filter'
             className='sr-only'
@@ -436,7 +405,7 @@ const MemoryBoard = () => {
             onCanvasMount={(mountFunc) => {
               mountFunc.fitContentToView({ scale: 0.5 });
             }}
-            backgroundType='none' // This disables the dotted background
+            backgroundType='none'
             customComponents={[
               {
                 component: (
@@ -454,7 +423,6 @@ const MemoryBoard = () => {
               },
             ]}
           >
-            {/* Rest of your canvas content */}
             {posts.map((post, postIndex) => (
               <div
                 key={postIndex}
@@ -478,7 +446,6 @@ const MemoryBoard = () => {
                     .slice()
                     .reverse()
                     .map((image, cardIndex, reversedArray) => {
-                      // Extract img_src and alt_text based on the image format
                       const imgSrc =
                         typeof image === "string"
                           ? image
@@ -495,12 +462,14 @@ const MemoryBoard = () => {
                         <div
                           key={cardIndex}
                           className='polaroid-card'
-                          onClick={() =>
-                            openModal(
-                              reversedArray.length - 1 - cardIndex,
-                              postIndex
-                            )
-                          }
+                          onClick={() => {
+                            const actualImageIndex =
+                              reversedArray.length - 1 - cardIndex;
+                            console.log(
+                              `MemoryBoard: Clicked card ${cardIndex}, actual image index: ${actualImageIndex}`
+                            );
+                            openModal(actualImageIndex, postIndex);
+                          }}
                           style={{
                             position: "absolute",
                             top: `${cardIndex * 5}px`,
@@ -518,10 +487,8 @@ const MemoryBoard = () => {
                             cursor: "pointer",
                           }}
                         >
-                          {/* Submitted Date */}
                           <p className='card-date'>{post.submittedDate}</p>
 
-                          {/* Image */}
                           <img
                             data-src={imgSrc}
                             src={loadedImages.has(imgSrc) ? imgSrc : ""}
@@ -536,7 +503,6 @@ const MemoryBoard = () => {
                             }}
                           />
 
-                          {/* Title - Only for the first image */}
                           {cardIndex === reversedArray.length - 1 && (
                             <p className='card-title'>{post.title}</p>
                           )}
@@ -558,6 +524,7 @@ const MemoryBoard = () => {
             teamName={selectedMemor.team}
             onClose={closeModal}
             onNavigate={handleImageNavigation}
+            memorId={selectedMemor.memorId}
           />
         )}
 

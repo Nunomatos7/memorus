@@ -3,7 +3,6 @@ import Navbar from "../Navbar/Navbar";
 import { useState } from "react";
 
 function CollaboratorLayout() {
-  // ✅ Initialize notifications state
   const [notifications, setNotifications] = useState([
     {
       id: 1,
@@ -19,7 +18,6 @@ function CollaboratorLayout() {
     },
   ]);
 
-  // ✅ Function to delete a notification
   const handleDeleteNotification = (id) => {
     setNotifications((prevNotifications) =>
       prevNotifications.filter((notification) => notification.id !== id)
@@ -28,7 +26,6 @@ function CollaboratorLayout() {
 
   return (
     <div>
-      {/* ✅ Pass notifications and delete handler to Navbar */}
       <Navbar
         notifications={notifications}
         handleDeleteNotification={handleDeleteNotification}

@@ -1,5 +1,3 @@
-// Updated Navbar.jsx with immersive MemoryBoard support
-
 import { useState, useEffect } from "react";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import {
@@ -122,7 +120,6 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Check if current page is MemoryBoard
   const isMemoryBoard = location.pathname
     .toLowerCase()
     .includes("/memoryboard");
@@ -138,11 +135,8 @@ const Navbar = () => {
     const newValue = !showLeaderboard;
     setShowLeaderboard(newValue);
     setLeaderboardVisibility(newValue);
-
-    // No need to navigate away if hiding - we'll handle this in the Home component
   };
 
-  // Fetch notifications when component mounts or user changes
   useEffect(() => {
     const fetchNotifications = async () => {
       if (!token || !user) return;
@@ -174,8 +168,7 @@ const Navbar = () => {
 
     fetchNotifications();
 
-    // Set up a polling interval to check for new notifications
-    const intervalId = setInterval(fetchNotifications, 60000); // Check every minute
+    const intervalId = setInterval(fetchNotifications, 60000);
 
     return () => clearInterval(intervalId);
   }, [token, user]);
@@ -185,10 +178,8 @@ const Navbar = () => {
       setShowLeaderboard(getLeaderboardVisibility());
     };
 
-    // Set initial value
     setShowLeaderboard(getLeaderboardVisibility());
 
-    // Listen for both localStorage events and our custom event
     window.addEventListener("storage", handleStorageChange);
     window.addEventListener(LEADERBOARD_VISIBILITY_CHANGE, handleStorageChange);
 
@@ -230,7 +221,6 @@ const Navbar = () => {
   const handleNotifClick = (event) => {
     setNotifAnchorEl(event.currentTarget);
 
-    // Mark all notifications as read when opening the menu
     notifications.forEach((notification) => {
       if (!notification.read) {
         markNotificationAsRead(notification.id);
@@ -287,7 +277,6 @@ const Navbar = () => {
         throw new Error("Failed to mark notification as read");
       }
 
-      // Update the local state to mark as read
       setNotifications((prev) =>
         prev.map((notification) =>
           notification.id === id
@@ -326,19 +315,16 @@ const Navbar = () => {
   };
 
   const handleNotificationClick = (notification) => {
-    // Navigate to the memor details page if it's a memor-related notification
     if (notification.memorId) {
       navigate(`/app/memors/${notification.memorId}`);
       handleNotifClose();
     }
   };
 
-  // Get unread notification count
   const unreadCount = notifications.filter((notif) => !notif.read).length;
 
   const classes = useStyles();
 
-  // Safely extract team name
   const getTeamName = () => {
     if (!user) return "";
     if (typeof user.team === "string") return user.team;
@@ -357,7 +343,7 @@ const Navbar = () => {
         borderBottom: isMemoryBoard ? "none" : "1px solid #444444",
         opacity: isMemoryBoard ? 0.3 : 1,
         transition: "all 0.3s ease",
-        zIndex: 1100, // Ensure navbar stays above memory board content
+        zIndex: 1100,
         top: 0,
         left: 0,
         right: 0,
@@ -376,7 +362,6 @@ const Navbar = () => {
           margin: "auto",
         }}
       >
-        {/* Logo */}
         <Box>
           <NavLink to='/app/home'>
             <img
@@ -387,7 +372,6 @@ const Navbar = () => {
           </NavLink>
         </Box>
 
-        {/* Desktop Navigation */}
         <Box
           sx={{
             display: { xs: "none", md: "flex" },
@@ -585,7 +569,7 @@ const Navbar = () => {
           </Box>
         </Box>
 
-        {/* Mobile Burger Menu */}
+        {/* Mobile Drawer */}
         <Box sx={{ display: { xs: "block", md: "none" } }}>
           <IconButton onClick={toggleDrawer(true)}>
             <MenuIcon sx={{ color: "#D0BCFE" }} />
@@ -602,7 +586,6 @@ const Navbar = () => {
               },
             }}
           >
-            {/* User Info */}
             <Box
               sx={{
                 display: "flex",
@@ -632,7 +615,6 @@ const Navbar = () => {
               </Typography>
             </Box>
             <Divider sx={{ backgroundColor: "#444" }} />
-            {/* Navigation Links */}
             <List
               sx={{
                 display: "flex",
@@ -667,7 +649,6 @@ const Navbar = () => {
               </StyledNavLink>
             </List>
             <Divider sx={{ backgroundColor: "#444", marginTop: "20px" }} />
-            {/* Change Password and Log Out */}
             <Box
               sx={{
                 display: "flex",

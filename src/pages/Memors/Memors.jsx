@@ -30,11 +30,9 @@ import "swiper/css/free-mode";
 import "swiper/css/scrollbar";
 import { useLocation, useNavigate } from "react-router-dom";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
-// import Loader from "../../Components/Loader/Loader";
 import BackupRoundedIcon from "@mui/icons-material/BackupRounded";
 import { useAuth } from "../../context/AuthContext";
 
-// Skeleton component for ongoing memor cards
 const OngoingMemorSkeleton = () => (
   <Card
     sx={{
@@ -113,7 +111,6 @@ const OngoingMemorSkeleton = () => (
   </Card>
 );
 
-// Skeleton component for horizontal scrolling container
 const OngoingMemorsCarouselSkeleton = () => (
   <Box sx={{ mb: 3 }}>
     <Swiper
@@ -142,7 +139,6 @@ const OngoingMemorsCarouselSkeleton = () => (
   </Box>
 );
 
-// Skeleton component for memor list items
 const MemorListItemSkeleton = () => (
   <Box sx={{ mb: 2 }}>
     <ListItem
@@ -489,7 +485,6 @@ const Memors = () => {
     setIsModalOpen(true);
     document.body.style.overflow = "hidden";
 
-    // Update URL without causing a page refresh using replaceState
     window.history.replaceState(null, "", `/app/memors/${memor.id}`);
   };
 
@@ -498,7 +493,6 @@ const Memors = () => {
     setSelectedMemor(null);
     document.body.style.overflow = "auto";
 
-    // Update URL without causing a page refresh using replaceState
     window.history.replaceState(null, "", "/app/memors");
   };
 
@@ -548,7 +542,6 @@ const Memors = () => {
 
   return (
     <>
-      {/* <Loader /> */}
       <div className='container'>
         <Box>
           <div className='memors-header'>
@@ -798,8 +791,6 @@ const Memors = () => {
             }}
           />
         )}
-
-        {/* Tabs Section */}
 
         <Box
           sx={{

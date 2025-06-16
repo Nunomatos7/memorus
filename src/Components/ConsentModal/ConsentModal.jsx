@@ -35,13 +35,11 @@ const ConsentModal = ({ setUser }) => {
         "; path=/;";
       setCookiesAccepted(true);
 
-      // If user is logged in, save to database too
       if (user && token) {
         try {
           await saveTermsAcceptance(token, user.tenant_subdomain, "cookies");
         } catch (error) {
           console.error("Error saving cookie acceptance to database:", error);
-          // Continue anyway as we've set the cookie locally
         }
       }
     } else {
@@ -133,7 +131,6 @@ const ConsentModal = ({ setUser }) => {
           open={termsModalOpen}
           onClose={() => {
             setTermsModalOpen(false);
-            // Ensure body overflow is restored
             setTimeout(() => {
               document.body.style.overflow = isVisible ? "hidden" : "auto";
             }, 0);

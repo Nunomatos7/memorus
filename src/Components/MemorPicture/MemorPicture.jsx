@@ -50,8 +50,87 @@ const MemorPicture = ({
   }, [memorId, images, token, user?.tenant_subdomain]);
 
   useEffect(() => {
-    setActiveIndex(currentIndex || 0);
-  }, [currentIndex]);
+    console.log("MemorPicture: currentIndex changed to:", currentIndex);
+
+    if (currentIndex !== undefined && currentIndex !== null) {
+      const maxIndex = Math.max(
+        0,
+        (teamFilteredImages.length || images.length) - 1
+      );
+      const safeIndex = Math.max(0, Math.min(currentIndex, maxIndex));
+      console.log("MemorPicture: Setting activeIndex to:", safeIndex);
+      setActiveIndex(safeIndex);
+    }
+  }, [currentIndex, teamFilteredImages.length, images.length]);
+
+  useEffect(() => {
+    if (
+      teamFilteredImages.length > 0 &&
+      currentIndex !== undefined &&
+      currentIndex !== null
+    ) {
+      const maxIndex = teamFilteredImages.length - 1;
+      const safeIndex = Math.max(0, Math.min(currentIndex, maxIndex));
+      setActiveIndex(safeIndex);
+    }
+  }, [teamFilteredImages, currentIndex]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      switch (event.key) {
+        case "ArrowRight":
+        case "Right": // For older browsers
+          event.preventDefault();
+          handleNextImage();
+          break;
+        case "ArrowLeft":
+        case "Left": // For older browsers
+          event.preventDefault();
+          handlePreviousImage();
+          break;
+        case "Escape":
+        case "Esc": // For older browsers
+          event.preventDefault();
+          onClose();
+          break;
+        default:
+          break;
+      }
+    };
+
+    // Add event listener when component mounts
+    document.addEventListener("keydown", handleKeyDown);
+
+    // Focus the modal container for accessibility
+    const modalElement = document.querySelector(".modal-overlay");
+    if (modalElement) {
+      modalElement.focus();
+    }
+
+    // Cleanup event listener when component unmounts
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [activeIndex, teamFilteredImages.length, onClose]);
+
+  const handleNextImage = () => {
+    if (teamFilteredImages.length <= 1) return;
+
+    const newIndex =
+      activeIndex >= teamFilteredImages.length - 1 ? 0 : activeIndex + 1;
+    setActiveIndex(newIndex);
+    if (onNavigate) onNavigate(newIndex);
+  };
+
+  const handlePreviousImage = () => {
+    if (teamFilteredImages.length <= 1) return;
+
+    const newIndex =
+      activeIndex <= 0 ? teamFilteredImages.length - 1 : activeIndex - 1;
+    setActiveIndex(newIndex);
+    if (onNavigate) onNavigate(newIndex);
+  };
 
   if (!teamFilteredImages || teamFilteredImages.length === 0) {
     if (images && images.length > 0) {
@@ -66,7 +145,6 @@ const MemorPicture = ({
     return null;
   }
 
-  // Prepare images for react-image-gallery
   const galleryImages = teamFilteredImages.map((img) => {
     if (typeof img === "string") {
       return { original: img, thumbnail: img };
@@ -84,7 +162,15 @@ const MemorPicture = ({
   });
 
   return (
-    <div className='modal-overlay' onClick={onClose}>
+    <div
+      className='modal-overlay'
+      onClick={onClose}
+      tabIndex={0}
+      role='dialog'
+      aria-modal='true'
+      aria-labelledby='modal-title'
+      aria-describedby='modal-description'
+    >
       <button
         className='modal-close'
         onClick={onClose}
@@ -99,13 +185,7 @@ const MemorPicture = ({
             aria-label='Previous image'
             onClick={(e) => {
               e.stopPropagation();
-              setActiveIndex((prev) =>
-                prev <= 0 ? galleryImages.length - 1 : prev - 1
-              );
-              if (onNavigate)
-                onNavigate(
-                  activeIndex <= 0 ? galleryImages.length - 1 : activeIndex - 1
-                );
+              handlePreviousImage();
             }}
           >
             &#10094;
@@ -115,13 +195,7 @@ const MemorPicture = ({
             aria-label='Next image'
             onClick={(e) => {
               e.stopPropagation();
-              setActiveIndex((prev) =>
-                prev >= galleryImages.length - 1 ? 0 : prev + 1
-              );
-              if (onNavigate)
-                onNavigate(
-                  activeIndex >= galleryImages.length - 1 ? 0 : activeIndex + 1
-                );
+              handleNextImage();
             }}
           >
             &#10095;
@@ -141,10 +215,16 @@ const MemorPicture = ({
           />
         </div>
         <div className='modal-sub-content'>
-          <h2>{title}</h2>
-          <p>
+          <h2 id='modal-title'>{title}</h2>
+          <p id='modal-description'>
             {teamName} • {submitDate}
           </p>
+          {galleryImages.length > 1 && (
+            <p className='sr-only'>
+              Image {activeIndex + 1} of {galleryImages.length}. Use arrow keys
+              to navigate, Escape to close.
+            </p>
+          )}
         </div>
       </div>
       <div className='memor-modal-thumbnails-fixed'>
@@ -162,6 +242,17 @@ const MemorPicture = ({
                 setActiveIndex(idx);
                 if (onNavigate) onNavigate(idx);
               }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setActiveIndex(idx);
+                  if (onNavigate) onNavigate(idx);
+                }
+              }}
+              tabIndex={0}
+              role='button'
+              aria-label={`Go to image ${idx + 1}`}
               draggable={false}
             />
           ))}

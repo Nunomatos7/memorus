@@ -31,9 +31,7 @@ import { useAuth } from "../../context/AuthContext";
 const TermsModal = ({ open, onClose, initialTab = "terms" }) => {
   const { token, user } = useAuth();
 
-  // Placeholder functions for API calls (to be implemented)
   const checkTermsAcceptance = async (token, tenantSubdomain) => {
-    // TODO: Implement API call to check terms acceptance
     return {
       termsAccepted: false,
       cookiesAccepted: false,
@@ -41,7 +39,6 @@ const TermsModal = ({ open, onClose, initialTab = "terms" }) => {
   };
 
   const saveTermsAcceptance = async (token, tenantSubdomain, type) => {
-    // TODO: Implement API call to save terms acceptance
     console.log(`Saving ${type} acceptance for tenant: ${tenantSubdomain}`);
   };
 
@@ -63,7 +60,6 @@ const TermsModal = ({ open, onClose, initialTab = "terms" }) => {
   const contentRef = useRef(null);
   const sectionRefs = useRef({});
 
-  // Lista de seções para o índice de Terms and Conditions
   const termsOfServiceSections = [
     { id: "agreement", title: "Agreement to Our Legal Terms", number: "" },
     { id: "our-services", title: "Our Services", number: "1" },
@@ -119,20 +115,16 @@ const TermsModal = ({ open, onClose, initialTab = "terms" }) => {
     { id: "contact-us", title: "Contact Us", number: "23" },
   ];
 
-  // Additional useEffect to ensure body overflow is restored when component unmounts
   useEffect(() => {
     return () => {
-      // Final cleanup - ensure overflow is restored when component unmounts
       document.body.style.overflow = "auto";
     };
   }, []);
 
-  // Check if user has already accepted terms
   useEffect(() => {
     if (open && token && user) {
       const checkAcceptance = async () => {
         try {
-          // Try to fetch from database first
           const acceptanceStatus = await checkTermsAcceptance(
             token,
             user.tenant_subdomain
@@ -142,7 +134,7 @@ const TermsModal = ({ open, onClose, initialTab = "terms" }) => {
             cookies: acceptanceStatus.cookiesAccepted,
           });
         } catch (error) {
-          // Fallback to React state if API fails
+          console.error("Error checking terms acceptance:", error);
           setHasAccepted({
             terms: false,
             cookies: false,
@@ -155,49 +147,41 @@ const TermsModal = ({ open, onClose, initialTab = "terms" }) => {
   }, [open, token, user]);
 
   useEffect(() => {
-    // Handle body overflow when modal opens/closes
     if (open) {
-      // Store the current overflow style
       const originalOverflow = document.body.style.overflow;
       document.body.style.overflow = "hidden";
 
-      // Return cleanup function that will run when component unmounts or 'open' changes
       return () => {
         document.body.style.overflow = originalOverflow || "auto";
       };
     }
 
-    // If modal is closed, ensure overflow is restored
     document.body.style.overflow = "auto";
 
     return () => {};
   }, [open]);
 
+  // Scroller da página
   useEffect(() => {
-    // Reset scroll position and acceptance status when tab changes
     setScrollPosition(0);
     setCanAccept(hasAccepted[activeTab] || false);
     setActiveSection(activeTab === "terms" ? "agreement" : "what-data-collect");
   }, [activeTab, hasAccepted]);
 
- 
-
-  // Detect which section is currently visible - VERSÃO CORRIGIDA
   const detectActiveSection = (scrollTop) => {
     const sections = termsOfServiceSections;
     let currentSection = sections[0].id;
-    const offset = 150; // Ajustado para melhor detecção
+    const offset = 150;
 
-    // Percorre as seções de baixo para cima para encontrar a ativa
     for (let i = sections.length - 1; i >= 0; i--) {
       const section = sections[i];
       const element = sectionRefs.current[section.id];
-      
+
       if (element) {
         const elementTop = element.offsetTop - offset;
         if (scrollTop >= elementTop) {
           currentSection = section.id;
-          break; // Para no primeiro match (da última seção visível)
+          break;
         }
       }
     }
@@ -205,40 +189,32 @@ const TermsModal = ({ open, onClose, initialTab = "terms" }) => {
     setActiveSection(currentSection);
   };
 
-  // Navigate to specific section - VERSÃO CORRIGIDA
   const navigateToSection = (sectionId) => {
     const element = sectionRefs.current[sectionId];
     if (element && contentRef.current) {
-      // Define imediatamente a seção ativa para feedback visual
       setActiveSection(sectionId);
-      
-      // Scroll suave para a seção
+
       const offset = 100;
       const elementTop = element.offsetTop - offset;
-      
+
       contentRef.current.scrollTo({
         top: elementTop,
-        behavior: "smooth"
+        behavior: "smooth",
       });
     }
   };
 
-  // Handle scroll and section detection - VERSÃO MELHORADA
   const handleScroll = (e) => {
     const { scrollTop, scrollHeight, clientHeight } = e.target;
-    
-    // Calculate how far user has scrolled (as a percentage)
+
     const scrollPercentage = (scrollTop / (scrollHeight - clientHeight)) * 100;
     setScrollPosition(scrollPercentage);
 
-    // Enable accept button when scrolled at least 70% through the content
     if (scrollPercentage > 70 && !canAccept) {
       setCanAccept(true);
     }
 
-    // Detect active section based on scroll position (apenas para terms)
     if (activeTab === "terms") {
-      // Usar throttling para melhor performance
       clearTimeout(window.scrollTimeout);
       window.scrollTimeout = setTimeout(() => {
         detectActiveSection(scrollTop);
@@ -252,7 +228,6 @@ const TermsModal = ({ open, onClose, initialTab = "terms" }) => {
 
   const handleAccept = async () => {
     if (!token || !user) {
-      // Store acceptance in component state since localStorage is not supported
       setHasAccepted((prev) => ({
         ...prev,
         [activeTab]: true,
@@ -264,14 +239,12 @@ const TermsModal = ({ open, onClose, initialTab = "terms" }) => {
     setIsSubmitting(true);
 
     try {
-      // Save to database
       await saveTermsAcceptance(
         token,
         user.tenant_subdomain,
         activeTab === "terms" ? "terms" : "cookies"
       );
 
-      // Update local state
       setHasAccepted((prev) => ({
         ...prev,
         [activeTab]: true,
@@ -280,7 +253,6 @@ const TermsModal = ({ open, onClose, initialTab = "terms" }) => {
       onClose();
     } catch (error) {
       console.error("Failed to save acceptance:", error);
-      // Fallback to component state
       setHasAccepted((prev) => ({
         ...prev,
         [activeTab]: true,
@@ -295,8 +267,8 @@ const TermsModal = ({ open, onClose, initialTab = "terms" }) => {
     <Modal
       open={open}
       onClose={onClose}
-      aria-labelledby="terms-modal-title"
-      aria-describedby="terms-modal-description"
+      aria-labelledby='terms-modal-title'
+      aria-describedby='terms-modal-description'
     >
       <Box
         sx={{
@@ -316,7 +288,6 @@ const TermsModal = ({ open, onClose, initialTab = "terms" }) => {
           height: "85vh",
         }}
       >
-        {/* Header with title and close button */}
         <Box
           sx={{
             display: "flex",
@@ -332,15 +303,15 @@ const TermsModal = ({ open, onClose, initialTab = "terms" }) => {
             <IconButton
               onClick={onClose}
               sx={{ color: "#CAC4D0", mr: 1 }}
-              aria-label="Back"
+              aria-label='Back'
             >
               <ArrowBackIcon />
             </IconButton>
             <Typography
-              id="terms-modal-title"
-              variant="h6"
-              component="h2"
-              color="white"
+              id='terms-modal-title'
+              variant='h6'
+              component='h2'
+              color='white'
             >
               Legal Policies
             </Typography>
@@ -348,13 +319,12 @@ const TermsModal = ({ open, onClose, initialTab = "terms" }) => {
           <IconButton
             onClick={onClose}
             sx={{ color: "#CAC4D0" }}
-            aria-label="Close"
+            aria-label='Close'
           >
             <CloseIcon />
           </IconButton>
         </Box>
 
-        {/* Tabs for Terms and Privacy Policy */}
         <Tabs
           value={activeTab}
           onChange={handleTabChange}
@@ -378,20 +348,19 @@ const TermsModal = ({ open, onClose, initialTab = "terms" }) => {
           }}
         >
           <Tab
-            label="Terms and Conditions"
-            value="terms"
-            id="terms-tab"
-            aria-controls="terms-panel"
+            label='Terms and Conditions'
+            value='terms'
+            id='terms-tab'
+            aria-controls='terms-panel'
           />
           <Tab
-            label="Privacy Policy"
-            value="cookies"
-            id="cookies-tab"
-            aria-controls="cookies-panel"
+            label='Privacy Policy'
+            value='cookies'
+            id='cookies-tab'
+            aria-controls='cookies-panel'
           />
         </Tabs>
 
-        {/* Main content area with sidebar and content */}
         <Box
           sx={{
             display: "flex",
@@ -399,7 +368,6 @@ const TermsModal = ({ open, onClose, initialTab = "terms" }) => {
             overflow: "hidden",
           }}
         >
-          {/* Sidebar with table of contents (only for Terms tab) */}
           {activeTab === "terms" && (
             <Box
               sx={{
@@ -420,7 +388,7 @@ const TermsModal = ({ open, onClose, initialTab = "terms" }) => {
               }}
             >
               <Typography
-                variant="subtitle2"
+                variant='subtitle2'
                 sx={{
                   color: "#d0bcfe",
                   p: 2,
@@ -454,7 +422,7 @@ const TermsModal = ({ open, onClose, initialTab = "terms" }) => {
                       <ListItemText
                         primary={
                           <Typography
-                            variant="body2"
+                            variant='body2'
                             sx={{
                               color:
                                 activeSection === section.id
@@ -479,7 +447,6 @@ const TermsModal = ({ open, onClose, initialTab = "terms" }) => {
             </Box>
           )}
 
-          {/* Content area with scrolling */}
           <Box
             ref={contentRef}
             sx={{
@@ -502,7 +469,7 @@ const TermsModal = ({ open, onClose, initialTab = "terms" }) => {
               },
             }}
             onScroll={handleScroll}
-            role="tabpanel"
+            role='tabpanel'
             id={`${activeTab}-panel`}
             aria-labelledby={`${activeTab}-tab`}
           >
@@ -514,7 +481,6 @@ const TermsModal = ({ open, onClose, initialTab = "terms" }) => {
           </Box>
         </Box>
 
-        {/* Footer with buttons */}
         <Box
           sx={{
             p: 2,
@@ -526,7 +492,7 @@ const TermsModal = ({ open, onClose, initialTab = "terms" }) => {
             minHeight: "64px",
           }}
         >
-          <Typography variant="caption" color="#999">
+          <Typography variant='caption' color='#999'>
             {scrollPosition < 70 && !canAccept
               ? "Please scroll to read the full document"
               : "Thank you for reviewing our policies"}
@@ -547,7 +513,7 @@ const TermsModal = ({ open, onClose, initialTab = "terms" }) => {
                 },
                 minWidth: "100px",
               }}
-              variant="contained"
+              variant='contained'
             >
               {isSubmitting ? (
                 <CircularProgress size={24} sx={{ color: "#381e72" }} />
@@ -562,38 +528,37 @@ const TermsModal = ({ open, onClose, initialTab = "terms" }) => {
   );
 };
 
-// Terms and Conditions Content Component - ESTRUTURA BASE
 const TermsOfServiceContent = ({ sectionRefs }) => (
   <Box sx={{ color: "white", textAlign: "left" }}>
     {/* Agreement Section */}
     <Box ref={(el) => (sectionRefs.current["agreement"] = el)} sx={{ mb: 4 }}>
       <Typography
-        variant="h4"
+        variant='h4'
         sx={{ color: "white", mb: 3, fontWeight: "bold" }}
       >
         TERMS AND CONDITIONS
       </Typography>
       <Typography
-        variant="body2"
+        variant='body2'
         sx={{ color: "#e0e0e0", mb: 3, fontStyle: "italic" }}
       >
         Last updated June 3, 2025
       </Typography>
 
-      <Typography variant="h5" sx={{ color: "#d0bcfe", mb: 2 }}>
+      <Typography variant='h5' sx={{ color: "#d0bcfe", mb: 2 }}>
         AGREEMENT TO OUR LEGAL TERMS
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         We are Memor&apos;us (&quot;<strong>Company</strong>,&quot; &quot;
         <strong>we</strong>,&quot; &quot;<strong>us</strong>,&quot; &quot;
         <strong>our</strong>&quot;), a company registered in Portugal at
         Universidade de Aveiro, Aveiro 3810-193.
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         We operate the website{" "}
-        <Link href="http://www.memor-us.com/" sx={{ color: "#d0bcfe" }}>
+        <Link href='http://www.memor-us.com/' sx={{ color: "#d0bcfe" }}>
           http://www.memor-us.com/
         </Link>{" "}
         (the &quot;<strong>Site</strong>&quot;), as well as any other related
@@ -602,7 +567,7 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
         <strong>Services</strong>&quot;).
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         Memor&apos;us is an online platform that helps companies and
         organizations strengthen team culture by recording and sharing
         meaningful moments, promoting engagement and collaboration among team
@@ -618,15 +583,15 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
         collective identity and a sense of belonging.
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         You can contact us by email at{" "}
-        <Link href="mailto:geral@memor-us.com" sx={{ color: "#d0bcfe" }}>
+        <Link href='mailto:geral@memor-us.com' sx={{ color: "#d0bcfe" }}>
           geral@memor-us.com
         </Link>{" "}
         or by mail to Universidade de Aveiro, Aveiro 3810-193, Portugal.
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         These Legal Terms constitute a legally binding agreement made between
         you, whether personally or on behalf of an entity (&quot;
         <strong>you</strong>&quot;), and Memor&apos;us, concerning your access
@@ -637,11 +602,11 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
         USE IMMEDIATELY.
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         We will provide you with prior notice of any scheduled changes to the
         Services you are using. The modified Legal Terms will become effective
         upon posting or notifying you by{" "}
-        <Link href="mailto:geral@memor-us.com" sx={{ color: "#d0bcfe" }}>
+        <Link href='mailto:geral@memor-us.com' sx={{ color: "#d0bcfe" }}>
           geral@memor-us.com
         </Link>
         , as stated in the email message. By continuing to use the Services
@@ -649,13 +614,13 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
         modified terms.
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         The Services are intended for users who are at least 18 years old.
         Persons under the age of 18 are not permitted to use or register for the
         Services.
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         We recommend that you print a copy of these Legal Terms for your
         records.
       </Typography>
@@ -666,10 +631,10 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
       ref={(el) => (sectionRefs.current["our-services"] = el)}
       sx={{ mb: 4 }}
     >
-      <Typography variant="h6" sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
+      <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
         1. OUR SERVICES
       </Typography>
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 2 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 2 }}>
         The information provided when using the Services is not intended for
         distribution to or use by any person or entity in any jurisdiction or
         country where such distribution or use would be contrary to law or
@@ -679,7 +644,7 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
         initiative and are solely responsible for compliance with local laws, if
         and to the extent local laws are applicable.
       </Typography>
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 2 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 2 }}>
         The Services are not tailored to comply with industry-specific
         regulations (Health Insurance Portability and Accountability Act
         (HIPAA), Federal Information Security Management Act (FISMA), etc.), so
@@ -694,18 +659,18 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
       ref={(el) => (sectionRefs.current["intellectual-property"] = el)}
       sx={{ mb: 4 }}
     >
-      <Typography variant="h6" sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
+      <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
         2. INTELLECTUAL PROPERTY RIGHTS
       </Typography>
       {/* Our intellectual property */}
       <Typography
-        variant="h6"
+        variant='h6'
         sx={{ color: "#e0e0e0", mt: 3, mb: 2, fontWeight: "bold" }}
       >
         Our intellectual property
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         We are the owner or the licensee of all intellectual property rights in
         our Services, including all source code, databases, functionality,
         software, website designs, audio, video, text, photographs, and graphics
@@ -714,13 +679,13 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
         <strong>Marks</strong>").
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         Our Content and Marks are protected by copyright and trademark laws (and
         various other intellectual property rights and unfair competition laws)
         and treaties in the United States and around the world.
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         The Content and Marks are provided in or through the Services &quot;AS
         IS&quot; for your personal, non-commercial use or internal business
         purpose only.
@@ -728,19 +693,19 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
 
       {/* Your use of our Services */}
       <Typography
-        variant="h6"
+        variant='h6'
         sx={{ color: "#e0e0e0", mt: 3, mb: 2, fontWeight: "bold" }}
       >
         Your use of our Services
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         Subject to your compliance with these Legal Terms, including the
         &quot;PROHIBITED ACTIVITIES&quot; section below, we grant you a
         non-exclusive, non-transferable, revocable license to:
       </Typography>
 
-      <Typography component="ul" sx={{ color: "#e0e0e0", mb: 3, pl: 4 }}>
+      <Typography component='ul' sx={{ color: "#e0e0e0", mb: 3, pl: 4 }}>
         <li>access the Services; and</li>
         <li>
           download or print a copy of any portion of the Content to which you
@@ -749,7 +714,7 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
         </li>
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         Except as set out in this section or elsewhere in our Legal Terms, no
         part of the Services and no Content or Marks may be copied, reproduced,
         aggregated, republished, uploaded, posted, publicly displayed, encoded,
@@ -758,11 +723,11 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
         prior written permission.
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         If you wish to make any use of the Services, Content, or Marks other
         than as set out in this section or elsewhere in our Legal Terms, please
         address your request to:{" "}
-        <Link href="mailto:geral@memor-us.com" sx={{ color: "#d0bcfe" }}>
+        <Link href='mailto:geral@memor-us.com' sx={{ color: "#d0bcfe" }}>
           geral@memor-us.com
         </Link>
         . If we ever grant you the permission to post, reproduce, or publicly
@@ -772,12 +737,12 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
         reproducing, or displaying our Content.
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         We reserve all rights not expressly granted to you in and to the
         Services, Content, and Marks.
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         Any breach of these Intellectual Property Rights will constitute a
         material breach of our Legal Terms and your right to use our Services
         will terminate immediately.
@@ -785,20 +750,20 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
 
       {/* Your submissions and contributions */}
       <Typography
-        variant="h6"
+        variant='h6'
         sx={{ color: "#e0e0e0", mt: 3, mb: 2, fontWeight: "bold" }}
       >
         Your submissions and contributions
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         Please review this section and the &quot;PROHIBITED ACTIVITIES&quot;
         section carefully prior to using our Services to understand the (a)
         rights you give us and (b) obligations you have when you post or upload
         any content through the Services.
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         <strong>Submissions:</strong> By directly sending us any question,
         comment, suggestion, idea, feedback, or other information about the
         Services ("<strong>Submissions</strong>"), you agree to assign to us all
@@ -808,7 +773,7 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
         acknowledgment or compensation to you.
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         <strong>Contributions:</strong> The Services may invite you to chat,
         contribute to, or participate in blogs, message boards, online forums,
         and other functionality during which you may create, submit, post,
@@ -820,12 +785,12 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
         publicly posted shall also be treated as a Contribution.
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         You understand that Contributions may be viewable by other users of the
         Services.
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         <strong>
           When you post Contributions, you grant us a license (including use of
           your name, trademarks, and logos):
@@ -843,13 +808,13 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
         and through any media channels.
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         This license includes our use of your name, company name, and franchise
         name, as applicable, and any of the trademarks, service marks, trade
         names, logos, and personal and commercial images you provide.
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         <strong>You are responsible for what you post or upload:</strong> By
         sending us Submissions and/or posting Contributions through any part of
         the Services or making Contributions accessible through the Services by
@@ -857,7 +822,7 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
         networking accounts, you:
       </Typography>
 
-      <Typography component="ul" sx={{ color: "#e0e0e0", mb: 3, pl: 4 }}>
+      <Typography component='ul' sx={{ color: "#e0e0e0", mb: 3, pl: 4 }}>
         <li>
           confirm that you have read and agree with our "PROHIBITED ACTIVITIES"
           and will not post, send, publish, upload, or transmit through the
@@ -883,14 +848,14 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
         </li>
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         You are solely responsible for your Submissions and/or Contributions and
         you expressly agree to reimburse us for any and all losses that we may
         suffer because of your breach of (a) this section, (b) any third party's
         intellectual property rights, or (c) applicable law.
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         <strong>We may remove or edit your Content:</strong> Although we have no
         obligation to monitor any Contributions, we shall have the right to
         remove or edit any Contributions at any time without notice if in our
@@ -902,18 +867,18 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
 
       {/* Copyright infringement */}
       <Typography
-        variant="h6"
+        variant='h6'
         sx={{ color: "#e0e0e0", mt: 3, mb: 2, fontWeight: "bold" }}
       >
         Copyright infringement
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         We respect the intellectual property rights of others. If you believe
         that any material available on or through the Services infringes upon
         any copyright you own or control, please immediately refer to us by
         contacting{" "}
-        <Link href="mailto:geral@memor-us.com" sx={{ color: "#d0bcfe" }}>
+        <Link href='mailto:geral@memor-us.com' sx={{ color: "#d0bcfe" }}>
           geral@memor-us.com
         </Link>
         .
@@ -925,11 +890,11 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
       ref={(el) => (sectionRefs.current["user-representations"] = el)}
       sx={{ mb: 4 }}
     >
-      <Typography variant="h6" sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
+      <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
         3. USER REPRESENTATIONS
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         By using the Services, you represent and warrant that: (1) all
         registration information you submit will be true, accurate, current, and
         complete; (2) you will maintain the accuracy of such information and
@@ -942,7 +907,7 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
         the Services will not violate any applicable law or regulation.
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         If you provide any information that is untrue, inaccurate, not current,
         or incomplete, we have the right to suspend or terminate your account
         and refuse any and all current or future use of the Services (or any
@@ -955,11 +920,11 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
       ref={(el) => (sectionRefs.current["user-registration"] = el)}
       sx={{ mb: 4 }}
     >
-      <Typography variant="h6" sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
+      <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
         4. USER REGISTRATION
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         You may be required to register to use the Services. You agree to keep
         your password confidential and will be responsible for all use of your
         account and password. We reserve the right to remove, reclaim, or change
@@ -973,19 +938,19 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
       ref={(el) => (sectionRefs.current["subscriptions"] = el)}
       sx={{ mb: 4 }}
     >
-      <Typography variant="h6" sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
+      <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
         5. SUBSCRIPTIONS
       </Typography>
 
       {/* Billing and Renewal */}
       <Typography
-        variant="h6"
+        variant='h6'
         sx={{ color: "#e0e0e0", mt: 3, mb: 2, fontWeight: "bold" }}
       >
         Billing and Renewal
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         Your subscription will continue and automatically renew unless canceled.
         You consent to our charging your payment method on a recurring basis
         without requiring your prior approval for each recurring charge, until
@@ -995,13 +960,13 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
 
       {/* Free Trial */}
       <Typography
-        variant="h6"
+        variant='h6'
         sx={{ color: "#e0e0e0", mt: 3, mb: 2, fontWeight: "bold" }}
       >
         Free Trial
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         We offer a 30-day free trial to new users who register with the
         Services. The account will not be charged and the subscription will be
         suspended until upgraded to a paid version at the end of the free trial.
@@ -1009,18 +974,18 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
 
       {/* Cancellation */}
       <Typography
-        variant="h6"
+        variant='h6'
         sx={{ color: "#e0e0e0", mt: 3, mb: 2, fontWeight: "bold" }}
       >
         Cancellation
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         You can cancel your subscription at any time by contacting us using the
         contact information provided below. Your cancellation will take effect
         at the end of the current paid term. If you have any questions or are
         unsatisfied with our Services, please email us at{" "}
-        <Link href="mailto:geral@memor-us.com" sx={{ color: "#d0bcfe" }}>
+        <Link href='mailto:geral@memor-us.com' sx={{ color: "#d0bcfe" }}>
           geral@memor-us.com
         </Link>
         .
@@ -1028,13 +993,13 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
 
       {/* Fee Changes */}
       <Typography
-        variant="h6"
+        variant='h6'
         sx={{ color: "#e0e0e0", mt: 3, mb: 2, fontWeight: "bold" }}
       >
         Fee Changes
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         We may, from time to time, make changes to the subscription fee and will
         communicate any price changes to you in accordance with applicable law.
       </Typography>
@@ -1045,22 +1010,22 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
       ref={(el) => (sectionRefs.current["prohibited-activities"] = el)}
       sx={{ mb: 4 }}
     >
-      <Typography variant="h6" sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
+      <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
         6. PROHIBITED ACTIVITIES
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         You may not access or use the Services for any purpose other than that
         for which we make the Services available. The Services may not be used
         in connection with any commercial endeavors except those that are
         specifically endorsed or approved by us.
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         As a user of the Services, you agree not to:
       </Typography>
 
-      <Typography component="ul" sx={{ color: "#e0e0e0", mb: 3, pl: 4 }}>
+      <Typography component='ul' sx={{ color: "#e0e0e0", mb: 3, pl: 4 }}>
         <li>
           Systematically retrieve data or other content from the Services to
           create or compile, directly or indirectly, a collection, compilation,
@@ -1187,11 +1152,11 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
       ref={(el) => (sectionRefs.current["user-contributions"] = el)}
       sx={{ mb: 4 }}
     >
-      <Typography variant="h6" sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
+      <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
         7. USER GENERATED CONTRIBUTIONS
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         The Services may invite you to chat, contribute to, or participate in
         blogs, message boards, online forums, and other functionality, and may
         provide you with the opportunity to create, submit, post, display,
@@ -1206,7 +1171,7 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
         you thereby represent and warrant that:
       </Typography>
 
-      <Typography component="ul" sx={{ color: "#e0e0e0", mb: 3, pl: 4 }}>
+      <Typography component='ul' sx={{ color: "#e0e0e0", mb: 3, pl: 4 }}>
         <li>
           The creation, distribution, transmission, public display, or
           performance, and the accessing, downloading, or copying of your
@@ -1273,7 +1238,7 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
         </li>
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         Any use of the Services in violation of the foregoing violates these
         Legal Terms and may result in, among other things, termination or
         suspension of your rights to use the Services.
@@ -1285,11 +1250,11 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
       ref={(el) => (sectionRefs.current["contribution-license"] = el)}
       sx={{ mb: 4 }}
     >
-      <Typography variant="h6" sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
+      <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
         8. CONTRIBUTION LICENSE
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         By posting your Contributions to any part of the Services, you
         automatically grant, and you represent and warrant that you have the
         right to grant, to us an unrestricted, unlimited, irrevocable,
@@ -1305,7 +1270,7 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
         occur in any media formats and through any media channels.
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         This license will apply to any form, media, or technology now known or
         hereafter developed, and includes our use of your name, company name,
         and franchise name, as applicable, and any of the trademarks, service
@@ -1315,7 +1280,7 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
         Contributions.
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         We do not assert any ownership over your Contributions. You retain full
         ownership of all of your Contributions and any intellectual property
         rights or other proprietary rights associated with your Contributions.
@@ -1326,7 +1291,7 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
         refrain from any legal action against us regarding your Contributions.
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         We have the right, in our sole and absolute discretion, (1) to edit,
         redact, or otherwise change any Contributions; (2) to re-categorize any
         Contributions to place them in more appropriate locations on the
@@ -1341,11 +1306,11 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
       ref={(el) => (sectionRefs.current["services-management"] = el)}
       sx={{ mb: 4 }}
     >
-      <Typography variant="h6" sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
+      <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
         9. SERVICES MANAGEMENT
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         We reserve the right, but not the obligation, to: (1) monitor the
         Services for violations of these Legal Terms; (2) take appropriate legal
         action against anyone who, in our sole discretion, violates the law or
@@ -1367,15 +1332,15 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
       ref={(el) => (sectionRefs.current["privacy-policy-ref"] = el)}
       sx={{ mb: 4 }}
     >
-      <Typography variant="h6" sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
+      <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
         10. PRIVACY POLICY
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         We care about data privacy and security. Please review our Privacy
         Policy:{" "}
         <Link
-          href="http://www.memor-us.com/privacy-policy"
+          href='http://www.memor-us.com/privacy-policy'
           sx={{ color: "#d0bcfe" }}
         >
           http://www.memor-us.com/privacy-policy
@@ -1396,11 +1361,11 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
       ref={(el) => (sectionRefs.current["copyright-infringements"] = el)}
       sx={{ mb: 4 }}
     >
-      <Typography variant="h6" sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
+      <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
         11. COPYRIGHT INFRINGEMENTS
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         We respect the intellectual property rights of others. If you believe
         that any material available on or through the Services infringes upon
         any copyright you own or control, please immediately notify us using the
@@ -1419,11 +1384,11 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
       ref={(el) => (sectionRefs.current["term-termination"] = el)}
       sx={{ mb: 4 }}
     >
-      <Typography variant="h6" sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
+      <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
         12. TERM AND TERMINATION
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         These Legal Terms shall remain in full force and effect while you use
         the Services.{" "}
         <strong>
@@ -1439,7 +1404,7 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
         </strong>
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         If we terminate or suspend your account for any reason, you are
         prohibited from registering and creating a new account under your name,
         a fake or borrowed name, or the name of any third party, even if you may
@@ -1455,11 +1420,11 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
       ref={(el) => (sectionRefs.current["modifications-interruptions"] = el)}
       sx={{ mb: 4 }}
     >
-      <Typography variant="h6" sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
+      <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
         13. MODIFICATIONS AND INTERRUPTIONS
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         We reserve the right to change, modify, or remove the contents of the
         Services at any time or for any reason at our sole discretion without
         notice. However, we have no obligation to update any information on our
@@ -1468,7 +1433,7 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
         Services.
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         We cannot guarantee the Services will be available at all times. We may
         experience hardware, software, or other problems or need to perform
         maintenance related to the Services, resulting in interruptions, delays,
@@ -1488,11 +1453,11 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
       ref={(el) => (sectionRefs.current["governing-law"] = el)}
       sx={{ mb: 4 }}
     >
-      <Typography variant="h6" sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
+      <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
         14. GOVERNING LAW
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         These Legal Terms are governed by and interpreted following the laws of{" "}
         <strong>Portugal</strong>, and the use of the United Nations Convention
         of Contracts for the International Sales of Goods is expressly excluded.
@@ -1512,19 +1477,19 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
       ref={(el) => (sectionRefs.current["dispute-resolution"] = el)}
       sx={{ mb: 4 }}
     >
-      <Typography variant="h6" sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
+      <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
         15. DISPUTE RESOLUTION
       </Typography>
 
       {/* Informal Negotiations */}
       <Typography
-        variant="h6"
+        variant='h6'
         sx={{ color: "#e0e0e0", mt: 3, mb: 2, fontWeight: "bold" }}
       >
         Informal Negotiations
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         To expedite resolution and control the cost of any dispute, controversy,
         or claim related to these Legal Terms (each a "<strong>Dispute</strong>"
         and collectively, the "<strong>Disputes</strong>") brought by either you
@@ -1538,13 +1503,13 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
 
       {/* Binding Arbitration */}
       <Typography
-        variant="h6"
+        variant='h6'
         sx={{ color: "#e0e0e0", mt: 3, mb: 2, fontWeight: "bold" }}
       >
         Binding Arbitration
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         Any dispute arising from the relationships between the Parties to these
         Legal Terms shall be determined by one arbitrator who will be chosen in
         accordance with the Arbitration and Internal Rules of the European Court
@@ -1559,13 +1524,13 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
 
       {/* Restrictions */}
       <Typography
-        variant="h6"
+        variant='h6'
         sx={{ color: "#e0e0e0", mt: 3, mb: 2, fontWeight: "bold" }}
       >
         Restrictions
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         The Parties agree that any arbitration shall be limited to the Dispute
         between the Parties individually. To the full extent permitted by law,
         (a) no arbitration shall be joined with any other proceeding; (b) there
@@ -1578,13 +1543,13 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
 
       {/* Exceptions to Informal Negotiations and Arbitration */}
       <Typography
-        variant="h6"
+        variant='h6'
         sx={{ color: "#e0e0e0", mt: 3, mb: 2, fontWeight: "bold" }}
       >
         Exceptions to Informal Negotiations and Arbitration
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         The Parties agree that the following Disputes are not subject to the
         above provisions concerning informal negotiations binding arbitration:
         (a) any Disputes seeking to enforce or protect, or concerning the
@@ -1602,11 +1567,11 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
 
     {/* Section 16 - Corrections */}
     <Box ref={(el) => (sectionRefs.current["corrections"] = el)} sx={{ mb: 4 }}>
-      <Typography variant="h6" sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
+      <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
         16. CORRECTIONS
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         There may be information on the Services that contains typographical
         errors, inaccuracies, or omissions, including descriptions, pricing,
         availability, and various other information. We reserve the right to
@@ -1617,11 +1582,11 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
 
     {/* Section 17 - Disclaimer */}
     <Box ref={(el) => (sectionRefs.current["disclaimer"] = el)} sx={{ mb: 4 }}>
-      <Typography variant="h6" sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
+      <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
         17. DISCLAIMER
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         The services are provided on an as-is and as-available basis. You agree
         that your use of the services will be at your sole risk. To the fullest
         extent permitted by law, we disclaim all warranties, express or implied,
@@ -1658,11 +1623,11 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
       ref={(el) => (sectionRefs.current["limitations-liability"] = el)}
       sx={{ mb: 4 }}
     >
-      <Typography variant="h6" sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
+      <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
         18. LIMITATIONS OF LIABILITY
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         In no event will we or our directors, employees, or agents be liable to
         you or any third party for any direct, indirect, consequential,
         exemplary, incidental, special, or punitive damages, including lost
@@ -1685,11 +1650,11 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
       ref={(el) => (sectionRefs.current["indemnification"] = el)}
       sx={{ mb: 4 }}
     >
-      <Typography variant="h6" sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
+      <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
         19. INDEMNIFICATION
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         You agree to defend, indemnify, and hold us harmless, including our
         subsidiaries, affiliates, and all of our respective officers, agents,
         partners, and employees, from and against any loss, damage, liability,
@@ -1712,11 +1677,11 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
 
     {/* Section 20 - User Data */}
     <Box ref={(el) => (sectionRefs.current["user-data"] = el)} sx={{ mb: 4 }}>
-      <Typography variant="h6" sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
+      <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
         20. USER DATA
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         We will maintain certain data that you transmit to the Services for the
         purpose of managing the performance of the Services, as well as data
         relating to your use of the Services. Although we perform regular
@@ -1733,11 +1698,11 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
       ref={(el) => (sectionRefs.current["electronic-communications"] = el)}
       sx={{ mb: 4 }}
     >
-      <Typography variant="h6" sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
+      <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
         21. ELECTRONIC COMMUNICATIONS, TRANSACTIONS, AND SIGNATURES
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         Visiting the Services, sending us emails, and completing online forms
         constitute electronic communications. You consent to receive electronic
         communications, and you agree that all agreements, notices, disclosures,
@@ -1763,11 +1728,11 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
       ref={(el) => (sectionRefs.current["miscellaneous"] = el)}
       sx={{ mb: 4 }}
     >
-      <Typography variant="h6" sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
+      <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
         22. MISCELLANEOUS
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         These Legal Terms and any policies or operating rules posted by us on
         the Services or in respect to the Services constitute the entire
         agreement and understanding between you and us. Our failure to exercise
@@ -1792,16 +1757,16 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
 
     {/* Section 23 - Contact Us */}
     <Box ref={(el) => (sectionRefs.current["contact-us"] = el)} sx={{ mb: 4 }}>
-      <Typography variant="h6" sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
+      <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 2 }}>
         23. CONTACT US
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         In order to resolve a complaint regarding the Services or to receive
         further information regarding use of the Services, please contact us at:
       </Typography>
 
-      <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 3 }}>
+      <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 3 }}>
         <strong>Memor'us</strong>
         <br />
         <strong>Universidade de Aveiro</strong>
@@ -1810,7 +1775,7 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
         <br />
         <strong>Portugal</strong>
         <br />
-        <Link href="mailto:geral@memor-us.com" sx={{ color: "#d0bcfe" }}>
+        <Link href='mailto:geral@memor-us.com' sx={{ color: "#d0bcfe" }}>
           <strong>geral@memor-us.com</strong>
         </Link>
       </Typography>
@@ -1821,21 +1786,21 @@ const TermsOfServiceContent = ({ sectionRefs }) => (
 // Privacy Policy Content Component (mantém a mesma estrutura atual)
 const PrivacyPolicyContent = () => (
   <Box sx={{ color: "white", textAlign: "left" }}>
-    <Typography variant="h5" sx={{ color: "white", mb: 2 }}>
+    <Typography variant='h5' sx={{ color: "white", mb: 2 }}>
       Privacy Policy
     </Typography>
-    <Typography variant="body1" sx={{ color: "white", mb: 3 }}>
+    <Typography variant='body1' sx={{ color: "white", mb: 3 }}>
       This privacy policy will explain how our organization uses the personal
       data we collect from you when you use our website.
     </Typography>
 
-    <Typography variant="h6" sx={{ color: "#d0bcfe", mt: 3, mb: 1 }}>
+    <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 1 }}>
       What data do we collect?
     </Typography>
-    <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 1 }}>
+    <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 1 }}>
       Memor'us collects the following data:
     </Typography>
-    <Typography component="ul" sx={{ color: "#e0e0e0", mb: 2, pl: 4 }}>
+    <Typography component='ul' sx={{ color: "#e0e0e0", mb: 2, pl: 4 }}>
       <li>Personal identification information</li>
       <li>Name</li>
       <li>Email Address</li>
@@ -1845,29 +1810,29 @@ const PrivacyPolicyContent = () => (
       <li>Profile Pictures</li>
     </Typography>
 
-    <Typography variant="h6" sx={{ color: "#d0bcfe", mt: 3, mb: 1 }}>
+    <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 1 }}>
       How do we collect your data?
     </Typography>
-    <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 2 }}>
+    <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 2 }}>
       Users will have to put their First and Last name upon their account
       creation. The user's first and last name are used to identify the account
       owner. Upon registration the email address used for platform access: This
       is the method by which users are able to log in to the platform.
     </Typography>
-    <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 2 }}>
+    <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 2 }}>
       Authentication Cookies: These are used to keep the user's session active.
       When Images are shared by collaborators: Users need to upload photographs
       to complete challenges, and sometimes individuals can be identified in
       these photos.
     </Typography>
 
-    <Typography variant="h6" sx={{ color: "#d0bcfe", mt: 3, mb: 1 }}>
+    <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 1 }}>
       How will we use your data?
     </Typography>
-    <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 2 }}>
+    <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 2 }}>
       Memor'us collects your data so that we can:
     </Typography>
-    <Typography component="ul" sx={{ color: "#e0e0e0", mb: 2, pl: 4 }}>
+    <Typography component='ul' sx={{ color: "#e0e0e0", mb: 2, pl: 4 }}>
       <li>Identify the account owner using first and last name</li>
       <li>Enable users to log in to the platform using their email address</li>
       <li>Keep user sessions active through authentication cookies</li>
@@ -1875,13 +1840,13 @@ const PrivacyPolicyContent = () => (
       <li>Enable users to personalize their accounts with profile photos</li>
     </Typography>
 
-    <Typography variant="h6" sx={{ color: "#d0bcfe", mt: 3, mb: 1 }}>
+    <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 1 }}>
       How do we store your data?
     </Typography>
-    <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 2 }}>
+    <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 2 }}>
       Memor'us securely stores your personal data at the following locations:
     </Typography>
-    <Typography component="ul" sx={{ color: "#e0e0e0", mb: 2, pl: 4 }}>
+    <Typography component='ul' sx={{ color: "#e0e0e0", mb: 2, pl: 4 }}>
       <li>
         Cookies are stored in the user's browser and are protected by browser
         security mechanisms
@@ -1900,7 +1865,7 @@ const PrivacyPolicyContent = () => (
       </li>
     </Typography>
 
-    <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 2 }}>
+    <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 2 }}>
       Memor'us will keep your personal data for as long as your account is
       active or as required to provide you with services. If you choose to
       delete your account, we implement a soft delete process: your account
@@ -1909,10 +1874,10 @@ const PrivacyPolicyContent = () => (
       period, your data will be permanently deleted.
     </Typography>
 
-    <Typography variant="h6" sx={{ color: "#d0bcfe", mt: 3, mb: 1 }}>
+    <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 1 }}>
       Marketing
     </Typography>
-    <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 2 }}>
+    <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 2 }}>
       Memor'us does not use your personal data for marketing purposes and will
       not send you information about products or services, nor will we share
       your data with partner companies for marketing. You will not receive
@@ -1920,13 +1885,13 @@ const PrivacyPolicyContent = () => (
       any third parties for marketing purposes.
     </Typography>
 
-    <Typography variant="h6" sx={{ color: "#d0bcfe", mt: 3, mb: 1 }}>
+    <Typography variant='h6' sx={{ color: "#d0bcfe", mt: 3, mb: 1 }}>
       What are your data protection rights?
     </Typography>
-    <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 1 }}>
+    <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 1 }}>
       Every user is entitled to the following:
     </Typography>
-    <Typography component="ul" sx={{ color: "#e0e0e0", mb: 2, pl: 4 }}>
+    <Typography component='ul' sx={{ color: "#e0e0e0", mb: 2, pl: 4 }}>
       <li>
         The right to access – You have the right to request Memor'us for copies
         of your personal data
@@ -1953,10 +1918,10 @@ const PrivacyPolicyContent = () => (
       </li>
     </Typography>
 
-    <Typography variant="body2" sx={{ color: "#e0e0e0", mb: 4 }}>
+    <Typography variant='body2' sx={{ color: "#e0e0e0", mb: 4 }}>
       If you make a request, we have one month to respond to you. If you would
       like to exercise any of these rights, please contact us at our email:{" "}
-      <Link href="mailto:geral@memor-us.com" sx={{ color: "#d0bcfe" }}>
+      <Link href='mailto:geral@memor-us.com' sx={{ color: "#d0bcfe" }}>
         geral@memor-us.com
       </Link>
     </Typography>
