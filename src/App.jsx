@@ -18,9 +18,9 @@ import CollaboratorFooter from "./Components/CollaboratorFooter/CollaboratorFoot
 import AdminFooter from "./Components/AdminFooter/AdminFooter";
 import LandingPage from "./pages/LandingPage/LandingPage";
 import Terms from "./pages/Terms/Terms";
-import { useAuth } from "./context/AuthContext";
+import { useAuth, SessionManager } from "./context/AuthContext";
 import Loader from "./Components/Loader/Loader";
-import { Toaster } from "react-hot-toast";
+import { Toaster, toast } from "react-hot-toast";
 import TeamGuard from "./Components/TeamGuard/TeamGuard";
 import { Box } from "@mui/material";
 import Profile from "./pages/Profile/Profile";
@@ -53,10 +53,25 @@ function App() {
     }
 
     if (!user) {
+      // Show toast when redirecting due to no user
+      toast.error("Please log in to access this page.", {
+        duration: 4000,
+        style: {
+          background: "#d32f2f",
+          color: "#fff",
+        },
+      });
       return <Navigate to='/app/login' state={{ from: location }} replace />;
     }
 
     if (role && !user.roles?.includes(role.toLowerCase())) {
+      toast.error("You don't have permission to access this page.", {
+        duration: 4000,
+        style: {
+          background: "#d32f2f",
+          color: "#fff",
+        },
+      });
       return <Navigate to='/app/login' replace />;
     }
 
@@ -93,6 +108,7 @@ function App() {
       }}
     >
       <ConsentModal setUser={setUser} />
+      <SessionManager />
 
       <Routes>
         {isMainDomain() && <Route path='/*' element={<LandingPage />} />}
@@ -166,7 +182,6 @@ function App() {
           <Route path='memoryboard' element={<MemoryBoard />} />
           <Route path='adminboard' element={<AdminBoard />} />
         </Route>
-
 
         {/* Landing Page Routes - Only for main domain (memor-us.com, www.memor-us.com, localhost) */}
         {isMainDomain() && (
