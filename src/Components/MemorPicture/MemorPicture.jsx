@@ -219,12 +219,6 @@ const MemorPicture = ({
           <p id='modal-description'>
             {teamName} • {submitDate}
           </p>
-          {galleryImages.length > 1 && (
-            <p className='sr-only'>
-              Image {activeIndex + 1} of {galleryImages.length}. Use arrow keys
-              to navigate, Escape to close.
-            </p>
-          )}
         </div>
       </div>
       <div className='memor-modal-thumbnails-fixed'>
