@@ -7,14 +7,41 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
-    const payload = token ? JSON.parse(atob(token.split(".")[1])) : null;
 
     if (token) {
-      config.headers["Authorization"] = `Bearer ${token}`;
-    }
+      try {
+        const payload = JSON.parse(atob(token.split(".")[1]));
+        const currentTime = Date.now() / 1000;
 
-    if (payload?.tenant_subdomain) {
-      config.headers["x-tenant"] = payload.tenant_subdomain;
+        if (payload.exp && payload.exp < currentTime) {
+          localStorage.removeItem("token");
+          window.dispatchEvent(
+            new CustomEvent("sessionExpiredWithNavigation", {
+              detail: {
+                message: "Your session has expired. Please log in again.",
+              },
+            })
+          );
+          return Promise.reject(new Error("Token expired"));
+        }
+
+        config.headers["Authorization"] = `Bearer ${token}`;
+
+        if (payload?.tenant_subdomain) {
+          config.headers["x-tenant"] = payload.tenant_subdomain;
+        }
+      } catch (error) {
+        localStorage.removeItem("token");
+        window.dispatchEvent(
+          new CustomEvent("sessionExpiredWithNavigation", {
+            detail: {
+              message:
+                "Invalid session. Please log in again. Error: " + error.message,
+            },
+          })
+        );
+        return Promise.reject(new Error("Invalid token"));
+      }
     }
 
     return config;
@@ -22,7 +49,6 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor for handling expired/invalid tokens
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -30,13 +56,12 @@ api.interceptors.response.use(
       error.response &&
       (error.response.status === 401 || error.response.status === 403)
     ) {
-      // Clear token and user info
       localStorage.removeItem("token");
-      // Dispatch a custom event for global logout and toast
+
       window.dispatchEvent(
-        new CustomEvent("sessionExpired", {
+        new CustomEvent("sessionExpiredWithNavigation", {
           detail: {
-            message: "Your session has ended. Please log in again to continue.",
+            message: "Your session has expired. Please log in again.",
           },
         })
       );

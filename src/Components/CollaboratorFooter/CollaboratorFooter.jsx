@@ -133,13 +133,11 @@ const Footer = () => {
         </FooterLinks>
       </FooterContent>
 
-      {/* Terms Modal */}
       {termsModalOpen && (
         <TermsModal
           open={termsModalOpen}
           onClose={() => {
             setTermsModalOpen(false);
-            // Ensure body overflow is restored
             setTimeout(() => {
               document.body.style.overflow = "auto";
             }, 0);

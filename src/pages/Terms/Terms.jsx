@@ -30,7 +30,6 @@ const Terms = () => {
   const contentRef = useRef(null);
   const sectionRefs = useRef({});
 
-  // Lista de seções para o índice de Terms and Conditions
   const termsOfServiceSections = [
     { id: "agreement", title: "Agreement to Our Legal Terms", number: "" },
     { id: "our-services", title: "Our Services", number: "1" },
@@ -86,7 +85,6 @@ const Terms = () => {
     { id: "contact-us", title: "Contact Us", number: "23" },
   ];
 
-  // Detect which section is currently visible
   const detectActiveSection = (scrollTop) => {
     const sections = termsOfServiceSections;
     let currentSection = sections[0].id;

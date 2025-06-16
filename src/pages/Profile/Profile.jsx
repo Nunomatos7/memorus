@@ -813,7 +813,6 @@ const Profile = () => {
 
           {/* Stats and Profile Picture */}
           <Grid item xs={12} md={4}>
-            {/* Profile Picture */}
             <Paper
               sx={{
                 p: 4,
@@ -881,7 +880,6 @@ const Profile = () => {
               </Box>
             </Paper>
 
-            {/* User Stats */}
             <Paper
               sx={{
                 p: 3,
@@ -963,7 +961,6 @@ const Profile = () => {
         </Grid>
       </Box>
 
-      {/* Alert Snackbar */}
       <Snackbar
         open={alert.open}
         autoHideDuration={6000}

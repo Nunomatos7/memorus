@@ -15,7 +15,6 @@ import {
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 
-// Skeleton component for top 3 podium cards
 const PodiumCardSkeleton = ({ height, isFirst = false }) => (
   <Card
     sx={{
@@ -94,7 +93,6 @@ const PodiumCardSkeleton = ({ height, isFirst = false }) => (
   </Card>
 );
 
-// Skeleton component for global ranking table header
 const GlobalRankingHeaderSkeleton = () => (
   <Box
     sx={{
@@ -116,7 +114,6 @@ const GlobalRankingHeaderSkeleton = () => (
   </Box>
 );
 
-// Skeleton component for global ranking table rows
 const GlobalRankingRowSkeleton = () => (
   <Box
     sx={{
@@ -177,7 +174,6 @@ const Leaderboard = () => {
       if (!token || !user?.tenant_subdomain) return;
 
       try {
-        // First, get active competitions to find the current one
         const compResponse = await fetch(
           `${import.meta.env.VITE_API_URL}/api/competitions/active`,
           {
@@ -212,19 +208,16 @@ const Leaderboard = () => {
     const handleLeaderboardVisibilityChange = () => {
       setShowLeaderboard(getLeaderboardVisibility());
 
-      // Optionally redirect if leaderboard is hidden
       if (!getLeaderboardVisibility()) {
         navigate("/app/home");
       }
     };
 
-    // Listen for our custom event
     window.addEventListener(
       LEADERBOARD_VISIBILITY_CHANGE,
       handleLeaderboardVisibilityChange
     );
 
-    // Also listen for standard storage events (for cross-tab sync)
     window.addEventListener("storage", handleLeaderboardVisibilityChange);
 
     return () => {
@@ -242,7 +235,6 @@ const Leaderboard = () => {
 
       try {
         setLoading(true);
-        // Now fetch the leaderboard for this competition
         const response = await fetch(
           `${import.meta.env.VITE_API_URL}/api/leaderboard/competition/${
             currentCompetition.id
@@ -262,11 +254,10 @@ const Leaderboard = () => {
         const leaderboardResult = await response.json();
 
         if (leaderboardResult && leaderboardResult.teams) {
-          // Transform API data to match our expected format
           const formattedData = leaderboardResult.teams.map((team, index) => ({
             teamName: team.name || `Team ${team.teamId}`,
             points: team.points,
-            memors: team.memors || 0, // Use actual memors count from API
+            memors: team.memors || 0,
             rank: team.rank || index + 1,
             avatar: team.avatar || getDefaultAvatar(),
             teamId: team.teamId,
@@ -279,7 +270,6 @@ const Leaderboard = () => {
         }
       } catch (err) {
         console.error("Error fetching leaderboard:", err);
-        // Don't use fallback data, just show an error
         setLeaderboardTeams([]);
         setError("Could not load leaderboard data.");
         setLoading(false);
@@ -289,14 +279,12 @@ const Leaderboard = () => {
     fetchLeaderboardData();
   }, [token, user, currentCompetition]);
 
-  // Simple placeholder avatar in case API doesn't provide one
   const getDefaultAvatar = () => {
     return "https://via.placeholder.com/150";
   };
 
   return (
     <>
-      {/* <Loader /> */}
       <div className='container'>
         <img
           src={background1}
@@ -383,7 +371,6 @@ const Leaderboard = () => {
 
           {loading ? (
             <>
-              {/* Top 3 Skeleton */}
               <Grid
                 container
                 spacing={3}
@@ -393,7 +380,6 @@ const Leaderboard = () => {
                   alignItems: "end",
                 }}
               >
-                {/* Rank 2 Skeleton */}
                 <Grid
                   sx={{
                     width: "calc(30% - 20px)",
@@ -406,7 +392,6 @@ const Leaderboard = () => {
                   <PodiumCardSkeleton height='15rem' />
                 </Grid>
 
-                {/* Rank 1 Skeleton */}
                 <Grid
                   sx={{
                     width: "calc(38% - 20px)",
@@ -419,7 +404,6 @@ const Leaderboard = () => {
                   <PodiumCardSkeleton height='20rem' isFirst={true} />
                 </Grid>
 
-                {/* Rank 3 Skeleton */}
                 <Grid
                   sx={{
                     width: "calc(30% - 20px)",
@@ -433,7 +417,6 @@ const Leaderboard = () => {
                 </Grid>
               </Grid>
 
-              {/* Global Ranking Skeleton */}
               <Skeleton
                 variant='text'
                 sx={{
@@ -448,7 +431,6 @@ const Leaderboard = () => {
               <Box sx={{ width: "100%", marginBottom: "20px" }}>
                 <GlobalRankingHeaderSkeleton />
 
-                {/* Show 4 skeleton rows */}
                 {[...Array(4)].map((_, index) => (
                   <GlobalRankingRowSkeleton key={index} />
                 ))}
@@ -486,7 +468,6 @@ const Leaderboard = () => {
                   alignItems: "end",
                 }}
               >
-                {/* Rank 2 - Only show if we have at least 2 teams */}
                 {leaderboardTeams.length >= 2 && (
                   <Grid
                     sx={{
@@ -574,7 +555,6 @@ const Leaderboard = () => {
                   </Grid>
                 )}
 
-                {/* Rank 1 - Always show if we have at least one team */}
                 {leaderboardTeams.length >= 1 && (
                   <Grid
                     sx={{
@@ -670,7 +650,6 @@ const Leaderboard = () => {
                   </Grid>
                 )}
 
-                {/* Rank 3 - Only show if we have at least 3 teams */}
                 {leaderboardTeams.length >= 3 && (
                   <Grid
                     sx={{
@@ -760,7 +739,6 @@ const Leaderboard = () => {
                 )}
               </Grid>
 
-              {/* Global Ranking */}
               <Typography
                 variant='h5'
                 component='h2'
@@ -804,7 +782,6 @@ const Leaderboard = () => {
                   </Typography>
                 </Box>
 
-                {/* Show teams from rank 4 and lower */}
                 {leaderboardTeams
                   .filter((team) => team.rank >= 4)
                   .map((team) => (
@@ -867,7 +844,6 @@ const Leaderboard = () => {
                     </Box>
                   ))}
 
-                {/* Display a message if there are no teams below rank 3 */}
                 {leaderboardTeams.filter((team) => team.rank >= 4).length ===
                   0 && (
                   <Box

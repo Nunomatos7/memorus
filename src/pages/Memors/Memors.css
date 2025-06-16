@@ -87,13 +87,11 @@
   color: rgba(255, 255, 255, 0.6);
 }
 
-/* Responsive improvements for the swiper */
 .memors-swiper {
   width: 100%;
-  padding-bottom: 30px; /* Add space for pagination */
+  padding-bottom: 30px;
 }
 
-/* Styling for the swiper container */
 .memors-swiper-container {
   position: relative;
   margin-bottom: 30px;
@@ -102,12 +100,10 @@
 }
 
 .memors-swiper {
-  /* Show the scrollbar at the bottom */
   overflow: visible;
   padding-bottom: 15px;
 }
 
-/* Style the Swiper scrollbar */
 .swiper-scrollbar {
   background: rgba(255, 255, 255, 0.1) !important;
   height: 4px !important;
@@ -115,22 +111,19 @@
 }
 
 .swiper-scrollbar-drag {
-  background: #9282f9 !important; /* Your purple theme color */
+  background: #9282f9 !important;
   border-radius: 10px !important;
 }
 
-/* Optional: Style on hover */
 .swiper-scrollbar-drag:hover {
   background: #d0bcfe !important;
 }
 
-/* Firefox scrollbar */
 .memors-swiper-container {
   scrollbar-width: thin;
   scrollbar-color: #7957c2 rgba(121, 87, 194, 0.1);
 }
 
-/* Create a native horizontal scrollable container */
 .horizontal-scroll-container {
   width: 100%;
   overflow-x: auto;
@@ -145,7 +138,6 @@
   white-space: normal;
 }
 
-/* Media queries for better responsiveness */
 @media (max-width: 768px) {
   .memor .description {
     width: 200px;

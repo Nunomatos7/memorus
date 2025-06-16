@@ -12,16 +12,13 @@ import background2 from "../../assets/images/background2.svg";
 import background3 from "../../assets/images/background3.svg";
 import PropTypes from "prop-types";
 
-/**
- * TeamGuard - A component that restricts access to the application for users not assigned to a team
- * Displays a message explaining that team assignment is required to use the platform
- */
+// Falta team filho
+
 const TeamGuard = ({ children }) => {
   const { user, loading } = useAuth();
   const [adminEmail, setAdminEmail] = useState(null);
   const [loadingAdmin, setLoadingAdmin] = useState(false);
 
-  // Attempt to fetch admin contact information
   useEffect(() => {
     const fetchAdminContact = async () => {
       if (!user?.tenant_subdomain) return;
@@ -40,7 +37,6 @@ const TeamGuard = ({ children }) => {
 
         if (response.ok) {
           const users = await response.json();
-          // Find the first user with admin role
           for (const potentialAdmin of users) {
             try {
               const rolesResponse = await fetch(
@@ -77,7 +73,6 @@ const TeamGuard = ({ children }) => {
     fetchAdminContact();
   }, [user?.tenant_subdomain]);
 
-  // Show loading state while auth state is being determined
   if (loading) {
     return (
       <Box
@@ -94,12 +89,10 @@ const TeamGuard = ({ children }) => {
     );
   }
 
-  // If user has a team, render the children (normal app content)
   if (user?.teamsId) {
     return children;
   }
 
-  // If no team, display the restricted message
   return (
     <Box
       sx={{
@@ -113,7 +106,6 @@ const TeamGuard = ({ children }) => {
         overflow: "hidden",
       }}
     >
-      {/* Background elements */}
       <img
         src={background1}
         alt=''
@@ -151,7 +143,6 @@ const TeamGuard = ({ children }) => {
         aria-hidden='true'
       />
 
-      {/* Message card */}
       <Paper
         elevation={3}
         sx={{

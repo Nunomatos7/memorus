@@ -21,7 +21,7 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false); // Add loading state
+  const [loading, setLoading] = useState(false);
   const [tenant, setTenant] = useState("");
   const [tenantInput, setTenantInput] = useState("");
   const [showTenantInput, setShowTenantInput] = useState(false);

@@ -1,4 +1,3 @@
-// src/App.jsx
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import PropTypes from "prop-types";
 import "./App.css";
@@ -19,10 +18,10 @@ import CollaboratorFooter from "./Components/CollaboratorFooter/CollaboratorFoot
 import AdminFooter from "./Components/AdminFooter/AdminFooter";
 import LandingPage from "./pages/LandingPage/LandingPage";
 import Terms from "./pages/Terms/Terms";
-import { useAuth } from "./context/AuthContext";
+import { useAuth, SessionManager } from "./context/AuthContext";
 import { SocketProvider } from "./context/SocketContext";
 import Loader from "./Components/Loader/Loader";
-import { Toaster } from "react-hot-toast";
+import { Toaster, toast } from "react-hot-toast";
 import TeamGuard from "./Components/TeamGuard/TeamGuard";
 import { Box } from "@mui/material";
 import Profile from "./pages/Profile/Profile";
@@ -31,23 +30,9 @@ function App() {
   const { user, setUser, loading, cookiesAccepted } = useAuth();
   const location = useLocation();
 
-  const isMainDomain = () => {
-    const hostname = window.location.hostname;
-    return (
-      hostname === "memor-us.com" ||
-      hostname === "www.memor-us.com" ||
-      hostname === "localhost"
-    );
-  };
-
-  const isTenantSubdomain = () => {
-    const hostname = window.location.hostname;
-    return (
-      hostname.endsWith(".memor-us.com") &&
-      hostname !== "memor-us.com" &&
-      hostname !== "www.memor-us.com"
-    );
-  };
+  if (loading) {
+    return <div className='p-4 text-center'>A carregar dados...</div>;
+  }
 
   const ProtectedRoute = ({ children, role }) => {
     if (loading || !cookiesAccepted) {
@@ -55,10 +40,24 @@ function App() {
     }
 
     if (!user) {
+      toast.error("Please log in to access this page.", {
+        duration: 4000,
+        style: {
+          background: "#d32f2f",
+          color: "#fff",
+        },
+      });
       return <Navigate to='/app/login' state={{ from: location }} replace />;
     }
 
     if (role && !user.roles?.includes(role.toLowerCase())) {
+      toast.error("You don't have permission to access this page.", {
+        duration: 4000,
+        style: {
+          background: "#d32f2f",
+          color: "#fff",
+        },
+      });
       return <Navigate to='/app/login' replace />;
     }
 
@@ -85,15 +84,8 @@ function App() {
 
   const isAdmin = user?.roles?.some((role) => role.toLowerCase() === "admin");
 
-  // Wrap authenticated parts with SocketProvider
   const AuthenticatedApp = ({ children }) => {
-    return user ? (
-      <SocketProvider>
-        {children}
-      </SocketProvider>
-    ) : (
-      children
-    );
+    return user ? <SocketProvider>{children}</SocketProvider> : children;
   };
 
   AuthenticatedApp.propTypes = {
@@ -110,11 +102,14 @@ function App() {
       }}
     >
       <ConsentModal setUser={setUser} />
+      <SessionManager />
 
       <AuthenticatedApp>
         <Routes>
-          {isMainDomain() && <Route path='/*' element={<LandingPage />} />}
+          {/* Landing Page Route - Available to everyone */}
+          <Route path='/' element={<LandingPage />} />
 
+          {/* Auth Routes */}
           <Route
             path='/app/login'
             element={
@@ -152,6 +147,7 @@ function App() {
           <Route path='/app/change-password' element={<ChangePassword />} />
           <Route path='/terms' element={<Terms />} />
 
+          {/* Collaborator Routes */}
           <Route
             path='/app/*'
             element={
@@ -171,6 +167,7 @@ function App() {
             <Route path='profile' element={<Profile />} />
           </Route>
 
+          {/* Admin Routes */}
           <Route
             path='/app/admin/*'
             element={
@@ -185,24 +182,12 @@ function App() {
             <Route path='adminboard' element={<AdminBoard />} />
           </Route>
 
-
-          {/* Landing Page Routes - Only for main domain (memor-us.com, www.memor-us.com, localhost) */}
-          {isMainDomain() && (
-            <>
-              <Route path='/' element={<LandingPage />} />
-              <Route path='/landing' element={<LandingPage />} />
-            </>
-          )}
-
-          {/* Catch-All Routes */}
-          <Route path='*' element={<Navigate to='/app/login' replace />} />
+          {/* Catch-All - Redirect to landing page for main domain, login for subdomains */}
           <Route
             path='*'
             element={
-              isMainDomain() ? (
+              window.location.hostname === "memor-us.com" ? (
                 <Navigate to='/landing' replace />
-              ) : isTenantSubdomain() ? (
-                <Navigate to='/app/login' replace />
               ) : (
                 <Navigate to='/app/login' replace />
               )
@@ -213,6 +198,7 @@ function App() {
         {!hideFooter && (isAdmin ? <AdminFooter /> : <CollaboratorFooter />)}
       </AuthenticatedApp>
 
+      {/* Toast Notifications */}
       <Toaster
         position='top-right'
         toastOptions={{
