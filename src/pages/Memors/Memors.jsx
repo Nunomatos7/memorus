@@ -241,6 +241,19 @@ const Memors = () => {
         setLoading(true);
         setError(null);
 
+        // Check if this is access from a temporary token (QR code)
+        const urlParams = new URLSearchParams(location.search);
+        const hadTempToken =
+          urlParams.has("token") ||
+          sessionStorage.getItem("fromTempToken") === "true";
+
+        if (hadTempToken) {
+          console.log(
+            "🎯 Detected access from temporary token - will auto-open modal"
+          );
+          sessionStorage.setItem("fromTempToken", "true");
+        }
+
         // First fetch active competition
         const competitionResponse = await fetch(
           `${import.meta.env.VITE_API_URL}/api/competitions/active`,
@@ -355,23 +368,78 @@ const Memors = () => {
         );
         setMemors(sortedAllMemors);
 
-        // Check for memor ID in URL
+        // Check for memor ID in URL (both from routing and temp token)
         const pathnameParts = location.pathname.split("/");
-        const memorIdFromUrl = pathnameParts[2];
+        const memorIdFromUrl = pathnameParts[pathnameParts.length - 1]; // Get last part of path
 
-        if (memorIdFromUrl) {
+        if (memorIdFromUrl && memorIdFromUrl !== "memors") {
           const memorToOpen = allProcessedMemors.find(
             (memor) => String(memor.id) === memorIdFromUrl
           );
+
           if (memorToOpen) {
+            console.log("🎯 Opening modal for memor:", memorToOpen.title);
+
+            // Special handling for temp token access
+            if (hadTempToken) {
+              console.log("✅ Auto-opening modal from QR code access");
+
+              // Show a welcome message for QR code users
+              const { toast } = await import("react-hot-toast");
+              toast.success(`Welcome! Opening ${memorToOpen.title}`, {
+                duration: 3000,
+                style: {
+                  background: "#2e7d32",
+                  color: "#fff",
+                },
+              });
+
+              // Clear the temp token flag after use
+              setTimeout(() => {
+                sessionStorage.removeItem("fromTempToken");
+              }, 1000);
+            }
+
             setSelectedMemor(memorToOpen);
             setIsModalOpen(true);
             document.body.style.overflow = "hidden";
+          } else {
+            console.log("❌ Memor not found for ID:", memorIdFromUrl);
+
+            // If memor not found but came from temp token, show error
+            if (hadTempToken) {
+              const { toast } = await import("react-hot-toast");
+              toast.error("Memor not found or no longer available", {
+                duration: 4000,
+                style: {
+                  background: "#d32f2f",
+                  color: "#fff",
+                },
+              });
+              sessionStorage.removeItem("fromTempToken");
+            }
           }
+        } else if (hadTempToken) {
+          // If came from temp token but no memor ID in URL, something went wrong
+          console.log("⚠️ Temp token access but no memor ID in URL");
+          const { toast } = await import("react-hot-toast");
+          toast.error("Invalid access link", {
+            duration: 4000,
+            style: {
+              background: "#d32f2f",
+              color: "#fff",
+            },
+          });
+          sessionStorage.removeItem("fromTempToken");
         }
       } catch (err) {
         console.error("Error loading memors:", err);
         setError(`Failed to load memors: ${err.message}`);
+
+        // Clean up temp token flag on error
+        if (sessionStorage.getItem("fromTempToken")) {
+          sessionStorage.removeItem("fromTempToken");
+        }
       } finally {
         setLoading(false);
       }
@@ -380,7 +448,7 @@ const Memors = () => {
     if (token && user?.tenant_subdomain) {
       fetchData();
     }
-  }, [token, user?.tenant_subdomain, location.pathname]);
+  }, [token, user?.tenant_subdomain, location.pathname, location.search]); // Added location.search to dependencies
 
   const getTimeLeft = (dueDate) => {
     const now = new Date();

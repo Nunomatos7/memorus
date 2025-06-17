@@ -116,9 +116,7 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
         const isLocalhost = window.location.hostname.includes("localhost");
         const protocol = isLocalhost ? "http" : "https";
         const domain = isLocalhost
-          ? `${user.tenant_subdomain}.${window.location.hostname}:${
-              window.location.port || "5173"
-            }`
+          ? `${window.location.hostname}:${window.location.port || "5173"}`
           : `${user.tenant_subdomain}.memor-us.com`;
 
         const qrUrl = `${protocol}://${domain}/app/memors/${memor.id}?token=${tempToken}`;
