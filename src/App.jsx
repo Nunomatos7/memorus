@@ -24,10 +24,13 @@ import { Toaster, toast } from "react-hot-toast";
 import TeamGuard from "./Components/TeamGuard/TeamGuard";
 import { Box } from "@mui/material";
 import Profile from "./pages/Profile/Profile";
+import { useEffect, useRef } from "react";
 
 function App() {
   const { user, setUser, loading, cookiesAccepted } = useAuth();
   const location = useLocation();
+  const sessionExpiredRef = useRef(false);
+  const logoutInProgressRef = useRef(false);
 
   const isMainDomain = () => {
     const hostname = window.location.hostname;
@@ -47,20 +50,77 @@ function App() {
     );
   };
 
+  // Listen for session expiration events
+  useEffect(() => {
+    const handleSessionExpired = () => {
+      sessionExpiredRef.current = true;
+      console.log("🚨 Session expiration flag set");
+    };
+
+    // Listen for normal logout events
+    const handleLogout = () => {
+      logoutInProgressRef.current = true;
+      console.log("🚪 Logout flag set");
+    };
+
+    window.addEventListener(
+      "sessionExpiredWithNavigation",
+      handleSessionExpired
+    );
+    window.addEventListener("userLogout", handleLogout);
+
+    return () => {
+      window.removeEventListener(
+        "sessionExpiredWithNavigation",
+        handleSessionExpired
+      );
+      window.removeEventListener("userLogout", handleLogout);
+    };
+  }, []);
+
+  // Reset flags when user logs in
+  useEffect(() => {
+    if (user) {
+      console.log("✅ User logged in, resetting all flags");
+      sessionExpiredRef.current = false;
+      logoutInProgressRef.current = false;
+    }
+  }, [user]);
+
   const ProtectedRoute = ({ children, role }) => {
     if (loading || !cookiesAccepted) {
       return <Loader />;
     }
 
     if (!user) {
-      // Show toast when redirecting due to no user
-      toast.error("Please log in to access this page.", {
-        duration: 4000,
-        style: {
-          background: "#d32f2f",
-          color: "#fff",
-        },
-      });
+      // Don't show toast if:
+      // 1. Session expiration (SessionManager handles that)
+      // 2. Normal logout in progress
+      // 3. Already on login page
+      const shouldShowToast =
+        !sessionExpiredRef.current &&
+        !logoutInProgressRef.current &&
+        !location.pathname.includes("/app/login");
+
+      if (shouldShowToast) {
+        console.log(
+          "🍞 Showing 'Please log in' toast - direct access to protected route"
+        );
+        toast.error("Please log in to access this page.", {
+          duration: 4000,
+          style: {
+            background: "#d32f2f",
+            color: "#fff",
+          },
+        });
+      } else {
+        console.log("🔇 Skipping toast:", {
+          sessionExpired: sessionExpiredRef.current,
+          logoutInProgress: logoutInProgressRef.current,
+          onLoginPage: location.pathname.includes("/app/login"),
+        });
+      }
+
       return <Navigate to='/app/login' state={{ from: location }} replace />;
     }
 

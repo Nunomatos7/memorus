@@ -116,7 +116,7 @@ const StyledNavLink = styled(NavLink)(() => ({
 const Navbar = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const { user, setToken, setUser, token } = useAuth();
+  const { user, clearSession, token } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -205,15 +205,18 @@ const Navbar = () => {
   };
 
   const handleLogOut = () => {
-    console.log("🚪 Logging out...");
-    localStorage.removeItem("token");
+    console.log("🚪 Regular user logging out...");
 
-    setUser(null);
-    setToken(null);
+    // Clear session using the proper method
+    clearSession();
 
+    // Close menu
     setAnchorEl(null);
 
+    // Show success toast
     toast.success("You've been logged out successfully 👋");
+
+    // Navigate to login page
     navigate("/app/login");
   };
 

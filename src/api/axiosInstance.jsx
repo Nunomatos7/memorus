@@ -1,3 +1,4 @@
+// Enhanced axiosInstance.jsx with React Router navigation support
 import axios from "axios";
 
 const api = axios.create({
@@ -10,10 +11,12 @@ api.interceptors.request.use(
 
     if (token) {
       try {
+        // Check if token is expired before making the request
         const payload = JSON.parse(atob(token.split(".")[1]));
         const currentTime = Date.now() / 1000;
 
         if (payload.exp && payload.exp < currentTime) {
+          // Token is expired, trigger logout immediately
           localStorage.removeItem("token");
           window.dispatchEvent(
             new CustomEvent("sessionExpiredWithNavigation", {
@@ -32,11 +35,11 @@ api.interceptors.request.use(
         }
       } catch (error) {
         localStorage.removeItem("token");
+        console.error("Invalid token format:", error);
         window.dispatchEvent(
           new CustomEvent("sessionExpiredWithNavigation", {
             detail: {
-              message:
-                "Invalid session. Please log in again. Error: " + error.message,
+              message: "Invalid session. Please log in again.",
             },
           })
         );
