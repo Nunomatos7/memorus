@@ -39,7 +39,7 @@ const StyledNavLink = styled(NavLink)(() => ({
 const AdminNavbar = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const { user, setToken, setUser } = useAuth();
+  const { user, clearSession } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -60,16 +60,19 @@ const AdminNavbar = () => {
   };
 
   const handleLogOut = () => {
-    console.log("🚪 Logging out...");
-    localStorage.removeItem("token");
+    console.log("🚪 Admin logging out...");
 
-    setToken(null);
-    setUser(null);
+    // Clear session using the proper method
+    clearSession();
 
+    // Close menu
     setAnchorEl(null);
 
+    // Show success toast
     toast.success("Logged out successfully 👋");
-    navigate("/app/admin/login");
+
+    // Navigate to correct login page
+    navigate("/app/login");
   };
 
   return (
