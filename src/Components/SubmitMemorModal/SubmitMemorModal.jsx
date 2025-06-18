@@ -38,6 +38,7 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
   const [qrCodeUrl, setQrCodeUrl] = useState("");
   const [isGeneratingQR, setIsGeneratingQR] = useState(false);
   const [qrError, setQrError] = useState(null);
+  const [isClosing, setIsClosing] = useState(false);
 
   const modalRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -57,7 +58,6 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
     };
   }, []);
 
-  // Generate QR code URL with temporary token
   useEffect(() => {
     const generateQRCodeUrl = async () => {
       console.log("=== QR Code Generation Debug ===");
@@ -242,7 +242,7 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
             setSelectedImage(null);
             document.body.style.overflow = "auto";
           } else {
-            onClose();
+            handleCloseModal();
           }
         } else if (event.key === "Tab") {
           if (!focusableElements || focusableElements.length === 0) return;
@@ -268,7 +268,20 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
         document.removeEventListener("keydown", handleKeyDown);
       };
     }
-  }, [isSubmitMemorOpen, selectedImage, onClose]);
+  }, [isSubmitMemorOpen, selectedImage]);
+
+  const handleCloseModal = () => {
+    setIsClosing(true);
+
+    // Wait for animation to complete before actually closing
+    setTimeout(() => {
+      setIsSubmitMemorOpen(false);
+      setIsClosing(false);
+      document.body.style.overflow = "auto";
+      window.history.replaceState(null, "", "/app/memors");
+      onClose();
+    }, 300); // Match the animation duration
+  };
 
   const fullNormalizedImages = (() => {
     const images = normalizedImages || [];
@@ -426,7 +439,7 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
   const closeFeedbackModal = () => {
     setFeedback(null);
     if (feedback?.type === "success") {
-      onClose();
+      handleCloseModal();
     } else {
       setIsSubmitMemorOpen(true);
       if (fileInputRef.current) {
@@ -450,7 +463,7 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
               ? [
                   {
                     label: "Close",
-                    onClick: onClose,
+                    onClick: handleCloseModal,
                     style: {
                       backgroundColor: "transparent",
                       border: "1px solid #988c9c",
@@ -505,10 +518,12 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
       )}
 
       {isSubmitMemorOpen && !feedback && (
-        <div className='modal-overlay-submit-memor'>
+        <div
+          className={`modal-overlay-submit-memor ${isClosing ? "closing" : ""}`}
+        >
           <div
             ref={modalRef}
-            className='modal-container'
+            className={`modal-container ${isClosing ? "closing" : ""}`}
             role='dialog'
             aria-modal='true'
             tabIndex={-1}
@@ -517,7 +532,7 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
           >
             <div className='modal-top'>
               <Button
-                onClick={onClose}
+                onClick={handleCloseModal}
                 sx={{ minWidth: 0, p: 0, color: "#CAC4D0" }}
               >
                 <ArrowBackIcon />
@@ -815,7 +830,7 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
             <div className='modal-actions'>
               <CustomButton
                 text='Cancel'
-                onClick={onClose}
+                onClick={handleCloseModal}
                 disabled={isSubmitting}
                 sx={{
                   backgroundColor: "transparent",

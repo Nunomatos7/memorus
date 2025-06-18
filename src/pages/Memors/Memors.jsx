@@ -386,7 +386,7 @@ const Memors = () => {
 
               // Show a welcome message for QR code users
               const { toast } = await import("react-hot-toast");
-              toast.success(`Welcome! Opening ${memorToOpen.title}`, {
+              toast.success(`Welcome! Opening memor: ${memorToOpen.title}`, {
                 duration: 3000,
                 style: {
                   background: "#2e7d32",
