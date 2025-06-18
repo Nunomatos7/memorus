@@ -209,7 +209,7 @@
 .modal-actions {
   margin-top: 20px;
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   gap: 10px;
   flex-shrink: 0;
 }
@@ -405,14 +405,16 @@
   .modal-overlay-submit-memor {
     justify-content: center;
     align-items: flex-start;
-    padding: 60px 0 0 0;
+    padding: 60px 0 70px 0; /* Add 70px bottom padding for mobile browser dock */
   }
 
   .modal-container {
     width: 100%;
     max-width: 100%;
-    height: calc(100vh - 60px);
-    max-height: calc(100vh - 60px);
+    height: calc(
+      100vh - 130px
+    ); /* Adjust for navbar (60px) + mobile dock (70px) */
+    max-height: calc(100vh - 130px);
     margin-top: 0;
     margin-bottom: 0;
     padding: 20px;
@@ -477,9 +479,10 @@
   }
 
   .modal-actions {
-    flex-direction: column-reverse;
+    flex-direction: row;
     gap: 12px;
     margin-top: 30px;
+    justify-content: center;
   }
 
   .modal-actions button {
@@ -491,15 +494,17 @@
 /* Mobile phones */
 @media (max-width: 480px) {
   .modal-overlay-submit-memor {
-    padding: 60px 0 0 0;
+    padding: 60px 0 70px 0; /* Add 70px bottom padding for mobile browser dock */
   }
 
   .modal-container {
     margin-top: 0;
     margin-bottom: 0;
     padding: 16px;
-    height: calc(100vh - 60px);
-    max-height: calc(100vh - 60px);
+    height: calc(
+      100vh - 130px
+    ); /* Adjust for navbar (60px) + mobile dock (70px) */
+    max-height: calc(100vh - 130px);
     border-radius: 0;
   }
 
@@ -589,11 +594,13 @@
   .modal-actions {
     margin-top: 20px;
     gap: 10px;
+    justify-content: center;
   }
 
   .modal-actions button {
     padding: 12px;
     font-size: 14px;
+    width: 100%;
   }
 }
 
@@ -601,8 +608,10 @@
 @media (max-width: 360px) {
   .modal-container {
     padding: 12px;
-    height: calc(100vh - 60px);
-    max-height: calc(100vh - 60px);
+    height: calc(
+      100vh - 130px
+    ); /* Adjust for navbar (60px) + mobile dock (70px) */
+    max-height: calc(100vh - 130px);
   }
 
   .modal-title {
@@ -650,12 +659,14 @@
 @media (max-height: 500px) and (orientation: landscape) {
   .modal-overlay-submit-memor {
     align-items: flex-start;
-    padding: 60px 0 0 0;
+    padding: 60px 0 70px 0; /* Add bottom padding for mobile dock even in landscape */
   }
 
   .modal-container {
-    height: calc(100vh - 60px);
-    max-height: calc(100vh - 60px);
+    height: calc(
+      100vh - 130px
+    ); /* Adjust for navbar (60px) + mobile dock (70px) */
+    max-height: calc(100vh - 130px);
     margin-top: 0;
     margin-bottom: 0;
     border-radius: 0;
@@ -686,7 +697,6 @@
   }
 }
 
-/* Ensure touch targets are large enough for mobile */
 @media (max-width: 768px) {
   .upload-button,
   .photo-slide,
@@ -709,7 +719,6 @@
   }
 }
 
-/* High DPI displays */
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
   .photo,
   .uploaded-image img {
