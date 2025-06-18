@@ -14,12 +14,16 @@
   justify-content: flex-end;
   align-items: center;
   z-index: 1000;
+  padding: 60px 0 50px 0;
+  opacity: 0;
+  animation: fadeInOverlay 0.3s ease-out forwards;
 }
 
 .modal-container {
   width: 35vw;
   max-width: 550px;
-  height: 100%;
+  height: calc(100vh - 110px);
+  max-height: calc(100vh - 110px);
   background: #111315;
   display: flex;
   flex-direction: column;
@@ -28,7 +32,52 @@
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
   overflow-y: auto;
   position: relative;
-  overflow: hidden;
+  transform: translateX(100%);
+  animation: slideInFromRight 0.4s ease-out forwards;
+}
+
+.modal-overlay-submit-memor.closing {
+  animation: fadeOutOverlay 0.3s ease-in forwards;
+}
+
+.modal-container.closing {
+  animation: slideOutToRight 0.3s ease-in forwards;
+}
+
+@keyframes fadeInOverlay {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOutOverlay {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOutToRight {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
 }
 
 .modal-top {
@@ -62,6 +111,8 @@
   display: flex;
   justify-content: space-between;
   font-size: 14px;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .modal-details-header {
@@ -83,6 +134,7 @@
 
 .modal-upload {
   margin: 20px 0 40px 0;
+  flex-shrink: 0;
 }
 
 .upload-box {
@@ -97,11 +149,16 @@
   align-items: center;
   gap: 10px;
   flex-shrink: 0;
+  min-height: 200px;
 }
 
 .qr-code-placeholder {
   height: 20vh;
   width: 20vw;
+  min-height: 150px;
+  max-height: 200px;
+  min-width: 150px;
+  max-width: 200px;
   border-radius: 8px;
   display: flex;
   flex-direction: column;
@@ -152,6 +209,7 @@
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+  flex-shrink: 0;
 }
 
 .cancel-button {
@@ -288,7 +346,6 @@
   cursor: pointer;
 }
 
-/* Add a simple fade animation for the upload button */
 .upload-button {
   transition: transform 0.2s ease, opacity 0.2s ease;
 }
@@ -298,12 +355,26 @@
   opacity: 0.9;
 }
 
-/* Mobile Responsiveness */
+@media (min-width: 1025px) {
+  .modal-overlay-submit-memor {
+    padding: 60px 0 50px 0;
+  }
 
-/* Large tablets and small desktops */
-@media (max-width: 1024px) {
+  .modal-container {
+    height: calc(100vh - 110px);
+    max-height: calc(100vh - 110px);
+  }
+}
+
+@media (max-width: 1024px) and (min-width: 769px) {
+  .modal-overlay-submit-memor {
+    padding: 60px 0 50px 0;
+  }
+
   .modal-container {
     width: 40%;
+    height: calc(100vh - 110px);
+    max-height: calc(100vh - 110px);
   }
 
   .modal-upload {
@@ -312,23 +383,32 @@
 
   .upload-box {
     width: 100%;
+    min-height: 180px;
+  }
+
+  .qr-code-placeholder {
+    height: 15vh;
+    width: 15vw;
+    min-height: 120px;
+    max-height: 150px;
+    min-width: 120px;
+    max-width: 150px;
   }
 }
 
-/* Tablets */
 @media (max-width: 768px) {
   .modal-overlay-submit-memor {
     justify-content: center;
     align-items: flex-start;
-    padding: 0;
+    padding: 60px 0 70px 0;
   }
 
   .modal-container {
     width: 100%;
     max-width: 100%;
-    height: calc(100vh - 60px);
-    max-height: calc(100vh - 60px);
-    margin-top: 60px;
+    height: calc(100vh - 130px);
+    max-height: calc(100vh - 130px);
+    margin-top: 0;
     margin-bottom: 0;
     padding: 20px;
     border-radius: 0;
@@ -359,12 +439,24 @@
     flex-direction: column;
     padding: 20px;
     gap: 15px;
+    min-height: 160px;
+    justify-content: center;
   }
 
-  .qr-code-placeholder {
-    height: auto;
+  .qr-code-placeholder:first-child {
+    display: none;
+  }
+
+  .or-text {
+    display: none;
+  }
+
+  .qr-code-placeholder:last-child {
     width: 100%;
+    height: auto;
     min-height: 160px;
+    max-height: none;
+    max-width: none;
     padding: 20px;
   }
 
@@ -389,18 +481,17 @@
   }
 }
 
-/* Mobile phones */
 @media (max-width: 480px) {
   .modal-overlay-submit-memor {
-    padding: 0;
+    padding: 60px 0 70px 0;
   }
 
   .modal-container {
-    margin-top: 60px;
+    margin-top: 0;
     margin-bottom: 0;
     padding: 16px;
-    height: calc(100vh - 60px);
-    max-height: calc(100vh - 60px);
+    height: calc(100vh - 130px);
+    max-height: calc(100vh - 130px);
     border-radius: 0;
   }
 
@@ -440,16 +531,22 @@
   .upload-box {
     padding: 16px;
     gap: 12px;
+    min-height: 140px;
+    justify-content: center;
   }
 
-  .qr-code-placeholder {
-    min-height: 140px;
-    padding: 16px;
-    font-size: 13px;
+  .qr-code-placeholder:first-child {
+    display: none;
   }
 
   .or-text {
-    margin: 8px 0;
+    display: none;
+  }
+
+  .qr-code-placeholder:last-child {
+    width: 100%;
+    min-height: 140px;
+    padding: 16px;
     font-size: 13px;
   }
 
@@ -490,12 +587,11 @@
   }
 }
 
-/* Small mobile phones */
 @media (max-width: 360px) {
   .modal-container {
     padding: 12px;
-    height: calc(100vh - 60px);
-    max-height: calc(100vh - 60px);
+    height: calc(100vh - 130px);
+    max-height: calc(100vh - 130px);
   }
 
   .modal-title {
@@ -508,9 +604,20 @@
 
   .upload-box {
     padding: 12px;
+    min-height: 120px;
+    justify-content: center;
   }
 
-  .qr-code-placeholder {
+  .qr-code-placeholder:first-child {
+    display: none;
+  }
+
+  .or-text {
+    display: none;
+  }
+
+  .qr-code-placeholder:last-child {
+    width: 100%;
     min-height: 120px;
     padding: 12px;
     font-size: 12px;
@@ -527,17 +634,16 @@
   }
 }
 
-/* Landscape mobile phones */
 @media (max-height: 500px) and (orientation: landscape) {
   .modal-overlay-submit-memor {
     align-items: flex-start;
-    padding: 0;
+    padding: 60px 0 70px 0;
   }
 
   .modal-container {
-    height: calc(100vh - 60px);
-    max-height: calc(100vh - 60px);
-    margin-top: 60px;
+    height: calc(100vh - 130px);
+    max-height: calc(100vh - 130px);
+    margin-top: 0;
     margin-bottom: 0;
     border-radius: 0;
   }
@@ -567,7 +673,6 @@
   }
 }
 
-/* Ensure touch targets are large enough for mobile */
 @media (max-width: 768px) {
   .upload-button,
   .photo-slide,
@@ -581,7 +686,6 @@
     -webkit-tap-highlight-color: rgba(208, 188, 254, 0.2);
   }
 
-  /* Improve scrolling on mobile */
   .modal-container {
     -webkit-overflow-scrolling: touch;
   }
@@ -591,7 +695,6 @@
   }
 }
 
-/* High DPI displays */
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
   .photo,
   .uploaded-image img {
