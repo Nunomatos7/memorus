@@ -14,7 +14,7 @@
   justify-content: flex-end;
   align-items: center;
   z-index: 1000;
-  padding: 60px 0 50px 0; /* Account for navbar (60px) and footer (50px) */
+  padding: 60px 0 50px 0;
   opacity: 0;
   animation: fadeInOverlay 0.3s ease-out forwards;
 }
@@ -22,7 +22,7 @@
 .modal-container {
   width: 35vw;
   max-width: 550px;
-  height: calc(100vh - 110px); /* Full height minus navbar + footer */
+  height: calc(100vh - 110px);
   max-height: calc(100vh - 110px);
   background: #111315;
   display: flex;
@@ -36,7 +36,6 @@
   animation: slideInFromRight 0.4s ease-out forwards;
 }
 
-/* Modal closing animations */
 .modal-overlay-submit-memor.closing {
   animation: fadeOutOverlay 0.3s ease-in forwards;
 }
@@ -45,7 +44,6 @@
   animation: slideOutToRight 0.3s ease-in forwards;
 }
 
-/* Keyframe animations */
 @keyframes fadeInOverlay {
   from {
     opacity: 0;
@@ -357,7 +355,6 @@
   opacity: 0.9;
 }
 
-/* Desktop Responsiveness */
 @media (min-width: 1025px) {
   .modal-overlay-submit-memor {
     padding: 60px 0 50px 0;
@@ -369,7 +366,6 @@
   }
 }
 
-/* Large tablets and small desktops */
 @media (max-width: 1024px) and (min-width: 769px) {
   .modal-overlay-submit-memor {
     padding: 60px 0 50px 0;
@@ -400,19 +396,18 @@
   }
 }
 
-/* Tablets */
 @media (max-width: 768px) {
   .modal-overlay-submit-memor {
     justify-content: center;
     align-items: flex-start;
-    padding: 60px 0 0 0;
+    padding: 60px 0 70px 0;
   }
 
   .modal-container {
     width: 100%;
     max-width: 100%;
-    height: calc(100vh - 60px);
-    max-height: calc(100vh - 60px);
+    height: calc(100vh - 130px);
+    max-height: calc(100vh - 130px);
     margin-top: 0;
     margin-bottom: 0;
     padding: 20px;
@@ -448,7 +443,6 @@
     justify-content: center;
   }
 
-  /* Hide QR code on mobile - it's meant to be scanned BY a phone, not ON a phone */
   .qr-code-placeholder:first-child {
     display: none;
   }
@@ -457,7 +451,6 @@
     display: none;
   }
 
-  /* Make the upload section take full width when QR is hidden */
   .qr-code-placeholder:last-child {
     width: 100%;
     height: auto;
@@ -488,18 +481,17 @@
   }
 }
 
-/* Mobile phones */
 @media (max-width: 480px) {
   .modal-overlay-submit-memor {
-    padding: 60px 0 0 0;
+    padding: 60px 0 70px 0;
   }
 
   .modal-container {
     margin-top: 0;
     margin-bottom: 0;
     padding: 16px;
-    height: calc(100vh - 60px);
-    max-height: calc(100vh - 60px);
+    height: calc(100vh - 130px);
+    max-height: calc(100vh - 130px);
     border-radius: 0;
   }
 
@@ -543,7 +535,6 @@
     justify-content: center;
   }
 
-  /* Hide QR code on mobile */
   .qr-code-placeholder:first-child {
     display: none;
   }
@@ -552,7 +543,6 @@
     display: none;
   }
 
-  /* Optimize upload section for mobile */
   .qr-code-placeholder:last-child {
     width: 100%;
     min-height: 140px;
@@ -597,12 +587,11 @@
   }
 }
 
-/* Small mobile phones */
 @media (max-width: 360px) {
   .modal-container {
     padding: 12px;
-    height: calc(100vh - 60px);
-    max-height: calc(100vh - 60px);
+    height: calc(100vh - 130px);
+    max-height: calc(100vh - 130px);
   }
 
   .modal-title {
@@ -619,7 +608,6 @@
     justify-content: center;
   }
 
-  /* Hide QR code on small mobile */
   .qr-code-placeholder:first-child {
     display: none;
   }
@@ -646,16 +634,15 @@
   }
 }
 
-/* Landscape mobile phones */
 @media (max-height: 500px) and (orientation: landscape) {
   .modal-overlay-submit-memor {
     align-items: flex-start;
-    padding: 60px 0 0 0;
+    padding: 60px 0 70px 0;
   }
 
   .modal-container {
-    height: calc(100vh - 60px);
-    max-height: calc(100vh - 60px);
+    height: calc(100vh - 130px);
+    max-height: calc(100vh - 130px);
     margin-top: 0;
     margin-bottom: 0;
     border-radius: 0;
@@ -686,7 +673,6 @@
   }
 }
 
-/* Ensure touch targets are large enough for mobile */
 @media (max-width: 768px) {
   .upload-button,
   .photo-slide,
@@ -709,7 +695,6 @@
   }
 }
 
-/* High DPI displays */
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
   .photo,
   .uploaded-image img {
