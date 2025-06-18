@@ -35,9 +35,14 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
   const [uploadError, setUploadError] = useState(null);
   const [loadingTeamPhotos, setLoadingTeamPhotos] = useState(false);
   const [normalizedImages, setNormalizedImages] = useState([]);
+  const [qrCodeUrl, setQrCodeUrl] = useState("");
+  const [isGeneratingQR, setIsGeneratingQR] = useState(false);
+  const [qrError, setQrError] = useState(null);
+  const [isClosing, setIsClosing] = useState(false);
 
   const modalRef = useRef(null);
   const fileInputRef = useRef(null);
+  const qrRefreshInterval = useRef(null);
 
   useEffect(() => {
     console.log("SubmitMemorModal: Initial memor=", memor);
@@ -47,8 +52,110 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
   useEffect(() => {
     return () => {
       document.body.style.overflow = "auto";
+      if (qrRefreshInterval.current) {
+        clearInterval(qrRefreshInterval.current);
+      }
     };
   }, []);
+
+  useEffect(() => {
+    const generateQRCodeUrl = async () => {
+      console.log("=== QR Code Generation Debug ===");
+      console.log("memor?.id:", memor?.id);
+      console.log("token exists:", !!token);
+      console.log("user?.tenant_subdomain:", user?.tenant_subdomain);
+      console.log("VITE_API_URL:", import.meta.env.VITE_API_URL);
+
+      if (!memor?.id || !token || !user?.tenant_subdomain) {
+        console.log("Missing required data for QR generation, skipping...");
+        return;
+      }
+
+      setIsGeneratingQR(true);
+      setQrError(null);
+
+      try {
+        const requestUrl = `${import.meta.env.VITE_API_URL}/api/memors/${
+          memor.id
+        }/temp-token`;
+        console.log("Making request to:", requestUrl);
+
+        const requestHeaders = {
+          Authorization: `Bearer ${token}`,
+          "X-Tenant": user.tenant_subdomain,
+          "Content-Type": "application/json",
+        };
+        console.log("Request headers:", requestHeaders);
+
+        const response = await fetch(requestUrl, {
+          method: "POST",
+          headers: requestHeaders,
+        });
+
+        console.log("Response status:", response.status);
+        console.log("Response ok:", response.ok);
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error("Response error text:", errorText);
+          throw new Error(
+            `Failed to generate temporary token: ${response.status} - ${errorText}`
+          );
+        }
+
+        const responseData = await response.json();
+        console.log("Response data:", responseData);
+
+        const { tempToken } = responseData;
+        if (!tempToken) {
+          console.error("No tempToken in response:", responseData);
+          throw new Error("No temporary token received from server");
+        }
+
+        // Generate appropriate URL based on environment
+        const isLocalhost = window.location.hostname.includes("localhost");
+        const protocol = isLocalhost ? "http" : "https";
+        const domain = isLocalhost
+          ? `${window.location.hostname}:${window.location.port || "5173"}`
+          : `${user.tenant_subdomain}.memor-us.com`;
+
+        const qrUrl = `${protocol}://${domain}/app/memors/${memor.id}?token=${tempToken}`;
+        console.log("Generated QR URL:", qrUrl);
+
+        setQrCodeUrl(qrUrl);
+        console.log("✅ QR code URL generated successfully");
+
+        // Refresh the token every 2.5 minutes (before 3-minute expiry)
+        if (qrRefreshInterval.current) {
+          clearInterval(qrRefreshInterval.current);
+        }
+
+        qrRefreshInterval.current = setInterval(() => {
+          console.log("🔄 Refreshing QR token...");
+          generateQRCodeUrl();
+        }, 150000); // 2.5 minutes
+      } catch (error) {
+        console.error("❌ Error generating QR code URL:", error);
+        console.error("Error stack:", error.stack);
+        setQrError(`Failed to generate QR code: ${error.message}`);
+
+        // Fallback to basic URL without token
+        const fallbackUrl = `https://${user.tenant_subdomain}.memor-us.com/app/memors/${memor.id}`;
+        console.log("Using fallback URL:", fallbackUrl);
+        setQrCodeUrl(fallbackUrl);
+      } finally {
+        setIsGeneratingQR(false);
+      }
+    };
+
+    generateQRCodeUrl();
+
+    return () => {
+      if (qrRefreshInterval.current) {
+        clearInterval(qrRefreshInterval.current);
+      }
+    };
+  }, [memor?.id, token, user?.tenant_subdomain]);
 
   useEffect(() => {
     if (!memor || !memor.id || !token || !user?.tenant_subdomain) return;
@@ -135,7 +242,7 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
             setSelectedImage(null);
             document.body.style.overflow = "auto";
           } else {
-            onClose();
+            handleCloseModal();
           }
         } else if (event.key === "Tab") {
           if (!focusableElements || focusableElements.length === 0) return;
@@ -161,7 +268,20 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
         document.removeEventListener("keydown", handleKeyDown);
       };
     }
-  }, [isSubmitMemorOpen, selectedImage, onClose]);
+  }, [isSubmitMemorOpen, selectedImage]);
+
+  const handleCloseModal = () => {
+    setIsClosing(true);
+
+    // Wait for animation to complete before actually closing
+    setTimeout(() => {
+      setIsSubmitMemorOpen(false);
+      setIsClosing(false);
+      document.body.style.overflow = "auto";
+      window.history.replaceState(null, "", "/app/memors");
+      onClose();
+    }, 300); // Match the animation duration
+  };
 
   const fullNormalizedImages = (() => {
     const images = normalizedImages || [];
@@ -280,17 +400,6 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
         }
       );
 
-      {
-        memor?.id && (
-          <div
-            style={{
-              marginTop: "20px",
-              padding: "10px",
-              background: "#f5f5f5",
-            }}
-          ></div>
-        );
-      }
       setIsSubmitting(false);
 
       if (!res.ok) {
@@ -330,7 +439,7 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
   const closeFeedbackModal = () => {
     setFeedback(null);
     if (feedback?.type === "success") {
-      onClose();
+      handleCloseModal();
     } else {
       setIsSubmitMemorOpen(true);
       if (fileInputRef.current) {
@@ -354,7 +463,7 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
               ? [
                   {
                     label: "Close",
-                    onClick: onClose,
+                    onClick: handleCloseModal,
                     style: {
                       backgroundColor: "transparent",
                       border: "1px solid #988c9c",
@@ -409,10 +518,12 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
       )}
 
       {isSubmitMemorOpen && !feedback && (
-        <div className='modal-overlay-submit-memor'>
+        <div
+          className={`modal-overlay-submit-memor ${isClosing ? "closing" : ""}`}
+        >
           <div
             ref={modalRef}
-            className='modal-container'
+            className={`modal-container ${isClosing ? "closing" : ""}`}
             role='dialog'
             aria-modal='true'
             tabIndex={-1}
@@ -421,7 +532,7 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
           >
             <div className='modal-top'>
               <Button
-                onClick={onClose}
+                onClick={handleCloseModal}
                 sx={{ minWidth: 0, p: 0, color: "#CAC4D0" }}
               >
                 <ArrowBackIcon />
@@ -461,7 +572,7 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
               </div>
             </div>
 
-            {/* Display error*/}
+            {/* Display upload error */}
             {uploadError && (
               <Alert
                 severity='error'
@@ -473,6 +584,21 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
                 }}
               >
                 {uploadError}
+              </Alert>
+            )}
+
+            {/* Display QR code error */}
+            {qrError && (
+              <Alert
+                severity='warning'
+                sx={{
+                  mt: 2,
+                  mb: 2,
+                  backgroundColor: "rgba(255, 152, 0, 0.1)",
+                  color: "#ff9800",
+                }}
+              >
+                {qrError}
               </Alert>
             )}
 
@@ -520,16 +646,50 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
                 ) : (
                   <>
                     <div className='qr-code-placeholder'>
-                      <QRCode
-                        value={`https://${user.tenant_subdomain}.memor-us.com/app/memors/${memor.id}`}
-                        size={128}
-                        bgColor='transparent'
-                        fgColor='#d0bcfe'
-                        style={{ padding: "8px", borderRadius: "8px" }}
-                      />
-                      <Typography variant='body2' style={{ color: "#DDDAF2" }}>
-                        Scan it with your phone
-                      </Typography>
+                      {isGeneratingQR ? (
+                        <Box
+                          sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            gap: 2,
+                          }}
+                        >
+                          <CircularProgress
+                            size={40}
+                            sx={{ color: "#d0bcfe" }}
+                          />
+                          <Typography
+                            variant='body2'
+                            style={{ color: "#DDDAF2" }}
+                          >
+                            Generating secure QR code...
+                          </Typography>
+                        </Box>
+                      ) : qrCodeUrl ? (
+                        <>
+                          <QRCode
+                            value={qrCodeUrl}
+                            size={128}
+                            bgColor='transparent'
+                            fgColor='#d0bcfe'
+                            style={{ padding: "8px", borderRadius: "8px" }}
+                          />
+                          <Typography
+                            variant='body2'
+                            style={{ color: "#DDDAF2" }}
+                          >
+                            Scan with your phone (expires in 3 min)
+                          </Typography>
+                        </>
+                      ) : (
+                        <Typography
+                          variant='body2'
+                          style={{ color: "#DDDAF2" }}
+                        >
+                          QR code unavailable
+                        </Typography>
+                      )}
                     </div>
                     <Typography variant='body2' className='or-text'>
                       or
@@ -670,7 +830,7 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
             <div className='modal-actions'>
               <CustomButton
                 text='Cancel'
-                onClick={onClose}
+                onClick={handleCloseModal}
                 disabled={isSubmitting}
                 sx={{
                   backgroundColor: "transparent",
