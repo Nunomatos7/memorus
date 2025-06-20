@@ -8,7 +8,7 @@ import Loader from "../../Components/Loader/Loader";
 import { useAuth } from "../../context/AuthContext";
 import { CircularProgress } from "@mui/material";
 
-// Icon components (you can replace these with your preferred icon library)
+// Icon components (same as before)
 const FilterIcon = () => (
   <svg viewBox="0 0 24 24" fill="currentColor">
     <path d="M4.25 5.61C6.27 8.2 10 13 10 13v6c0 .55.45 1 1 1h2c.55 0 1-.45 1-1v-6s3.73-4.8 5.75-7.39C20.25 4.95 19.78 4 18.95 4H5.05c-.83 0-1.3.95-.8 1.61z"/>
@@ -86,14 +86,13 @@ const MemoryBoard = () => {
 
   // Filter state
   const [showFilterPanel, setShowFilterPanel] = useState(false);
-  const [viewMode, setViewMode] = useState('canvas'); // 'canvas' or 'grid'dTeam] = useState('');
-  // Enhanced filters state
+  const [viewMode, setViewMode] = useState('canvas');
   const [selectedCompetition, setSelectedCompetition] = useState('');
   const [selectedTeam, setSelectedTeam] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [dateRange, setDateRange] = useState({ start: '', end: '' });
-  const [sortBy, setSortBy] = useState('date'); // 'date', 'title', 'team', 'images'
-  const [sortDirection, setSortDirection] = useState('desc'); // 'asc', 'desc'
+  const [sortBy, setSortBy] = useState('date');
+  const [sortDirection, setSortDirection] = useState('desc');
   const [minImages, setMinImages] = useState(1);
   const [selectedTags, setSelectedTags] = useState([]);
 
@@ -106,49 +105,104 @@ const MemoryBoard = () => {
   // Navigation state
   const [focusedIndex, setFocusedIndex] = useState(0);
 
-  // Improved positioning algorithm - centered around origin
+  // Enhanced positioning algorithm with better dispersion and centering
   const generatePositions = useCallback((count) => {
     const positions = [];
-    const rng = seedrandom("memory-board-seed");
     
     if (count === 0) return positions;
     
-    // Start with center position for first item
+    // Enhanced constants for better dispersion
+    const CARD_COLLISION_WIDTH = CARD_WIDTH + MIN_SPACING * 2; // More spacing
+    const CARD_COLLISION_HEIGHT = CARD_HEIGHT + MIN_SPACING * 2;
+    const MAX_ATTEMPTS = 100;
+    const SPIRAL_INCREMENT = 120; // Much larger increments for more dispersion
+    const MIN_RADIUS = 200; // Minimum distance from center
+    
+    // Seed the random number generator for consistent results
+    const rng = seedrandom("memory-board-seed");
+    
+    // Helper function to check if two rectangles overlap (accounting for cascade)
+    const checkCollision = (pos1, pos2) => {
+      // Account for cascade effect - add extra padding
+      const cascadePadding = 60; // Extra space for cascade visibility
+      const dx = Math.abs(pos1.x - pos2.x);
+      const dy = Math.abs(pos1.y - pos2.y);
+      return dx < (CARD_COLLISION_WIDTH + cascadePadding) && dy < (CARD_COLLISION_HEIGHT + cascadePadding);
+    };
+    
+    // Helper function to check if a position collides with any existing positions
+    const hasCollision = (newPos, existingPositions) => {
+      return existingPositions.some(existingPos => checkCollision(newPos, existingPos));
+    };
+    
+    // Helper function to generate positions in a more dispersed pattern
+    const generateDispersedPosition = (index, ringRadius) => {
+      const circumference = 2 * Math.PI * ringRadius;
+      const optimalSpacing = CARD_COLLISION_WIDTH + 80; // Extra spacing
+      const pointsInRing = Math.max(4, Math.floor(circumference / optimalSpacing));
+      const angleStep = (2 * Math.PI) / pointsInRing;
+      const angle = (index % pointsInRing) * angleStep;
+      
+      // Add more randomness for organic dispersion
+      const radiusVariation = (rng() - 0.5) * 80; // Larger radius variation
+      const angleVariation = (rng() - 0.5) * 0.6; // More angle variation
+      
+      const finalRadius = Math.max(MIN_RADIUS, ringRadius + radiusVariation);
+      const finalAngle = angle + angleVariation;
+      
+      return {
+        x: finalRadius * Math.cos(finalAngle),
+        y: finalRadius * Math.sin(finalAngle),
+        rotation: (rng() - 0.5) * 20 // Slightly more rotation
+      };
+    };
+    
+    // Handle single item - place at center
     if (count === 1) {
-      return [{ x: 0, y: 0, rotation: (rng() - 0.5) * 10 }];
+      return [{ x: 0, y: 0, rotation: (rng() - 0.5) * 15 }];
     }
     
-    // Spiral pattern starting from center
-    const radius = Math.min(150, 100 + count * 2); // Adaptive radius
-    const spiralTurns = Math.ceil(count / 8); // Number of spiral turns
-    
+    // For multiple items, start from first ring (not center)
     for (let i = 0; i < count; i++) {
-      let x, y;
+      let positioned = false;
+      let attempts = 0;
+      let currentRadius = MIN_RADIUS; // Start at minimum radius
       
-      if (i === 0) {
-        // First item at center
-        x = 0;
-        y = 0;
-      } else {
-        // Spiral positioning
-        const t = i / (count - 1) * spiralTurns * 2 * Math.PI;
-        const currentRadius = radius * Math.sqrt(i / count);
+      while (!positioned && attempts < MAX_ATTEMPTS) {
+        // Calculate which ring we're trying
+        const ringIndex = Math.floor(attempts / 6); // Fewer attempts per ring
+        const radius = currentRadius + (ringIndex * SPIRAL_INCREMENT);
         
-        x = currentRadius * Math.cos(t);
-        y = currentRadius * Math.sin(t);
+        const candidatePosition = generateDispersedPosition(i + attempts, radius);
         
-        // Add some randomness for organic feel
-        x += (rng() - 0.5) * 60;
-        y += (rng() - 0.5) * 60;
+        // Check for collisions
+        if (!hasCollision(candidatePosition, positions)) {
+          positions.push(candidatePosition);
+          positioned = true;
+        } else {
+          attempts++;
+          
+          // If we've tried many positions in this ring, move to next ring
+          if (attempts % 6 === 0) {
+            currentRadius += SPIRAL_INCREMENT;
+          }
+        }
       }
       
-      positions.push({
-        x,
-        y,
-        rotation: (rng() - 0.5) * 15 // Random rotation between -7.5 and 7.5 degrees
-      });
+      // Fallback: if we couldn't find a non-overlapping position
+      if (!positioned) {
+        const fallbackRadius = currentRadius + 150;
+        const fallbackAngle = (i / count) * 2 * Math.PI + (rng() - 0.5) * 0.8;
+        positions.push({
+          x: fallbackRadius * Math.cos(fallbackAngle),
+          y: fallbackRadius * Math.sin(fallbackAngle),
+          rotation: (rng() - 0.5) * 20
+        });
+        console.warn(`Using fallback position for item ${i}`);
+      }
     }
     
+    console.log(`Generated ${positions.length} dispersed positions for ${count} items`);
     return positions;
   }, []);
 
@@ -224,11 +278,6 @@ const MemoryBoard = () => {
 
     return filtered;
   }, [allPosts, searchQuery, dateRange, minImages, selectedTags, sortBy, sortDirection]);
-
-
-  
-
-  
 
   // Generate positions for filtered posts
   const positionedPosts = useMemo(() => {
@@ -323,7 +372,7 @@ const MemoryBoard = () => {
             setSelectedTeam('all');
           }
         }
-              } catch (err) {
+      } catch (err) {
         console.error("Error fetching initial data:", err);
         setError("Failed to load initial data");
       } finally {
@@ -435,46 +484,76 @@ const MemoryBoard = () => {
     return () => observer.disconnect();
   }, [positionedPosts, viewMode]);
 
-  // Zoom and wheel handling
+  // ULTRA HIGH-PERFORMANCE zoom and navigation - NO LAG
   useEffect(() => {
+    let isUserInteracting = false;
+    let lastWheelTime = 0;
+    
     const handleWheel = (e) => {
       if (e.ctrlKey && viewMode === 'canvas') {
         e.preventDefault();
+        e.stopPropagation();
+        
+        // IMMEDIATE response - no throttling
+        const now = performance.now();
+        if (now - lastWheelTime < 8) return; // Minimal 8ms throttle only
+        lastWheelTime = now;
+
+        const canvasState = canvasRef.current?.getCanvasState?.();
+        if (canvasState) {
+          isUserInteracting = true;
+          
+          const { currentPosition, d3Zoom, canvasNode } = canvasState;
+          const { k: currentScale } = currentPosition || {};
+          
+          // Very small, precise zoom steps for smooth control
+          const sensitivity = 0.05;
+          const delta = e.deltaY > 0 ? -sensitivity : sensitivity;
+          const newScale = Math.max(0.1, Math.min(8, currentScale + delta));
+          
+          // ZERO DELAY transform - instant response
+          d3Zoom.scaleTo(canvasNode, newScale);
+          setZoomLevel(newScale);
+          
+          // Quick reset of interaction flag
+          clearTimeout(window.interactionTimeout);
+          window.interactionTimeout = setTimeout(() => {
+            isUserInteracting = false;
+          }, 50);
+        }
+      }
+    };
+
+    // Minimal sync - only when NOT actively interacting
+    const syncZoomLevel = () => {
+      if (viewMode === 'canvas' && !isUserInteracting) {
         const canvasState = canvasRef.current?.getCanvasState?.();
         if (canvasState) {
           const { currentPosition } = canvasState;
           const { k: currentScale } = currentPosition || {};
-          const newScale = currentScale + (e.deltaY > 0 ? -0.1 : 0.1);
-          if (newScale >= 0.1 && newScale <= 3) {
-            canvasState.d3Zoom.scaleTo(
-              canvasState.canvasNode.transition().duration(0),
-              newScale
-            );
-            setZoomLevel(newScale);
+          
+          if (Math.abs(currentScale - zoomLevel) > 0.01) {
+            setZoomLevel(currentScale);
           }
         }
       }
     };
 
-    const syncZoomLevel = () => {
-      if (viewMode === 'canvas') {
-        const canvasState = canvasRef.current?.getCanvasState?.();
-        if (canvasState) {
-          const { currentPosition } = canvasState;
-          const { k: currentScale } = currentPosition || {};
-          setZoomLevel(currentScale);
-        }
-      }
-    };
-
-    window.addEventListener("wheel", handleWheel, { passive: false });
-    const interval = setInterval(syncZoomLevel, 200);
+    // High priority wheel event
+    window.addEventListener("wheel", handleWheel, { 
+      passive: false, 
+      capture: true 
+    });
+    
+    // Very infrequent sync to avoid performance impact
+    const syncInterval = setInterval(syncZoomLevel, 1000);
 
     return () => {
-      window.removeEventListener("wheel", handleWheel);
-      clearInterval(interval);
+      window.removeEventListener("wheel", handleWheel, true);
+      clearInterval(syncInterval);
+      clearTimeout(window.interactionTimeout);
     };
-  }, [viewMode]);
+  }, [viewMode, zoomLevel]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -511,7 +590,7 @@ const MemoryBoard = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [viewMode, positionedPosts, focusedIndex, selectedMemor, showFilterPanel]);
 
-  // Handle functions
+  // INSTANT zoom buttons - no delays
   const handleZoom = useCallback((action = "out") => {
     if (viewMode !== 'canvas') return;
     
@@ -520,20 +599,56 @@ const MemoryBoard = () => {
 
     const { canvasNode, currentPosition, d3Zoom } = canvasState;
     const { k: currentScale } = currentPosition || {};
-    const diff = action === "out" ? -0.25 : 0.25;
-
-    const newScale = Math.max(0.1, Math.min(3, currentScale + diff));
-    d3Zoom.scaleTo(canvasNode.transition().duration(300), newScale);
+    
+    // Immediate zoom steps
+    const step = action === "out" ? -0.2 : 0.2;
+    const newScale = Math.max(0.1, Math.min(8, currentScale + step));
+    
+    // INSTANT transform - ZERO delay
+    d3Zoom.scaleTo(canvasNode, newScale);
     setZoomLevel(newScale);
   }, [viewMode]);
 
   const handleCenterView = useCallback(() => {
     if (viewMode === 'canvas' && canvasRef.current) {
-      canvasRef.current.fitContentToView({ scale: 0.8 });
+      // Calculate the bounding box of all positioned posts for better centering
+      if (positionedPosts.length > 0) {
+        const bounds = positionedPosts.reduce((acc, post) => {
+          return {
+            minX: Math.min(acc.minX, post.x - CARD_WIDTH / 2),
+            maxX: Math.max(acc.maxX, post.x + CARD_WIDTH / 2),
+            minY: Math.min(acc.minY, post.y - CARD_HEIGHT / 2),
+            maxY: Math.max(acc.maxY, post.y + CARD_HEIGHT / 2),
+          };
+        }, {
+          minX: positionedPosts[0].x,
+          maxX: positionedPosts[0].x,
+          minY: positionedPosts[0].y,
+          maxY: positionedPosts[0].y,
+        });
+
+        const centerX = (bounds.minX + bounds.maxX) / 2;
+        const centerY = (bounds.minY + bounds.maxY) / 2;
+        
+        // Center on the calculated center point
+        const canvasState = canvasRef.current.getCanvasState();
+        if (canvasState) {
+          const { d3Zoom, canvasNode } = canvasState;
+          d3Zoom.transform(
+            canvasNode.transition().duration(800),
+            d3Zoom.identity
+              .translate(CANVAS_WIDTH / 2 - centerX, CANVAS_HEIGHT / 2 - centerY)
+              .scale(0.6) // Better zoom level to see all collections
+          );
+        }
+      } else {
+        // Fallback to canvas center if no posts
+        canvasRef.current.fitContentToView({ scale: 0.8 });
+      }
     } else if (viewMode === 'grid' && gridViewRef.current) {
       gridViewRef.current.scrollTo({ top: 0, behavior: 'smooth' });
     }
-  }, [viewMode]);
+  }, [viewMode, positionedPosts]);
 
   const openModal = useCallback((imageIndex, postIndex) => {
     const post = positionedPosts[postIndex];
@@ -739,29 +854,31 @@ const MemoryBoard = () => {
             </select>
           </div>
 
-          {/* Sorting */}
-          <div className="filter-section">
-            <label className="filter-label">Sort & Order</label>
-            <div className="sort-container">
-              <select
-                className="filter-select"
-                value={sortBy}
-                onChange={(e) => handleFilterChange('sortBy', e.target.value)}
-              >
-                <option value="date">Sort by Date</option>
-                <option value="title">Sort by Title</option>
-                <option value="team">Sort by Team</option>
-                <option value="images">Sort by Image Count</option>
-              </select>
-              <button
-                className={`sort-direction-btn ${sortDirection}`}
-                onClick={() => handleFilterChange('sortDirection', sortDirection === 'asc' ? 'desc' : 'asc')}
-                title={`Sort ${sortDirection === 'asc' ? 'Descending' : 'Ascending'}`}
-              >
-                <SortIcon />
-              </button>
+          {/* Sorting - Only show in Grid Mode */}
+          {viewMode === 'grid' && (
+            <div className="filter-section">
+              <label className="filter-label">Sort & Order</label>
+              <div className="sort-container">
+                <select
+                  className="filter-select"
+                  value={sortBy}
+                  onChange={(e) => handleFilterChange('sortBy', e.target.value)}
+                >
+                  <option value="date">Sort by Date</option>
+                  <option value="title">Sort by Title</option>
+                  <option value="team">Sort by Team</option>
+                  <option value="images">Sort by Image Count</option>
+                </select>
+                <button
+                  className={`sort-direction-btn ${sortDirection}`}
+                  onClick={() => handleFilterChange('sortDirection', sortDirection === 'asc' ? 'desc' : 'asc')}
+                  title={`Sort ${sortDirection === 'asc' ? 'Descending' : 'Ascending'}`}
+                >
+                  <SortIcon />
+                </button>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Advanced Filters */}
           <div className="filter-section second">
@@ -830,8 +947,6 @@ const MemoryBoard = () => {
           </button>
         </div>
 
-        
-
         {/* Main Content */}
         {filteredPosts.length === 0 ? (
           <div className="empty-container">
@@ -886,11 +1001,18 @@ const MemoryBoard = () => {
             </div>
           </div>
         ) : (
-          // Canvas View
+          // Canvas View with Enhanced Non-Overlapping Collections and Cascade Effect
           <ReactInfiniteCanvas
             ref={canvasRef}
             onCanvasMount={(mountFunc) => {
-              mountFunc.fitContentToView({ scale: 0.8 });
+              // Initial view - center on collections with appropriate scale
+              setTimeout(() => {
+                if (positionedPosts.length > 0) {
+                  handleCenterView();
+                } else {
+                  mountFunc.fitContentToView({ scale: 0.6 });
+                }
+              }, 100);
             }}
             backgroundType="none"
           >
@@ -902,8 +1024,9 @@ const MemoryBoard = () => {
                   position: "absolute",
                   top: post.y + CANVAS_HEIGHT / 2,
                   left: post.x + CANVAS_WIDTH / 2,
-                  width: `${CARD_WIDTH}px`,
-                  height: `${CARD_HEIGHT}px`,
+                  width: `${CARD_WIDTH + 30}px`, // Just enough for small cascade
+                  height: `${CARD_HEIGHT + 24}px`, // Just enough for small cascade
+                  zIndex: focusedIndex === postIndex ? 100 : 1,
                 }}
               >
                 <div style={{ position: "relative", width: "100%", height: "100%" }}>
@@ -913,6 +1036,19 @@ const MemoryBoard = () => {
                     .map((image, cardIndex, reversedArray) => {
                       const imgSrc = typeof image === "string" ? image : image?.img_src || "";
                       const altText = image?.alt_text || `Image for ${post.title}`;
+                      
+                      // Subtle cascade - just a sliver of each card visible behind
+                      const cascadeOffsetX = cardIndex * 8; // Small horizontal peek
+                      const cascadeOffsetY = cardIndex * 6; // Small vertical peek
+                      const rotationOffset = cardIndex * 2; // Slight rotation difference
+                      const baseZIndex = reversedArray.length - cardIndex; // Fixed cascade order
+                      
+                      // Base transform
+                      const baseTransform = `rotate(${post.rotation + rotationOffset}deg)`;
+                      
+                      // Hover transform - only slight lift, NEVER change z-index
+                      const hoverLift = Math.max(3, 8 - cardIndex * 2); // Front cards lift more
+                      const hoverTransform = `rotate(${post.rotation + rotationOffset}deg) translateY(-${hoverLift}px)`;
 
                       return (
                         <div
@@ -924,11 +1060,19 @@ const MemoryBoard = () => {
                           }}
                           style={{
                             position: "absolute",
-                            top: `${cardIndex * 5}px`,
-                            left: `${cardIndex * 8}px`,
-                            width: "100%",
-                            height: "100%",
+                            top: `${cascadeOffsetY}px`,
+                            left: `${cascadeOffsetX}px`,
+                            width: `${CARD_WIDTH}px`,
+                            height: `${CARD_HEIGHT}px`,
                             cursor: "pointer",
+                            transform: baseTransform,
+                            transformOrigin: "center center",
+                            zIndex: baseZIndex, // NEVER CHANGES
+                            boxShadow: cardIndex === 0 ? 
+                              "0 12px 40px rgba(0, 0, 0, 0.2)" :
+                              `0 ${4 + cardIndex * 2}px ${8 + cardIndex * 3}px rgba(0, 0, 0, 0.15)`,
+                            border: "4px solid white",
+                            transition: "transform 0.15s ease-out, box-shadow 0.15s ease-out",
                           }}
                           tabIndex={focusedIndex === postIndex ? 0 : -1}
                           onKeyDown={(e) => {
@@ -938,8 +1082,27 @@ const MemoryBoard = () => {
                               openModal(actualImageIndex, postIndex);
                             }
                           }}
+                          onMouseEnter={(e) => {
+                            // Only change transform, NEVER z-index
+                            e.currentTarget.style.transform = hoverTransform;
+                            e.currentTarget.style.boxShadow = `0 ${8 + hoverLift}px ${16 + hoverLift * 2}px rgba(0, 0, 0, 0.25)`;
+                          }}
+                          onMouseLeave={(e) => {
+                            // Return to base state, NEVER change z-index
+                            e.currentTarget.style.transform = baseTransform;
+                            e.currentTarget.style.boxShadow = cardIndex === 0 ? 
+                              "0 12px 40px rgba(0, 0, 0, 0.2)" :
+                              `0 ${4 + cardIndex * 2}px ${8 + cardIndex * 3}px rgba(0, 0, 0, 0.15)`;
+                          }}
                         >
-                          <p className="card-date">{post.submittedDate}</p>
+                          <p className="card-date" style={{ 
+                            margin: "16px 20px 10px",
+                            fontSize: "12px",
+                            pointerEvents: "none",
+                            userSelect: "none"
+                          }}>
+                            {post.submittedDate}
+                          </p>
 
                           <img
                             className="card-image"
@@ -947,10 +1110,25 @@ const MemoryBoard = () => {
                             src={loadedImages.has(imgSrc) ? imgSrc : ""}
                             alt={altText}
                             loading="lazy"
+                            draggable={false}
+                            style={{
+                              width: "calc(100% - 32px)",
+                              height: "60%",
+                              margin: "0 16px",
+                              pointerEvents: "none",
+                              userSelect: "none",
+                            }}
                           />
 
                           {cardIndex === reversedArray.length - 1 && (
-                            <p className="card-title">{post.title}</p>
+                            <p className="card-title" style={{
+                              fontSize: "16px",
+                              margin: "16px 20px",
+                              pointerEvents: "none",
+                              userSelect: "none"
+                            }}>
+                              {post.title}
+                            </p>
                           )}
                         </div>
                       );
@@ -1012,3 +1190,9 @@ const MemoryBoard = () => {
 };
 
 export default MemoryBoard;
+
+/* .zoom-btn:hover {
+  background: #D0BCFE;
+  color: black;
+  transform: scale(1.1);
+} */

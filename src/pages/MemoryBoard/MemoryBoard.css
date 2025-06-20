@@ -1,3 +1,5 @@
+/* Enhanced Memory Board CSS with improved cascade effect */
+
 .memory-board-container {
   width: 100%;
   height: 100vh;
@@ -185,7 +187,6 @@
 .filter-input:focus {
   outline: none;
   border-color: #7e57c2;
-
 }
 
 .date-range-container {
@@ -428,8 +429,8 @@
 }
 
 .zoom-btn:hover {
-  background: linear-gradient(135deg, #7e57c2, #9c27b0);
-  color: white;
+  background: #D0BCFE;
+  color: black;
   transform: scale(1.1);
 }
 
@@ -462,10 +463,9 @@
 }
 
 .control-btn:hover {
-  background: linear-gradient(135deg, #7e57c2, #9c27b0);
+  background: #D0BCFE;
   transform: translateY(-3px);
-  box-shadow: 0 12px 40px rgba(126, 87, 194, 0.3);
-  color: white;
+  color: black;
   border-color: transparent;
 }
 
@@ -568,61 +568,185 @@
   overflow: hidden;
 }
 
-/* Enhanced Canvas View Improvements */
+/* MAXIMUM PERFORMANCE Canvas View - NO CSS HOVER INTERFERENCE */
 .polaroid-container {
   position: relative;
-  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), z-index 0.2s ease;
+  padding: 15px;
+  overflow: visible;
+  /* Minimal performance properties */
+  contain: layout;
 }
 
 .polaroid-card {
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: absolute;
   background: white;
-  border: 4px solid white;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
   border-radius: 16px;
   cursor: pointer;
   overflow: hidden;
+  border: 4px solid white;
+  /* ONLY essential performance properties */
+  backface-visibility: hidden;
+  /* Fast transitions only for JavaScript-controlled properties */
+  transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
 }
 
+/* REMOVE ALL CSS HOVER EFFECTS - JavaScript handles everything */
 .polaroid-card:hover {
-  transform: translateY(-16px) rotate(0deg) scale(1.05) !important;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
-  z-index: 100;
-  border-color: rgba(126, 87, 194, 0.3);
+  /* NO CSS HOVER EFFECTS - completely handled by JavaScript */
 }
 
+/* NO cascade hover classes */
+.cascade-card-0:hover,
+.cascade-card-1:hover,
+.cascade-card-2:hover,
+.cascade-card-3:hover,
+.cascade-card-4:hover,
+.cascade-card-5:hover {
+  /* NO CSS HOVER EFFECTS */
+}
+
+/* Simple z-index structure - NEVER modified by CSS hover */
+.polaroid-container .polaroid-card:nth-child(1) { z-index: 10; }
+.polaroid-container .polaroid-card:nth-child(2) { z-index: 9; }
+.polaroid-container .polaroid-card:nth-child(3) { z-index: 8; }
+.polaroid-container .polaroid-card:nth-child(4) { z-index: 7; }
+.polaroid-container .polaroid-card:nth-child(5) { z-index: 6; }
+.polaroid-container .polaroid-card:nth-child(n+6) { z-index: 5; }
+
+/* MAXIMUM performance card content */
 .card-date {
   color: #718096;
   font-family: 'Georgia', serif;
-  font-size: 12px;
-  margin: 16px 20px 10px;
   font-style: italic;
   font-weight: 500;
+  font-size: 12px;
+  margin: 16px 20px 10px;
+  /* Prevent ANY interaction */
+  user-select: none;
+  pointer-events: none;
 }
 
 .card-title {
   color: #2d3748;
   text-align: center;
   font-family: 'Georgia', serif;
-  font-size: 16px;
   font-weight: 700;
-  margin: 16px 20px;
   line-height: 1.4;
+  font-size: 16px;
+  margin: 16px 20px;
+  /* Prevent ANY interaction */
+  user-select: none;
+  pointer-events: none;
 }
 
 .card-image {
-  width: calc(100% - 32px);
-  height: 60%;
   object-fit: cover;
   border-radius: 12px;
-  margin: 0 16px;
   background: linear-gradient(135deg, #f7fafc, #edf2f7);
-  transition: transform 0.3s ease;
+  width: calc(100% - 32px);
+  height: 60%;
+  margin: 0 16px;
+  /* MAXIMUM performance optimizations */
+  transform: translateZ(0);
+  user-select: none;
+  pointer-events: none;
+  /* NO transitions on images */
+  transition: none;
 }
 
-.polaroid-card:hover .card-image {
-  transform: scale(1.02);
+/* ULTIMATE canvas performance optimizations */
+.infinite-canvas-container {
+  /* Force hardware acceleration */
+  transform: translateZ(0);
+  will-change: transform;
+  /* Maximum rendering optimization */
+  contain: strict;
+  /* Disable text selection globally */
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* Disable ALL complex effects */
+.polaroid-container::before,
+.polaroid-container::after {
+  display: none !important;
+}
+
+/* Memory Collection Focus - minimal */
+.polaroid-container.focused .polaroid-card {
+  border-color: rgba(126, 87, 194, 0.3);
+}
+
+/* REMOVE any scrollbar performance impact */
+.filter-panel {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.filter-panel::-webkit-scrollbar {
+  display: none;
+}
+
+/* ULTIMATE performance for mobile */
+@media (max-width: 768px) {
+  .polaroid-card {
+    /* Disable ALL effects on mobile */
+    transition: none !important;
+    will-change: auto !important;
+  }
+  
+  .infinite-canvas-container {
+    /* Mobile-specific optimizations */
+    -webkit-transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+  }
+}
+
+/* ULTIMATE performance for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+    will-change: auto !important;
+  }
+}
+
+/* Force GPU acceleration on everything */
+.memory-board-container * {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* REMOVE any paint optimization issues */
+.polaroid-container,
+.polaroid-card {
+  /* Force layer creation only when needed */
+  will-change: auto;
+}
+
+/* Optimize filter panel for performance */
+.filter-panel {
+  /* Reduce repaints */
+  contain: layout style;
+}
+
+/* Remove ALL complex hover states globally */
+.memory-board-container *:hover {
+  /* Block CSS hover effects that could interfere */
+  will-change: auto;
+}
+
+/* Grid performance optimization */
+.grid-card:hover .grid-card-image {
+  transform: none; /* Remove image scaling on hover */
+}
+
+.grid-card:hover {
+  /* Minimal grid hover effect */
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }
 
 /* Enhanced Statistics Panel */
@@ -770,6 +894,11 @@
     grid-template-columns: 1fr;
     gap: 10px;
   }
+
+  /* Mobile cascade adjustments */
+  .polaroid-container {
+    padding: 15px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -791,6 +920,11 @@
 
   .filter-section {
     margin-bottom: 20px;
+  }
+
+  /* Smaller cascade effect on mobile */
+  .polaroid-container {
+    padding: 10px;
   }
 }
 
@@ -828,8 +962,6 @@
   }
 }
 
-
-
 /* Smooth scrolling for grid */
 .grid-view-container {
   scroll-behavior: smooth;
@@ -857,26 +989,56 @@
   }
 }
 
-/* Memory Collection Separation */
-.memory-collection {
-  position: relative;
-  padding: 20px;
-  margin: 40px;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+/* Enhanced Cascade Effect Styles */
+.polaroid-container .polaroid-card:nth-child(1) {
+  z-index: 10;
 }
 
-.memory-collection-header {
+.polaroid-container .polaroid-card:nth-child(2) {
+  z-index: 9;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+}
+
+.polaroid-container .polaroid-card:nth-child(3) {
+  z-index: 8;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.polaroid-container .polaroid-card:nth-child(4) {
+  z-index: 7;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.polaroid-container .polaroid-card:nth-child(n+5) {
+  z-index: 6;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+/* Memory Collection Focus Effect */
+.polaroid-container.focused {
+  z-index: 200 !important;
+}
+
+.polaroid-container.focused .polaroid-card {
+  border-color: rgba(126, 87, 194, 0.5) !important;
+  box-shadow: 0 12px 40px rgba(126, 87, 194, 0.2) !important;
+}
+
+/* Better visual separation for collections */
+.polaroid-container::before {
+  content: '';
   position: absolute;
-  top: -15px;
-  left: 20px;
-  background: linear-gradient(135deg, #7e57c2, #9c27b0);
-  color: white;
-  padding: 8px 16px;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+  background: radial-gradient(circle, rgba(126, 87, 194, 0.05) 0%, transparent 70%);
   border-radius: 20px;
-  font-size: 14px;
-  font-weight: 600;
-  box-shadow: 0 4px 12px rgba(126, 87, 194, 0.3);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+}
+
+.polaroid-container:hover::before {
+  opacity: 1;
 }
