@@ -484,76 +484,55 @@ const MemoryBoard = () => {
     return () => observer.disconnect();
   }, [positionedPosts, viewMode]);
 
-  // ULTRA HIGH-PERFORMANCE zoom and navigation - NO LAG
+  // Optimized zoom handling with debouncing for smooth performance
   useEffect(() => {
-    let isUserInteracting = false;
-    let lastWheelTime = 0;
+    if (viewMode !== 'canvas') return;
+    
+    let zoomTimeout;
+    let lastScale = zoomLevel;
     
     const handleWheel = (e) => {
-      if (e.ctrlKey && viewMode === 'canvas') {
-        e.preventDefault();
-        e.stopPropagation();
+      if (!e.ctrlKey) return;
+      
+      e.preventDefault();
+      e.stopPropagation();
+      
+      // Clear previous timeout
+      clearTimeout(zoomTimeout);
+      
+      // Debounce zoom updates for smoother performance
+      zoomTimeout = setTimeout(() => {
+        const canvasState = canvasRef.current?.getCanvasState?.();
+        if (!canvasState) return;
         
-        // IMMEDIATE response - no throttling
-        const now = performance.now();
-        if (now - lastWheelTime < 8) return; // Minimal 8ms throttle only
-        lastWheelTime = now;
-
-        const canvasState = canvasRef.current?.getCanvasState?.();
-        if (canvasState) {
-          isUserInteracting = true;
+        const { currentPosition, d3Zoom, canvasNode } = canvasState;
+        const { k: currentScale } = currentPosition || {};
+        
+        // Larger steps for faster zoom
+        const sensitivity = e.shiftKey ? 0.3 : 0.15;
+        const delta = e.deltaY > 0 ? -sensitivity : sensitivity;
+        const targetScale = Math.max(0.1, Math.min(8, currentScale + delta));
+        
+        // Only update if significant change
+        if (Math.abs(targetScale - lastScale) > 0.01) {
+          d3Zoom.scaleTo(canvasNode, targetScale);
+          lastScale = targetScale;
           
-          const { currentPosition, d3Zoom, canvasNode } = canvasState;
-          const { k: currentScale } = currentPosition || {};
-          
-          // Very small, precise zoom steps for smooth control
-          const sensitivity = 0.05;
-          const delta = e.deltaY > 0 ? -sensitivity : sensitivity;
-          const newScale = Math.max(0.1, Math.min(8, currentScale + delta));
-          
-          // ZERO DELAY transform - instant response
-          d3Zoom.scaleTo(canvasNode, newScale);
-          setZoomLevel(newScale);
-          
-          // Quick reset of interaction flag
-          clearTimeout(window.interactionTimeout);
-          window.interactionTimeout = setTimeout(() => {
-            isUserInteracting = false;
-          }, 50);
+          // Debounced state update
+          requestAnimationFrame(() => {
+            setZoomLevel(targetScale);
+          });
         }
-      }
+      }, 16); // ~60fps
     };
 
-    // Minimal sync - only when NOT actively interacting
-    const syncZoomLevel = () => {
-      if (viewMode === 'canvas' && !isUserInteracting) {
-        const canvasState = canvasRef.current?.getCanvasState?.();
-        if (canvasState) {
-          const { currentPosition } = canvasState;
-          const { k: currentScale } = currentPosition || {};
-          
-          if (Math.abs(currentScale - zoomLevel) > 0.01) {
-            setZoomLevel(currentScale);
-          }
-        }
-      }
-    };
-
-    // High priority wheel event
-    window.addEventListener("wheel", handleWheel, { 
-      passive: false, 
-      capture: true 
-    });
+    window.addEventListener("wheel", handleWheel, { passive: false });
     
-    // Very infrequent sync to avoid performance impact
-    const syncInterval = setInterval(syncZoomLevel, 1000);
-
     return () => {
-      window.removeEventListener("wheel", handleWheel, true);
-      clearInterval(syncInterval);
-      clearTimeout(window.interactionTimeout);
+      window.removeEventListener("wheel", handleWheel);
+      clearTimeout(zoomTimeout);
     };
-  }, [viewMode, zoomLevel]);
+  }, [viewMode]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -1031,108 +1010,107 @@ const MemoryBoard = () => {
               >
                 <div style={{ position: "relative", width: "100%", height: "100%" }}>
                   {post.image
-                    .slice()
-                    .reverse()
-                    .map((image, cardIndex, reversedArray) => {
-                      const imgSrc = typeof image === "string" ? image : image?.img_src || "";
-                      const altText = image?.alt_text || `Image for ${post.title}`;
-                      
-                      // Subtle cascade - just a sliver of each card visible behind
-                      const cascadeOffsetX = cardIndex * 8; // Small horizontal peek
-                      const cascadeOffsetY = cardIndex * 6; // Small vertical peek
-                      const rotationOffset = cardIndex * 2; // Slight rotation difference
-                      const baseZIndex = reversedArray.length - cardIndex; // Fixed cascade order
-                      
-                      // Base transform
-                      const baseTransform = `rotate(${post.rotation + rotationOffset}deg)`;
-                      
-                      // Hover transform - only slight lift, NEVER change z-index
-                      const hoverLift = Math.max(3, 8 - cardIndex * 2); // Front cards lift more
-                      const hoverTransform = `rotate(${post.rotation + rotationOffset}deg) translateY(-${hoverLift}px)`;
+  .slice()
+  .reverse()
+  .map((image, cardIndex, reversedArray) => {
+    const imgSrc = typeof image === "string" ? image : image?.img_src || "";
+    const altText = image?.alt_text || `Image for ${post.title}`;
+    
+    // Subtle cascade - just a sliver of each card visible behind
+    const cascadeOffsetX = cardIndex * 8; // Small horizontal peek
+    const cascadeOffsetY = cardIndex * 6; // Small vertical peek
+    const rotationOffset = cardIndex * 2; // Slight rotation difference
+    const baseZIndex = reversedArray.length - cardIndex; // Fixed cascade order
+    
+    // Base transform
+    const baseTransform = `rotate(${post.rotation + rotationOffset}deg)`;
+    
+    // Hover transform - only slight lift, NEVER change z-index
+    const hoverLift = Math.max(3, 8 - cardIndex * 2); // Front cards lift more
+    const hoverTransform = `rotate(${post.rotation + rotationOffset}deg) translateY(-${hoverLift}px)`;
 
-                      return (
-                        <div
-                          key={cardIndex}
-                          className={`polaroid-card ${focusedIndex === postIndex ? 'focused' : ''}`}
-                          onClick={() => {
-                            const actualImageIndex = reversedArray.length - 1 - cardIndex;
-                            openModal(actualImageIndex, postIndex);
-                          }}
-                          style={{
-                            position: "absolute",
-                            top: `${cascadeOffsetY}px`,
-                            left: `${cascadeOffsetX}px`,
-                            width: `${CARD_WIDTH}px`,
-                            height: `${CARD_HEIGHT}px`,
-                            cursor: "pointer",
-                            transform: baseTransform,
-                            transformOrigin: "center center",
-                            zIndex: baseZIndex, // NEVER CHANGES
-                            boxShadow: cardIndex === 0 ? 
-                              "0 12px 40px rgba(0, 0, 0, 0.2)" :
-                              `0 ${4 + cardIndex * 2}px ${8 + cardIndex * 3}px rgba(0, 0, 0, 0.15)`,
-                            border: "4px solid white",
-                            transition: "transform 0.15s ease-out, box-shadow 0.15s ease-out",
-                          }}
-                          tabIndex={focusedIndex === postIndex ? 0 : -1}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                              e.preventDefault();
-                              const actualImageIndex = reversedArray.length - 1 - cardIndex;
-                              openModal(actualImageIndex, postIndex);
-                            }
-                          }}
-                          onMouseEnter={(e) => {
-                            // Only change transform, NEVER z-index
-                            e.currentTarget.style.transform = hoverTransform;
-                            e.currentTarget.style.boxShadow = `0 ${8 + hoverLift}px ${16 + hoverLift * 2}px rgba(0, 0, 0, 0.25)`;
-                          }}
-                          onMouseLeave={(e) => {
-                            // Return to base state, NEVER change z-index
-                            e.currentTarget.style.transform = baseTransform;
-                            e.currentTarget.style.boxShadow = cardIndex === 0 ? 
-                              "0 12px 40px rgba(0, 0, 0, 0.2)" :
-                              `0 ${4 + cardIndex * 2}px ${8 + cardIndex * 3}px rgba(0, 0, 0, 0.15)`;
-                          }}
-                        >
-                          <p className="card-date" style={{ 
-                            margin: "16px 20px 10px",
-                            fontSize: "12px",
-                            pointerEvents: "none",
-                            userSelect: "none"
-                          }}>
-                            {post.submittedDate}
-                          </p>
+    return (
+      <div
+        key={cardIndex}
+        className={`polaroid-card ${focusedIndex === postIndex ? 'focused' : ''}`}
+        onClick={() => {
+          const actualImageIndex = reversedArray.length - 1 - cardIndex;
+          openModal(actualImageIndex, postIndex);
+        }}
+        style={{
+          position: "absolute",
+          top: `${cascadeOffsetY}px`,
+          left: `${cascadeOffsetX}px`,
+          width: `${CARD_WIDTH}px`,
+          height: `${CARD_HEIGHT}px`,
+          cursor: "pointer",
+          transform: baseTransform,
+          transformOrigin: "center center",
+          zIndex: baseZIndex, // NEVER CHANGES
+          boxShadow: cardIndex === 0 ? 
+            "0 12px 40px rgba(0, 0, 0, 0.2)" :
+            `0 ${4 + cardIndex * 2}px ${8 + cardIndex * 3}px rgba(0, 0, 0, 0.15)`,
+          border: "4px solid white",
+          transition: "transform 0.15s ease-out, box-shadow 0.15s ease-out",
+        }}
+        tabIndex={focusedIndex === postIndex ? 0 : -1}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            const actualImageIndex = reversedArray.length - 1 - cardIndex;
+            openModal(actualImageIndex, postIndex);
+          }
+        }}
+        onMouseEnter={(e) => {
+          // Only change transform, NEVER z-index
+          e.currentTarget.style.transform = hoverTransform;
+          e.currentTarget.style.boxShadow = `0 ${8 + hoverLift}px ${16 + hoverLift * 2}px rgba(0, 0, 0, 0.25)`;
+        }}
+        onMouseLeave={(e) => {
+          // Return to base state, NEVER change z-index
+          e.currentTarget.style.transform = baseTransform;
+          e.currentTarget.style.boxShadow = cardIndex === 0 ? 
+            "0 12px 40px rgba(0, 0, 0, 0.2)" :
+            `0 ${4 + cardIndex * 2}px ${8 + cardIndex * 3}px rgba(0, 0, 0, 0.15)`;
+        }}
+      >
+        <p className="card-date" style={{ 
+          margin: "16px 20px 10px",
+          fontSize: "12px",
+          pointerEvents: "none",
+          userSelect: "none"
+        }}>
+          {post.submittedDate}
+        </p>
 
-                          <img
-                            className="card-image"
-                            data-src={imgSrc}
-                            src={loadedImages.has(imgSrc) ? imgSrc : ""}
-                            alt={altText}
-                            loading="lazy"
-                            draggable={false}
-                            style={{
-                              width: "calc(100% - 32px)",
-                              height: "60%",
-                              margin: "0 16px",
-                              pointerEvents: "none",
-                              userSelect: "none",
-                            }}
-                          />
+        <img
+          className="card-image"
+          data-src={imgSrc}
+          src={loadedImages.has(imgSrc) ? imgSrc : ""}
+          alt={altText}
+          loading="lazy"
+          draggable={false}
+          style={{
+            width: "calc(100% - 32px)",
+            height: "60%",
+            margin: "0 16px",
+            pointerEvents: "none",
+            userSelect: "none",
+          }}
+        />
 
-                          {cardIndex === reversedArray.length - 1 && (
-                            <p className="card-title" style={{
-                              fontSize: "16px",
-                              margin: "16px 20px",
-                              pointerEvents: "none",
-                              userSelect: "none"
-                            }}>
-                              {post.title}
-                            </p>
-                          )}
-                        </div>
-                      );
-                    })}
+        {/* Title now appears on EVERY card, not just the front one */}
+        <p className="card-title" style={{
+          fontSize: "16px",
+          margin: "16px 20px",
+          pointerEvents: "none",
+          userSelect: "none"
+        }}>
+          {post.title}
+        </p>
+      </div>
+    );
+  })}
                 </div>
               </div>
             ))}
