@@ -682,6 +682,23 @@ const MemoryBoard = () => {
             </div>
           </div>
 
+          {/* Search */}
+          <div className="filter-section">
+            <label className="filter-label" htmlFor="search-input">
+              Search Memors
+            </label>
+            <div className="search-container">
+              <input
+                id="search-input"
+                type="text"
+                className="filter-input search-input"
+                placeholder="Search by title, description, or team..."
+                value={searchQuery}
+                onChange={(e) => handleFilterChange('search', e.target.value)}
+              />
+            </div>
+          </div>
+
           {/* Competition Filter */}
           <div className="filter-section">
             <label className="filter-label" htmlFor="competition-select">
@@ -722,24 +739,6 @@ const MemoryBoard = () => {
             </select>
           </div>
 
-          {/* Search */}
-          <div className="filter-section">
-            <label className="filter-label" htmlFor="search-input">
-              Search Memors
-            </label>
-            <div className="search-container">
-              <SearchIcon className="search-icon" />
-              <input
-                id="search-input"
-                type="text"
-                className="filter-input search-input"
-                placeholder="Search by title, description, or team..."
-                value={searchQuery}
-                onChange={(e) => handleFilterChange('search', e.target.value)}
-              />
-            </div>
-          </div>
-
           {/* Sorting */}
           <div className="filter-section">
             <label className="filter-label">Sort & Order</label>
@@ -765,7 +764,7 @@ const MemoryBoard = () => {
           </div>
 
           {/* Advanced Filters */}
-          <div className="filter-section">
+          <div className="filter-section second">
             <label className="filter-label">Advanced Filters</label>
             <div className="filter-group">
               <div>
@@ -831,22 +830,7 @@ const MemoryBoard = () => {
           </button>
         </div>
 
-        {/* Statistics Panel */}
-        <div className="stats-panel">
-          <div className="stats-title">Memory Statistics</div>
-          <div className="stats-item">
-            <span className="stats-label">Showing:</span>
-            <span className="stats-value">{stats.filtered}</span>
-          </div>
-          <div className="stats-item">
-            <span className="stats-label">Total:</span>
-            <span className="stats-value">{stats.total}</span>
-          </div>
-          <div className="stats-item">
-            <span className="stats-label">Teams:</span>
-            <span className="stats-value">{stats.teams}</span>
-          </div>
-        </div>
+        
 
         {/* Main Content */}
         {filteredPosts.length === 0 ? (
