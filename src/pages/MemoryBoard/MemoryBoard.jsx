@@ -4,11 +4,9 @@ import { COMPONENT_POSITIONS } from "../../assets/Helpers/constants";
 import seedrandom from "seedrandom";
 import MemorPicture from "../../Components/MemorPicture/MemorPicture";
 import "./MemoryBoard.css";
-import Loader from "../../Components/Loader/Loader";
 import { useAuth } from "../../context/AuthContext";
 import { CircularProgress } from "@mui/material";
 
-// Icon components (same as before)
 const FilterIcon = () => (
   <svg viewBox="0 0 24 24" fill="currentColor">
     <path d="M4.25 5.61C6.27 8.2 10 13 10 13v6c0 .55.45 1 1 1h2c.55 0 1-.45 1-1v-6s3.73-4.8 5.75-7.39C20.25 4.95 19.78 4 18.95 4H5.05c-.83 0-1.3.95-.8 1.61z"/>
@@ -63,28 +61,23 @@ const CloseIcon = () => (
   </svg>
 );
 
-// Constants
 const CANVAS_WIDTH = 3000;
 const CANVAS_HEIGHT = 3000;
 const CARD_WIDTH = 350;
 const CARD_HEIGHT = 400;
 const MIN_SPACING = 50;
-const GRID_SPACING = 100;
 
 const MemoryBoard = () => {
   const canvasRef = useRef(null);
   const { token, user } = useAuth();
   const gridViewRef = useRef(null);
 
-  // Core state
   const [selectedMemor, setSelectedMemor] = useState(null);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [loadedImages, setLoadedImages] = useState(new Set());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [posts, setPosts] = useState([]);
 
-  // Filter state
   const [showFilterPanel, setShowFilterPanel] = useState(false);
   const [viewMode, setViewMode] = useState('canvas');
   const [selectedCompetition, setSelectedCompetition] = useState('');
@@ -96,56 +89,45 @@ const MemoryBoard = () => {
   const [minImages, setMinImages] = useState(1);
   const [selectedTags, setSelectedTags] = useState([]);
 
-  // Data state
   const [competitions, setCompetitions] = useState([]);
   const [teams, setTeams] = useState([]);
   const [allPosts, setAllPosts] = useState([]);
-  const [availableTags, setAvailableTags] = useState([]);
 
-  // Navigation state
   const [focusedIndex, setFocusedIndex] = useState(0);
 
-  // Enhanced positioning algorithm with better dispersion and centering
   const generatePositions = useCallback((count) => {
     const positions = [];
     
     if (count === 0) return positions;
     
-    // Enhanced constants for better dispersion
-    const CARD_COLLISION_WIDTH = CARD_WIDTH + MIN_SPACING * 2; // More spacing
+    const CARD_COLLISION_WIDTH = CARD_WIDTH + MIN_SPACING * 2;
     const CARD_COLLISION_HEIGHT = CARD_HEIGHT + MIN_SPACING * 2;
     const MAX_ATTEMPTS = 100;
-    const SPIRAL_INCREMENT = 120; // Much larger increments for more dispersion
-    const MIN_RADIUS = 200; // Minimum distance from center
+    const SPIRAL_INCREMENT = 120;
+    const MIN_RADIUS = 200;
     
-    // Seed the random number generator for consistent results
     const rng = seedrandom("memory-board-seed");
     
-    // Helper function to check if two rectangles overlap (accounting for cascade)
     const checkCollision = (pos1, pos2) => {
-      // Account for cascade effect - add extra padding
-      const cascadePadding = 60; // Extra space for cascade visibility
+      const cascadePadding = 60;
       const dx = Math.abs(pos1.x - pos2.x);
       const dy = Math.abs(pos1.y - pos2.y);
       return dx < (CARD_COLLISION_WIDTH + cascadePadding) && dy < (CARD_COLLISION_HEIGHT + cascadePadding);
     };
     
-    // Helper function to check if a position collides with any existing positions
     const hasCollision = (newPos, existingPositions) => {
       return existingPositions.some(existingPos => checkCollision(newPos, existingPos));
     };
     
-    // Helper function to generate positions in a more dispersed pattern
     const generateDispersedPosition = (index, ringRadius) => {
       const circumference = 2 * Math.PI * ringRadius;
-      const optimalSpacing = CARD_COLLISION_WIDTH + 80; // Extra spacing
+      const optimalSpacing = CARD_COLLISION_WIDTH + 80;
       const pointsInRing = Math.max(4, Math.floor(circumference / optimalSpacing));
       const angleStep = (2 * Math.PI) / pointsInRing;
       const angle = (index % pointsInRing) * angleStep;
       
-      // Add more randomness for organic dispersion
-      const radiusVariation = (rng() - 0.5) * 80; // Larger radius variation
-      const angleVariation = (rng() - 0.5) * 0.6; // More angle variation
+      const radiusVariation = (rng() - 0.5) * 80;
+      const angleVariation = (rng() - 0.5) * 0.6;
       
       const finalRadius = Math.max(MIN_RADIUS, ringRadius + radiusVariation);
       const finalAngle = angle + angleVariation;
@@ -153,43 +135,37 @@ const MemoryBoard = () => {
       return {
         x: finalRadius * Math.cos(finalAngle),
         y: finalRadius * Math.sin(finalAngle),
-        rotation: (rng() - 0.5) * 20 // Slightly more rotation
+        rotation: (rng() - 0.5) * 20
       };
     };
     
-    // Handle single item - place at center
     if (count === 1) {
       return [{ x: 0, y: 0, rotation: (rng() - 0.5) * 15 }];
     }
     
-    // For multiple items, start from first ring (not center)
     for (let i = 0; i < count; i++) {
       let positioned = false;
       let attempts = 0;
-      let currentRadius = MIN_RADIUS; // Start at minimum radius
+      let currentRadius = MIN_RADIUS;
       
       while (!positioned && attempts < MAX_ATTEMPTS) {
-        // Calculate which ring we're trying
-        const ringIndex = Math.floor(attempts / 6); // Fewer attempts per ring
+        const ringIndex = Math.floor(attempts / 6);
         const radius = currentRadius + (ringIndex * SPIRAL_INCREMENT);
         
         const candidatePosition = generateDispersedPosition(i + attempts, radius);
         
-        // Check for collisions
         if (!hasCollision(candidatePosition, positions)) {
           positions.push(candidatePosition);
           positioned = true;
         } else {
           attempts++;
           
-          // If we've tried many positions in this ring, move to next ring
           if (attempts % 6 === 0) {
             currentRadius += SPIRAL_INCREMENT;
           }
         }
       }
       
-      // Fallback: if we couldn't find a non-overlapping position
       if (!positioned) {
         const fallbackRadius = currentRadius + 150;
         const fallbackAngle = (i / count) * 2 * Math.PI + (rng() - 0.5) * 0.8;
@@ -206,11 +182,9 @@ const MemoryBoard = () => {
     return positions;
   }, []);
 
-  // Enhanced filtered posts with sorting
   const filteredPosts = useMemo(() => {
     let filtered = [...allPosts];
 
-    // Filter by search query
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(post => 
@@ -220,7 +194,6 @@ const MemoryBoard = () => {
       );
     }
 
-    // Filter by date range
     if (dateRange.start) {
       filtered = filtered.filter(post => {
         const postDate = new Date(post.created_at || post.submittedDate);
@@ -235,12 +208,10 @@ const MemoryBoard = () => {
       });
     }
 
-    // Filter by minimum images
     if (minImages > 1) {
       filtered = filtered.filter(post => post.image?.length >= minImages);
     }
 
-    // Filter by tags (if implemented)
     if (selectedTags.length > 0) {
       filtered = filtered.filter(post => 
         selectedTags.some(tag => 
@@ -250,7 +221,6 @@ const MemoryBoard = () => {
       );
     }
 
-    // Sort filtered results
     filtered.sort((a, b) => {
       let compareValue = 0;
       
@@ -279,7 +249,6 @@ const MemoryBoard = () => {
     return filtered;
   }, [allPosts, searchQuery, dateRange, minImages, selectedTags, sortBy, sortDirection]);
 
-  // Generate positions for filtered posts
   const positionedPosts = useMemo(() => {
     const positions = generatePositions(filteredPosts.length);
     return filteredPosts.map((post, index) => ({
@@ -288,7 +257,6 @@ const MemoryBoard = () => {
     }));
   }, [filteredPosts, generatePositions]);
 
-  // Statistics
   const stats = useMemo(() => {
     const totalMemors = allPosts.length;
     const filteredCount = filteredPosts.length;
@@ -306,12 +274,10 @@ const MemoryBoard = () => {
     };
   }, [allPosts, filteredPosts]);
 
-  // Initialize document title
   useEffect(() => {
     document.title = "Memor'us | Memory Board";
   }, []);
 
-  // Fetch initial data
   useEffect(() => {
     if (!token || !user) return;
 
@@ -319,7 +285,6 @@ const MemoryBoard = () => {
       setLoading(true);
 
       try {
-        // Fetch competitions
         const competitionsResponse = await fetch(
           `${import.meta.env.VITE_API_URL}/api/competitions`,
           {
@@ -334,7 +299,6 @@ const MemoryBoard = () => {
           const competitionsData = await competitionsResponse.json();
           setCompetitions(competitionsData);
 
-          // Set default competition (active or first)
           const today = new Date().toISOString().split("T")[0];
           const activeCompetition = competitionsData.find(
             (comp) =>
@@ -350,7 +314,6 @@ const MemoryBoard = () => {
           }
         }
 
-        // Fetch teams
         const teamsResponse = await fetch(
           `${import.meta.env.VITE_API_URL}/api/teams`,
           {
@@ -365,7 +328,6 @@ const MemoryBoard = () => {
           const teamsData = await teamsResponse.json();
           setTeams([{ id: 'all', name: 'All Teams' }, ...teamsData]);
 
-          // Set default team (user's team or all)
           if (user?.teamsId) {
             setSelectedTeam(user.teamsId.toString());
           } else {
@@ -383,7 +345,6 @@ const MemoryBoard = () => {
     fetchInitialData();
   }, [token, user]);
 
-  // Fetch memor data when filters change
   useEffect(() => {
     if (!selectedCompetition || !selectedTeam || !token || !user?.tenant_subdomain) {
       return;
@@ -397,10 +358,8 @@ const MemoryBoard = () => {
         let memorUrl;
         
         if (selectedTeam === 'all') {
-          // Fetch all memors for the competition
           memorUrl = `${import.meta.env.VITE_API_URL}/api/memors/latest/all`;
         } else {
-          // Fetch memors for specific team
           memorUrl = `${import.meta.env.VITE_API_URL}/api/memors/team/${selectedTeam}/competition/${selectedCompetition}/completed`;
         }
 
@@ -420,12 +379,10 @@ const MemoryBoard = () => {
         if (memorData && memorData.length > 0) {
           const processedPosts = memorData
             .filter((item) => {
-              // Handle different data structures
               const hasImages = item.pictures?.length > 0 || item.image?.length > 0;
               return hasImages;
             })
             .map((item) => {
-              // Normalize the data structure
               let images = [];
               if (item.pictures?.length > 0) {
                 images = item.pictures.map((pic) => ({
@@ -465,7 +422,6 @@ const MemoryBoard = () => {
     fetchMemorData();
   }, [selectedCompetition, selectedTeam, token, user]);
 
-  // Image lazy loading observer
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -484,7 +440,6 @@ const MemoryBoard = () => {
     return () => observer.disconnect();
   }, [positionedPosts, viewMode]);
 
-  // Optimized zoom handling with debouncing for smooth performance
   useEffect(() => {
     if (viewMode !== 'canvas') return;
     
@@ -497,10 +452,8 @@ const MemoryBoard = () => {
       e.preventDefault();
       e.stopPropagation();
       
-      // Clear previous timeout
       clearTimeout(zoomTimeout);
       
-      // Debounce zoom updates for smoother performance
       zoomTimeout = setTimeout(() => {
         const canvasState = canvasRef.current?.getCanvasState?.();
         if (!canvasState) return;
@@ -508,22 +461,19 @@ const MemoryBoard = () => {
         const { currentPosition, d3Zoom, canvasNode } = canvasState;
         const { k: currentScale } = currentPosition || {};
         
-        // Larger steps for faster zoom
         const sensitivity = e.shiftKey ? 0.3 : 0.15;
         const delta = e.deltaY > 0 ? -sensitivity : sensitivity;
         const targetScale = Math.max(0.1, Math.min(8, currentScale + delta));
         
-        // Only update if significant change
         if (Math.abs(targetScale - lastScale) > 0.01) {
           d3Zoom.scaleTo(canvasNode, targetScale);
           lastScale = targetScale;
           
-          // Debounced state update
           requestAnimationFrame(() => {
             setZoomLevel(targetScale);
           });
         }
-      }, 16); // ~60fps
+      }, 16);
     };
 
     window.addEventListener("wheel", handleWheel, { passive: false });
@@ -534,7 +484,6 @@ const MemoryBoard = () => {
     };
   }, [viewMode]);
 
-  // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (viewMode === 'canvas' && positionedPosts.length > 0) {
@@ -569,7 +518,6 @@ const MemoryBoard = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [viewMode, positionedPosts, focusedIndex, selectedMemor, showFilterPanel]);
 
-  // INSTANT zoom buttons - no delays
   const handleZoom = useCallback((action = "out") => {
     if (viewMode !== 'canvas') return;
     
@@ -579,18 +527,15 @@ const MemoryBoard = () => {
     const { canvasNode, currentPosition, d3Zoom } = canvasState;
     const { k: currentScale } = currentPosition || {};
     
-    // Immediate zoom steps
     const step = action === "out" ? -0.2 : 0.2;
     const newScale = Math.max(0.1, Math.min(8, currentScale + step));
     
-    // INSTANT transform - ZERO delay
     d3Zoom.scaleTo(canvasNode, newScale);
     setZoomLevel(newScale);
   }, [viewMode]);
 
   const handleCenterView = useCallback(() => {
     if (viewMode === 'canvas' && canvasRef.current) {
-      // Calculate the bounding box of all positioned posts for better centering
       if (positionedPosts.length > 0) {
         const bounds = positionedPosts.reduce((acc, post) => {
           return {
@@ -609,7 +554,6 @@ const MemoryBoard = () => {
         const centerX = (bounds.minX + bounds.maxX) / 2;
         const centerY = (bounds.minY + bounds.maxY) / 2;
         
-        // Center on the calculated center point
         const canvasState = canvasRef.current.getCanvasState();
         if (canvasState) {
           const { d3Zoom, canvasNode } = canvasState;
@@ -617,11 +561,10 @@ const MemoryBoard = () => {
             canvasNode.transition().duration(800),
             d3Zoom.identity
               .translate(CANVAS_WIDTH / 2 - centerX, CANVAS_HEIGHT / 2 - centerY)
-              .scale(0.6) // Better zoom level to see all collections
+              .scale(0.6)
           );
         }
       } else {
-        // Fallback to canvas center if no posts
         canvasRef.current.fitContentToView({ scale: 0.8 });
       }
     } else if (viewMode === 'grid' && gridViewRef.current) {
@@ -659,7 +602,6 @@ const MemoryBoard = () => {
     setSelectedTags([]);
     setSortBy('date');
     setSortDirection('desc');
-    // Don't clear competition and team as they're primary filters
   }, []);
 
   const handleFilterChange = useCallback((filterType, value) => {
@@ -701,11 +643,9 @@ const MemoryBoard = () => {
     setSelectedTags(prev => prev.filter(t => t !== tag));
   }, []);
 
-  // Render loading state
   if (loading && allPosts.length === 0) {
     return (
       <>
-        <Loader />
         <div className="memory-board-container">
           <div className="loading-container">
             <CircularProgress size={60} sx={{ color: "#d0bcfe" }} />
@@ -716,11 +656,9 @@ const MemoryBoard = () => {
     );
   }
 
-  // Render error state
   if (error) {
     return (
       <>
-        <Loader />
         <div className="memory-board-container">
           <div className="empty-container">
             <p className="empty-message">
@@ -741,9 +679,7 @@ const MemoryBoard = () => {
 
   return (
     <>
-      <Loader />
       <div className="memory-board-container">
-        {/* Filter Toggle Button */}
         <button
           className={`filter-toggle-btn ${showFilterPanel ? 'active' : ''}`}
           onClick={() => setShowFilterPanel(!showFilterPanel)}
@@ -753,9 +689,7 @@ const MemoryBoard = () => {
           <FilterIcon />
         </button>
 
-        {/* Filter Panel */}
         <div className={`filter-panel ${showFilterPanel ? 'open' : ''}`}>
-          {/* View Mode Toggle */}
           <div className="filter-section">
             <label className="filter-label">View Mode</label>
             <div className="view-mode-toggle">
@@ -776,7 +710,6 @@ const MemoryBoard = () => {
             </div>
           </div>
 
-          {/* Search */}
           <div className="filter-section">
             <label className="filter-label" htmlFor="search-input">
               Search Memors
@@ -793,7 +726,6 @@ const MemoryBoard = () => {
             </div>
           </div>
 
-          {/* Competition Filter */}
           <div className="filter-section">
             <label className="filter-label" htmlFor="competition-select">
               Competition
@@ -813,7 +745,6 @@ const MemoryBoard = () => {
             </select>
           </div>
 
-          {/* Team Filter */}
           <div className="filter-section">
             <label className="filter-label" htmlFor="team-select">
               Team
@@ -833,7 +764,6 @@ const MemoryBoard = () => {
             </select>
           </div>
 
-          {/* Sorting - Only show in Grid Mode */}
           {viewMode === 'grid' && (
             <div className="filter-section">
               <label className="filter-label">Sort & Order</label>
@@ -859,7 +789,6 @@ const MemoryBoard = () => {
             </div>
           )}
 
-          {/* Advanced Filters */}
           <div className="filter-section second">
             <label className="filter-label">Advanced Filters</label>
             <div className="filter-group">
@@ -881,7 +810,6 @@ const MemoryBoard = () => {
             </div>
           </div>
 
-          {/* Tags */}
           {selectedTags.length > 0 && (
             <div className="filter-section">
               <label className="filter-label">Active Filters</label>
@@ -899,7 +827,6 @@ const MemoryBoard = () => {
             </div>
           )}
 
-          {/* Date Range */}
           <div className="filter-section">
             <label className="filter-label">Date Range</label>
             <div className="date-range-container">
@@ -920,13 +847,11 @@ const MemoryBoard = () => {
             </div>
           </div>
 
-          {/* Clear Filters */}
           <button className="clear-filters-btn" onClick={clearFilters}>
             🗑️ Clear Search & Advanced Filters
           </button>
         </div>
 
-        {/* Main Content */}
         {filteredPosts.length === 0 ? (
           <div className="empty-container">
             <p className="empty-message">
@@ -980,11 +905,9 @@ const MemoryBoard = () => {
             </div>
           </div>
         ) : (
-          // Canvas View with Enhanced Non-Overlapping Collections and Cascade Effect
           <ReactInfiniteCanvas
             ref={canvasRef}
             onCanvasMount={(mountFunc) => {
-              // Initial view - center on collections with appropriate scale
               setTimeout(() => {
                 if (positionedPosts.length > 0) {
                   handleCenterView();
@@ -1003,8 +926,8 @@ const MemoryBoard = () => {
                   position: "absolute",
                   top: post.y + CANVAS_HEIGHT / 2,
                   left: post.x + CANVAS_WIDTH / 2,
-                  width: `${CARD_WIDTH + 30}px`, // Just enough for small cascade
-                  height: `${CARD_HEIGHT + 24}px`, // Just enough for small cascade
+                  width: `${CARD_WIDTH + 30}px`,
+                  height: `${CARD_HEIGHT + 24}px`,
                   zIndex: focusedIndex === postIndex ? 100 : 1,
                 }}
               >
@@ -1016,17 +939,14 @@ const MemoryBoard = () => {
     const imgSrc = typeof image === "string" ? image : image?.img_src || "";
     const altText = image?.alt_text || `Image for ${post.title}`;
     
-    // Subtle cascade - just a sliver of each card visible behind
-    const cascadeOffsetX = cardIndex * 8; // Small horizontal peek
-    const cascadeOffsetY = cardIndex * 6; // Small vertical peek
-    const rotationOffset = cardIndex * 2; // Slight rotation difference
-    const baseZIndex = reversedArray.length - cardIndex; // Fixed cascade order
+    const cascadeOffsetX = cardIndex * 8;
+    const cascadeOffsetY = cardIndex * 6;
+    const rotationOffset = cardIndex * 2;
+    const baseZIndex = reversedArray.length - cardIndex;
     
-    // Base transform
     const baseTransform = `rotate(${post.rotation + rotationOffset}deg)`;
     
-    // Hover transform - only slight lift, NEVER change z-index
-    const hoverLift = Math.max(3, 8 - cardIndex * 2); // Front cards lift more
+    const hoverLift = Math.max(3, 8 - cardIndex * 2); 
     const hoverTransform = `rotate(${post.rotation + rotationOffset}deg) translateY(-${hoverLift}px)`;
 
     return (
@@ -1046,7 +966,7 @@ const MemoryBoard = () => {
           cursor: "pointer",
           transform: baseTransform,
           transformOrigin: "center center",
-          zIndex: baseZIndex, // NEVER CHANGES
+          zIndex: baseZIndex,
           boxShadow: cardIndex === 0 ? 
             "0 12px 40px rgba(0, 0, 0, 0.2)" :
             `0 ${4 + cardIndex * 2}px ${8 + cardIndex * 3}px rgba(0, 0, 0, 0.15)`,
@@ -1062,12 +982,10 @@ const MemoryBoard = () => {
           }
         }}
         onMouseEnter={(e) => {
-          // Only change transform, NEVER z-index
           e.currentTarget.style.transform = hoverTransform;
           e.currentTarget.style.boxShadow = `0 ${8 + hoverLift}px ${16 + hoverLift * 2}px rgba(0, 0, 0, 0.25)`;
         }}
         onMouseLeave={(e) => {
-          // Return to base state, NEVER change z-index
           e.currentTarget.style.transform = baseTransform;
           e.currentTarget.style.boxShadow = cardIndex === 0 ? 
             "0 12px 40px rgba(0, 0, 0, 0.2)" :
@@ -1099,7 +1017,6 @@ const MemoryBoard = () => {
           }}
         />
 
-        {/* Title now appears on EVERY card, not just the front one */}
         <p className="card-title" style={{
           fontSize: "16px",
           margin: "16px 20px",
@@ -1117,7 +1034,6 @@ const MemoryBoard = () => {
           </ReactInfiniteCanvas>
         )}
 
-        {/* Controls Panel */}
         <div className="controls-panel">
           {viewMode === 'canvas' && (
             <div className="zoom-controls">
@@ -1149,7 +1065,6 @@ const MemoryBoard = () => {
           </button>
         </div>
 
-        {/* Modal */}
         {selectedMemor && (
           <MemorPicture
             images={selectedMemor.images}
