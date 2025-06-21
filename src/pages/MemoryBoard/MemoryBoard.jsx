@@ -679,7 +679,14 @@ const MemoryBoard = () => {
 
   return (
     <>
-      <div className="memory-board-container">
+      <div className="memory-board-container" style={{ 
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100vw',
+        height: '100vh',
+        zIndex: 0
+      }}>
         <button
           className={`filter-toggle-btn ${showFilterPanel ? 'active' : ''}`}
           onClick={() => setShowFilterPanel(!showFilterPanel)}
@@ -868,7 +875,15 @@ const MemoryBoard = () => {
           </div>
         ) : viewMode === 'grid' ? (
           // Grid View
-          <div className="grid-view-container" ref={gridViewRef}>
+          <div className="grid-view-container" ref={gridViewRef} style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            overflow: 'auto',
+            paddingTop: '80px'
+          }}>
             <div className="grid-container">
               {positionedPosts.map((post, postIndex) => (
                 <div
@@ -905,135 +920,156 @@ const MemoryBoard = () => {
             </div>
           </div>
         ) : (
-          <ReactInfiniteCanvas
-            ref={canvasRef}
-            onCanvasMount={(mountFunc) => {
-              setTimeout(() => {
-                if (positionedPosts.length > 0) {
-                  handleCenterView();
-                } else {
-                  mountFunc.fitContentToView({ scale: 0.6 });
-                }
-              }, 100);
-            }}
-            maxZoom={1.5}
-            minZoom={0.1}
-            backgroundType="none"
-          >
-            {positionedPosts.map((post, postIndex) => (
-              <div
-                key={`${post.memorId}-${postIndex}`}
-                className="polaroid-container"
-                style={{
-                  position: "absolute",
-                  top: post.y + CANVAS_HEIGHT / 2,
-                  left: post.x + CANVAS_WIDTH / 2,
-                  width: `${CARD_WIDTH + 30}px`,
-                  height: `${CARD_HEIGHT + 24}px`,
-                  zIndex: focusedIndex === postIndex ? 100 : 1,
-                }}
-              >
-                <div style={{ position: "relative", width: "100%", height: "100%" }}>
-                  {post.image
-  .slice()
-  .reverse()
-  .map((image, cardIndex, reversedArray) => {
-    const imgSrc = typeof image === "string" ? image : image?.img_src || "";
-    const altText = image?.alt_text || `Image for ${post.title}`;
-    
-    const cascadeOffsetX = cardIndex * 8;
-    const cascadeOffsetY = cardIndex * 6;
-    const rotationOffset = cardIndex * 2;
-    const baseZIndex = reversedArray.length - cardIndex;
-    
-    const baseTransform = `rotate(${post.rotation + rotationOffset}deg)`;
-    
-    const hoverLift = Math.max(3, 8 - cardIndex * 2); 
-    const hoverTransform = `rotate(${post.rotation + rotationOffset}deg) translateY(-${hoverLift}px)`;
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            overflow: 'hidden'
+          }}>
+            <ReactInfiniteCanvas
+              ref={canvasRef}
+              onCanvasMount={(mountFunc) => {
+                setTimeout(() => {
+                  if (positionedPosts.length > 0) {
+                    handleCenterView();
+                  } else {
+                    mountFunc.fitContentToView({ scale: 0.6 });
+                  }
+                }, 100);
+              }}
+              maxZoom={1.5}
+              minZoom={0.1}
+              backgroundType="none"
+              style={{
+                width: '100%',
+                height: '100%'
+              }}
+            >
+              {positionedPosts.map((post, postIndex) => (
+                <div
+                  key={`${post.memorId}-${postIndex}`}
+                  className="polaroid-container"
+                  style={{
+                    position: "absolute",
+                    top: post.y + CANVAS_HEIGHT / 2,
+                    left: post.x + CANVAS_WIDTH / 2,
+                    width: `${CARD_WIDTH + 30}px`,
+                    height: `${CARD_HEIGHT + 24}px`,
+                    zIndex: focusedIndex === postIndex ? 100 : 1,
+                  }}
+                >
+                  <div style={{ position: "relative", width: "100%", height: "100%" }}>
+                    {post.image
+                      .slice()
+                      .reverse()
+                      .map((image, cardIndex, reversedArray) => {
+                        const imgSrc = typeof image === "string" ? image : image?.img_src || "";
+                        const altText = image?.alt_text || `Image for ${post.title}`;
+                        
+                        const cascadeOffsetX = cardIndex * 8;
+                        const cascadeOffsetY = cardIndex * 6;
+                        const rotationOffset = cardIndex * 2;
+                        const baseZIndex = reversedArray.length - cardIndex;
+                        
+                        const baseTransform = `rotate(${post.rotation + rotationOffset}deg)`;
+                        
+                        const hoverLift = Math.max(3, 8 - cardIndex * 2); 
+                        const hoverTransform = `rotate(${post.rotation + rotationOffset}deg) translateY(-${hoverLift}px)`;
 
-    return (
-      <div
-        key={cardIndex}
-        className={`polaroid-card ${focusedIndex === postIndex ? 'focused' : ''}`}
-        onClick={() => {
-          const actualImageIndex = reversedArray.length - 1 - cardIndex;
-          openModal(actualImageIndex, postIndex);
-        }}
-        style={{
-          position: "absolute",
-          top: `${cascadeOffsetY}px`,
-          left: `${cascadeOffsetX}px`,
-          width: `${CARD_WIDTH}px`,
-          height: `${CARD_HEIGHT}px`,
-          cursor: "pointer",
-          transform: baseTransform,
-          transformOrigin: "center center",
-          zIndex: baseZIndex,
-          boxShadow: cardIndex === 0 ? 
-            "0 12px 40px rgba(0, 0, 0, 0.2)" :
-            `0 ${4 + cardIndex * 2}px ${8 + cardIndex * 3}px rgba(0, 0, 0, 0.15)`,
-          border: "4px solid white",
-          transition: "transform 0.15s ease-out, box-shadow 0.15s ease-out",
-        }}
-        tabIndex={focusedIndex === postIndex ? 0 : -1}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            const actualImageIndex = reversedArray.length - 1 - cardIndex;
-            openModal(actualImageIndex, postIndex);
-          }
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = hoverTransform;
-          e.currentTarget.style.boxShadow = `0 ${8 + hoverLift}px ${16 + hoverLift * 2}px rgba(0, 0, 0, 0.25)`;
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = baseTransform;
-          e.currentTarget.style.boxShadow = cardIndex === 0 ? 
-            "0 12px 40px rgba(0, 0, 0, 0.2)" :
-            `0 ${4 + cardIndex * 2}px ${8 + cardIndex * 3}px rgba(0, 0, 0, 0.15)`;
-        }}
-      >
-        <p className="card-date" style={{ 
-          margin: "16px 20px 10px",
-          fontSize: "12px",
-          pointerEvents: "none",
-          userSelect: "none"
-        }}>
-          {post.submittedDate}
-        </p>
+                        return (
+                          <div
+                            key={cardIndex}
+                            className={`polaroid-card ${focusedIndex === postIndex ? 'focused' : ''}`}
+                            onClick={() => {
+                              const actualImageIndex = reversedArray.length - 1 - cardIndex;
+                              openModal(actualImageIndex, postIndex);
+                            }}
+                            style={{
+                              position: "absolute",
+                              top: `${cascadeOffsetY}px`,
+                              left: `${cascadeOffsetX}px`,
+                              width: `${CARD_WIDTH}px`,
+                              height: `${CARD_HEIGHT}px`,
+                              cursor: "pointer",
+                              transform: baseTransform,
+                              WebkitTransform: baseTransform,
+                              transformOrigin: "center center",
+                              WebkitTransformOrigin: "center center",
+                              zIndex: baseZIndex,
+                              boxShadow: cardIndex === 0 ? 
+                                "0 12px 40px rgba(0, 0, 0, 0.2)" :
+                                `0 ${4 + cardIndex * 2}px ${8 + cardIndex * 3}px rgba(0, 0, 0, 0.15)`,
+                              border: "4px solid white",
+                              transition: "transform 0.15s ease-out, box-shadow 0.15s ease-out",
+                              WebkitTransition: "-webkit-transform 0.15s ease-out, box-shadow 0.15s ease-out",
+                            }}
+                            tabIndex={focusedIndex === postIndex ? 0 : -1}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                const actualImageIndex = reversedArray.length - 1 - cardIndex;
+                                openModal(actualImageIndex, postIndex);
+                              }
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.transform = hoverTransform;
+                              e.currentTarget.style.WebkitTransform = hoverTransform;
+                              e.currentTarget.style.boxShadow = `0 ${8 + hoverLift}px ${16 + hoverLift * 2}px rgba(0, 0, 0, 0.25)`;
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.transform = baseTransform;
+                              e.currentTarget.style.WebkitTransform = baseTransform;
+                              e.currentTarget.style.boxShadow = cardIndex === 0 ? 
+                                "0 12px 40px rgba(0, 0, 0, 0.2)" :
+                                `0 ${4 + cardIndex * 2}px ${8 + cardIndex * 3}px rgba(0, 0, 0, 0.15)`;
+                            }}
+                          >
+                            <p className="card-date" style={{ 
+                              margin: "16px 20px 10px",
+                              fontSize: "12px",
+                              pointerEvents: "none",
+                              userSelect: "none",
+                              WebkitUserSelect: "none"
+                            }}>
+                              {post.submittedDate}
+                            </p>
 
-        <img
-          className="card-image"
-          data-src={imgSrc}
-          src={loadedImages.has(imgSrc) ? imgSrc : ""}
-          alt={altText}
-          loading="lazy"
-          draggable={false}
-          style={{
-            width: "calc(100% - 32px)",
-            height: "60%",
-            margin: "0 16px",
-            pointerEvents: "none",
-            userSelect: "none",
-          }}
-        />
+                            <img
+                              className="card-image"
+                              data-src={imgSrc}
+                              src={loadedImages.has(imgSrc) ? imgSrc : ""}
+                              alt={altText}
+                              loading="lazy"
+                              draggable={false}
+                              style={{
+                                width: "calc(100% - 32px)",
+                                height: "60%",
+                                margin: "0 16px",
+                                pointerEvents: "none",
+                                userSelect: "none",
+                                WebkitUserSelect: "none",
+                              }}
+                            />
 
-        <p className="card-title" style={{
-          fontSize: "16px",
-          margin: "16px 20px",
-          pointerEvents: "none",
-          userSelect: "none"
-        }}>
-          {post.title}
-        </p>
-      </div>
-    );
-  })}
+                            <p className="card-title" style={{
+                              fontSize: "16px",
+                              margin: "16px 20px",
+                              pointerEvents: "none",
+                              userSelect: "none",
+                              WebkitUserSelect: "none"
+                            }}>
+                              {post.title}
+                            </p>
+                          </div>
+                        );
+                      })}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </ReactInfiniteCanvas>
+              ))}
+            </ReactInfiniteCanvas>
+          </div>
         )}
 
         <div className="controls-panel">
@@ -1085,9 +1121,3 @@ const MemoryBoard = () => {
 };
 
 export default MemoryBoard;
-
-/* .zoom-btn:hover {
-  background: #D0BCFE;
-  color: black;
-  transform: scale(1.1);
-} */
