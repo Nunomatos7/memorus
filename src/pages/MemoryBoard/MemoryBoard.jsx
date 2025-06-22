@@ -104,8 +104,8 @@ const MemoryBoard = () => {
 
     if (count === 0) return positions;
 
-    const CARD_COLLISION_WIDTH = CARD_WIDTH + MIN_SPACING * 2;
-    const CARD_COLLISION_HEIGHT = CARD_HEIGHT + MIN_SPACING * 2;
+    const CARD_COLLISION_WIDTH = CARD_WIDTH + MIN_SPACING * 4;
+    const CARD_COLLISION_HEIGHT = CARD_HEIGHT + MIN_SPACING * 4;
     const MAX_ATTEMPTS = 100;
     const SPIRAL_INCREMENT = 120;
     const MIN_RADIUS = 200;
@@ -614,8 +614,8 @@ const MemoryBoard = () => {
           }
         );
 
-        const centerX = (bounds.minX + bounds.maxX) / 2;
-        const centerY = (bounds.minY + bounds.maxY) / 2;
+        const centerX = (bounds.minX + bounds.maxX) / 2 + 1700;
+        const centerY = (bounds.minY + bounds.maxY) / 2 + 2000;
 
         const canvasState = canvasRef.current.getCanvasState();
         if (canvasState) {
