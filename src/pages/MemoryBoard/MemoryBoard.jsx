@@ -6,6 +6,7 @@ import MemorPicture from "../../Components/MemorPicture/MemorPicture";
 import "./MemoryBoard.css";
 import { useAuth } from "../../context/AuthContext";
 import { CircularProgress } from "@mui/material";
+import * as d3 from 'd3';
 
 const FilterIcon = () => (
   <svg viewBox="0 0 24 24" fill="currentColor">
@@ -558,11 +559,12 @@ const MemoryBoard = () => {
         if (canvasState) {
           const { d3Zoom, canvasNode } = canvasState;
           d3Zoom.transform(
-            canvasNode.transition().duration(800),
-            d3Zoom.identity
-              .translate(CANVAS_WIDTH / 2 - centerX, CANVAS_HEIGHT / 2 - centerY)
-              .scale(0.6)
-          );
+  canvasNode.transition().duration(800),
+  d3.zoomIdentity
+    .translate(CANVAS_WIDTH / 2 - centerX, CANVAS_HEIGHT / 2 - centerY)
+    .scale(0.6)
+);
+
         }
       } else {
         canvasRef.current.fitContentToView({ scale: 0.8 });
