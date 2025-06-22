@@ -577,7 +577,7 @@ const Navbar = () => {
               >
                 <NotificationsNoneRoundedIcon
                   sx={{ 
-                    color: unreadCount > 0 ? "#FFD700" : "#D0BCFE", 
+                    color: unreadCount > 0 ? "#D0BCFE" : "#D0BCFE", 
                     fontSize: "30px",
                     animation: unreadCount > 0 ? "pulse 2s infinite" : "none",
                   }}
