@@ -893,7 +893,7 @@ const Memors = () => {
                                   sx={{
                                     color: "white",
                                   }}
-                                  fontSize='small'
+                                  fontSize='5px'
                                 />
                               ) : (
                                 <AddRoundedIcon fontSize='small' />
