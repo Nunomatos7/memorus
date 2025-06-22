@@ -963,7 +963,6 @@ const MemoryBoard = () => {
                   <div style={{ position: "relative", width: "100%", height: "100%" }}>
                     {post.image
                       .slice()
-                      .reverse()
                       .map((image, cardIndex, reversedArray) => {
                         const imgSrc = typeof image === "string" ? image : image?.img_src || "";
                         const altText = image?.alt_text || `Image for ${post.title}`;
@@ -975,7 +974,7 @@ const MemoryBoard = () => {
                         
                         const baseTransform = `rotate(${post.rotation + rotationOffset}deg)`;
                         
-                        const hoverLift = Math.max(3, 8 - cardIndex * 2); 
+                        const hoverLift = Math.max(300, 8 - cardIndex * 2); 
                         const hoverTransform = `rotate(${post.rotation + rotationOffset}deg) translateY(-${hoverLift}px)`;
 
                         return (
