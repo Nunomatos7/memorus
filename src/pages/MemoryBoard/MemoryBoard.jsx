@@ -96,6 +96,9 @@ const MemoryBoard = () => {
 
   const [focusedIndex, setFocusedIndex] = useState(0);
 
+  const [hoveredCardInfo, setHoveredCardInfo] = useState(null);
+
+
   const generatePositions = useCallback((count) => {
     const positions = [];
 
@@ -1074,138 +1077,132 @@ const MemoryBoard = () => {
                     }}
                   >
                     {post.image
-                      .slice()
-                      .map((image, cardIndex, reversedArray) => {
-                        const imgSrc =
-                          typeof image === "string"
-                            ? image
-                            : image?.img_src || "";
-                        const altText =
-                          image?.alt_text || `Image for ${post.title}`;
+  .slice()
+  .map((image, cardIndex, reversedArray) => {
+    const imgSrc = typeof image === "string" ? image : image?.img_src || "";
+    const altText = image?.alt_text || `Image for ${post.title}`;
 
-                        const cascadeOffsetX = cardIndex * 8;
-                        const cascadeOffsetY = cardIndex * 6;
-                        const rotationOffset = cardIndex * 2;
-                        const baseZIndex = reversedArray.length - cardIndex;
+    const cascadeOffsetX = cardIndex * 20;
+    const cascadeOffsetY = cardIndex * -30;
+    const rotationOffset = cardIndex * 2;
+    const baseZIndex = reversedArray.length - cardIndex;
 
-                        const baseTransform = `rotate(${
-                          post.rotation + rotationOffset
-                        }deg)`;
+    // Check if this card should move aside or is being hovered
+    const isCurrentPostHovered = hoveredCardInfo?.postIndex === postIndex;
+    const isThisCardHovered = isCurrentPostHovered && hoveredCardInfo?.cardIndex === cardIndex;
+    const shouldMoveAside = isCurrentPostHovered && cardIndex < hoveredCardInfo.cardIndex;
+    
+    // Animation logic for returning to stack
+    let finalX = cascadeOffsetX;
+    let finalY = cascadeOffsetY;
+    
+    if (shouldMoveAside) {
+      // Move to the left when a card behind is hovered
+      finalX = cascadeOffsetX - 120;
+      finalY = cascadeOffsetY;
+    } else if (!isCurrentPostHovered && cardIndex > 0) {
+      // When hover ends, animate back to tight stack behind front card
+      // All cards behind the front one should stack closely
+      finalX = cardIndex * 5; // Much tighter horizontal spacing
+      finalY = cardIndex * -8; // Much tighter vertical spacing
+    }
+    
+    const scaleEffect = isThisCardHovered ? 'scale(1.05)' : '';
+    const currentTransform = `rotate(${
+      post.rotation + rotationOffset
+    }deg) translateX(${finalX}px) translateY(${finalY}px) ${scaleEffect}`;
 
-                        const hoverLift = Math.max(300, 8 - cardIndex * 2);
-                        const hoverTransform = `rotate(${
-                          post.rotation + rotationOffset
-                        }deg) translateY(-${hoverLift}px)`;
+    return (
+      <div
+        key={cardIndex}
+        className={`polaroid-card ${
+          focusedIndex === postIndex ? "focused" : ""
+        }`}
+        onClick={() => {
+          const actualImageIndex = reversedArray.length - 1 - cardIndex;
+          openModal(actualImageIndex, postIndex);
+        }}
+        style={{
+          position: "absolute",
+          top: `0px`, // Base position, movement handled by transform
+          left: `0px`, // Base position, movement handled by transform
+          width: `${CARD_WIDTH}px`,
+          height: `${CARD_HEIGHT}px`,
+          cursor: "pointer",
+          transform: currentTransform,
+          WebkitTransform: currentTransform,
+          transformOrigin: "center center",
+          WebkitTransformOrigin: "center center",
+          zIndex: isThisCardHovered ? baseZIndex + 100 : baseZIndex,
+          boxShadow: isThisCardHovered
+            ? "0 20px 60px rgba(0, 0, 0, 0.3)"
+            : cardIndex === 0
+            ? "0 12px 40px rgba(0, 0, 0, 0.2)"
+            : `0 ${4 + cardIndex * 2}px ${8 + cardIndex * 3}px rgba(0, 0, 0, 0.15)`,
+          border: "4px solid white",
+          transition: "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)", // Slower transition for better visibility
+          WebkitTransition: "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
+        }}
+        tabIndex={focusedIndex === postIndex ? 0 : -1}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            const actualImageIndex = reversedArray.length - 1 - cardIndex;
+            openModal(actualImageIndex, postIndex);
+          }
+        }}
+        onMouseEnter={() => {
+          setHoveredCardInfo({ postIndex, cardIndex });
+        }}
+        onMouseLeave={() => {
+          setHoveredCardInfo(null);
+        }}
+      >
+        <p
+          className="card-date"
+          style={{
+            margin: "16px 20px 10px",
+            fontSize: "12px",
+            pointerEvents: "none",
+            userSelect: "none",
+            WebkitUserSelect: "none",
+          }}
+        >
+          {post.submittedDate}
+        </p>
 
-                        return (
-                          <div
-                            key={cardIndex}
-                            className={`polaroid-card ${
-                              focusedIndex === postIndex ? "focused" : ""
-                            }`}
-                            onClick={() => {
-                              const actualImageIndex =
-                                reversedArray.length - 1 - cardIndex;
-                              openModal(actualImageIndex, postIndex);
-                            }}
-                            style={{
-                              position: "absolute",
-                              top: `${cascadeOffsetY}px`,
-                              left: `${cascadeOffsetX}px`,
-                              width: `${CARD_WIDTH}px`,
-                              height: `${CARD_HEIGHT}px`,
-                              cursor: "pointer",
-                              transform: baseTransform,
-                              WebkitTransform: baseTransform,
-                              transformOrigin: "center center",
-                              WebkitTransformOrigin: "center center",
-                              zIndex: baseZIndex,
-                              boxShadow:
-                                cardIndex === 0
-                                  ? "0 12px 40px rgba(0, 0, 0, 0.2)"
-                                  : `0 ${4 + cardIndex * 2}px ${
-                                      8 + cardIndex * 3
-                                    }px rgba(0, 0, 0, 0.15)`,
-                              border: "4px solid white",
-                              transition:
-                                "transform 0.15s ease-out, box-shadow 0.15s ease-out",
-                              WebkitTransition:
-                                "-webkit-transform 0.15s ease-out, box-shadow 0.15s ease-out",
-                            }}
-                            tabIndex={focusedIndex === postIndex ? 0 : -1}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter" || e.key === " ") {
-                                e.preventDefault();
-                                const actualImageIndex =
-                                  reversedArray.length - 1 - cardIndex;
-                                openModal(actualImageIndex, postIndex);
-                              }
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.transform = hoverTransform;
-                              e.currentTarget.style.WebkitTransform =
-                                hoverTransform;
-                              e.currentTarget.style.boxShadow = `0 ${
-                                8 + hoverLift
-                              }px ${16 + hoverLift * 2}px rgba(0, 0, 0, 0.25)`;
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.transform = baseTransform;
-                              e.currentTarget.style.WebkitTransform =
-                                baseTransform;
-                              e.currentTarget.style.boxShadow =
-                                cardIndex === 0
-                                  ? "0 12px 40px rgba(0, 0, 0, 0.2)"
-                                  : `0 ${4 + cardIndex * 2}px ${
-                                      8 + cardIndex * 3
-                                    }px rgba(0, 0, 0, 0.15)`;
-                            }}
-                          >
-                            <p
-                              className="card-date"
-                              style={{
-                                margin: "16px 20px 10px",
-                                fontSize: "12px",
-                                pointerEvents: "none",
-                                userSelect: "none",
-                                WebkitUserSelect: "none",
-                              }}
-                            >
-                              {post.submittedDate}
-                            </p>
+        <img
+          className="card-image"
+          data-src={imgSrc}
+          src={loadedImages.has(imgSrc) ? imgSrc : ""}
+          alt={altText}
+          loading="lazy"
+          draggable={false}
+          style={{
+            width: "calc(100% - 32px)",
+            height: "60%",
+            margin: "0 16px",
+            pointerEvents: "none",
+            userSelect: "none",
+            WebkitUserSelect: "none",
+          }}
+        />
 
-                            <img
-                              className="card-image"
-                              data-src={imgSrc}
-                              src={loadedImages.has(imgSrc) ? imgSrc : ""}
-                              alt={altText}
-                              loading="lazy"
-                              draggable={false}
-                              style={{
-                                width: "calc(100% - 32px)",
-                                height: "60%",
-                                margin: "0 16px",
-                                pointerEvents: "none",
-                                userSelect: "none",
-                                WebkitUserSelect: "none",
-                              }}
-                            />
-
-                            <p
-                              className="card-title"
-                              style={{
-                                fontSize: "16px",
-                                margin: "16px 20px",
-                                pointerEvents: "none",
-                                userSelect: "none",
-                                WebkitUserSelect: "none",
-                              }}
-                            >
-                              {post.title}
-                            </p>
-                          </div>
-                        );
-                      })}
+        <p
+          className="card-title"
+          style={{
+            fontSize: "16px",
+            margin: "16px 20px",
+            pointerEvents: "none",
+            userSelect: "none",
+            WebkitUserSelect: "none",
+          }}
+        >
+          {post.title}
+        </p>
+      </div>
+    );
+  })}
                   </div>
                 </div>
               ))}
