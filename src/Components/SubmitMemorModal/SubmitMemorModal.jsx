@@ -829,23 +829,6 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
 
             <div className='modal-actions'>
               <CustomButton
-                text='Cancel'
-                onClick={handleCloseModal}
-                disabled={isSubmitting}
-                sx={{
-                  backgroundColor: "transparent",
-                  border: "1px solid #988c9c",
-                  color: "#D0BCFE",
-                  "&:hover": {
-                    backgroundColor: "rgba(181, 237, 228, 0.08)",
-                  },
-                  "&:disabled": {
-                    color: "#645c6b",
-                    borderColor: "#645c6b",
-                  },
-                }}
-              />
-              <CustomButton
                 text={isSubmitting ? "Submitting..." : "Submit"}
                 onClick={handleSubmit}
                 disabled={isSubmitting || !uploadedImage}
@@ -868,6 +851,7 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
                     backgroundColor: "#a395c5",
                     color: "#2d1a54",
                   },
+                  width: "100%",
                   minWidth: "120px",
                 }}
               />

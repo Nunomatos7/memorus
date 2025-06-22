@@ -48,6 +48,17 @@ const useStyles = makeStyles({
 });
 
 const NotificationItem = ({ notification, onDelete, onClick }) => {
+  const getNotificationIcon = (type) => {
+    switch (type) {
+      case "due_soon":
+        return notifPurple;
+      case "new_memor":
+        return notifGreen;
+      default:
+        return notifGreen;
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -56,40 +67,76 @@ const NotificationItem = ({ notification, onDelete, onClick }) => {
         backgroundColor: "#272A2C",
         padding: "10px",
         marginBottom: "8px",
+        borderRadius: "8px",
+        transition: "background-color 0.2s ease",
         "&:hover": {
           backgroundColor: "#323537",
-          cursor: "pointer",
+          cursor: notification.memorId ? "pointer" : "default",
         },
       }}
       onClick={notification.memorId ? () => onClick(notification) : null}
     >
-      <IconButton
-        src={notification.read ? notifPurple : notifGreen}
+      <img
+        src={getNotificationIcon(notification.type)}
         alt='Notification Icon'
-        style={{ width: 28, height: 28 }}
+        style={{ 
+          width: 28, 
+          height: 28, 
+          marginRight: 8,
+          opacity: notification.read ? 0.6 : 1,
+        }}
       />
-      <Box sx={{ flexGrow: 1, paddingLeft: 2 }}>
+      <Box sx={{ flexGrow: 1, paddingLeft: 1 }}>
         <Typography
           variant='subtitle1'
-          sx={{ color: "#fff", lineHeight: 1.2, marginBottom: 1 }}
+          sx={{ 
+            color: notification.read ? "#aaa" : "#fff", 
+            lineHeight: 1.2, 
+            marginBottom: 0.5,
+            fontWeight: notification.read ? "normal" : "bold",
+          }}
         >
           {notification.title}
         </Typography>
-        <Typography variant='body2' sx={{ color: "#aaa" }}>
+        <Typography 
+          variant='body2' 
+          sx={{ 
+            color: notification.read ? "#888" : "#ccc",
+            fontSize: "0.85rem",
+          }}
+        >
           {notification.description}
         </Typography>
+        {notification.points && (
+          <Typography 
+            variant='caption' 
+            sx={{ 
+              color: "#82D5C7",
+              fontSize: "0.75rem",
+              fontWeight: "bold",
+            }}
+          >
+            +{notification.points} points
+          </Typography>
+        )}
       </Box>
       <IconButton
         onClick={(e) => {
           e.stopPropagation();
           onDelete(notification.id);
         }}
-        sx={{ color: "#ff1744" }}
+        sx={{ 
+          color: "#ff1744",
+          padding: "4px",
+          "&:hover": {
+            backgroundColor: "rgba(255, 23, 68, 0.1)",
+          },
+        }}
       >
         <img
           src={notifDelete}
           alt='Delete Icon'
-          style={{ width: 24, height: 24 }}
+          style={{ width: 20, height: 20 }}
         />
       </IconButton>
     </Box>
@@ -128,8 +175,10 @@ const Navbar = () => {
     getLeaderboardVisibility()
   );
 
+  // 🚀 NEW: Updated notification state management
   const [notifications, setNotifications] = useState([]);
   const [loadingNotifications, setLoadingNotifications] = useState(false);
+  const [notificationError, setNotificationError] = useState(null);
 
   const toggleLeaderboard = () => {
     const newValue = !showLeaderboard;
@@ -137,12 +186,17 @@ const Navbar = () => {
     setLeaderboardVisibility(newValue);
   };
 
+  // 🚀 NEW: Improved notification fetching
   useEffect(() => {
     const fetchNotifications = async () => {
       if (!token || !user) return;
 
       setLoadingNotifications(true);
+      setNotificationError(null);
+      
       try {
+        console.log("📬 Fetching notifications...");
+        
         const response = await fetch(
           `${import.meta.env.VITE_API_URL}/api/users/me/notifications`,
           {
@@ -154,13 +208,16 @@ const Navbar = () => {
         );
 
         if (!response.ok) {
-          throw new Error("Failed to fetch notifications");
+          throw new Error(`Failed to fetch notifications: ${response.status}`);
         }
 
         const data = await response.json();
+        console.log(`✅ Fetched ${data.length} notifications`);
         setNotifications(data);
       } catch (error) {
-        console.error("Error fetching notifications:", error);
+        console.error("❌ Error fetching notifications:", error);
+        setNotificationError(error.message);
+        // Don't show error toast on every fetch, just log it
       } finally {
         setLoadingNotifications(false);
       }
@@ -168,7 +225,8 @@ const Navbar = () => {
 
     fetchNotifications();
 
-    const intervalId = setInterval(fetchNotifications, 60000);
+    // Poll for new notifications every 30 seconds
+    const intervalId = setInterval(fetchNotifications, 30000);
 
     return () => clearInterval(intervalId);
   }, [token, user]);
@@ -221,13 +279,14 @@ const Navbar = () => {
   };
 
   const [notifAnchorEl, setNotifAnchorEl] = useState(null);
+  
   const handleNotifClick = (event) => {
     setNotifAnchorEl(event.currentTarget);
 
-    notifications.forEach((notification) => {
-      if (!notification.read) {
-        markNotificationAsRead(notification.id);
-      }
+    // 🚀 NEW: Mark all unread notifications as read when opening the menu
+    const unreadNotifications = notifications.filter(notif => !notif.read);
+    unreadNotifications.forEach((notification) => {
+      markNotificationAsRead(notification.id);
     });
   };
 
@@ -235,8 +294,11 @@ const Navbar = () => {
     setNotifAnchorEl(null);
   };
 
+  // 🚀 NEW: Updated notification handlers
   const handleDeleteNotification = async (id) => {
     try {
+      console.log(`🗑️ Deleting notification ${id}`);
+      
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/users/me/notifications/${id}`,
         {
@@ -252,13 +314,14 @@ const Navbar = () => {
         throw new Error("Failed to delete notification");
       }
 
+      // Remove from local state
       setNotifications((prevNotifications) =>
         prevNotifications.filter((notification) => notification.id !== id)
       );
 
       toast.success("Notification removed");
     } catch (error) {
-      console.error("Error deleting notification:", error);
+      console.error("❌ Error deleting notification:", error);
       toast.error("Failed to delete notification");
     }
   };
@@ -280,6 +343,7 @@ const Navbar = () => {
         throw new Error("Failed to mark notification as read");
       }
 
+      // Update local state
       setNotifications((prev) =>
         prev.map((notification) =>
           notification.id === id
@@ -288,12 +352,14 @@ const Navbar = () => {
         )
       );
     } catch (error) {
-      console.error("Error marking notification as read:", error);
+      console.error("❌ Error marking notification as read:", error);
     }
   };
 
   const handleMarkAllRead = async () => {
     try {
+      console.log("🧹 Clearing all notifications");
+      
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/users/me/notifications`,
         {
@@ -312,18 +378,20 @@ const Navbar = () => {
       setNotifications([]);
       toast.success("All notifications removed");
     } catch (error) {
-      console.error("Error clearing notifications:", error);
+      console.error("❌ Error clearing notifications:", error);
       toast.error("Failed to clear notifications");
     }
   };
 
   const handleNotificationClick = (notification) => {
     if (notification.memorId) {
+      console.log(`🎯 Navigating to memor ${notification.memorId}`);
       navigate(`/app/memors/${notification.memorId}`);
       handleNotifClose();
     }
   };
 
+  // Calculate unread count
   const unreadCount = notifications.filter((notif) => !notif.read).length;
 
   const classes = useStyles();
@@ -498,14 +566,21 @@ const Navbar = () => {
               </MenuItem>
             </Menu>
           </Box>
+          
+          {/* 🚀 NEW: Updated notification menu */}
           <Box>
             <IconButton onClick={handleNotifClick}>
               <Badge
                 badgeContent={unreadCount}
                 classes={{ badge: classes.customBadge }}
+                max={99}
               >
                 <NotificationsNoneRoundedIcon
-                  sx={{ color: "#D0BCFE", fontSize: "30px" }}
+                  sx={{ 
+                    color: unreadCount > 0 ? "#D0BCFE" : "#D0BCFE", 
+                    fontSize: "30px",
+                    animation: unreadCount > 0 ? "pulse 2s infinite" : "none",
+                  }}
                 />
               </Badge>
             </IconButton>
@@ -518,7 +593,8 @@ const Navbar = () => {
                 style: {
                   backgroundColor: "#1e1e1e",
                   color: "white",
-                  width: "400px",
+                  width: "420px",
+                  maxHeight: "500px",
                 },
               }}
             >
@@ -527,31 +603,52 @@ const Navbar = () => {
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "center",
-                  padding: "10px",
+                  padding: "12px 16px",
+                  borderBottom: "1px solid #333",
                 }}
               >
-                <Typography variant='body1' sx={{ color: "#fff" }}>
+                <Typography variant='h6' sx={{ color: "#fff", fontWeight: "bold" }}>
                   Notifications ({notifications.length})
                 </Typography>
                 <Button
                   variant='text'
-                  sx={{ color: "#fff" }}
+                  sx={{ 
+                    color: "#82D5C7",
+                    fontSize: "0.85rem",
+                    minWidth: "auto",
+                    "&:hover": {
+                      backgroundColor: "rgba(130, 213, 199, 0.1)",
+                    },
+                  }}
                   onClick={handleMarkAllRead}
                   disabled={notifications.length === 0}
                 >
-                  Remove All
+                  Clear All
                 </Button>
               </Box>
+              
               <Box
                 sx={{
-                  maxHeight: "300px",
+                  maxHeight: "400px",
                   overflowY: "auto",
-                  padding: "0 10px",
+                  padding: "8px",
                 }}
               >
                 {loadingNotifications ? (
-                  <Box sx={{ display: "flex", justifyContent: "center", p: 2 }}>
+                  <Box sx={{ display: "flex", justifyContent: "center", p: 3 }}>
                     <CircularProgress size={24} sx={{ color: "#d0bcfe" }} />
+                    <Typography sx={{ ml: 2, color: "#888" }}>
+                      Loading notifications...
+                    </Typography>
+                  </Box>
+                ) : notificationError ? (
+                  <Box sx={{ p: 2, textAlign: "center", color: "#ff6b6b" }}>
+                    <Typography variant="body2">
+                      Failed to load notifications
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: "#888" }}>
+                      {notificationError}
+                    </Typography>
                   </Box>
                 ) : notifications.length > 0 ? (
                   notifications.map((notification) => (
@@ -563,8 +660,14 @@ const Navbar = () => {
                     />
                   ))
                 ) : (
-                  <Box sx={{ p: 2, textAlign: "center", color: "#888" }}>
-                    No notifications
+                  <Box sx={{ p: 3, textAlign: "center", color: "#888" }}>
+                    <Typography variant="body1">🔔</Typography>
+                    <Typography variant="body2" sx={{ mt: 1 }}>
+                      No notifications yet
+                    </Typography>
+                    <Typography variant="caption">
+                      You'll be notified about new memors and due dates
+                    </Typography>
                   </Box>
                 )}
               </Box>
@@ -697,10 +800,11 @@ const Navbar = () => {
 NotificationItem.propTypes = {
   notification: PropTypes.shape({
     id: PropTypes.number.isRequired,
-    image: PropTypes.string.isRequired,
+    type: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,
     description: PropTypes.string.isRequired,
     memorId: PropTypes.number,
+    points: PropTypes.number,
     read: PropTypes.bool,
   }).isRequired,
   onDelete: PropTypes.func.isRequired,
