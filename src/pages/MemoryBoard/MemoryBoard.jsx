@@ -514,7 +514,7 @@ const MemoryBoard = () => {
 
         const sensitivity = e.shiftKey ? 0.3 : 0.15;
         const delta = e.deltaY > 0 ? -sensitivity : sensitivity;
-        const targetScale = Math.max(0.1, Math.min(1.5, currentScale + delta));
+        const targetScale = Math.max(0.1, Math.min(1, currentScale + delta));
 
         if (Math.abs(targetScale - lastScale) > 0.01) {
           d3Zoom.scaleTo(canvasNode, targetScale);
@@ -583,7 +583,7 @@ const MemoryBoard = () => {
       const { k: currentScale } = currentPosition || {};
 
       const step = action === "out" ? -0.2 : 0.2;
-      const newScale = Math.max(0.1, Math.min(1.5, currentScale + step));
+      const newScale = Math.max(0.1, Math.min(1, currentScale + step));
 
       d3Zoom.scaleTo(canvasNode, newScale);
       setZoomLevel(newScale);
@@ -1045,7 +1045,7 @@ const MemoryBoard = () => {
                   }
                 }, 100);
               }}
-              maxZoom={1.5}
+              maxZoom={1}
               minZoom={0.1}
               backgroundType="none"
               style={{
