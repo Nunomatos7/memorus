@@ -629,6 +629,7 @@ const MemoryBoard = () => {
               )
               .scale(0.6)
           );
+          setZoomLevel(0.6);
         }
       } else {
         canvasRef.current.fitContentToView({ scale: 0.8 });
