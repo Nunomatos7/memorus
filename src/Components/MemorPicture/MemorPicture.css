@@ -103,7 +103,7 @@
 
 .modal-close {
   position: fixed;
-  top: 60px;
+  top: 80px;
   right: 48px;
   background: rgba(34, 34, 38, 0.85);
   border: none;
@@ -141,10 +141,10 @@
 }
 
 .modal-sub-content {
-  position: fixed;
+  /* position: fixed;
   left: 0;
   right: 0;
-  bottom: 80px;
+  bottom: 80px; */
   z-index: 1102;
   text-align: center;
   color: #fff;
@@ -308,8 +308,10 @@
   justify-content: flex-end;
   width: 100vw;
   height: 100vh;
-  padding-bottom: 90px; /* space for thumbnails */
+  padding-bottom: 100px;
   box-sizing: border-box;
+  /* Allow clicks to pass through to the overlay */
+  pointer-events: none;
 }
 .memor-main-image-container {
   display: flex;
@@ -320,6 +322,8 @@
   min-height: 0;
   margin-top: 40px;
   margin-bottom: 16px;
+  /* Allow clicks to pass through to the overlay */
+  pointer-events: none;
 }
 .memor-main-image {
   max-width: 90vw;
@@ -330,6 +334,8 @@
   object-fit: contain;
   display: block;
   margin: 0 auto;
+  /* Enable pointer events only on the image itself */
+  pointer-events: auto;
 }
 .memor-modal-thumbnails-fixed {
   position: fixed;
@@ -338,11 +344,17 @@
   bottom: 0;
   width: 100vw;
   background: transparent;
-  padding-bottom: 18px;
+  padding-bottom: 38px;
   z-index: 1101;
   display: flex;
   justify-content: center;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  /* Enable pointer events for thumbnails */
+  pointer-events: auto;
 }
+
 .memor-thumbnails-row {
   display: flex;
   gap: 10px;

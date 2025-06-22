@@ -132,10 +132,18 @@ const MemorPicture = ({
     if (onNavigate) onNavigate(newIndex);
   };
 
+  // Handle background click to close modal
+  const handleOverlayClick = (e) => {
+    // Only close if clicking directly on the overlay (background)
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   if (!teamFilteredImages || teamFilteredImages.length === 0) {
     if (images && images.length > 0) {
       return (
-        <div className='modal-overlay' onClick={onClose}>
+        <div className='modal-overlay' onClick={handleOverlayClick}>
           <div className='modal-content'>
             <p style={{ color: "white" }}>Loading images...</p>
           </div>
@@ -164,7 +172,7 @@ const MemorPicture = ({
   return (
     <div
       className='modal-overlay'
-      onClick={onClose}
+      onClick={handleOverlayClick}
       tabIndex={0}
       role='dialog'
       aria-modal='true'
@@ -173,7 +181,10 @@ const MemorPicture = ({
     >
       <button
         className='modal-close'
-        onClick={onClose}
+        onClick={(e) => {
+          e.stopPropagation();
+          onClose();
+        }}
         aria-label='Close viewer'
       >
         &times;
@@ -203,10 +214,7 @@ const MemorPicture = ({
         </>
       )}
       <div className='memor-main-area'>
-        <div
-          className='memor-main-image-container'
-          onClick={(e) => e.stopPropagation()}
-        >
+        <div className='memor-main-image-container'>
           <img
             src={galleryImages[activeIndex]?.original}
             alt={galleryImages[activeIndex]?.originalAlt}
@@ -214,14 +222,14 @@ const MemorPicture = ({
             draggable={false}
           />
         </div>
+      </div>
+      <div className='memor-modal-thumbnails-fixed'>
         <div className='modal-sub-content'>
           <h2 id='modal-title'>{title}</h2>
           <p id='modal-description'>
             {teamName} • {submitDate}
           </p>
         </div>
-      </div>
-      <div className='memor-modal-thumbnails-fixed'>
         <div className='memor-thumbnails-row'>
           {galleryImages.map((item, idx) => (
             <img
