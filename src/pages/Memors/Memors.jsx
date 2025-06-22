@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -23,14 +23,16 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import TodayIcon from "@mui/icons-material/Today";
 import "./Memors.css";
 import SubmitMemorModal from "../../Components/SubmitMemorModal/SubmitMemorModal";
+import MemorPicture from "../../Components/MemorPicture/MemorPicture";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Mousewheel, FreeMode, Scrollbar } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/free-mode";
 import "swiper/css/scrollbar";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import BackupRoundedIcon from "@mui/icons-material/BackupRounded";
+import CollectionsIcon from "@mui/icons-material/Collections";
 import { useAuth } from "../../context/AuthContext";
 
 const OngoingMemorSkeleton = () => (
@@ -218,13 +220,15 @@ const Memors = () => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const tabParam = searchParams.get("tab") || "all";
-  const navigate = useNavigate();
 
   const [tab, setTab] = useState(tabParam);
   const [expandedIndex, setExpandedIndex] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPictureViewerOpen, setIsPictureViewerOpen] = useState(false);
   const [selectedMemor, setSelectedMemor] = useState(null);
+  const [selectedMemorForViewing, setSelectedMemorForViewing] = useState(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [ongoingMemors, setOngoingMemors] = useState([]);
   const [memors, setMemors] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -400,9 +404,12 @@ const Memors = () => {
               }, 1000);
             }
 
-            setSelectedMemor(memorToOpen);
-            setIsModalOpen(true);
-            document.body.style.overflow = "hidden";
+            // Determine which modal to open based on submission status
+            if (memorToOpen.status === "submitted") {
+              await handleViewPictures(memorToOpen);
+            } else {
+              await handleOpenModal(memorToOpen);
+            }
           } else {
             console.log("❌ Memor not found for ID:", memorIdFromUrl);
 
@@ -477,7 +484,7 @@ const Memors = () => {
   };
 
   const handleOpenModal = async (memor) => {
-    console.log("Memors: Opening modal for memor:", memor);
+    console.log("Memors: Opening submission modal for memor:", memor);
 
     // Prepare memor for display
     const preparedMemor = { ...memor };
@@ -556,12 +563,82 @@ const Memors = () => {
     window.history.replaceState(null, "", `/app/memors/${memor.id}`);
   };
 
+  const handleViewPictures = async (memor) => {
+    console.log("Memors: Opening picture viewer for memor:", memor);
+
+    try {
+      // Fetch the submitted pictures for this memor
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/memors/${
+          memor.id
+        }/my-submission-pictures`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "X-Tenant": user.tenant_subdomain,
+          },
+        }
+      );
+
+      let pictures = [];
+      if (response.ok) {
+        pictures = await response.json();
+        console.log("Fetched my submission pictures:", pictures);
+      } else {
+        console.warn("Failed to fetch submission pictures, using fallback");
+        // Fallback to any existing pictures
+        pictures = Array.isArray(memor.image) ? memor.image : [];
+      }
+
+      // Prepare memor for picture viewer
+      const preparedMemor = {
+        ...memor,
+        image: pictures,
+      };
+
+      setSelectedMemorForViewing(preparedMemor);
+      setCurrentImageIndex(0);
+      setIsPictureViewerOpen(true);
+      document.body.style.overflow = "hidden";
+
+      window.history.replaceState(null, "", `/app/memors/${memor.id}`);
+    } catch (error) {
+      console.error("Error fetching submission pictures:", error);
+
+      // Fallback: use any existing images
+      const preparedMemor = {
+        ...memor,
+        image: Array.isArray(memor.image) ? memor.image : [],
+      };
+
+      setSelectedMemorForViewing(preparedMemor);
+      setCurrentImageIndex(0);
+      setIsPictureViewerOpen(true);
+      document.body.style.overflow = "hidden";
+
+      window.history.replaceState(null, "", `/app/memors/${memor.id}`);
+    }
+  };
+
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedMemor(null);
     document.body.style.overflow = "auto";
 
     window.history.replaceState(null, "", "/app/memors");
+  };
+
+  const handleClosePictureViewer = () => {
+    setIsPictureViewerOpen(false);
+    setSelectedMemorForViewing(null);
+    setCurrentImageIndex(0);
+    document.body.style.overflow = "auto";
+
+    window.history.replaceState(null, "", "/app/memors");
+  };
+
+  const handleNavigateImage = (newIndex) => {
+    setCurrentImageIndex(newIndex);
   };
 
   const handleSubmitMemor = (id) => {
@@ -590,6 +667,14 @@ const Memors = () => {
           : memor
       )
     );
+  };
+
+  const handleCardAction = (memor) => {
+    if (memor.status === "submitted") {
+      handleViewPictures(memor);
+    } else if (memor.status !== "expired") {
+      handleOpenModal(memor);
+    }
   };
 
   const filteredMemors = memors.filter((memor) => {
@@ -760,56 +845,74 @@ const Memors = () => {
                           </Box>
                         </CardContent>
 
-                        {memor.status !== "expired" &&
-                          memor.status !== "submitted" && (
-                            <Box
+                        {memor.status !== "expired" && (
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "8px",
+                              padding: "8px 16px",
+                              cursor: "pointer",
+                              width: "fit-content",
+                            }}
+                            onClick={() => handleCardAction(memor)}
+                            role='button'
+                            tabIndex={0}
+                            aria-label={`${
+                              memor.status === "submitted"
+                                ? "View submitted pictures"
+                                : "View details"
+                            } for ${memor.title}`}
+                          >
+                            <Button
+                              variant='contained'
+                              aria-label={
+                                memor.status === "submitted"
+                                  ? "View pictures"
+                                  : "Add picture"
+                              }
                               sx={{
+                                backgroundColor: "#7E57C2",
+                                color: "white",
+                                borderRadius: "8px",
+                                width: "30px",
+                                height: "30px",
+                                minWidth: "0px",
+                                padding: "0px",
                                 display: "flex",
                                 alignItems: "center",
-                                gap: "8px",
-                                padding: "8px 16px",
-                                cursor: "pointer",
-                                width: "fit-content",
+                                justifyContent: "center",
+                                boxShadow: "0px 4px 10px rgba(0,0,0,0.4)",
+                                "&:hover": {
+                                  backgroundColor: "#6A48B3",
+                                },
                               }}
-                              onClick={() => handleOpenModal(memor)}
-                              role='button'
-                              tabIndex={0}
-                              aria-label={`View details for ${memor.title}`}
                             >
-                              <Button
-                                variant='contained'
-                                aria-label='Add picture'
-                                sx={{
-                                  backgroundColor: "#7E57C2",
-                                  color: "white",
-                                  borderRadius: "8px",
-                                  width: "30px",
-                                  height: "30px",
-                                  minWidth: "0px",
-                                  padding: "0px",
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  boxShadow: "0px 4px 10px rgba(0,0,0,0.4)",
-                                  "&:hover": {
-                                    backgroundColor: "#6A48B3",
-                                  },
-                                }}
-                              >
+                              {memor.status === "submitted" ? (
+                                <CollectionsIcon
+                                  sx={{
+                                    color: "white",
+                                  }}
+                                  fontSize='small'
+                                />
+                              ) : (
                                 <AddRoundedIcon fontSize='small' />
-                              </Button>
+                              )}
+                            </Button>
 
-                              <Typography
-                                variant='body2'
-                                sx={{
-                                  fontSize: "0.8rem",
-                                  color: "white",
-                                }}
-                              >
-                                View details
-                              </Typography>
-                            </Box>
-                          )}
+                            <Typography
+                              variant='body2'
+                              sx={{
+                                fontSize: "0.8rem",
+                                color: "white",
+                              }}
+                            >
+                              {memor.status === "submitted"
+                                ? "View pictures"
+                                : "View details"}
+                            </Typography>
+                          </Box>
+                        )}
                       </Card>
                     </SwiperSlide>
                   ))
@@ -839,6 +942,19 @@ const Memors = () => {
             memor={selectedMemor}
             onClose={handleCloseModal}
             onSubmit={() => handleSubmitMemor(selectedMemor.id)}
+          />
+        )}
+
+        {isPictureViewerOpen && selectedMemorForViewing && (
+          <MemorPicture
+            images={selectedMemorForViewing.image || []}
+            currentIndex={currentImageIndex}
+            teamName={user?.team?.name || "Your Team"}
+            title={selectedMemorForViewing.title}
+            submitDate={selectedMemorForViewing.dueDate}
+            onClose={handleClosePictureViewer}
+            onNavigate={handleNavigateImage}
+            memorId={selectedMemorForViewing.id}
           />
         )}
 
@@ -1043,8 +1159,33 @@ const Memors = () => {
                           />
                         </div>
                         <div className='submissions'>
-                          {memor.status !== "expired" &&
-                            memor.status !== "submitted" && (
+                          {memor.status === "submitted" ? (
+                            <CollectionsIcon
+                              sx={{
+                                color: "#CBCBCB",
+                                fontSize: "28px",
+                                cursor: "pointer",
+                                "&:hover": { color: "white" },
+                              }}
+                              tabIndex={0}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleViewPictures(memor);
+                              }}
+                              onKeyDown={(event) => {
+                                if (
+                                  event.key === "Enter" ||
+                                  event.key === " "
+                                ) {
+                                  event.preventDefault();
+                                  event.stopPropagation();
+                                  handleViewPictures(memor);
+                                }
+                              }}
+                              aria-label={`View pictures for ${memor.title}`}
+                            />
+                          ) : (
+                            memor.status !== "expired" && (
                               <BackupRoundedIcon
                                 sx={{
                                   color: "#CBCBCB",
@@ -1069,7 +1210,8 @@ const Memors = () => {
                                 }}
                                 aria-label={`Submit ${memor.title}`}
                               />
-                            )}
+                            )
+                          )}
                         </div>
 
                         <div className='arrowIcon'>
