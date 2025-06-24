@@ -88,7 +88,7 @@ const StatCardSkeleton = ({ cardId }) => (
         )}
       </Box>
       <Typography variant='body2' color='#B0B0B0'>
-        {cardId === "pending" ? "Team's pending Memors" : "Completed Memors"}
+        {cardId === "pending" ? "Pending Memors" : "Completed Memors"}
       </Typography>
     </CardContent>
   </Card>
