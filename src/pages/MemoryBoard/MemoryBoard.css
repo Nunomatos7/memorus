@@ -208,12 +208,31 @@
   appearance: none;
 }
 
-.filter-select:hover,
+/* Dropdown-specific styling with arrow */
+.filter-select {
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23888888'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 20px;
+  padding-right: 44px; /* Extra space for arrow */
+  cursor: pointer;
+}
+
+.filter-select:hover {
+  border-color: rgba(208, 188, 254, 0.7);
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23D0BCFE'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #7e57c2;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%237e57c2'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+}
+
 .filter-input:hover {
   border-color: rgba(208, 188, 254, 0.7);
 }
 
-.filter-select:focus,
 .filter-input:focus {
   outline: none;
   border-color: #7e57c2;
@@ -1039,6 +1058,16 @@
   .filter-toggle-btn.active {
     background: black;
     color: white;
+  }
+
+  /* High contrast dropdown arrows */
+  .filter-select {
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23000000'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  }
+
+  .filter-select:hover,
+  .filter-select:focus {
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23000000'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
   }
 }
 
