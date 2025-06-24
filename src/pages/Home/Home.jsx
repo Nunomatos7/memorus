@@ -743,10 +743,11 @@ const Home = () => {
             alt='Decorative background element'
             style={{
               position: "absolute",
-              top: "35%",
+              top: "90%",
               right: "6%",
               width: "5%",
               zIndex: "0",
+              marginTop: "10rem",
             }}
             aria-hidden='true'
           />
