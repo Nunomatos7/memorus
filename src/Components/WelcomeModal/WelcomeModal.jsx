@@ -56,6 +56,7 @@ const WelcomeModal = () => {
     } catch (error) {
       // If all API calls fail, try to use any team info from user object
       if (user?.team) {
+        console.error("Failed to fetch team data:", error);
         setTeamData(user.team);
       }
     }
