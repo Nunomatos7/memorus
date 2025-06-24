@@ -389,7 +389,8 @@ function App() {
         />
       </Routes>
 
-      {!hideFooter && (isAdmin ? <AdminFooter /> : <CollaboratorFooter />)}
+      {!location.pathname.toLowerCase().includes("/memoryboard") &&
+        (isAdmin ? <AdminFooter /> : <CollaboratorFooter />)}
 
       <Toaster
         position='top-right'

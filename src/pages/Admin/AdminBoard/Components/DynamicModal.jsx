@@ -26,7 +26,6 @@ const DynamicModal = ({
   refreshData,
 }) => {
   const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
-
   const [newMemorTitle, setNewMemorTitle] = useState("");
   const [newMemorDate, setNewMemorDate] = useState(null);
   const [newMemorDescription, setNewMemorDescription] = useState("");
@@ -42,7 +41,6 @@ const DynamicModal = ({
     useState("");
   const [newCompetitionStartDate, setNewCompetitionStartDate] = useState("");
   const [newCompetitionEndDate, setNewCompetitionEndDate] = useState("");
-
   useEffect(() => {
     if ((action === "edit" || action === "delete") && data) {
       switch (modalType) {
@@ -60,12 +58,10 @@ const DynamicModal = ({
             }
           }
           break;
-
         case "team":
           setNewTeamName(data.name || "");
           setNewTeamThumbnail(data.avatar || null);
           break;
-
         case "competition":
           setNewCompetitionTitle(data.title || "");
           setNewCompetitionDescription(data.description || "");
@@ -74,7 +70,6 @@ const DynamicModal = ({
           break;
       }
     }
-
     if (modalType === "team" && action !== "delete") {
       fetchUnassignedMembers();
     }
@@ -89,12 +84,10 @@ const DynamicModal = ({
 
       for (const user of users) {
         if (user.teams_id) continue;
-
         try {
           const rolesResponse = await api.get(`/api/users/${user.id}/roles`);
           const roles = rolesResponse.data || [];
           const isAdmin = roles.some((role) => role.title === "admin");
-
           if (!isAdmin) {
             unassignedMembers.push({
               id: user.id,
@@ -106,7 +99,6 @@ const DynamicModal = ({
           console.error(`Error checking roles for user ${user.id}:`, error);
         }
       }
-
       setUnassignedMembers(unassignedMembers);
     } catch (error) {
       console.error("Error fetching unassigned members:", error);
@@ -125,7 +117,6 @@ const DynamicModal = ({
     const file = event.target.files[0];
     if (file) {
       setNewTeamThumbnailFile(file);
-
       const reader = new FileReader();
       reader.onload = (e) => {
         setNewTeamThumbnail(e.target.result);
@@ -137,10 +128,8 @@ const DynamicModal = ({
   const filteredUnassignedMembers = unassignedMembers.filter((member) =>
     member.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
   const validateFormBeforeSubmit = () => {
     if (action === "delete") return true;
-
     switch (modalType) {
       case "memor":
         return newMemorTitle && newMemorDate && newMemorPoints;
@@ -167,14 +156,12 @@ const DynamicModal = ({
       );
       return;
     }
-
     setConfirmationModalOpen(true);
   };
 
   const executeSubmit = async () => {
     setLoading(true);
     let success = false;
-
     try {
       switch (modalType) {
         case "memor":
@@ -190,13 +177,11 @@ const DynamicModal = ({
           success = true;
           break;
       }
-
       if (success) {
         if (typeof refreshData === "function") {
           console.log(`Refreshing after ${action} ${modalType}`);
           refreshData();
         }
-
         setTimeout(() => {
           forceRefreshAdminBoard();
         }, 300);
@@ -220,7 +205,6 @@ const DynamicModal = ({
     } finally {
       setLoading(false);
       setConfirmationModalOpen(false);
-
       if (success) {
         onClose();
       }
@@ -234,7 +218,6 @@ const DynamicModal = ({
       "0"
     )}-${String(date.getDate()).padStart(2, "0")}`;
   };
-
   const handleMemorSubmit = async () => {
     if (action === "delete" && data?.id) {
       await api.delete(`/api/memors/${data.id}`);
@@ -382,7 +365,6 @@ const DynamicModal = ({
     if (action === "edit" && data?.id) {
       try {
         setLoading(true);
-
         const formData = new FormData();
         formData.append("name", newTeamName);
 
@@ -397,7 +379,6 @@ const DynamicModal = ({
         });
 
         console.log(`Updated team with ID: ${data.id}`);
-
         setLoading(false);
         showFeedback(
           "success",
@@ -453,7 +434,6 @@ const DynamicModal = ({
       );
     }
   };
-
   const renderModalContent = () => {
     if (action === "delete") {
       return (
@@ -509,24 +489,33 @@ const DynamicModal = ({
               label='Title'
               required
               variant='outlined'
+              size='small'
               value={newMemorTitle}
               onChange={(e) => setNewMemorTitle(e.target.value)}
               fullWidth
               sx={{
-                marginBottom: "20px",
-                "& .MuiInputBase-input": { color: "#FFFFFF" },
+                marginBottom: "15px",
+                "& .MuiInputBase-input": {
+                  color: "#FFFFFF",
+                  fontSize: "0.875rem",
+                  padding: "10px 14px",
+                },
                 "& .MuiOutlinedInput-root": {
                   "& fieldset": { borderColor: "#90948c" },
                   "&:hover fieldset": { borderColor: "#AAA" },
                   "&.Mui-focused fieldset": { borderColor: "#CCC" },
                 },
-                "& .MuiInputLabel-root": { color: "#888" },
+                "& .MuiInputLabel-root": {
+                  color: "#888",
+                  fontSize: "0.875rem",
+                },
               }}
             />
             <TextField
               type='date'
               label='Due Date'
               required
+              size='small'
               value={newMemorDate || ""}
               onChange={(e) => setNewMemorDate(e.target.value)}
               fullWidth
@@ -536,17 +525,21 @@ const DynamicModal = ({
                 "aria-label": "Due Date",
               }}
               sx={{
-                marginBottom: "20px",
-                "& .MuiInputBase-input": { color: "#FFFFFF" },
+                marginBottom: "15px",
+                "& .MuiInputBase-input": {
+                  color: "#FFFFFF",
+                  fontSize: "0.875rem",
+                  padding: "10px 14px",
+                },
                 "& .MuiOutlinedInput-root": {
                   "& fieldset": { borderColor: "#90948c" },
                   "&:hover fieldset": { borderColor: "#AAA" },
                   "&.Mui-focused fieldset": { borderColor: "#CCC" },
                 },
-                "& .MuiInputLabel-root": { color: "#888" },
-                "&hover": { backgroundColor: "#80ccbc" },
-                "& .MuiSvgIcon-root": { color: "#FFFFFF" },
-                "& .MuiInputAdornment-root": { color: "#FFFFFF" },
+                "& .MuiInputLabel-root": {
+                  color: "#888",
+                  fontSize: "0.875rem",
+                },
                 "& input::-webkit-calendar-picker-indicator": {
                   filter: "invert(1)",
                 },
@@ -556,26 +549,40 @@ const DynamicModal = ({
               label='Description'
               variant='outlined'
               required
+              size='small'
               multiline
-              rows={4}
+              rows={3}
               value={newMemorDescription}
               onChange={(e) => setNewMemorDescription(e.target.value)}
               fullWidth
               sx={{
-                marginBottom: "20px",
-                "& .MuiInputBase-input": { color: "#FFFFFF" },
+                marginBottom: "15px",
+                "& .MuiInputBase-input": {
+                  color: "#FFFFFF",
+                  fontSize: "0.875rem",
+                },
                 "& .MuiOutlinedInput-root": {
                   "& fieldset": { borderColor: "#90948c" },
                   "&:hover fieldset": { borderColor: "#AAA" },
                   "&.Mui-focused fieldset": { borderColor: "#CCC" },
                 },
-                "& .MuiInputLabel-root": { color: "#888" },
+                "& .MuiInputLabel-root": {
+                  color: "#888",
+                  fontSize: "0.875rem",
+                },
               }}
               inputProps={{
                 "aria-label": "memor description",
               }}
             />
-            <Typography variant='body1' sx={{ color: "#CAC4D0" }}>
+            <Typography
+              variant='body1'
+              sx={{
+                color: "#CAC4D0",
+                marginBottom: "10px",
+                fontSize: "0.875rem",
+              }}
+            >
               Points *
             </Typography>
             <Box
@@ -596,13 +603,22 @@ const DynamicModal = ({
                       newMemorPoints === point ? "#283434" : "#181c1c",
                     color: "#82D5C7",
                     borderRadius: "50%",
-                    width: "50px",
-                    height: "50px",
+                    width: "45px",
+                    height: "45px",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     minWidth: 0,
-                    "&:hover": { backgroundColor: "#1f2c29" },
+                    fontSize: "0.875rem",
+                    fontWeight: "bold",
+                    border:
+                      newMemorPoints === point
+                        ? "2px solid #82D5C7"
+                        : "1px solid #444",
+                    "&:hover": {
+                      backgroundColor: "#1f2c29",
+                      border: "2px solid #82D5C7",
+                    },
                   }}
                 >
                   {point}
@@ -611,7 +627,6 @@ const DynamicModal = ({
             </Box>
           </>
         );
-
       case "team":
         return (
           <>
@@ -629,18 +644,26 @@ const DynamicModal = ({
               label="Team's Name"
               required
               variant='outlined'
+              size='small'
               value={newTeamName}
               onChange={(e) => setNewTeamName(e.target.value)}
               fullWidth
               sx={{
-                marginBottom: "20px",
-                "& .MuiInputBase-input": { color: "#FFFFFF" },
+                marginBottom: "15px",
+                "& .MuiInputBase-input": {
+                  color: "#FFFFFF",
+                  fontSize: "0.875rem",
+                  padding: "10px 14px",
+                },
                 "& .MuiOutlinedInput-root": {
                   "& fieldset": { borderColor: "#888" },
                   "&:hover fieldset": { borderColor: "#AAA" },
                   "&.Mui-focused fieldset": { borderColor: "#CCC" },
                 },
-                "& .MuiInputLabel-root": { color: "#888" },
+                "& .MuiInputLabel-root": {
+                  color: "#888",
+                  fontSize: "0.875rem",
+                },
               }}
               inputProps={{
                 "aria-label": "Team's Name",
@@ -648,7 +671,11 @@ const DynamicModal = ({
             />
             <Typography
               variant='body1'
-              sx={{ color: "#CAC4D0", marginBottom: "10px" }}
+              sx={{
+                color: "#CAC4D0",
+                marginBottom: "10px",
+                fontSize: "0.875rem",
+              }}
             >
               Team Avatar (Optional)
             </Typography>
@@ -744,7 +771,11 @@ const DynamicModal = ({
             </div>
             <Typography
               variant='body1'
-              sx={{ color: "#CAC4D0", marginBottom: "10px" }}
+              sx={{
+                color: "#CAC4D0",
+                marginBottom: "10px",
+                fontSize: "0.875rem",
+              }}
             >
               Members *
             </Typography>
@@ -752,12 +783,16 @@ const DynamicModal = ({
               placeholder='Search Name'
               value={searchQuery}
               required
+              size='small'
               onChange={(e) => setSearchQuery(e.target.value)}
               variant='outlined'
-              size='small'
               sx={{
                 borderRadius: "40px",
-                input: { color: "white" },
+                input: {
+                  color: "white",
+                  fontSize: "0.875rem",
+                  padding: "8px 14px",
+                },
                 width: "250px",
                 border: "0.905px solid #88938F",
                 "& fieldset": { border: "none" },
@@ -812,10 +847,13 @@ const DynamicModal = ({
                         "aria-label": `Select ${member.name}`,
                       }}
                     />
-                    <Typography sx={{ color: "#FFFFFF" }}>
+                    <Typography sx={{ color: "#FFFFFF", fontSize: "0.875rem" }}>
                       {member.name}
                     </Typography>
-                    <Typography variant='body2' sx={{ color: "#888" }}>
+                    <Typography
+                      variant='body2'
+                      sx={{ color: "#888", fontSize: "0.75rem" }}
+                    >
                       {member.email}
                     </Typography>
                   </Box>
@@ -852,18 +890,26 @@ const DynamicModal = ({
               label='Title'
               required
               variant='outlined'
+              size='small'
               value={newCompetitionTitle}
               onChange={(e) => setNewCompetitionTitle(e.target.value)}
               fullWidth
               sx={{
-                marginBottom: "20px",
-                "& .MuiInputBase-input": { color: "#FFFFFF" },
+                marginBottom: "15px",
+                "& .MuiInputBase-input": {
+                  color: "#FFFFFF",
+                  fontSize: "0.875rem",
+                  padding: "10px 14px",
+                },
                 "& .MuiOutlinedInput-root": {
                   "& fieldset": { borderColor: "#90948c" },
                   "&:hover fieldset": { borderColor: "#AAA" },
                   "&.Mui-focused fieldset": { borderColor: "#CCC" },
                 },
-                "& .MuiInputLabel-root": { color: "#888" },
+                "& .MuiInputLabel-root": {
+                  color: "#888",
+                  fontSize: "0.875rem",
+                },
               }}
             />
             <TextField
@@ -871,30 +917,42 @@ const DynamicModal = ({
               variant='outlined'
               multiline
               required
-              rows={4}
+              size='small'
+              rows={3}
               value={newCompetitionDescription}
               onChange={(e) => setNewCompetitionDescription(e.target.value)}
               fullWidth
               sx={{
-                marginBottom: "20px",
-                "& .MuiInputBase-input": { color: "#FFFFFF" },
+                marginBottom: "15px",
+                "& .MuiInputBase-input": {
+                  color: "#FFFFFF",
+                  fontSize: "0.875rem",
+                },
                 "& .MuiOutlinedInput-root": {
                   "& fieldset": { borderColor: "#90948c" },
                   "&:hover fieldset": { borderColor: "#AAA" },
                   "&.Mui-focused fieldset": { borderColor: "#CCC" },
                 },
-                "& .MuiInputLabel-root": { color: "#888" },
+                "& .MuiInputLabel-root": {
+                  color: "#888",
+                  fontSize: "0.875rem",
+                },
               }}
             />
             <Typography
               variant='body1'
-              sx={{ color: "#CAC4D0", marginBottom: "5px" }}
+              sx={{
+                color: "#CAC4D0",
+                marginBottom: "5px",
+                fontSize: "0.875rem",
+              }}
             >
               Start Date *
             </Typography>
             <TextField
               type='date'
               required
+              size='small'
               value={newCompetitionStartDate || ""}
               onChange={(e) => setNewCompetitionStartDate(e.target.value)}
               fullWidth
@@ -902,8 +960,12 @@ const DynamicModal = ({
                 min: getTodayDate(),
               }}
               sx={{
-                marginBottom: "20px",
-                "& .MuiInputBase-input": { color: "#FFFFFF" },
+                marginBottom: "15px",
+                "& .MuiInputBase-input": {
+                  color: "#FFFFFF",
+                  fontSize: "0.875rem",
+                  padding: "10px 14px",
+                },
                 "& .MuiOutlinedInput-root": {
                   "& fieldset": { borderColor: "#90948c" },
                   "&:hover fieldset": { borderColor: "#AAA" },
@@ -916,13 +978,18 @@ const DynamicModal = ({
             />
             <Typography
               variant='body1'
-              sx={{ color: "#CAC4D0", marginBottom: "5px" }}
+              sx={{
+                color: "#CAC4D0",
+                marginBottom: "5px",
+                fontSize: "0.875rem",
+              }}
             >
               End Date *
             </Typography>
             <TextField
               type='date'
               required
+              size='small'
               value={newCompetitionEndDate || ""}
               onChange={(e) => setNewCompetitionEndDate(e.target.value)}
               fullWidth
@@ -931,7 +998,11 @@ const DynamicModal = ({
               }}
               sx={{
                 marginBottom: "20px",
-                "& .MuiInputBase-input": { color: "#FFFFFF" },
+                "& .MuiInputBase-input": {
+                  color: "#FFFFFF",
+                  fontSize: "0.875rem",
+                  padding: "10px 14px",
+                },
                 "& .MuiOutlinedInput-root": {
                   "& fieldset": { borderColor: "#90948c" },
                   "&:hover fieldset": { borderColor: "#AAA" },
@@ -949,7 +1020,6 @@ const DynamicModal = ({
         return <Typography>Invalid modal type</Typography>;
     }
   };
-
   return (
     <div className='modal-overlay-submit-memor' role='dialog' aria-modal='true'>
       <div
@@ -966,8 +1036,8 @@ const DynamicModal = ({
             <ArrowBackIcon />
           </Button>
           <Typography
-            variant='h6'
-            sx={{ marginLeft: "10px", color: "#BEC9C5" }}
+            variant='h4'
+            sx={{ marginLeft: "10px", color: "#BEC9C5", fontSize: "0.875rem" }}
             id='modal-title'
           >
             Admin Board
