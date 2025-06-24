@@ -921,7 +921,7 @@ const Home = () => {
 
       <section id='myMemors' className='container' tabIndex='0'>
         <Typography variant='h6' gutterBottom style={{ color: "white" }}>
-          My Memors
+          Team Memors
         </Typography>
         <Grid container spacing={3}>
           <Grid item xs={12} sm={3}>
