@@ -982,7 +982,11 @@ const Home = () => {
                               {team.teamName}
                             </Typography>
                             <img
-                              src={team.avatar}
+                              src={
+                                team.avatar
+                                  ? team.avatar
+                                  : "./../../../assets/images/default_avatar.png"
+                              }
                               alt={team.teamName}
                               className='team-avatar-admin'
                               style={{
