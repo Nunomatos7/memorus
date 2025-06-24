@@ -360,12 +360,12 @@
 /* Desktop Responsiveness */
 @media (min-width: 1025px) {
   .modal-overlay-submit-memor {
-    padding: 60px 0 50px 0;
+    padding: 60px 0 0 0;
   }
 
   .modal-container {
-    height: calc(100vh - 110px);
-    max-height: calc(100vh - 110px);
+    height: calc(100vh - 60px);
+    max-height: calc(100vh - 60px);
   }
 }
 
@@ -377,8 +377,8 @@
 
   .modal-container {
     width: 40%;
-    height: calc(100vh - 110px);
-    max-height: calc(100vh - 110px);
+    height: calc(100vh - 60px);
+    max-height: calc(100vh - 60px);
   }
 
   .modal-upload {
@@ -405,7 +405,7 @@
   .modal-overlay-submit-memor {
     justify-content: center;
     align-items: flex-start;
-    padding: 60px 0 70px 0; /* Add 70px bottom padding for mobile browser dock */
+    padding: 60px 0 70px 0;
   }
 
   .modal-container {
