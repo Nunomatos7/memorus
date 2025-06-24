@@ -811,22 +811,6 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
               </>
             )}
 
-            {selectedImage !== null && (
-              <MemorPicture
-                images={normalizedImages}
-                currentIndex={
-                  typeof selectedImage === "number" ? selectedImage : 0
-                }
-                title={memor.title}
-                submitDate={memor.dueDate}
-                teamName={memor.team}
-                onClose={() => {
-                  setSelectedImage(null);
-                  document.body.style.overflow = "auto";
-                }}
-              />
-            )}
-
             <div className='modal-actions'>
               <CustomButton
                 text={isSubmitting ? "Submitting..." : "Submit"}
@@ -858,6 +842,20 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
             </div>
           </div>
         </div>
+      )}
+
+      {selectedImage !== null && (
+        <MemorPicture
+          images={normalizedImages}
+          currentIndex={typeof selectedImage === "number" ? selectedImage : 0}
+          title={memor.title}
+          submitDate={memor.dueDate}
+          teamName={memor.team}
+          onClose={() => {
+            setSelectedImage(null);
+            document.body.style.overflow = "auto";
+          }}
+        />
       )}
     </>
   );
