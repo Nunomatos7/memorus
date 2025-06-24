@@ -364,7 +364,7 @@ const MemoryBoard = () => {
 
         if (teamsResponse.ok) {
           const teamsData = await teamsResponse.json();
-          setTeams([{ id: "all", name: "All Teams" }, ...teamsData]);
+          setTeams([...teamsData]);
 
           if (user?.teamsId) {
             setSelectedTeam(user.teamsId.toString());

@@ -314,7 +314,7 @@ const LoginPage = () => {
         <Typography variant='h5' className='login-title' id='login-title'>
           Login {tenant && `(${tenant})`}
         </Typography>
-        <Typography variant='body2' className='login-subtitle' sx={{ mb: 2 }}>
+        <Typography variant='body2' className='login-subtitle' sx={{ mb: 4, mt: 2 }}>
           This device is currently not logged in. Please enter the credentials
           to access your account.{" "}
           <span style={{ color: "rgb(146,130,249)" }}>* = required </span>
@@ -358,13 +358,13 @@ const LoginPage = () => {
               },
               "& .MuiOutlinedInput-root": {
                 "& fieldset": {
-                  borderColor: "#6200ea",
+                  borderColor: "rgb(146, 130, 249)",
                 },
                 "&:hover fieldset": {
-                  borderColor: "#4e00d1",
+                  borderColor: "rgb(146, 130, 249)",
                 },
                 "&.Mui-focused fieldset": {
-                  borderColor: "#6200ea",
+                  borderColor: "rgb(146, 130, 249)",
                 },
               },
             }}
@@ -396,13 +396,13 @@ const LoginPage = () => {
               },
               "& .MuiOutlinedInput-root": {
                 "& fieldset": {
-                  borderColor: "#6200ea",
+                  borderColor: "rgb(146, 130, 249)",
                 },
                 "&:hover fieldset": {
-                  borderColor: "#4e00d1",
+                  borderColor: "rgb(146, 130, 249)",
                 },
                 "&.Mui-focused fieldset": {
-                  borderColor: "#6200ea",
+                  borderColor: "rgb(146, 130, 249)",
                 },
               },
             }}
@@ -448,7 +448,7 @@ const LoginPage = () => {
             disabled={loading} // Disable button when loading
             aria-label='Login to your account'
             sx={{
-              backgroundColor: "#6200ea",
+              backgroundColor: "#5548bf",
               "&:hover": { backgroundColor: "#4e00d1" },
               "&:disabled": {
                 backgroundColor: "#555",
