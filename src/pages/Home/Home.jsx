@@ -950,7 +950,7 @@ const Home = () => {
                     <img src={pending} alt='Pending memors icon' />
                   </Box>
                   <Typography variant='body2' color='#B0B0B0'>
-                    Team&apos;s pending Memors
+                    Pending Memors
                   </Typography>
                 </CardContent>
               </Card>
