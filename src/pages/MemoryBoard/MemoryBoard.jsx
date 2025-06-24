@@ -768,7 +768,7 @@ const MemoryBoard = () => {
           aria-label='Toggle filters'
           aria-expanded={showFilterPanel}
         >
-          <FilterIcon />
+          <FilterIcon/>
         </button>
         <div className={`filter-panel ${showFilterPanel ? "open" : ""}`}>
           <div className='filter-section'>
@@ -949,7 +949,7 @@ const MemoryBoard = () => {
           </div>
 
           <button className='clear-filters-btn' onClick={clearFilters}>
-            🗑️ Clear Search & Advanced Filters
+            Clear Search & Advanced Filters
           </button>
         </div>
         {filteredPosts.length === 0 ? (

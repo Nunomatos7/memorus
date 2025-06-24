@@ -45,7 +45,7 @@
   top: 80px;
   left: 20px;
   z-index: 1000;
-  background: rgba(255, 255, 255, 0.96);
+  background: #222;
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
   border: 2px solid rgba(126, 87, 194, 0.2);
@@ -65,6 +65,8 @@
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
 }
+
+
 
 /* Safari backdrop-filter fallback */
 @supports not (backdrop-filter: blur(15px)) {
@@ -86,36 +88,30 @@
 }
 
 .filter-toggle-btn:hover {
-  background: rgba(248, 249, 250, 0.98);
+  background: #000000ac;
   transform: translateY(-3px);
   -webkit-transform: translateY(-3px) translateZ(0);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
-  border-color: rgba(126, 87, 194, 0.4);
 }
 
-.filter-toggle-btn:hover::before {
+.filter-toggle-btn.active:hover {
+  background: #000000ac;
   opacity: 1;
 }
 
-.filter-toggle-btn svg {
-  width: 22px;
-  height: 22px;
-  color: #7e57c2;
-  transition: all 0.3s ease;
-  position: relative;
-  z-index: 1;
-}
-
 .filter-toggle-btn.active {
-  background: #D0BCFE;
+  background: #222222;
   border-color: transparent;
   box-shadow: 0 8px 32px rgba(126, 87, 194, 0.3);
 }
 
 .filter-toggle-btn.active svg {
-  color: black;
+  color: white;
   transform: rotate(180deg);
   -webkit-transform: rotate(180deg);
+}
+
+.filter-toggle-btn svg {
+  color: #fff;
 }
 
 .filter-panel {
@@ -474,7 +470,7 @@
 .zoom-controls {
   display: flex;
   align-items: center;
-  background: rgba(255, 255, 255, 0.96);
+  background: #222;
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
   border: 2px solid rgba(126, 87, 194, 0.1);
@@ -498,7 +494,7 @@
   border: none;
   font-size: 20px;
   font-weight: bold;
-  color: #718096;
+  color: #fff;
   cursor: pointer;
   width: 36px;
   height: 36px;
@@ -513,8 +509,8 @@
 }
 
 .zoom-btn:hover {
-  background: #D0BCFE;
-  color: black;
+  background: #0000004f;
+  color: white;
   transform: scale(1.1);
   -webkit-transform: scale(1.1);
 }
@@ -523,13 +519,13 @@
   margin: 0 16px;
   font-size: 13px;
   font-weight: 700;
-  color: #2d3748;
+  color: #fff;
   min-width: 50px;
   text-align: center;
 }
 
 .control-btn {
-  background: rgba(255, 255, 255, 0.96);
+  background: #222;
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
   border: 2px solid rgba(126, 87, 194, 0.1);
@@ -544,7 +540,7 @@
   gap: 10px;
   font-size: 14px;
   font-weight: 600;
-  color: #2d3748;
+  color: #fff;
   /* Safari button fix */
   -webkit-appearance: none;
   appearance: none;
@@ -560,10 +556,10 @@
 }
 
 .control-btn:hover {
-  background: #D0BCFE;
+  background: #000000ac;
   transform: translateY(-3px);
   -webkit-transform: translateY(-3px) translateZ(0);
-  color: black;
+  color: white;
   border-color: transparent;
 }
 
