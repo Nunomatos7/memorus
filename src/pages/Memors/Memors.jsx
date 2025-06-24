@@ -997,7 +997,7 @@ const Memors = () => {
                 textTransform: "none",
                 fontSize: "14px",
                 color: "#d0bcfe",
-                padding: "6px 16px",
+                padding: "0px 16px",
                 borderRadius: "40px",
                 border: "1px solid #938f99",
                 marginRight: "10px",
