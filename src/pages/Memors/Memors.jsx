@@ -567,11 +567,9 @@ const Memors = () => {
     console.log("Memors: Opening picture viewer for memor:", memor);
 
     try {
-      // Fetch the submitted pictures for this memor
+      // Use the correct endpoint that exists - same as MemoryBoard
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/memors/${
-          memor.id
-        }/my-submission-pictures`,
+        `${import.meta.env.VITE_API_URL}/api/memors/${memor.id}/pictures`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -583,10 +581,15 @@ const Memors = () => {
       let pictures = [];
       if (response.ok) {
         pictures = await response.json();
-        console.log("Fetched my submission pictures:", pictures);
+        console.log("Fetched memor pictures:", pictures);
       } else {
-        console.warn("Failed to fetch submission pictures, using fallback");
+        console.warn("Failed to fetch memor pictures, using fallback");
         // Fallback to any existing pictures
+        pictures = Array.isArray(memor.image) ? memor.image : [];
+      }
+
+      // If no pictures from API, try to use what we already have
+      if (pictures.length === 0 && memor.image && memor.image.length > 0) {
         pictures = Array.isArray(memor.image) ? memor.image : [];
       }
 
@@ -603,7 +606,7 @@ const Memors = () => {
 
       window.history.replaceState(null, "", `/app/memors/${memor.id}`);
     } catch (error) {
-      console.error("Error fetching submission pictures:", error);
+      console.error("Error fetching memor pictures:", error);
 
       // Fallback: use any existing images
       const preparedMemor = {

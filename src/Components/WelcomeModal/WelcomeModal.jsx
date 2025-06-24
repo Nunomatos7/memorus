@@ -15,18 +15,57 @@ const WelcomeModal = () => {
     const hasClickedBegin = localStorage.getItem("hasClickedBegin");
     if (!hasClickedBegin) {
       setIsVisible(true);
-      fetchTeamData();
+      fetchUserTeamData();
     }
   }, []);
 
-  const fetchTeamData = async () => {
+  const fetchUserTeamData = async () => {
     try {
+      // First, try to get team info from user object
+      if (user?.team) {
+        console.log("Using team data from user object:", user.team);
+        setTeamData(user.team);
+        return;
+      }
+
+      // If user has teamsId, fetch specific team
+      if (user?.teamsId) {
+        console.log("Fetching team data for teamsId:", user.teamsId);
+        const response = await api.get(`/api/teams/${user.teamsId}`);
+        if (response.data) {
+          setTeamData(response.data);
+          return;
+        }
+      }
+
+      // Fallback: fetch all teams and find the one the user belongs to
+      console.log("Fallback: fetching all teams to find user's team");
       const response = await api.get("/api/teams");
       if (response.data && response.data.length > 0) {
-        setTeamData(response.data[0]);
+        // Try to find the team that contains this user
+        const userTeam = response.data.find(
+          (team) =>
+            team.members?.some((member) => member.id === user?.id) ||
+            team.id === user?.teamsId
+        );
+
+        if (userTeam) {
+          setTeamData(userTeam);
+        } else {
+          // Last resort: use first team
+          console.warn(
+            "Could not find user's specific team, using first available team"
+          );
+          setTeamData(response.data[0]);
+        }
       }
     } catch (error) {
       console.error("Error fetching team data:", error);
+
+      // If all API calls fail, try to use any team info from user object
+      if (user?.team) {
+        setTeamData(user.team);
+      }
     }
   };
 
@@ -36,11 +75,11 @@ const WelcomeModal = () => {
   };
 
   const getTeamName = () => {
-    return teamData?.name || "Your Team";
+    return teamData?.name || user?.team?.name || "Your Team";
   };
 
   const getTeamImage = () => {
-    return teamData?.avatar || "default_avatar.png";
+    return teamData?.avatar || user?.team?.avatar || "default_avatar.png";
   };
 
   const BeginButton = styled(Button)({

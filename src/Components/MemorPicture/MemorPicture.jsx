@@ -29,6 +29,18 @@ const MemorPicture = ({
 
   // Separate effect for initial data loading - only runs once per modal open
   useEffect(() => {
+    // If useTeamFiltering is false, skip all API logic and use passed images directly
+    if (!useTeamFiltering) {
+      console.log(
+        "🎯 MemorPicture: useTeamFiltering is false, using passed images directly"
+      );
+      setTeamFilteredImages(images || []);
+      setActiveIndex(initialCurrentIndex.current || 0);
+      setIsLoadingImages(false);
+      setHasFetchedImages(true);
+      return;
+    }
+
     // Only fetch if we haven't already fetched for this memorId in this modal session
     if (fetchedForMemorId.current === memorId && hasFetchedImages) {
       console.log(
@@ -47,17 +59,6 @@ const MemorPicture = ({
       console.log("🔥 DEBUG: selectedTeam:", selectedTeam);
       console.log("🔥 DEBUG: memorId:", memorId);
       console.log("🔥 DEBUG: clickedImageSrc:", clickedImageSrc);
-
-      // If useTeamFiltering is false, just use the passed images directly
-      if (!useTeamFiltering) {
-        console.log(
-          "🎯 MemorPicture: Not using team filtering, using passed images directly"
-        );
-        setTeamFilteredImages(images || []);
-        setActiveIndex(initialCurrentIndex.current || 0);
-        setIsLoadingImages(false);
-        return;
-      }
 
       // Simple check: if no clickedImageSrc and we're filtering, just use currentIndex
       if (!clickedImageSrc) {
@@ -243,14 +244,14 @@ const MemorPicture = ({
     }
   }, [currentIndex, useTeamFiltering]);
 
-  // Reset refs when modal opens with a new memorId
+  // Reset refs when modal opens with a new memorId (only when team filtering is enabled)
   useEffect(() => {
-    if (memorId !== fetchedForMemorId.current) {
+    if (useTeamFiltering && memorId !== fetchedForMemorId.current) {
       fetchedForMemorId.current = null;
       setHasFetchedImages(false);
       initialCurrentIndex.current = currentIndex;
     }
-  }, [memorId, currentIndex]);
+  }, [memorId, currentIndex, useTeamFiltering]);
 
   const handleNextImage = () => {
     const imagesToUse =
@@ -331,8 +332,14 @@ const MemorPicture = ({
   const imagesToDisplay =
     teamFilteredImages.length > 0 ? teamFilteredImages : images || [];
 
-  // Don't render the modal content until we've loaded the images and determined the correct index
-  if (isLoadingImages || !imagesToDisplay || imagesToDisplay.length === 0) {
+  // For non-team filtering scenarios, don't show loading if we have images
+  if (!useTeamFiltering && images && images.length > 0) {
+    // We have images and not using team filtering, so render immediately
+  } else if (
+    isLoadingImages ||
+    !imagesToDisplay ||
+    imagesToDisplay.length === 0
+  ) {
     return (
       <div className='modal-overlay' onClick={handleOverlayClick}>
         <div className='modal-content'>
