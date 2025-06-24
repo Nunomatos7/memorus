@@ -502,7 +502,7 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
                     label: "Go to Memory Board",
                     onClick: () => {
                       onSubmit();
-                      window.location.href = "/memoryBoard";
+                      window.location.href = "/app/memoryBoard";
                     },
                     style: {
                       backgroundColor: "#d0bcfe",
