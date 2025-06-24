@@ -913,6 +913,7 @@ const Home = () => {
             submitDate={selectedSlide.submittedDate}
             onClose={closeModal}
             memorId={selectedSlide.memorId}
+            useTeamFiltering={false}
           />
         )}
       </section>

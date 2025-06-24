@@ -955,6 +955,7 @@ const Memors = () => {
             onClose={handleClosePictureViewer}
             onNavigate={handleNavigateImage}
             memorId={selectedMemorForViewing.id}
+            useTeamFiltering={false}
           />
         )}
 

@@ -9,56 +9,56 @@ import { CircularProgress } from "@mui/material";
 import * as d3 from "d3";
 
 const FilterIcon = () => (
-  <svg viewBox="0 0 24 24" fill="currentColor">
-    <path d="M4.25 5.61C6.27 8.2 10 13 10 13v6c0 .55.45 1 1 1h2c.55 0 1-.45 1-1v-6s3.73-4.8 5.75-7.39C20.25 4.95 19.78 4 18.95 4H5.05c-.83 0-1.3.95-.8 1.61z" />
+  <svg viewBox='0 0 24 24' fill='currentColor'>
+    <path d='M4.25 5.61C6.27 8.2 10 13 10 13v6c0 .55.45 1 1 1h2c.55 0 1-.45 1-1v-6s3.73-4.8 5.75-7.39C20.25 4.95 19.78 4 18.95 4H5.05c-.83 0-1.3.95-.8 1.61z' />
   </svg>
 );
 
 const SearchIcon = () => (
-  <svg viewBox="0 0 24 24" fill="currentColor">
-    <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
+  <svg viewBox='0 0 24 24' fill='currentColor'>
+    <path d='M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z' />
   </svg>
 );
 
 const GridIcon = () => (
-  <svg viewBox="0 0 24 24" fill="currentColor">
-    <path d="M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm10 0h8v8h-8v-8z" />
+  <svg viewBox='0 0 24 24' fill='currentColor'>
+    <path d='M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm10 0h8v8h-8v-8z' />
   </svg>
 );
 
 const CanvasIcon = () => (
-  <svg viewBox="0 0 24 24" fill="currentColor">
-    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+  <svg viewBox='0 0 24 24' fill='currentColor'>
+    <path d='M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z' />
   </svg>
 );
 
 const CenterIcon = () => (
-  <svg viewBox="0 0 24 24" fill="currentColor">
-    <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
+  <svg viewBox='0 0 24 24' fill='currentColor'>
+    <path d='M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z' />
   </svg>
 );
 
 const ResetIcon = () => (
-  <svg viewBox="0 0 24 24" fill="currentColor">
-    <path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" />
+  <svg viewBox='0 0 24 24' fill='currentColor'>
+    <path d='M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z' />
   </svg>
 );
 
 const SortIcon = () => (
-  <svg viewBox="0 0 24 24" fill="currentColor">
-    <path d="M3 18h6v-2H3v2zM3 6v2h18V6H3zm0 7h12v-2H3v2z" />
+  <svg viewBox='0 0 24 24' fill='currentColor'>
+    <path d='M3 18h6v-2H3v2zM3 6v2h18V6H3zm0 7h12v-2H3v2z' />
   </svg>
 );
 
 const TagIcon = () => (
-  <svg viewBox="0 0 24 24" fill="currentColor">
-    <path d="M17.63 5.84C17.27 5.33 16.67 5 16 5L5 5.01C3.9 5.01 3 5.9 3 7v10c0 1.1.9 1.99 2 1.99L16 19c.67 0 1.27-.33 1.63-.84L22 12l-4.37-6.16z" />
+  <svg viewBox='0 0 24 24' fill='currentColor'>
+    <path d='M17.63 5.84C17.27 5.33 16.67 5 16 5L5 5.01C3.9 5.01 3 5.9 3 7v10c0 1.1.9 1.99 2 1.99L16 19c.67 0 1.27-.33 1.63-.84L22 12l-4.37-6.16z' />
   </svg>
 );
 
 const CloseIcon = () => (
-  <svg viewBox="0 0 24 24" fill="currentColor">
-    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+  <svg viewBox='0 0 24 24' fill='currentColor'>
+    <path d='M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z' />
   </svg>
 );
 
@@ -97,7 +97,6 @@ const MemoryBoard = () => {
   const [focusedIndex, setFocusedIndex] = useState(0);
 
   const [hoveredCardInfo, setHoveredCardInfo] = useState(null);
-
 
   const generatePositions = useCallback((count) => {
     const positions = [];
@@ -721,10 +720,10 @@ const MemoryBoard = () => {
   if (loading && allPosts.length === 0) {
     return (
       <>
-        <div className="memory-board-container">
-          <div className="loading-container">
+        <div className='memory-board-container'>
+          <div className='loading-container'>
             <CircularProgress size={60} sx={{ color: "#d0bcfe" }} />
-            <div className="loading-text">Loading memories...</div>
+            <div className='loading-text'>Loading memories...</div>
           </div>
         </div>
       </>
@@ -734,11 +733,11 @@ const MemoryBoard = () => {
   if (error) {
     return (
       <>
-        <div className="memory-board-container">
-          <div className="empty-container">
-            <p className="empty-message">{error}</p>
+        <div className='memory-board-container'>
+          <div className='empty-container'>
+            <p className='empty-message'>{error}</p>
             <button
-              className="control-btn"
+              className='control-btn'
               onClick={() => window.location.reload()}
             >
               <ResetIcon />
@@ -753,7 +752,7 @@ const MemoryBoard = () => {
   return (
     <>
       <div
-        className="memory-board-container"
+        className='memory-board-container'
         style={{
           position: "fixed",
           top: 0,
@@ -766,16 +765,15 @@ const MemoryBoard = () => {
         <button
           className={`filter-toggle-btn ${showFilterPanel ? "active" : ""}`}
           onClick={() => setShowFilterPanel(!showFilterPanel)}
-          aria-label="Toggle filters"
+          aria-label='Toggle filters'
           aria-expanded={showFilterPanel}
         >
           <FilterIcon />
         </button>
-
         <div className={`filter-panel ${showFilterPanel ? "open" : ""}`}>
-          <div className="filter-section">
-            <label className="filter-label">View Mode</label>
-            <div className="view-mode-toggle">
+          <div className='filter-section'>
+            <label className='filter-label'>View Mode</label>
+            <div className='view-mode-toggle'>
               <button
                 className={`view-mode-btn ${
                   viewMode === "canvas" ? "active" : ""
@@ -797,35 +795,35 @@ const MemoryBoard = () => {
             </div>
           </div>
 
-          <div className="filter-section">
-            <label className="filter-label" htmlFor="search-input">
+          <div className='filter-section'>
+            <label className='filter-label' htmlFor='search-input'>
               Search Memors
             </label>
-            <div className="search-container">
+            <div className='search-container'>
               <input
-                id="search-input"
-                type="text"
-                className="filter-input search-input"
-                placeholder="Search by title, description, or team..."
+                id='search-input'
+                type='text'
+                className='filter-input search-input'
+                placeholder='Search by title, description, or team...'
                 value={searchQuery}
                 onChange={(e) => handleFilterChange("search", e.target.value)}
               />
             </div>
           </div>
 
-          <div className="filter-section">
-            <label className="filter-label" htmlFor="competition-select">
+          <div className='filter-section'>
+            <label className='filter-label' htmlFor='competition-select'>
               Competition
             </label>
             <select
-              id="competition-select"
-              className="filter-select"
+              id='competition-select'
+              className='filter-select'
               value={selectedCompetition}
               onChange={(e) =>
                 handleFilterChange("competition", e.target.value)
               }
             >
-              <option value="">Select Competition</option>
+              <option value=''>Select Competition</option>
               {competitions.map((competition) => (
                 <option key={competition.id} value={competition.id}>
                   {competition.name}
@@ -834,17 +832,17 @@ const MemoryBoard = () => {
             </select>
           </div>
 
-          <div className="filter-section">
-            <label className="filter-label" htmlFor="team-select">
+          <div className='filter-section'>
+            <label className='filter-label' htmlFor='team-select'>
               Team
             </label>
             <select
-              id="team-select"
-              className="filter-select"
+              id='team-select'
+              className='filter-select'
               value={selectedTeam}
               onChange={(e) => handleFilterChange("team", e.target.value)}
             >
-              <option value="">Select Team</option>
+              <option value=''>Select Team</option>
               {teams.map((team) => (
                 <option key={team.id} value={team.id}>
                   {team.name}
@@ -854,18 +852,18 @@ const MemoryBoard = () => {
           </div>
 
           {viewMode === "grid" && (
-            <div className="filter-section">
-              <label className="filter-label">Sort & Order</label>
-              <div className="sort-container">
+            <div className='filter-section'>
+              <label className='filter-label'>Sort & Order</label>
+              <div className='sort-container'>
                 <select
-                  className="filter-select"
+                  className='filter-select'
                   value={sortBy}
                   onChange={(e) => handleFilterChange("sortBy", e.target.value)}
                 >
-                  <option value="date">Sort by Date</option>
-                  <option value="title">Sort by Title</option>
-                  <option value="team">Sort by Team</option>
-                  <option value="images">Sort by Image Count</option>
+                  <option value='date'>Sort by Date</option>
+                  <option value='title'>Sort by Title</option>
+                  <option value='team'>Sort by Team</option>
+                  <option value='images'>Sort by Image Count</option>
                 </select>
                 <button
                   className={`sort-direction-btn ${sortDirection}`}
@@ -885,38 +883,38 @@ const MemoryBoard = () => {
             </div>
           )}
 
-          <div className="filter-section second">
-            <label className="filter-label">Advanced Filters</label>
-            <div className="filter-group">
+          <div className='filter-section second'>
+            <label className='filter-label'>Advanced Filters</label>
+            <div className='filter-group'>
               <div>
                 <label
-                  className="filter-label"
+                  className='filter-label'
                   style={{ fontSize: "12px", marginBottom: "6px" }}
                 >
                   Min Images
                 </label>
                 <select
-                  className="filter-select"
+                  className='filter-select'
                   value={minImages}
                   onChange={(e) =>
                     handleFilterChange("minImages", e.target.value)
                   }
                 >
-                  <option value="1">1+</option>
-                  <option value="2">2+</option>
-                  <option value="3">3+</option>
-                  <option value="5">5+</option>
+                  <option value='1'>1+</option>
+                  <option value='2'>2+</option>
+                  <option value='3'>3+</option>
+                  <option value='5'>5+</option>
                 </select>
               </div>
             </div>
           </div>
 
           {selectedTags.length > 0 && (
-            <div className="filter-section">
-              <label className="filter-label">Active Filters</label>
-              <div className="filter-tags">
+            <div className='filter-section'>
+              <label className='filter-label'>Active Filters</label>
+              <div className='filter-tags'>
                 {selectedTags.map((tag, index) => (
-                  <div key={index} className="filter-tag">
+                  <div key={index} className='filter-tag'>
                     <TagIcon />
                     {tag}
                     <button onClick={() => removeTag(tag)}>
@@ -928,42 +926,41 @@ const MemoryBoard = () => {
             </div>
           )}
 
-          <div className="filter-section">
-            <label className="filter-label">Date Range</label>
-            <div className="date-range-container">
+          <div className='filter-section'>
+            <label className='filter-label'>Date Range</label>
+            <div className='date-range-container'>
               <input
-                type="date"
-                className="filter-input"
-                placeholder="Start date"
+                type='date'
+                className='filter-input'
+                placeholder='Start date'
                 value={dateRange.start}
                 onChange={(e) =>
                   handleFilterChange("dateStart", e.target.value)
                 }
               />
               <input
-                type="date"
-                className="filter-input"
-                placeholder="End date"
+                type='date'
+                className='filter-input'
+                placeholder='End date'
                 value={dateRange.end}
                 onChange={(e) => handleFilterChange("dateEnd", e.target.value)}
               />
             </div>
           </div>
 
-          <button className="clear-filters-btn" onClick={clearFilters}>
+          <button className='clear-filters-btn' onClick={clearFilters}>
             🗑️ Clear Search & Advanced Filters
           </button>
         </div>
-
         {filteredPosts.length === 0 ? (
-          <div className="empty-container">
-            <p className="empty-message">
+          <div className='empty-container'>
+            <p className='empty-message'>
               {searchQuery || dateRange.start || dateRange.end
                 ? "No memors match your current filters"
                 : "No memors found for this selection"}
             </p>
             {(searchQuery || dateRange.start || dateRange.end) && (
-              <button className="control-btn" onClick={clearFilters}>
+              <button className='control-btn' onClick={clearFilters}>
                 <ResetIcon />
                 Clear Filters
               </button>
@@ -972,7 +969,7 @@ const MemoryBoard = () => {
         ) : viewMode === "grid" ? (
           // Grid View
           <div
-            className="grid-view-container"
+            className='grid-view-container'
             ref={gridViewRef}
             style={{
               position: "absolute",
@@ -984,7 +981,7 @@ const MemoryBoard = () => {
               paddingTop: "80px",
             }}
           >
-            <div className="grid-container">
+            <div className='grid-container'>
               {positionedPosts.map((post, postIndex) => (
                 <div
                   key={`${post.memorId}-${postIndex}`}
@@ -1001,7 +998,7 @@ const MemoryBoard = () => {
                   }}
                 >
                   <img
-                    className="grid-card-image"
+                    className='grid-card-image'
                     data-src={post.image[0]?.img_src}
                     src={
                       loadedImages.has(post.image[0]?.img_src)
@@ -1009,16 +1006,16 @@ const MemoryBoard = () => {
                         : ""
                     }
                     alt={post.image[0]?.alt_text || `Image for ${post.title}`}
-                    loading="lazy"
+                    loading='lazy'
                   />
-                  <div className="grid-card-content">
-                    <h3 className="grid-card-title">{post.title}</h3>
-                    <div className="grid-card-meta">
+                  <div className='grid-card-content'>
+                    <h3 className='grid-card-title'>{post.title}</h3>
+                    <div className='grid-card-meta'>
                       <span>{post.submittedDate}</span>
-                      <span className="grid-card-team">{post.team}</span>
+                      <span className='grid-card-team'>{post.team}</span>
                     </div>
                     {post.description && (
-                      <p className="grid-card-description">
+                      <p className='grid-card-description'>
                         {post.description}
                       </p>
                     )}
@@ -1051,7 +1048,7 @@ const MemoryBoard = () => {
               }}
               maxZoom={1}
               minZoom={0.1}
-              backgroundType="none"
+              backgroundType='none'
               style={{
                 width: "100%",
                 height: "100%",
@@ -1060,7 +1057,7 @@ const MemoryBoard = () => {
               {positionedPosts.map((post, postIndex) => (
                 <div
                   key={`${post.memorId}-${postIndex}`}
-                  className="polaroid-container"
+                  className='polaroid-container'
                   style={{
                     position: "absolute",
                     top: post.y + CANVAS_HEIGHT / 2,
@@ -1078,156 +1075,174 @@ const MemoryBoard = () => {
                     }}
                   >
                     {post.image
-  .slice()
-  .map((image, cardIndex, reversedArray) => {
-    const imgSrc = typeof image === "string" ? image : image?.img_src || "";
-    const altText = image?.alt_text || `Image for ${post.title}`;
+                      .slice()
+                      .map((image, cardIndex, reversedArray) => {
+                        const imgSrc =
+                          typeof image === "string"
+                            ? image
+                            : image?.img_src || "";
+                        const altText =
+                          image?.alt_text || `Image for ${post.title}`;
 
-    const cascadeOffsetX = cardIndex * 20;
-    const cascadeOffsetY = cardIndex * -30;
-    const rotationOffset = cardIndex * 2;
-    const baseZIndex = reversedArray.length - cardIndex;
+                        const cascadeOffsetX = cardIndex * 20;
+                        const cascadeOffsetY = cardIndex * -30;
+                        const rotationOffset = cardIndex * 2;
+                        const baseZIndex = reversedArray.length - cardIndex;
 
-    // Check if this card should move aside or is being hovered
-    const isCurrentPostHovered = hoveredCardInfo?.postIndex === postIndex;
-    const isThisCardHovered = isCurrentPostHovered && hoveredCardInfo?.cardIndex === cardIndex;
-    const shouldMoveAside = isCurrentPostHovered && cardIndex < hoveredCardInfo.cardIndex;
-    
-    // Animation logic for returning to stack
-    let finalX = cascadeOffsetX;
-    let finalY = cascadeOffsetY;
-    
-    if (shouldMoveAside) {
-      // Move to the left when a card behind is hovered
-      finalX = cascadeOffsetX - 120;
-      finalY = cascadeOffsetY;
-    } else if (!isCurrentPostHovered && cardIndex > 0) {
-      // When hover ends, animate back to tight stack behind front card
-      // All cards behind the front one should stack closely
-      finalX = cardIndex * 5; // Much tighter horizontal spacing
-      finalY = cardIndex * -8; // Much tighter vertical spacing
-    }
-    
-    const scaleEffect = isThisCardHovered ? 'scale(1.05)' : '';
-    const currentTransform = `rotate(${
-      post.rotation + rotationOffset
-    }deg) translateX(${finalX}px) translateY(${finalY}px) ${scaleEffect}`;
+                        // Check if this card should move aside or is being hovered
+                        const isCurrentPostHovered =
+                          hoveredCardInfo?.postIndex === postIndex;
+                        const isThisCardHovered =
+                          isCurrentPostHovered &&
+                          hoveredCardInfo?.cardIndex === cardIndex;
+                        const shouldMoveAside =
+                          isCurrentPostHovered &&
+                          cardIndex < hoveredCardInfo.cardIndex;
 
-    return (
-      <div
-        key={cardIndex}
-        className={`polaroid-card ${
-          focusedIndex === postIndex ? "focused" : ""
-        }`}
-        onClick={() => {
-          const actualImageIndex = reversedArray.length - 1 - cardIndex;
-          openModal(actualImageIndex, postIndex);
-        }}
-        style={{
-          position: "absolute",
-          top: `0px`, // Base position, movement handled by transform
-          left: `0px`, // Base position, movement handled by transform
-          width: `${CARD_WIDTH}px`,
-          height: `${CARD_HEIGHT}px`,
-          cursor: "pointer",
-          transform: currentTransform,
-          WebkitTransform: currentTransform,
-          transformOrigin: "center center",
-          WebkitTransformOrigin: "center center",
-          zIndex: isThisCardHovered ? baseZIndex + 100 : baseZIndex,
-          boxShadow: isThisCardHovered
-            ? "0 20px 60px rgba(0, 0, 0, 0.3)"
-            : cardIndex === 0
-            ? "0 12px 40px rgba(0, 0, 0, 0.2)"
-            : `0 ${4 + cardIndex * 2}px ${8 + cardIndex * 3}px rgba(0, 0, 0, 0.15)`,
-          border: "4px solid white",
-          transition: "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)", // Slower transition for better visibility
-          WebkitTransition: "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
-        }}
-        tabIndex={focusedIndex === postIndex ? 0 : -1}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            const actualImageIndex = reversedArray.length - 1 - cardIndex;
-            openModal(actualImageIndex, postIndex);
-          }
-        }}
-        onMouseEnter={() => {
-          setHoveredCardInfo({ postIndex, cardIndex });
-        }}
-        onMouseLeave={() => {
-          setHoveredCardInfo(null);
-        }}
-      >
-        <p
-          className="card-date"
-          style={{
-            margin: "16px 20px 10px",
-            fontSize: "12px",
-            pointerEvents: "none",
-            userSelect: "none",
-            WebkitUserSelect: "none",
-          }}
-        >
-          {post.submittedDate}
-        </p>
+                        // Animation logic for returning to stack
+                        let finalX = cascadeOffsetX;
+                        let finalY = cascadeOffsetY;
 
-        <img
-          className="card-image"
-          data-src={imgSrc}
-          src={loadedImages.has(imgSrc) ? imgSrc : ""}
-          alt={altText}
-          loading="lazy"
-          draggable={false}
-          style={{
-            width: "calc(100% - 32px)",
-            height: "60%",
-            margin: "0 16px",
-            pointerEvents: "none",
-            userSelect: "none",
-            WebkitUserSelect: "none",
-          }}
-        />
+                        if (shouldMoveAside) {
+                          // Move to the left when a card behind is hovered
+                          finalX = cascadeOffsetX - 120;
+                          finalY = cascadeOffsetY;
+                        } else if (!isCurrentPostHovered && cardIndex > 0) {
+                          // When hover ends, animate back to tight stack behind front card
+                          // All cards behind the front one should stack closely
+                          finalX = cardIndex * 5; // Much tighter horizontal spacing
+                          finalY = cardIndex * -8; // Much tighter vertical spacing
+                        }
 
-        <p
-          className="card-title"
-          style={{
-            fontSize: "16px",
-            margin: "16px 20px",
-            pointerEvents: "none",
-            userSelect: "none",
-            WebkitUserSelect: "none",
-          }}
-        >
-          {post.title}
-        </p>
-      </div>
-    );
-  })}
+                        const scaleEffect = isThisCardHovered
+                          ? "scale(1.05)"
+                          : "";
+                        const currentTransform = `rotate(${
+                          post.rotation + rotationOffset
+                        }deg) translateX(${finalX}px) translateY(${finalY}px) ${scaleEffect}`;
+
+                        return (
+                          <div
+                            key={cardIndex}
+                            className={`polaroid-card ${
+                              focusedIndex === postIndex ? "focused" : ""
+                            }`}
+                            onClick={() => {
+                              const actualImageIndex =
+                                reversedArray.length - 1 - cardIndex;
+                              openModal(actualImageIndex, postIndex);
+                            }}
+                            style={{
+                              position: "absolute",
+                              top: `0px`, // Base position, movement handled by transform
+                              left: `0px`, // Base position, movement handled by transform
+                              width: `${CARD_WIDTH}px`,
+                              height: `${CARD_HEIGHT}px`,
+                              cursor: "pointer",
+                              transform: currentTransform,
+                              WebkitTransform: currentTransform,
+                              transformOrigin: "center center",
+                              WebkitTransformOrigin: "center center",
+                              zIndex: isThisCardHovered
+                                ? baseZIndex + 100
+                                : baseZIndex,
+                              boxShadow: isThisCardHovered
+                                ? "0 20px 60px rgba(0, 0, 0, 0.3)"
+                                : cardIndex === 0
+                                ? "0 12px 40px rgba(0, 0, 0, 0.2)"
+                                : `0 ${4 + cardIndex * 2}px ${
+                                    8 + cardIndex * 3
+                                  }px rgba(0, 0, 0, 0.15)`,
+                              border: "4px solid white",
+                              transition:
+                                "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)", // Slower transition for better visibility
+                              WebkitTransition:
+                                "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
+                            }}
+                            tabIndex={focusedIndex === postIndex ? 0 : -1}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                e.preventDefault();
+                                const actualImageIndex =
+                                  reversedArray.length - 1 - cardIndex;
+                                openModal(actualImageIndex, postIndex);
+                              }
+                            }}
+                            onMouseEnter={() => {
+                              setHoveredCardInfo({ postIndex, cardIndex });
+                            }}
+                            onMouseLeave={() => {
+                              setHoveredCardInfo(null);
+                            }}
+                          >
+                            <p
+                              className='card-date'
+                              style={{
+                                margin: "16px 20px 10px",
+                                fontSize: "12px",
+                                pointerEvents: "none",
+                                userSelect: "none",
+                                WebkitUserSelect: "none",
+                              }}
+                            >
+                              {post.submittedDate}
+                            </p>
+
+                            <img
+                              className='card-image'
+                              data-src={imgSrc}
+                              src={loadedImages.has(imgSrc) ? imgSrc : ""}
+                              alt={altText}
+                              loading='lazy'
+                              draggable={false}
+                              style={{
+                                width: "calc(100% - 32px)",
+                                height: "60%",
+                                margin: "0 16px",
+                                pointerEvents: "none",
+                                userSelect: "none",
+                                WebkitUserSelect: "none",
+                              }}
+                            />
+
+                            <p
+                              className='card-title'
+                              style={{
+                                fontSize: "16px",
+                                margin: "16px 20px",
+                                pointerEvents: "none",
+                                userSelect: "none",
+                                WebkitUserSelect: "none",
+                              }}
+                            >
+                              {post.title}
+                            </p>
+                          </div>
+                        );
+                      })}
                   </div>
                 </div>
               ))}
             </ReactInfiniteCanvas>
           </div>
         )}
-
-        <div className="controls-panel">
+        <div className='controls-panel'>
           {viewMode === "canvas" && (
-            <div className="zoom-controls">
+            <div className='zoom-controls'>
               <button
-                className="zoom-btn"
+                className='zoom-btn'
                 onClick={() => handleZoom("out")}
-                aria-label="Zoom out"
+                aria-label='Zoom out'
               >
                 <span>−</span>
               </button>
-              <span className="zoom-display">
+              <span className='zoom-display'>
                 {Math.round(zoomLevel * 100)}%
               </span>
               <button
-                className="zoom-btn"
+                className='zoom-btn'
                 onClick={() => handleZoom("in")}
-                aria-label="Zoom in"
+                aria-label='Zoom in'
               >
                 <span>+</span>
               </button>
@@ -1235,7 +1250,7 @@ const MemoryBoard = () => {
           )}
 
           <button
-            className="control-btn"
+            className='control-btn'
             onClick={handleCenterView}
             aria-label={viewMode === "canvas" ? "Center view" : "Scroll to top"}
           >
@@ -1254,6 +1269,10 @@ const MemoryBoard = () => {
             onClose={closeModal}
             onNavigate={handleImageNavigation}
             memorId={selectedMemor.memorId}
+            selectedTeam={selectedTeam}
+            selectedCompetition={selectedCompetition}
+            useTeamFiltering={true}
+            clickedImageSrc={selectedMemor.clickedImageSrc} // Pass the clicked image source
           />
         )}
       </div>
