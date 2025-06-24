@@ -88,7 +88,7 @@ const StatCardSkeleton = ({ cardId }) => (
         )}
       </Box>
       <Typography variant='body2' color='#B0B0B0'>
-        {cardId === "pending" ? "Pending Memors" : "Completed Memors"}
+        {cardId === "pending" ? "Team's pending Memors" : "Completed Memors"}
       </Typography>
     </CardContent>
   </Card>
@@ -950,7 +950,7 @@ const Home = () => {
                     <img src={pending} alt='Pending memors icon' />
                   </Box>
                   <Typography variant='body2' color='#B0B0B0'>
-                    Pending Memors
+                    Team&apos;s pending Memors
                   </Typography>
                 </CardContent>
               </Card>
