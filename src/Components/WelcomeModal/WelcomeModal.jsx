@@ -13,24 +13,22 @@ const WelcomeModal = () => {
 
   useEffect(() => {
     const hasClickedBegin = localStorage.getItem("hasClickedBegin");
-    if (!hasClickedBegin) {
+    if (!hasClickedBegin && user) {
       setIsVisible(true);
       fetchUserTeamData();
     }
-  }, []);
+  }, [user]);
 
   const fetchUserTeamData = async () => {
     try {
       // First, try to get team info from user object
       if (user?.team) {
-        console.log("Using team data from user object:", user.team);
         setTeamData(user.team);
         return;
       }
 
       // If user has teamsId, fetch specific team
       if (user?.teamsId) {
-        console.log("Fetching team data for teamsId:", user.teamsId);
         const response = await api.get(`/api/teams/${user.teamsId}`);
         if (response.data) {
           setTeamData(response.data);
@@ -39,7 +37,6 @@ const WelcomeModal = () => {
       }
 
       // Fallback: fetch all teams and find the one the user belongs to
-      console.log("Fallback: fetching all teams to find user's team");
       const response = await api.get("/api/teams");
       if (response.data && response.data.length > 0) {
         // Try to find the team that contains this user
@@ -53,15 +50,10 @@ const WelcomeModal = () => {
           setTeamData(userTeam);
         } else {
           // Last resort: use first team
-          console.warn(
-            "Could not find user's specific team, using first available team"
-          );
           setTeamData(response.data[0]);
         }
       }
     } catch (error) {
-      console.error("Error fetching team data:", error);
-
       // If all API calls fail, try to use any team info from user object
       if (user?.team) {
         setTeamData(user.team);
