@@ -22,18 +22,18 @@ const MemorPicture = ({
   const [teamFilteredImages, setTeamFilteredImages] = useState([]);
   const [isLoadingImages, setIsLoadingImages] = useState(false);
   const [hasFetchedImages, setHasFetchedImages] = useState(false);
+  const [isZoomed, setIsZoomed] = useState(false);
+  const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
 
   // Use ref to track if we've already fetched data for this modal session
   const fetchedForMemorId = useRef(null);
   const initialCurrentIndex = useRef(currentIndex);
+  const imageRef = useRef(null);
 
   // Separate effect for initial data loading - only runs once per modal open
   useEffect(() => {
     // If useTeamFiltering is false, skip all API logic and use passed images directly
     if (!useTeamFiltering) {
-      console.log(
-        "🎯 MemorPicture: useTeamFiltering is false, using passed images directly"
-      );
       setTeamFilteredImages(images || []);
       setActiveIndex(initialCurrentIndex.current || 0);
       setIsLoadingImages(false);
@@ -43,9 +43,6 @@ const MemorPicture = ({
 
     // Only fetch if we haven't already fetched for this memorId in this modal session
     if (fetchedForMemorId.current === memorId && hasFetchedImages) {
-      console.log(
-        "🎯 MemorPicture: Already fetched for this memorId, skipping fetch"
-      );
       return;
     }
 
@@ -54,21 +51,9 @@ const MemorPicture = ({
       fetchedForMemorId.current = memorId;
       setHasFetchedImages(true);
 
-      console.log("🔥 DEBUG: loadTeamFilteredImages called");
-      console.log("🔥 DEBUG: useTeamFiltering:", useTeamFiltering);
-      console.log("🔥 DEBUG: selectedTeam:", selectedTeam);
-      console.log("🔥 DEBUG: memorId:", memorId);
-      console.log("🔥 DEBUG: clickedImageSrc:", clickedImageSrc);
-
       // Simple check: if no clickedImageSrc and we're filtering, just use currentIndex
       if (!clickedImageSrc) {
-        console.log(
-          "🚨 WARNING: No clickedImageSrc provided! MemoryBoard might not be passing it correctly."
-        );
-        console.log(
-          "🚨 Falling back to using currentIndex:",
-          initialCurrentIndex.current
-        );
+        // No clickedImageSrc provided, falling back to using currentIndex
       }
 
       // Only apply team filtering if explicitly requested and we have the necessary data
@@ -253,6 +238,12 @@ const MemorPicture = ({
     }
   }, [memorId, currentIndex, useTeamFiltering]);
 
+  // Reset zoom when image changes
+  useEffect(() => {
+    setIsZoomed(false);
+    setZoomPosition({ x: 0, y: 0 });
+  }, [activeIndex]);
+
   const handleNextImage = () => {
     const imagesToUse =
       teamFilteredImages.length > 0 ? teamFilteredImages : images || [];
@@ -278,6 +269,23 @@ const MemorPicture = ({
     // Only call onNavigate if we're not using team filtering to avoid parent re-renders
     if (onNavigate && !useTeamFiltering) {
       onNavigate(newIndex);
+    }
+  };
+
+  // Handle image zoom
+  const handleImageClick = (e) => {
+    if (!imageRef.current) return;
+
+    const rect = imageRef.current.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+    const y = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+
+    if (isZoomed) {
+      setIsZoomed(false);
+      setZoomPosition({ x: 0, y: 0 });
+    } else {
+      setIsZoomed(true);
+      setZoomPosition({ x: x * -50, y: y * -50 });
     }
   };
 
@@ -308,6 +316,14 @@ const MemorPicture = ({
           event.preventDefault();
           onClose();
           break;
+        case " ": // Spacebar for zoom
+          event.preventDefault();
+          handleImageClick({
+            clientX: window.innerWidth / 2,
+            clientY: window.innerHeight / 2,
+            target: imageRef.current,
+          });
+          break;
         default:
           break;
       }
@@ -326,7 +342,7 @@ const MemorPicture = ({
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [activeIndex, teamFilteredImages, images]); // Added dependencies for handleNextImage/handlePreviousImage
+  }, [activeIndex, teamFilteredImages, images, isZoomed]); // Added dependencies for handleNextImage/handlePreviousImage
 
   // Use teamFilteredImages if available, otherwise fall back to original images
   const imagesToDisplay =
@@ -387,6 +403,26 @@ const MemorPicture = ({
       >
         &times;
       </button>
+
+      {/* Zoom Indicator */}
+      {isZoomed && (
+        <div
+          style={{
+            position: "absolute",
+            top: "20px",
+            left: "20px",
+            background: "rgba(0, 0, 0, 0.7)",
+            color: "white",
+            padding: "8px 12px",
+            borderRadius: "20px",
+            fontSize: "14px",
+            zIndex: 1001,
+          }}
+        >
+          🔍 Click to zoom out
+        </div>
+      )}
+
       {galleryImages.length > 1 && (
         <>
           <button
@@ -414,10 +450,20 @@ const MemorPicture = ({
       <div className='memor-main-area'>
         <div className='memor-main-image-container'>
           <img
+            ref={imageRef}
             src={galleryImages[activeIndex]?.original}
             alt={galleryImages[activeIndex]?.originalAlt}
             className='memor-main-image'
             draggable={false}
+            onClick={handleImageClick}
+            style={{
+              cursor: "zoom-in",
+              transform: isZoomed
+                ? `scale(2.5) translate(${zoomPosition.x}%, ${zoomPosition.y}%)`
+                : "scale(1)",
+              transformOrigin: "center center",
+              transition: "transform 0.3s ease",
+            }}
           />
         </div>
       </div>
@@ -480,7 +526,7 @@ MemorPicture.propTypes = {
   selectedTeam: PropTypes.string,
   selectedCompetition: PropTypes.string,
   useTeamFiltering: PropTypes.bool,
-  clickedImageSrc: PropTypes.string, // New prop
+  clickedImageSrc: PropTypes.string,
 };
 
 export default MemorPicture;
