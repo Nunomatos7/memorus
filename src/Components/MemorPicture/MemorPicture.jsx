@@ -9,6 +9,7 @@ const MemorPicture = ({
   teamName,
   title,
   submitDate,
+  submitter, // New prop for who submitted it
   onClose,
   onNavigate,
   memorId,
@@ -24,6 +25,7 @@ const MemorPicture = ({
   const [hasFetchedImages, setHasFetchedImages] = useState(false);
   const [isZoomed, setIsZoomed] = useState(false);
   const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
+  const [currentSubmitter, setCurrentSubmitter] = useState(submitter); // Track current image's submitter
 
   // Use ref to track if we've already fetched data for this modal session
   const fetchedForMemorId = useRef(null);
@@ -242,7 +244,31 @@ const MemorPicture = ({
   useEffect(() => {
     setIsZoomed(false);
     setZoomPosition({ x: 0, y: 0 });
-  }, [activeIndex]);
+
+    // Update submitter when image changes
+    const imagesToUse =
+      teamFilteredImages.length > 0 ? teamFilteredImages : images || [];
+    const currentImage = imagesToUse[activeIndex];
+
+    if (currentImage && typeof currentImage === "object") {
+      // If the image object has submitter info, use it
+      if (currentImage.first_name) {
+        const imageSubmitter = currentImage.last_name
+          ? `${currentImage.first_name} ${currentImage.last_name}`
+          : currentImage.first_name;
+        setCurrentSubmitter(imageSubmitter);
+      } else if (currentImage.submitter) {
+        setCurrentSubmitter(currentImage.submitter);
+      } else {
+        // Fallback to original submitter
+        setCurrentSubmitter(submitter);
+      }
+    } else {
+      // For string images or when no individual submitter info is available
+      // On Home page, all images in a memor are usually from the same submitter
+      setCurrentSubmitter(submitter);
+    }
+  }, [activeIndex, teamFilteredImages, images, submitter]);
 
   const handleNextImage = () => {
     const imagesToUse =
@@ -472,6 +498,12 @@ const MemorPicture = ({
           <h2 id='modal-title'>{title}</h2>
           <p id='modal-description'>
             {teamName} • {submitDate}
+            {currentSubmitter && (
+              <>
+                {" • "}
+                {currentSubmitter}
+              </>
+            )}
           </p>
         </div>
         <div className='memor-thumbnails-row'>
@@ -520,6 +552,7 @@ MemorPicture.propTypes = {
   teamName: PropTypes.string,
   title: PropTypes.string,
   submitDate: PropTypes.string,
+  submitter: PropTypes.string, // New prop type
   onClose: PropTypes.func.isRequired,
   onNavigate: PropTypes.func,
   memorId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),

@@ -851,6 +851,7 @@ const SubmitMemorModal = ({ memor, onClose, onSubmit }) => {
           title={memor.title}
           submitDate={memor.dueDate}
           teamName={memor.team}
+          submitter='Various team members'
           onClose={() => {
             setSelectedImage(null);
             document.body.style.overflow = "auto";

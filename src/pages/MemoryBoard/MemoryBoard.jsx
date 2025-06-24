@@ -429,11 +429,20 @@ const MemoryBoard = () => {
             })
             .map((item) => {
               let images = [];
+              let submitter = "Team member"; // Default fallback
+
               if (item.pictures?.length > 0) {
                 images = item.pictures.map((pic) => ({
                   img_src: pic.img_src,
                   alt_text: pic.alt_text || `Image for ${item.title}`,
                 }));
+
+                // Get submitter from the first picture (or you could get it from the item itself)
+                if (item.pictures[0].first_name) {
+                  submitter = item.pictures[0].last_name
+                    ? `${item.pictures[0].first_name} ${item.pictures[0].last_name}`
+                    : item.pictures[0].first_name;
+                }
               } else if (item.image?.length > 0) {
                 images = item.image.map((img) => ({
                   img_src: typeof img === "string" ? img : img.img_src,
@@ -442,6 +451,15 @@ const MemoryBoard = () => {
                       ? img.alt_text
                       : `Image for ${item.title}`,
                 }));
+
+                // Try to get submitter from item properties
+                if (item.submitter) {
+                  submitter = item.submitter;
+                } else if (item.first_name) {
+                  submitter = item.last_name
+                    ? `${item.first_name} ${item.last_name}`
+                    : item.first_name;
+                }
               }
 
               return {
@@ -455,6 +473,7 @@ const MemoryBoard = () => {
                     ? new Date(item.created_at).toLocaleDateString()
                     : "Unknown date"),
                 created_at: item.created_at || item.submittedDate,
+                submitter: submitter, // Add this line
                 image: images,
               };
             })
@@ -649,6 +668,7 @@ const MemoryBoard = () => {
         title: post.title,
         submittedDate: post.submittedDate,
         team: post.team,
+        submitter: post.submitter,
         postIndex,
         memorId: post.memorId,
       });
@@ -768,7 +788,7 @@ const MemoryBoard = () => {
           aria-label='Toggle filters'
           aria-expanded={showFilterPanel}
         >
-          <FilterIcon/>
+          <FilterIcon />
         </button>
         <div className={`filter-panel ${showFilterPanel ? "open" : ""}`}>
           <div className='filter-section'>
@@ -1266,13 +1286,14 @@ const MemoryBoard = () => {
             title={selectedMemor.title}
             submitDate={selectedMemor.submittedDate}
             teamName={selectedMemor.team}
+            submitter={selectedMemor.submitter}
             onClose={closeModal}
             onNavigate={handleImageNavigation}
             memorId={selectedMemor.memorId}
             selectedTeam={selectedTeam}
             selectedCompetition={selectedCompetition}
             useTeamFiltering={true}
-            clickedImageSrc={selectedMemor.clickedImageSrc} // Pass the clicked image source
+            clickedImageSrc={selectedMemor.clickedImageSrc}
           />
         )}
       </div>

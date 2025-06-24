@@ -955,6 +955,7 @@ const Memors = () => {
             teamName={user?.team?.name || "Your Team"}
             title={selectedMemorForViewing.title}
             submitDate={selectedMemorForViewing.dueDate}
+            submitter={selectedMemorForViewing.submitter}
             onClose={handleClosePictureViewer}
             onNavigate={handleNavigateImage}
             memorId={selectedMemorForViewing.id}

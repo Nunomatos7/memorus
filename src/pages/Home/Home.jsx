@@ -582,13 +582,24 @@ const Home = () => {
           );
 
           if (allPictures && allPictures.length > 1) {
+            // IMPORTANT: Map the pictures with submitter info
             preparedSlide.image = allPictures.map((pic) => ({
               img_src: pic.img_src,
               alt_text: pic.alt_text || `Image for ${slide.title}`,
+              // Add submitter info to each image
+              first_name: pic.first_name,
+              last_name: pic.last_name,
+              submitter: pic.first_name
+                ? pic.last_name
+                  ? `${pic.first_name} ${pic.last_name}`
+                  : pic.first_name
+                : pic.user_id === user.id
+                ? "You"
+                : "Team member",
             }));
 
             console.log(
-              "🔍 HOME DEBUG: Updated preparedSlide.image with all pictures:",
+              "🔍 HOME DEBUG: Updated preparedSlide.image with all pictures and submitters:",
               preparedSlide.image
             );
 
@@ -912,6 +923,7 @@ const Home = () => {
             teamName={selectedSlide.team}
             title={selectedSlide.title}
             submitDate={selectedSlide.submittedDate}
+            submitter={selectedSlide.submitter}
             onClose={closeModal}
             memorId={selectedSlide.memorId}
             useTeamFiltering={false}

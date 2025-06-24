@@ -544,9 +544,18 @@ const Home = () => {
         if (response.ok) {
           const allPictures = await response.json();
           if (allPictures && allPictures.length > 0) {
+            // IMPORTANT: Map the pictures with submitter info
             preparedSlide.image = allPictures.map((pic) => ({
               img_src: pic.img_src,
               alt_text: pic.alt_text || `Image for ${slide.title}`,
+              // Add submitter info to each image
+              first_name: pic.first_name,
+              last_name: pic.last_name,
+              submitter: pic.first_name
+                ? pic.last_name
+                  ? `${pic.first_name} ${pic.last_name}`
+                  : pic.first_name
+                : "Team member",
             }));
 
             // Find the index of the current image in the full array
@@ -755,6 +764,7 @@ const Home = () => {
             currentIndex={selectedSlide.currentIndex || 0}
             teamName={selectedSlide.team}
             title={selectedSlide.title}
+            submitter={selectedSlide.submitter}
             submitDate={selectedSlide.submittedDate}
             onClose={closeModal}
             onNavigate={handleImageClick}
