@@ -525,7 +525,11 @@ const ManageMemors = ({
               {(() => {
                 const daysLeft = calculateDaysLeft(memor.date);
                 if (daysLeft > 0) {
-                  return `${daysLeft} days left`;
+                  if (daysLeft > 1) {
+                    return `${daysLeft} days left`;
+                  } else if (daysLeft === 1) {
+                    return <span>1 day left</span>;
+                  }
                 } else if (daysLeft === 0) {
                   return (
                     <span style={{ color: "#d8504d" }}>&lt; 1 day left</span>
