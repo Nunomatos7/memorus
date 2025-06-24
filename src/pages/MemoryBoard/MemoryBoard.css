@@ -202,7 +202,7 @@
   background: #232627;
   transition: all 0.3s ease;
   font-family: inherit;
-  color: #888888;
+  color: #fff;
   /* Safari input fix */
   -webkit-appearance: none;
   appearance: none;
@@ -309,6 +309,12 @@
 
 .search-input {
   background: #232627;
+  color: #fff !important;
+}
+
+.search-input::placeholder {
+  color: #fff;
+  opacity: 1;
 }
 
 .search-icon {
@@ -424,11 +430,14 @@
 
 .clear-filters-btn {
   width: 100%;
-  padding: 12px;
+  padding: 12px;.search-input::placeholder {
+  color: #888; /* Replace with your desired color */
+  opacity: 1;  /* Optional: ensures full color visibility in some browsers */
+}
   background: #232627;
   border: 1px solid rgba(230, 224, 233, 0.3);
   border-radius: 12px;
-  color: #888888;
+  color: #fff;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -746,6 +755,10 @@
   -webkit-user-select: none;
   pointer-events: none;
   transition: none;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.6); /* Inverts black to white */
 }
 
 .infinite-canvas-container {
