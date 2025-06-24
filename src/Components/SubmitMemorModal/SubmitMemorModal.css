@@ -13,7 +13,7 @@
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  z-index: 1000;
+  z-index: 1001;
   padding: 60px 0 50px 0; /* Account for navbar (60px) and footer (50px) */
   opacity: 0;
   animation: fadeInOverlay 0.3s ease-out forwards;
