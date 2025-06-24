@@ -219,9 +219,9 @@ const ManageMemors = ({
         description: memor.description,
         date: new Date(memor.due_date).toLocaleDateString("en-GB"),
         points: `+ ${memor.points} pts`,
-        teamsLeft: memor.team_submissions?.length || 0,
         is_done: memor.is_done,
       }));
+      // teamsLeft: memor.team_submissions?.length || 0,
 
       setMemors(formattedMemors);
     } catch (error) {
@@ -264,9 +264,9 @@ const ManageMemors = ({
           description: memor.description,
           date: new Date(memor.due_date).toLocaleDateString("en-GB"),
           points: `+ ${memor.points} pts`,
-          teamsLeft: memor.team_submissions?.length || 0,
           is_done: memor.is_done,
         }));
+        // teamsLeft: memor.team_submissions?.length || 0,
 
         setMemors(formattedMemors);
       } catch (error) {
@@ -473,9 +473,9 @@ const ManageMemors = ({
         <Typography variant='body2' sx={{ flex: 1 }}>
           Time Left
         </Typography>
-        <Typography variant='body2' sx={{ flex: 1 }}>
+        {/* <Typography variant='body2' sx={{ flex: 1 }}>
           Teams Left
-        </Typography>
+        </Typography> */}
         <Typography variant='body2' sx={{ flex: 1 }}></Typography>
       </Box>
 
@@ -539,9 +539,9 @@ const ManageMemors = ({
                 }
               })()}
             </Typography>
-            <Typography variant='body2' sx={{ flex: 1 }}>
+            {/* <Typography variant='body2' sx={{ flex: 1 }}>
               {memor.teamsLeft}
-            </Typography>
+            </Typography> */}
             <Box
               sx={{
                 flex: 1,
