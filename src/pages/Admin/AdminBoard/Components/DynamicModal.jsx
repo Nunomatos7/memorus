@@ -489,16 +489,16 @@ const DynamicModal = ({
               label='Title'
               required
               variant='outlined'
-              size='small'
+              size='medium'
               value={newMemorTitle}
               onChange={(e) => setNewMemorTitle(e.target.value)}
               fullWidth
               sx={{
-                marginBottom: "15px",
+                marginBottom: "20px",
                 "& .MuiInputBase-input": {
                   color: "#FFFFFF",
-                  fontSize: "0.875rem",
-                  padding: "10px 14px",
+                  fontSize: "1.1rem",
+                  padding: "16px 18px",
                 },
                 "& .MuiOutlinedInput-root": {
                   "& fieldset": { borderColor: "#90948c" },
@@ -507,7 +507,7 @@ const DynamicModal = ({
                 },
                 "& .MuiInputLabel-root": {
                   color: "#888",
-                  fontSize: "0.875rem",
+                  fontSize: "1.1rem",
                 },
               }}
             />
@@ -515,7 +515,7 @@ const DynamicModal = ({
               type='date'
               label='Due Date'
               required
-              size='small'
+              size='medium'
               value={newMemorDate || ""}
               onChange={(e) => setNewMemorDate(e.target.value)}
               fullWidth
@@ -525,11 +525,11 @@ const DynamicModal = ({
                 "aria-label": "Due Date",
               }}
               sx={{
-                marginBottom: "15px",
+                marginBottom: "20px",
                 "& .MuiInputBase-input": {
                   color: "#FFFFFF",
-                  fontSize: "0.875rem",
-                  padding: "10px 14px",
+                  fontSize: "1.1rem",
+                  padding: "16px 18px",
                 },
                 "& .MuiOutlinedInput-root": {
                   "& fieldset": { borderColor: "#90948c" },
@@ -538,7 +538,7 @@ const DynamicModal = ({
                 },
                 "& .MuiInputLabel-root": {
                   color: "#888",
-                  fontSize: "0.875rem",
+                  fontSize: "1.1rem",
                 },
                 "& input::-webkit-calendar-picker-indicator": {
                   filter: "invert(1)",
@@ -549,17 +549,17 @@ const DynamicModal = ({
               label='Description'
               variant='outlined'
               required
-              size='small'
+              size='medium'
               multiline
               rows={3}
               value={newMemorDescription}
               onChange={(e) => setNewMemorDescription(e.target.value)}
               fullWidth
               sx={{
-                marginBottom: "15px",
+                marginBottom: "20px",
                 "& .MuiInputBase-input": {
                   color: "#FFFFFF",
-                  fontSize: "0.875rem",
+                  fontSize: "1.1rem",
                 },
                 "& .MuiOutlinedInput-root": {
                   "& fieldset": { borderColor: "#90948c" },
@@ -568,7 +568,7 @@ const DynamicModal = ({
                 },
                 "& .MuiInputLabel-root": {
                   color: "#888",
-                  fontSize: "0.875rem",
+                  fontSize: "1.1rem",
                 },
               }}
               inputProps={{
@@ -579,8 +579,8 @@ const DynamicModal = ({
               variant='body1'
               sx={{
                 color: "#CAC4D0",
-                marginBottom: "10px",
-                fontSize: "0.875rem",
+                marginBottom: "-30px",
+                fontSize: "1.1rem",
               }}
             >
               Points *
@@ -603,13 +603,13 @@ const DynamicModal = ({
                       newMemorPoints === point ? "#283434" : "#181c1c",
                     color: "#82D5C7",
                     borderRadius: "50%",
-                    width: "45px",
-                    height: "45px",
+                    width: "55px",
+                    height: "55px",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     minWidth: 0,
-                    fontSize: "0.875rem",
+                    fontSize: "1.1rem",
                     fontWeight: "bold",
                     border:
                       newMemorPoints === point
@@ -644,16 +644,16 @@ const DynamicModal = ({
               label="Team's Name"
               required
               variant='outlined'
-              size='small'
+              size='medium'
               value={newTeamName}
               onChange={(e) => setNewTeamName(e.target.value)}
               fullWidth
               sx={{
-                marginBottom: "15px",
+                marginBottom: "20px",
                 "& .MuiInputBase-input": {
                   color: "#FFFFFF",
-                  fontSize: "0.875rem",
-                  padding: "10px 14px",
+                  fontSize: "1.1rem",
+                  padding: "16px 18px",
                 },
                 "& .MuiOutlinedInput-root": {
                   "& fieldset": { borderColor: "#888" },
@@ -662,7 +662,7 @@ const DynamicModal = ({
                 },
                 "& .MuiInputLabel-root": {
                   color: "#888",
-                  fontSize: "0.875rem",
+                  fontSize: "1.1rem",
                 },
               }}
               inputProps={{
@@ -673,8 +673,8 @@ const DynamicModal = ({
               variant='body1'
               sx={{
                 color: "#CAC4D0",
-                marginBottom: "10px",
-                fontSize: "0.875rem",
+                marginBottom: "15px",
+                fontSize: "1.1rem",
               }}
             >
               Team Avatar (Optional)
@@ -682,7 +682,7 @@ const DynamicModal = ({
             <div
               style={{
                 border: "1px dashed #888",
-                borderRadius: "10px",
+                borderRadius: "15px",
                 padding: "20px",
                 textAlign: "center",
                 marginBottom: "20px",
@@ -699,9 +699,9 @@ const DynamicModal = ({
                     src={newTeamThumbnail}
                     alt='Team Avatar Preview'
                     style={{
-                      borderRadius: "10px",
-                      height: "120px",
-                      maxWidth: "120px",
+                      borderRadius: "15px",
+                      height: "130px",
+                      maxWidth: "130px",
                       objectFit: "cover",
                     }}
                     aria-label='Team Avatar Preview'
@@ -713,8 +713,8 @@ const DynamicModal = ({
                     }}
                     sx={{
                       position: "absolute",
-                      top: "-10px",
-                      right: "-10px",
+                      top: "-15px",
+                      right: "-15px",
                       minWidth: "20px",
                       width: "20px",
                       height: "20px",
@@ -742,9 +742,9 @@ const DynamicModal = ({
                         src={background3}
                         alt='Upload Avatar'
                         style={{
-                          width: "50px",
-                          height: "50px",
-                          marginBottom: "10px",
+                          width: "60px",
+                          height: "60px",
+                          marginBottom: "15px",
                         }}
                       />
                       <Typography variant='body2' sx={{ color: "#888" }}>
@@ -773,8 +773,8 @@ const DynamicModal = ({
               variant='body1'
               sx={{
                 color: "#CAC4D0",
-                marginBottom: "10px",
-                fontSize: "0.875rem",
+                marginBottom: "15px",
+                fontSize: "1.1rem",
               }}
             >
               Members *
@@ -783,17 +783,17 @@ const DynamicModal = ({
               placeholder='Search Name'
               value={searchQuery}
               required
-              size='small'
+              size='medium'
               onChange={(e) => setSearchQuery(e.target.value)}
               variant='outlined'
               sx={{
                 borderRadius: "40px",
                 input: {
                   color: "white",
-                  fontSize: "0.875rem",
+                  fontSize: "1.1rem",
                   padding: "8px 14px",
                 },
-                width: "250px",
+                width: "260px",
                 border: "0.905px solid #88938F",
                 "& fieldset": { border: "none" },
                 "&:hover": { backgroundColor: "#2E2F30" },
@@ -812,11 +812,11 @@ const DynamicModal = ({
             />
             <div
               style={{
-                maxHeight: "200px",
+                maxHeight: "250px",
                 overflowY: "auto",
                 background: "#1E1E1E",
-                borderRadius: "10px",
-                padding: "10px",
+                borderRadius: "15px",
+                padding: "15px",
                 border: "1px solid #333",
               }}
               role='listbox'
@@ -830,7 +830,7 @@ const DynamicModal = ({
                       display: "flex",
                       justifyContent: "space-between",
                       alignItems: "center",
-                      padding: "10px",
+                      padding: "15px",
                       borderBottom: "1px solid #333",
                     }}
                   >
@@ -847,7 +847,7 @@ const DynamicModal = ({
                         "aria-label": `Select ${member.name}`,
                       }}
                     />
-                    <Typography sx={{ color: "#FFFFFF", fontSize: "0.875rem" }}>
+                    <Typography sx={{ color: "#FFFFFF", fontSize: "1.1rem" }}>
                       {member.name}
                     </Typography>
                     <Typography
@@ -890,16 +890,16 @@ const DynamicModal = ({
               label='Title'
               required
               variant='outlined'
-              size='small'
+              size='medium'
               value={newCompetitionTitle}
               onChange={(e) => setNewCompetitionTitle(e.target.value)}
               fullWidth
               sx={{
-                marginBottom: "15px",
+                marginBottom: "20px",
                 "& .MuiInputBase-input": {
                   color: "#FFFFFF",
-                  fontSize: "0.875rem",
-                  padding: "10px 14px",
+                  fontSize: "1.1rem",
+                  padding: "16px 18px",
                 },
                 "& .MuiOutlinedInput-root": {
                   "& fieldset": { borderColor: "#90948c" },
@@ -908,7 +908,7 @@ const DynamicModal = ({
                 },
                 "& .MuiInputLabel-root": {
                   color: "#888",
-                  fontSize: "0.875rem",
+                  fontSize: "1.1rem",
                 },
               }}
             />
@@ -917,16 +917,16 @@ const DynamicModal = ({
               variant='outlined'
               multiline
               required
-              size='small'
+              size='medium'
               rows={3}
               value={newCompetitionDescription}
               onChange={(e) => setNewCompetitionDescription(e.target.value)}
               fullWidth
               sx={{
-                marginBottom: "15px",
+                marginBottom: "20px",
                 "& .MuiInputBase-input": {
                   color: "#FFFFFF",
-                  fontSize: "0.875rem",
+                  fontSize: "1.1rem",
                 },
                 "& .MuiOutlinedInput-root": {
                   "& fieldset": { borderColor: "#90948c" },
@@ -935,7 +935,7 @@ const DynamicModal = ({
                 },
                 "& .MuiInputLabel-root": {
                   color: "#888",
-                  fontSize: "0.875rem",
+                  fontSize: "1.1rem",
                 },
               }}
             />
@@ -944,7 +944,7 @@ const DynamicModal = ({
               sx={{
                 color: "#CAC4D0",
                 marginBottom: "5px",
-                fontSize: "0.875rem",
+                fontSize: "1.1rem",
               }}
             >
               Start Date *
@@ -952,7 +952,7 @@ const DynamicModal = ({
             <TextField
               type='date'
               required
-              size='small'
+              size='medium'
               value={newCompetitionStartDate || ""}
               onChange={(e) => setNewCompetitionStartDate(e.target.value)}
               fullWidth
@@ -960,11 +960,11 @@ const DynamicModal = ({
                 min: getTodayDate(),
               }}
               sx={{
-                marginBottom: "15px",
+                marginBottom: "20px",
                 "& .MuiInputBase-input": {
                   color: "#FFFFFF",
-                  fontSize: "0.875rem",
-                  padding: "10px 14px",
+                  fontSize: "1.1rem",
+                  padding: "16px 18px",
                 },
                 "& .MuiOutlinedInput-root": {
                   "& fieldset": { borderColor: "#90948c" },
@@ -981,7 +981,7 @@ const DynamicModal = ({
               sx={{
                 color: "#CAC4D0",
                 marginBottom: "5px",
-                fontSize: "0.875rem",
+                fontSize: "1.1rem",
               }}
             >
               End Date *
@@ -989,7 +989,7 @@ const DynamicModal = ({
             <TextField
               type='date'
               required
-              size='small'
+              size='medium'
               value={newCompetitionEndDate || ""}
               onChange={(e) => setNewCompetitionEndDate(e.target.value)}
               fullWidth
@@ -1000,8 +1000,8 @@ const DynamicModal = ({
                 marginBottom: "20px",
                 "& .MuiInputBase-input": {
                   color: "#FFFFFF",
-                  fontSize: "0.875rem",
-                  padding: "10px 14px",
+                  fontSize: "1.1rem",
+                  padding: "16px 18px",
                 },
                 "& .MuiOutlinedInput-root": {
                   "& fieldset": { borderColor: "#90948c" },
@@ -1037,7 +1037,7 @@ const DynamicModal = ({
           </Button>
           <Typography
             variant='h4'
-            sx={{ marginLeft: "10px", color: "#BEC9C5", fontSize: "0.875rem" }}
+            sx={{ marginLeft: "15px", color: "#BEC9C5", fontSize: "1.1rem" }}
             id='modal-title'
           >
             Admin Board
@@ -1056,7 +1056,7 @@ const DynamicModal = ({
               backgroundColor: "transparent",
               border: "1px solid #B5EDE4",
               color: "#B5EDE4",
-              borderRadius: "50px",
+              borderRadius: "60px",
               "&:hover": {
                 backgroundColor: "rgba(181, 237, 228, 0.08)",
               },
@@ -1066,7 +1066,7 @@ const DynamicModal = ({
             text={action === "delete" ? "Delete" : "Submit"}
             onClick={handleSubmit}
             sx={{
-              borderRadius: "50px",
+              borderRadius: "60px",
               backgroundColor: action === "delete" ? "#D64545" : "#B5EDE4",
               color: action === "delete" ? "#FFFFFF" : "#000",
               "&:hover": {
